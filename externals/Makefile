@@ -558,8 +558,8 @@ $(gem_src)/configure:
 $(gem_src)/Gem.dll: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
-		--prefix=$(PREFIX) \
-		--libdir=$(OBJECTSDIR) \
+		--prefix=$(prefix) \
+		--libdir=$(objectsdir) \
 		--with-video=plugins \
 		--with-film=plugins \
 		--with-pd=$(pd_src)
@@ -568,7 +568,7 @@ $(gem_src)/Gem.dll: $(gem_src)/configure
 $(gem_src)/Gem.pd_linux: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
-		--prefix=$(PREFIX) \
+		--prefix=$(prefix) \
 		--with-video=plugins \
 		--with-film=plugins \
 		--with-pd=$(pd_src)
@@ -578,8 +578,8 @@ $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
-		--prefix=$(PREFIX) \
-		--libdir=$(OBJECTSDIR) \
+		--prefix=$(prefix) \
+		--libdir=$(objectsdir) \
 		--without-ALL \
 		--disable-mmx \
 		--with-ftgl --with-ftgl-libs=/sw/lib \
@@ -592,7 +592,7 @@ $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 gem: $(gem_src)/Gem.$(EXTENSION)
 
 gem_install: gem
-	$(MAKE) -C $(gem_src) DESTDIR=$(DESTDIR) prefix=$(PREFIX) libdir=$(OBJECTSDIR) install
+	$(MAKE) -C $(gem_src) DESTDIR=$(DESTDIR) prefix=$(prefix) libdir=$(objectsdir) install
 
 gem_clean:
 	-$(MAKE) -C $(gem_src) clean
