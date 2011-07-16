@@ -2,7 +2,7 @@
 # of the Media menu for quick opening
 
 # you probably want to set this to something that makes sense for you:
-set mypatch_dir ~/Documents/Pd
+set mypatch_dir "~/Documents/Pd"
 
 .menubar.media add separator
 
