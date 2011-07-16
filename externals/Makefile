@@ -560,6 +560,9 @@ $(gem_src)/Gem.dll: $(gem_src)/configure
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		--prefix=$(prefix) \
 		--libdir=$(objectsdir) \
+		--disable-mmx \
+		--enable-sse2 \
+		--without-quicktime \
 		--with-video=plugins \
 		--with-film=plugins \
 		--with-pd=$(pd_src)
