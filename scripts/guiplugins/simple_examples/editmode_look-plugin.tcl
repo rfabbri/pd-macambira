@@ -1,6 +1,6 @@
 # this script makes it so that the cords are hidden when not in edit mode
 
-proc set_cords_by_editmode {mytoplevel} {
+proc set_cords_by_editmode {mytoplevel eventname} {
     if {$mytoplevel eq ".pdwindow"} {return}
     set tkcanvas [tkcanvas_name $mytoplevel]
  	if { ! [winfo exists $mytoplevel] } {return}
@@ -15,6 +15,7 @@ proc set_cords_by_editmode {mytoplevel} {
         $tkcanvas itemconfigure atom -activefill black
         $tkcanvas itemconfigure cord -fill black
         $tkcanvas itemconfigure {inlet || outlet} -outline black
+        $tkcanvas raise cord
     } else {
         $tkcanvas configure -background white
         $tkcanvas itemconfigure graph -fill magenta
@@ -26,7 +27,7 @@ proc set_cords_by_editmode {mytoplevel} {
         $tkcanvas itemconfigure atom -activefill blue
         $tkcanvas itemconfigure cord -fill grey
         $tkcanvas itemconfigure {inlet || outlet} -outline white
-        $tkcanvas lower {inlet || outlet}
+        $tkcanvas lower {inlet || outlet || cord}
     }
 }
 
