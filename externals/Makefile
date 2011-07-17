@@ -595,7 +595,8 @@ $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 gem: $(gem_src)/Gem.$(EXTENSION)
 
 gem_install: gem
-	$(MAKE) -C $(gem_src) DESTDIR=$(DESTDIR) prefix=$(prefix) libdir=$(objectsdir) install
+	$(MAKE) -C $(gem_src) DESTDIR=$(DESTDIR) prefix=$(prefix) \
+		libdir=$(objectsdir) pkglibdir=$(objectsdir)/Gem install
 
 gem_clean:
 	-$(MAKE) -C $(gem_src) clean
