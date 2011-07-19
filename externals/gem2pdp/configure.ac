@@ -69,7 +69,7 @@ then
 fi
 
 echo -n "looking for gem sources (required) ... "
-if test -f $GEM_DIR/src/Base/GemMan.h
+if test -f $GEM_DIR/src/Base/CPPExtern.h
 then
   AC_SUBST(GEM_DIR)
   echo "ok." 
