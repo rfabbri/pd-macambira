@@ -560,12 +560,12 @@ $(gem_src)/Gem.dll: $(gem_src)/configure
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		--prefix=$(prefix) \
 		--libdir=$(objectsdir) \
-		--disable-mmx \
 		--enable-sse2 \
 		--without-quicktime \
 		--with-video=plugins \
 		--with-film=plugins \
-		--with-pd=$(pd_src)
+		--with-pd=$(pd_src) \
+		--with-extension=dll
 	$(MAKE) -C $(gem_src)
 
 $(gem_src)/Gem.pd_linux: $(gem_src)/configure
@@ -584,7 +584,6 @@ $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 		--prefix=$(prefix) \
 		--libdir=$(objectsdir) \
 		--without-ALL \
-		--disable-mmx \
 		--with-ftgl --with-ftgl-libs=/sw/lib \
 		--with-artoolkit-includes=/sw/include --with-artoolkit-libs=/sw/lib \
 		--with-video=plugins \
