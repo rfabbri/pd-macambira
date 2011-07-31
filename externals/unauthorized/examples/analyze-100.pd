@@ -1,4 +1,5 @@
-#N canvas 112 -6 970 685 10;
+#N canvas 112 22 970 685 10;
+#X declare -lib unauthorized;
 #X obj 236 283 filterbank~ 0 2000 100;
 #X obj 31 62 t s b;
 #X obj 80 68 float \$0;
@@ -19,6 +20,7 @@
 #X msg 484 52 location /Samples;
 #X obj 484 25 loadbang;
 #X obj 391 369 dac~;
+#X obj 728 13 import unauthorized;
 #X connect 0 8 19 0;
 #X connect 0 15 19 1;
 #X connect 0 28 19 1;

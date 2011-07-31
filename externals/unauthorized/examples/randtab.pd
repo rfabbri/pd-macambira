@@ -14,7 +14,7 @@
 #X obj 110 303 tabread4~ \$0-music;
 #X obj 20 331 print~;
 #X msg 19 307 bang;
-#X obj 138 29 opanel;
+#X obj 138 29 openpanel;
 #X obj 109 330 /~ 100;
 #X obj 34 235 randomblock~ 1000;
 #X obj 241 325 print~;

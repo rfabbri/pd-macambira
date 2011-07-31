@@ -13,7 +13,7 @@ SOURCES = audience~.c beatify~.c blinkenlights.c compressor~.c cooled~.c countun
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = speaker.gif wanderer.gif
+EXAMPLES = analyze-100.pd mrandtab.pd randtab.pd resynth-64.pd setosc.pd speaker.gif test-streaming-mp3.pd wanderer.gif xmms.pd yesterday.txt
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -35,7 +35,7 @@ EXTRA_DIST = audience~.h exciter.h filterbank~.h interface.h g_grid.h mpg123.h m
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
 CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
-LIBS = 
+LIBS = -lspeex -lmp3lame
 
 #------------------------------------------------------------------------------#
 #

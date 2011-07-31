@@ -1,7 +1,8 @@
-#N canvas 36 14 971 657 10;
+#N canvas 159 22 971 657 10;
+#X declare -lib unauthorized;
 #X obj 56 522 *~ 1;
 #X obj 103 522 / 100;
-#X floatatom 147 522 5 0 0;
+#X floatatom 147 522 5 0 0 0 - - -;
 #X obj 272 280 filterbank~ 0 1920 64;
 #X obj 31 62 t s b;
 #X obj 80 68 float \$0;
@@ -19,13 +20,13 @@
 #X obj 486 42 playlist all 200 200;
 #X msg 359 35 location /Samples;
 #X obj 359 12 loadbang;
-#X obj 374 569 volpan;
+#X obj 374 569 output~;
 #X msg 518 250 randomize 0;
 #X obj 354 123 s fbstep;
-#X floatatom 354 100 5 0 0;
+#X floatatom 354 100 5 0 0 0 - - -;
 #X msg 306 91 30;
 #X obj 306 68 loadbang;
-#X floatatom 229 42 5 0 0;
+#X floatatom 229 42 5 0 0 0 - - -;
 #X obj 210 68 s firstfreq;
 #X msg 181 35 15;
 #X obj 181 12 loadbang;
@@ -39,7 +40,7 @@
 #X obj 108 476 setosc 7;
 #X obj 199 521 *~ 1;
 #X obj 246 521 / 100;
-#X floatatom 290 521 5 0 0;
+#X floatatom 290 521 5 0 0 0 - - -;
 #X obj 250 313 setosc 8;
 #X obj 250 336 setosc 9;
 #X obj 250 359 setosc 10;
@@ -50,7 +51,7 @@
 #X obj 251 475 setosc 15;
 #X obj 339 519 *~ 1;
 #X obj 386 519 / 100;
-#X floatatom 430 519 5 0 0;
+#X floatatom 430 519 5 0 0 0 - - -;
 #X obj 390 311 setosc 16;
 #X obj 390 334 setosc 17;
 #X obj 390 357 setosc 18;
@@ -61,7 +62,7 @@
 #X obj 391 473 setosc 23;
 #X obj 479 519 *~ 1;
 #X obj 526 519 / 100;
-#X floatatom 570 519 5 0 0;
+#X floatatom 570 519 5 0 0 0 - - -;
 #X obj 530 311 setosc 24;
 #X obj 530 334 setosc 25;
 #X obj 530 357 setosc 26;
@@ -72,7 +73,7 @@
 #X obj 531 473 setosc 31;
 #X obj 621 518 *~ 1;
 #X obj 668 518 / 100;
-#X floatatom 712 518 5 0 0;
+#X floatatom 712 518 5 0 0 0 - - -;
 #X obj 672 310 setosc 32;
 #X obj 672 333 setosc 33;
 #X obj 672 356 setosc 34;
@@ -83,7 +84,7 @@
 #X obj 673 472 setosc 39;
 #X obj 762 519 *~ 1;
 #X obj 809 519 / 100;
-#X floatatom 853 519 5 0 0;
+#X floatatom 853 519 5 0 0 0 - - -;
 #X obj 813 311 setosc 40;
 #X obj 813 334 setosc 41;
 #X obj 813 357 setosc 42;
@@ -94,7 +95,7 @@
 #X obj 814 473 setosc 47;
 #X obj 903 519 *~ 1;
 #X obj 950 519 / 100;
-#X floatatom 994 519 5 0 0;
+#X floatatom 994 519 5 0 0 0 - - -;
 #X obj 954 311 setosc 48;
 #X obj 954 334 setosc 49;
 #X obj 954 357 setosc 50;
@@ -105,7 +106,7 @@
 #X obj 955 473 setosc 55;
 #X obj 1041 518 *~ 1;
 #X obj 1088 518 / 100;
-#X floatatom 1132 518 5 0 0;
+#X floatatom 1132 518 5 0 0 0 - - -;
 #X obj 1092 310 setosc 56;
 #X obj 1092 333 setosc 57;
 #X obj 1092 356 setosc 58;
@@ -114,6 +115,7 @@
 #X obj 1092 425 setosc 61;
 #X obj 1092 448 setosc 62;
 #X obj 1093 472 setosc 63;
+#X obj 682 9 import unauthorized;
 #X connect 0 0 20 0;
 #X connect 1 0 0 1;
 #X connect 2 0 1 0;
