@@ -16,7 +16,7 @@ PDOBJECTS =
 EXAMPLES = analyze-100.pd mrandtab.pd randtab.pd resynth-64.pd setosc.pd speaker.gif test-streaming-mp3.pd wanderer.gif xmms.pd yesterday.txt
 
 # manuals and related files, in the 'manual' subfolder
-MANUAL = 
+MANUAL = disto~.txt
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, test patches,

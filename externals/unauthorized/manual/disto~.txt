@@ -1,5 +1,5 @@
 Distortion (algorithm 3)
-þþþþþþþþþþþþþþþþþþþþþþþþ
+------------------------
 
 Similar to Distortion (algorithm 1) but uses Hi & Low Pass Filters from
 Filters. Algorithm is HPF -> Distortion -> LPF. There are parameters for
