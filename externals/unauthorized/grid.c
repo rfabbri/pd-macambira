@@ -322,7 +322,7 @@ static void grid_dialog(t_grid *x, t_symbol *s, int argc, t_atom *argv)
    }
    if ( argc != 12 )
    {
-      post( "grid : error in the number of arguments ( %d instead of 12 )", argc );
+      pd_error(x, "grid : error in the number of arguments ( %d instead of 12 )", argc );
       return;
    }
       if ( argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT ||
@@ -331,7 +331,7 @@ static void grid_dialog(t_grid *x, t_symbol *s, int argc, t_atom *argv)
         argv[6].a_type != A_FLOAT || argv[7].a_type != A_FLOAT || 
         argv[8].a_type != A_FLOAT || argv[9].a_type != A_FLOAT || 
         argv[10].a_type != A_FLOAT || argv[11].a_type != A_FLOAT ) {
-      post( "grid : wrong arguments" );
+       pd_error(x, "grid : wrong arguments" );
       return;
    }
    x->x_name = argv[0].a_w.w_symbol;
@@ -435,15 +435,15 @@ static void grid_new_color(t_grid *x, t_floatarg color1, t_floatarg color2, t_fl
 
     if ( ( color1 < 0 ) || ( color1 > 255 ) )
     {
-        post( "wrong color component : %d", (int) color1 );
+        pd_error(x, "wrong color component : %d", (int) color1 );
     }
     if ( ( color2 < 0 ) || ( color2 > 255 ) )
     {
-        post( "wrong color component : %d", (int) color2 );
+        pd_error(x, "wrong color component : %d", (int) color2 );
     }
     if ( ( color3 < 0 ) || ( color3 > 255 ) )
     {
-        post( "wrong color component : %d", (int) color3 );
+        pd_error(x, "wrong color component : %d", (int) color3 );
     }
 
     if (color1 < 17)
@@ -590,7 +590,7 @@ static t_grid *grid_new(t_symbol *s, int argc, t_atom *argv)
     {
       if ( argc != 14 )
       {
-        post( "grid : error in the number of arguments ( %d instead of 14 )", argc );
+        pd_error(x, "grid : error in the number of arguments ( %d instead of 14 )", argc );
         return NULL;
       }
       if ( argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT ||
@@ -600,7 +600,7 @@ static t_grid *grid_new(t_symbol *s, int argc, t_atom *argv)
         argv[8].a_type != A_FLOAT || argv[9].a_type != A_FLOAT || 
         argv[10].a_type != A_FLOAT || argv[11].a_type != A_FLOAT || 
         argv[12].a_type != A_FLOAT || argv[13].a_type != A_FLOAT ) {
-        post( "grid : wrong arguments" );
+        pd_error(x, "grid : wrong arguments" );
         return NULL;
       }
 
@@ -670,7 +670,6 @@ static t_grid *grid_new(t_symbol *s, int argc, t_atom *argv)
 
 static void grid_free(t_grid *x)
 {
-    post( "grid~: freeing ressources [NULL]" );
 }
 
 void grid_setup(void)
