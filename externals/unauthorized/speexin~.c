@@ -86,7 +86,7 @@ extern void sys_sockerror(char *s);
 
 void speexin_closesocket(int fd)
 {
-#ifdef UNIX
+#ifndef _WIN32
     if ( close(fd) < 0 )
     {
        perror( "close" );
@@ -96,7 +96,7 @@ void speexin_closesocket(int fd)
        post( "speexin~ : closed socket : %d", fd );
     }
 #endif
-#ifdef NT
+#ifdef _WIN32
     closesocket(fd);
 #endif
     sys_rmpollfn(fd);
@@ -116,7 +116,7 @@ int setsocketoptions(int sockfd)
 	  post("speexin~ : TCP_NODELAY set");
      }
      
-#ifdef UNIX
+#ifdef _WIN32
      sockopt = 1;    
      if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sockopt, sizeof(int)) < 0)
      {

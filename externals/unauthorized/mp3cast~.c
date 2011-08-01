@@ -135,10 +135,10 @@ static void mp3cast_encode(t_mp3cast *x)
     int err = -1;
     int n = x->x_lamechunk;
 
-#ifdef UNIX
-    if(x->x_lamechunk < (int)sizeof(x->x_mp3inbuf))
-#else
+#ifdef _WIN32
     if(x->x_lamechunk < sizeof(x->x_mp3inbuf))
+#else
+    if(x->x_lamechunk < (int)sizeof(x->x_mp3inbuf))
 #endif
     {
         error("not enough memory!");

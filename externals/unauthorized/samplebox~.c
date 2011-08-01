@@ -40,13 +40,13 @@
 #include <malloc.h>
 #endif
 #include <ctype.h>
-#ifdef UNIX
-#include <unistd.h>
-#endif
-#ifdef NT
-#define M_PI 3.14159265358979323846
-#endif
 #include <math.h>
+
+#ifdef _MSC_VER
+# define M_PI 3.14159265358979323846
+#else
+# include <unistd.h>
+#endif
 
 #include "m_pd.h"            /* standard pd stuff */
 

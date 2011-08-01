@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef NT
+#ifdef _MSC_VER
 #define M_PI 3.14159265358979323846
 #endif
 

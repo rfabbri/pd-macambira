@@ -87,7 +87,7 @@ extern void sys_sockerror(char *s);
 
 void mp3streamin_closesocket(int fd)
 {
-#ifdef UNIX
+#ifndef _MSC_VER
     if ( close(fd) < 0 )
     {
        perror( "close" );
@@ -97,7 +97,7 @@ void mp3streamin_closesocket(int fd)
        post( "mp3streamin~ : closed socket : %d", fd );
     }
 #endif
-#ifdef NT
+#ifdef _WIN32
     closesocket(fd);
 #endif
     sys_rmpollfn(fd);
@@ -117,7 +117,7 @@ int setsocketoptions(int sockfd)
 	  post("mp3streamin~ : TCP_NODELAY set");
      }
      
-#ifdef UNIX
+#ifndef _MSC_VER
      sockopt = 1;    
      if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sockopt, sizeof(int)) < 0)
      {

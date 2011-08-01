@@ -81,7 +81,7 @@ extern void sys_sockerror(char *s);
 
 void mp3fileout_closesocket(int fd)
 {
-#ifdef UNIX
+#ifndef _MSC_VER
     if ( close(fd) < 0 )
     {
        perror( "close" );
@@ -91,7 +91,7 @@ void mp3fileout_closesocket(int fd)
        post( "mp3fileout~ : closed socket : %d", fd );
     }
 #endif
-#ifdef NT
+#ifdef _WIN32
     closesocket(fd);
 #else
     sys_rmpollfn(fd);

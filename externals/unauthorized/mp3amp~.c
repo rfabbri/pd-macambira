@@ -43,6 +43,7 @@
 #include <winsock.h>
 #include <winbase.h>
 #include <io.h>
+#define strdup _strdup
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -65,14 +66,6 @@
 #if defined(__APPLE__) || defined(WIN32)
 #define MSG_NOSIGNAL 0
 #endif
-#ifdef UNIX
-#define STRDUP strdup
-#endif
-#ifdef WIN32
-#define STRDUP _strdup
-#define sys_closesocket closesocket
-#endif
-
 
 #define     LAME_AUDIO_CHUNK_SIZE     1152
 #define     MIN_AUDIO_INPUT           2*LAME_AUDIO_CHUNK_SIZE  /* we must have at least n chunks to play a steady sound */
@@ -159,10 +152,10 @@ typedef struct _mp3amp
      t_int    x_standby;        /* flag to freeze decoding */
      t_int    x_nooutput;       /* flag to avoid output of connection state */
 
-#ifdef UNIX
-     unsigned char  *x_inbuffer;       /* accumulation buffer for incoming mp3 frames */
-#else
+#ifdef _WIN32
      char    *x_inbuffer;       /* accumulation buffer for incoming mp3 frames */
+#else
+     unsigned char  *x_inbuffer;       /* accumulation buffer for incoming mp3 frames */
 #endif
 
      t_int    x_inwriteposition;
@@ -409,17 +402,17 @@ static void mp3amp_recv(t_mp3amp *x)
    unsigned int a,b,c,d;
    unsigned long cheader;
  
-#ifdef UNIX
+#ifdef _WIN32
+      if(( ret = recv(x->x_fd, (char*)x->x_inbuffer + x->x_inwriteposition,
+                (x->x_inbuffersize-x->x_inwriteposition), 0)) < 0)
+#else
      if ( ( ret = recv(x->x_fd, (void*) (x->x_inbuffer + x->x_inwriteposition),
                 (size_t)((x->x_inbuffersize-x->x_inwriteposition)),
                 MSG_NOSIGNAL) ) < 0 )
-#else
-      if(( ret = recv(x->x_fd, (char*)x->x_inbuffer + x->x_inwriteposition,
-                (x->x_inbuffersize-x->x_inwriteposition), 0)) < 0)
 #endif
      {
         post( "mp3amp~: receive error" );
-#ifdef UNIX
+#ifndef _MSC_VER
         perror( "recv" );
 #endif
         mp3amp_disconnect(x);
@@ -682,7 +675,7 @@ static void *mp3amp_do_connect(void *tdata )
     if ( send(sockfd, request, strlen(request), 0) < 0 )    /* say hello to server */
     {
        post( "mp3amp~: could not contact server... " );
-#ifdef UNIX
+#ifndef _MSC_VER
        perror( "send" );
 #endif
        return NULL;
@@ -699,7 +692,7 @@ static void *mp3amp_do_connect(void *tdata )
       if( ( ret = recv(sockfd, request+offset, STRBUF_SIZE, MSG_NOSIGNAL) ) <0)
       {
         error("mp3amp~: no response from server");
-#ifdef UNIX
+#ifndef _MSC_VER
         perror( "recv" );
 #endif
         return NULL;
@@ -737,7 +730,7 @@ static void *mp3amp_do_connect(void *tdata )
                post("mp3amp~: %s", request );
                return NULL;
             }
-            url = STRDUP(cpoint + 10);
+            url = strdup(cpoint + 10);
             post("mp3amp~: relocating to %s", url);
             sys_closesocket(sockfd);
             x->x_nooutput = 1;
@@ -759,7 +752,7 @@ static void *mp3amp_do_connect(void *tdata )
              // check what we got
         if( cpoint = strstr(request, "x-audiocast-mount:"))
         {
-             x->x_mountpoint = STRDUP(cpoint + 18);
+             x->x_mountpoint = strdup(cpoint + 18);
              for ( i=0; i<(int)strlen(x->x_mountpoint); i++ )
              {
                 if ( x->x_mountpoint[i] == '\n' )
@@ -772,7 +765,7 @@ static void *mp3amp_do_connect(void *tdata )
         }
         if( cpoint = strstr(request, "x-audiocast-server-url:"))
         {
-             sptr = STRDUP( cpoint + 24);
+             sptr = strdup( cpoint + 24);
              for ( i=0; i<(int)strlen(sptr); i++ )
              {
                 if ( sptr[i] == '\n' )
@@ -785,7 +778,7 @@ static void *mp3amp_do_connect(void *tdata )
          }
          if( cpoint = strstr(request, "x-audiocast-location:"))
          {
-             sptr = STRDUP( cpoint + 22);
+             sptr = strdup( cpoint + 22);
              for ( i=0; i<(int)strlen(sptr); i++ )
              {
                 if ( sptr[i] == '\n' )
@@ -798,7 +791,7 @@ static void *mp3amp_do_connect(void *tdata )
          }
          if( cpoint = strstr(request, "x-audiocast-admin:"))
          {
-             sptr = STRDUP( cpoint + 19);
+             sptr = strdup( cpoint + 19);
              for ( i=0; i<(int)strlen(sptr); i++ )
              {
                 if ( sptr[i] == '\n' )
@@ -811,7 +804,7 @@ static void *mp3amp_do_connect(void *tdata )
          }
          if( cpoint = strstr(request, "x-audiocast-name:"))
          {
-             x->x_bcname = STRDUP( cpoint + 17);
+             x->x_bcname = strdup( cpoint + 17);
              for ( i=0; i<(int)strlen(x->x_bcname); i++ )
              {
                 if ( x->x_bcname[i] == '\n' )
@@ -824,7 +817,7 @@ static void *mp3amp_do_connect(void *tdata )
          }
          if( cpoint = strstr(request, "x-audiocast-genre:"))
          {
-             x->x_bcgenre = STRDUP( cpoint + 18);
+             x->x_bcgenre = strdup( cpoint + 18);
              for ( i=0; i<(int)strlen(x->x_bcgenre); i++ )
              {
                 if ( x->x_bcgenre[i] == '\n' )
@@ -837,7 +830,7 @@ static void *mp3amp_do_connect(void *tdata )
          }
          if( cpoint = strstr(request, "x-audiocast-url:"))
          {
-             x->x_bcurl = STRDUP( cpoint + 16);
+             x->x_bcurl = strdup( cpoint + 16);
              for ( i=0; i<(int)strlen(x->x_bcurl); i++ )
              {
                 if ( x->x_bcurl[i] == '\n' )
@@ -858,7 +851,7 @@ static void *mp3amp_do_connect(void *tdata )
          }
          if( cpoint = strstr(request, "x-audiocast-bitrate:"))
          {
-             sptr = STRDUP( cpoint + 20);
+             sptr = strdup( cpoint + 20);
              for ( i=0; i<(int)strlen(sptr); i++ )
              {
                 if ( sptr[i] == '\n' )
@@ -916,7 +909,7 @@ static void *mp3amp_do_connect(void *tdata )
 
             if( cpoint = strstr(request, "icy-name:"))
             {
-               x->x_bcname = STRDUP( cpoint + 10);
+               x->x_bcname = strdup( cpoint + 10);
                for ( i=0; i<(int)strlen(x->x_bcname); i++ )
                {
                 if ( x->x_bcname[i] == '\n' )
@@ -929,7 +922,7 @@ static void *mp3amp_do_connect(void *tdata )
             }
             if( cpoint = strstr(request, "x-audiocast-name:"))
             {
-               x->x_bcname = STRDUP( cpoint + 18);
+               x->x_bcname = strdup( cpoint + 18);
                for ( i=0; i<(int)strlen(x->x_bcname); i++ )
                {
                 if ( x->x_bcname[i] == '\n' )
@@ -942,7 +935,7 @@ static void *mp3amp_do_connect(void *tdata )
             }
             if( cpoint = strstr(request, "icy-genre:"))
             {
-               x->x_bcgenre = STRDUP( cpoint + 10);
+               x->x_bcgenre = strdup( cpoint + 10);
                for ( i=0; i<(int)strlen(x->x_bcgenre); i++ )
                {
                 if ( x->x_bcgenre[i] == '\n' )
@@ -955,7 +948,7 @@ static void *mp3amp_do_connect(void *tdata )
             }
             if( cpoint = strstr(request, "icy-aim:"))
             {
-               x->x_bcaim = STRDUP( cpoint + 8);
+               x->x_bcaim = strdup( cpoint + 8);
                for ( i=0; i<(int)strlen(x->x_bcaim); i++ )
                {
                 if ( x->x_bcaim[i] == '\n' )
@@ -968,7 +961,7 @@ static void *mp3amp_do_connect(void *tdata )
             }
             if( cpoint = strstr(request, "icy-url:"))
             {
-               x->x_bcurl = STRDUP( cpoint + 8);
+               x->x_bcurl = strdup( cpoint + 8);
                for ( i=0; i<(int)strlen(x->x_bcurl); i++ )
                {
                 if ( x->x_bcurl[i] == '\n' )
@@ -989,7 +982,7 @@ static void *mp3amp_do_connect(void *tdata )
             }
             if( cpoint = strstr(request, "icy-br:"))
             {
-               sptr = STRDUP( cpoint + 7);
+               sptr = strdup( cpoint + 7);
                if(!strncmp(sptr, "320", 3))x->x_bitrate = 320;
                else if(!strncmp(sptr, "256", 3))x->x_bitrate = 256;
                else if(!strncmp(sptr, "224", 3))x->x_bitrate = 224;
