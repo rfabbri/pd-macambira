@@ -1,6 +1,6 @@
 
-unauthorized is a library of GUI objects and a handful of objects for
-working with streaming and mp3s.  Its home page is here:
+unauthorized is a library of GUI objects and a handful of objects for working
+with streaming and mp3s.  The home page for the GPL version is here:
 
 http://puredata.info/community/projects/software/unauthorized
 
@@ -15,7 +15,7 @@ To get the new non-free version, download it from its new CVS repository:
  cvs co pidip
  cvs co unauthorized
 
-original sources available from http://ydegoyon.free.fr
+original sources available from http://ydegoyon.free.fr/software.html
 
 Installing
 ----------
