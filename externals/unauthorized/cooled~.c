@@ -48,7 +48,10 @@
 
 #ifdef _WIN32
 # define M_PI 3.14159265358979323846
-#else
+# include <windows.h>
+#endif
+
+#ifndef _MSC_VER
 # include <unistd.h>
 #endif
 
@@ -58,9 +61,6 @@
 
 
 static int guidebug=0;
-static int ignorevisible=1; // ignore visible test
-                         // because this seems to lead to bad refresh
-                         // wait for a fix                            
 
 #define SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -332,8 +332,10 @@ static void *cooled_do_update_part(void *tdata)
       SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #000000\n", canvas, x);
    }
 
+#ifndef _WIN32
    post("cooled~ : child thread %d ended", (int)x->x_updatechild );
-   x->x_updatechild = 0;
+   x->x_updatechild = NULL;
+#endif
    return NULL;
 }
 
@@ -343,11 +345,13 @@ static void cooled_update_part(t_cooled *x, t_glist *glist, int bstart, int bend
   pthread_attr_t update_child_attr;
   t_canvas *canvas=glist_getcanvas(x->x_glist);
 
+#ifndef _WIN32
     if ( x->x_updatechild != 0 )
     {
        // post( "cooled~ : error : no update is possible for now" );
        return;
     }
+#endif
     x->x_updatestart = bstart;
     x->x_updateend = bend;
     if ( !keepframe ) 
@@ -1154,10 +1158,12 @@ static void cooled_resize(t_cooled *x, t_floatarg fnewsize )
         post( "cooled~ : error : cannot resize while re-allocation" );
         return;
     }
+#ifndef _WIN32
     if (x->x_updatechild > 0) {
         post( "cooled~ : can't resize now, an update is pending." );
         return;
     }
+#endif
     post( "cooled~ : reallocating tables" );
     x->x_allocate = 1;
     x->x_play = 0;
@@ -1342,7 +1348,9 @@ static void *cooled_new(t_symbol *s, int argc, t_atom *argv)
     /* graphic data */
     x->x_selected = 0;
     x->x_zoom = 1;
+#ifndef _WIN32
     x->x_updatechild = 0;
+#endif
     x->x_glist = (t_glist*)canvas_getcurrent();
     // post( "cooled~ : new : readend=%d", x->x_readend );
     cooled_readstart( x, 0);

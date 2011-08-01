@@ -44,13 +44,16 @@
 #endif
 #include <ctype.h>
 #include <pthread.h>
-#ifdef UNIX
-#include <unistd.h>
-#endif
-#ifdef NT
-#define M_PI 3.14159265358979323846
-#endif
 #include <math.h>
+
+#ifdef _WIN32
+# include <io.h>
+# define random rand
+#endif
+
+#ifndef _MSC_VER /* only MSVC doesn't have unistd.h */
+# include <unistd.h>
+#endif
 
 #include "m_pd.h"
 #include "m_imp.h"

@@ -34,8 +34,11 @@
 #include "filterbank~.h"
 
 #ifdef _WIN32
-#include <io.h>
-#else
+# include <io.h>
+# define random rand
+#endif
+
+#ifndef _MSC_VER /* only MSVC doesn't have unistd.h */
 #include <unistd.h>
 #endif
 
