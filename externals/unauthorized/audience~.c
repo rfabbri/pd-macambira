@@ -112,12 +112,12 @@ static void audience_draw_update(t_audience_tilde *x, t_glist *glist)
 
     for ( ei=0; ei<x->x_nbinputs; ei++ )
     {
-       SYS_VGUI6(".x%x.c coords %xISPEAKER%d %d %d\n",
+       SYS_VGUI6(".x%lx.c coords %xISPEAKER%d %d %d\n",
              canvas, x, ei, 
              text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei],
              text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei]
              );
-       SYS_VGUI6(".x%x.c coords %xSPEAKERNUM%d %d %d\n",
+       SYS_VGUI6(".x%lx.c coords %xSPEAKERNUM%d %d %d\n",
           canvas, x, ei, 
           text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
           text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2
@@ -125,12 +125,12 @@ static void audience_draw_update(t_audience_tilde *x, t_glist *glist)
     }
     for ( ei=0; ei<x->x_nboutputs; ei++ )
     {
-       SYS_VGUI6(".x%x.c coords %xILISTENER%d %d %d\n",
+       SYS_VGUI6(".x%lx.c coords %xILISTENER%d %d %d\n",
              canvas, x, ei, 
              text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei],
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei]
              );
-       SYS_VGUI6(".x%x.c coords %xLISTENERNUM%d %d %d\n",
+       SYS_VGUI6(".x%lx.c coords %xLISTENERNUM%d %d %d\n",
              canvas, x, ei, 
              text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei] + LISTENER_HEIGHT/2
@@ -143,16 +143,16 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
   t_canvas *canvas=glist_getcanvas(glist);
   int ei;
 
-    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #EAF1E2 -tags %xAAUDIENCE\n",
+    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #EAF1E2 -tags %xAAUDIENCE\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 	     text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
 	     x);
     // create captions 
-    SYS_VGUI5(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0m\" -tags %xBLCAPTION\n",
+    SYS_VGUI5(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0m\" -tags %xBLCAPTION\n",
              canvas, text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10, x );
-    SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%dm\" -tags %xBRCAPTION\n",
+    SYS_VGUI6(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%dm\" -tags %xBRCAPTION\n",
              canvas, text_xpix(&x->x_obj, glist) + x->x_width + 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10, x->x_width, x );
-    SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%dm\" -tags %xULCAPTION\n",
+    SYS_VGUI6(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%dm\" -tags %xULCAPTION\n",
              canvas, text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist), x->x_height, x );
 
     // draw all outlets
@@ -160,7 +160,7 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
     {
       for ( ei=0; ei<x->x_nboutputs; ei++ )
       {
-         SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
+         SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
              canvas, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1),
              text_ypix(&x->x_obj, glist) + x->x_height,
              text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1) + 5,
@@ -170,7 +170,7 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
     }
     else
     {
-       SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
+       SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
              canvas, text_xpix(&x->x_obj, glist),
              text_ypix(&x->x_obj, glist) + x->x_height,
              text_xpix(&x->x_obj, glist) + 5,
@@ -180,7 +180,7 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
     // draw all inlets
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
-         SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN%d\n",
+         SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN%d\n",
              canvas, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs),
              text_ypix(&x->x_obj, glist) - 2,
              text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs) + 5,
@@ -192,12 +192,12 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
     {
       SYS_VGUI6("image create photo %xSPEAKER%d -file %s/examples/speaker.gif -format gif -width %d -height %d\n", 
                     x, ei, audience_class_tilde->c_externdir->s_name, SPEAKER_WIDTH, SPEAKER_HEIGHT );
-      SYS_VGUI8(".x%x.c create image %d %d -image %xSPEAKER%d -tags %xISPEAKER%d\n",
+      SYS_VGUI8(".x%lx.c create image %d %d -image %xSPEAKER%d -tags %xISPEAKER%d\n",
                           canvas, 
                           text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei],
                           text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei],
                           x, ei, x, ei );
-      SYS_VGUI7(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"s%d\" -tags %xSPEAKERNUM%d\n",
+      SYS_VGUI7(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"s%d\" -tags %xSPEAKERNUM%d\n",
              canvas, text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
              text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2, ei+1, x, ei );
     }
@@ -206,12 +206,12 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
     {
       SYS_VGUI6("image create photo %xLISTENER%d -file %s/examples/wanderer.gif -format gif -width %d -height %d\n", 
                 x, ei, audience_class_tilde->c_externdir->s_name, LISTENER_WIDTH, LISTENER_HEIGHT );
-      SYS_VGUI8(".x%x.c create image %d %d -image %xLISTENER%d -tags %xILISTENER%d\n",
+      SYS_VGUI8(".x%lx.c create image %d %d -image %xLISTENER%d -tags %xILISTENER%d\n",
                           canvas, 
                           text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei],
                           text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei],
                           x, ei, x, ei );
-      SYS_VGUI7(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"l%d\" -tags %xLISTENERNUM%d\n",
+      SYS_VGUI7(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"l%d\" -tags %xLISTENERNUM%d\n",
              canvas, text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei] + LISTENER_HEIGHT/2, ei+1, x, ei );
     }
@@ -223,23 +223,23 @@ static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
   t_canvas *canvas=glist_getcanvas(glist);
   t_int ei;
 
-    SYS_VGUI7(".x%x.c coords %xAAUDIENCE %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xAAUDIENCE %d %d %d %d\n",
 	     canvas, x,
 	     text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height);
-    SYS_VGUI5(".x%x.c coords %xBLCAPTION %d %d\n",
+    SYS_VGUI5(".x%lx.c coords %xBLCAPTION %d %d\n",
 	     canvas, x,
              text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10);
-    SYS_VGUI5(".x%x.c coords %xBRCAPTION %d %d\n",
+    SYS_VGUI5(".x%lx.c coords %xBRCAPTION %d %d\n",
 	     canvas, x,
              text_xpix(&x->x_obj, glist) + x->x_width + 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10 );
-    SYS_VGUI5(".x%x.c coords %xULCAPTION %d %d\n",
+    SYS_VGUI5(".x%lx.c coords %xULCAPTION %d %d\n",
 	     canvas, x,
              text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist) );
 
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
-         SYS_VGUI8(".x%x.c coords %xIN%d %d %d %d %d\n",
+         SYS_VGUI8(".x%lx.c coords %xIN%d %d %d %d %d\n",
              canvas, x, ei, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs),
              text_ypix(&x->x_obj, glist) - 2,
              text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs) + 5,
@@ -248,12 +248,12 @@ static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
     }
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
-        SYS_VGUI6(".x%x.c coords %xISPEAKER%d %d %d\n",
+        SYS_VGUI6(".x%lx.c coords %xISPEAKER%d %d %d\n",
           canvas, x, ei, 
           text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei],
           text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei]
           );
-        SYS_VGUI6(".x%x.c coords %xSPEAKERNUM%d %d %d\n",
+        SYS_VGUI6(".x%lx.c coords %xSPEAKERNUM%d %d %d\n",
           canvas, x, ei, 
           text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
           text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2
@@ -263,18 +263,18 @@ static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
     {
       for ( ei=0; ei<x->x_nboutputs; ei++ )
       {
-         SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
+         SYS_VGUI8(".x%lx.c coords %xOUT%d %d %d %d %d\n",
              canvas, x, ei, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1),
              text_ypix(&x->x_obj, glist) + x->x_height,
              text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1) + 5,
              text_ypix(&x->x_obj, glist) + x->x_height + 2
              );
-         SYS_VGUI6(".x%x.c coords %xILISTENER%d %d %d\n",
+         SYS_VGUI6(".x%lx.c coords %xILISTENER%d %d %d\n",
              canvas, x, ei, 
              text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei],
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei]
              );
-         SYS_VGUI6(".x%x.c coords %xLISTENERNUM%d %d %d\n",
+         SYS_VGUI6(".x%lx.c coords %xLISTENERNUM%d %d %d\n",
              canvas, x, ei, 
              text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei] + LISTENER_HEIGHT/2
@@ -283,18 +283,18 @@ static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
     }
     else
     {
-         SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
+         SYS_VGUI8(".x%lx.c coords %xOUT%d %d %d %d %d\n",
              canvas, x, 0, text_xpix(&x->x_obj, glist),
              text_ypix(&x->x_obj, glist) + x->x_height,
              text_xpix(&x->x_obj, glist) + 5,
              text_ypix(&x->x_obj, glist) + x->x_height + 2
              );
-         SYS_VGUI6(".x%x.c coords %xILISTENER%d %d %d\n",
+         SYS_VGUI6(".x%lx.c coords %xILISTENER%d %d %d\n",
              canvas, x, 0, 
              text_xpix(&x->x_obj, glist) + x->x_outputs_x[0],
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[0]
              );
-         SYS_VGUI6(".x%x.c coords %xLISTENERNUM%d %d %d\n",
+         SYS_VGUI6(".x%lx.c coords %xLISTENERNUM%d %d %d\n",
              canvas, x, 0, 
              text_xpix(&x->x_obj, glist) + x->x_outputs_x[0] + LISTENER_WIDTH/2, 
              text_ypix(&x->x_obj, glist) + x->x_outputs_y[0] + LISTENER_HEIGHT/2
@@ -308,25 +308,25 @@ static void audience_draw_erase(t_audience_tilde* x,t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   int ei;
 
-    SYS_VGUI3(".x%x.c delete %xAAUDIENCE\n", canvas, x);
-    SYS_VGUI3(".x%x.c delete %xBLCAPTION\n", canvas, x);
-    SYS_VGUI3(".x%x.c delete %xBRCAPTION\n", canvas, x);
-    SYS_VGUI3(".x%x.c delete %xULCAPTION\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xAAUDIENCE\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xBLCAPTION\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xBRCAPTION\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xULCAPTION\n", canvas, x);
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
-      SYS_VGUI4(".x%x.c delete %xIN%d\n", canvas, x, ei );
+      SYS_VGUI4(".x%lx.c delete %xIN%d\n", canvas, x, ei );
     }
     for ( ei=0; ei<x->x_nbinputs; ei++ )
     {
-        SYS_VGUI4(".x%x.c delete %xISPEAKER%d\n", canvas, x, ei );
-        SYS_VGUI4(".x%x.c delete %xSPEAKERNUM%d\n", canvas, x, ei );
+        SYS_VGUI4(".x%lx.c delete %xISPEAKER%d\n", canvas, x, ei );
+        SYS_VGUI4(".x%lx.c delete %xSPEAKERNUM%d\n", canvas, x, ei );
         // SYS_VGUI3("image delete %xSPEAKER%d\n", x, ei );
     }
     for ( ei=0; ei<x->x_nboutputs; ei++ )
     {
-      SYS_VGUI4(".x%x.c delete %xOUT%d\n", canvas, x, ei );
-      SYS_VGUI4(".x%x.c delete %xILISTENER%d\n", canvas, x, ei );
-      SYS_VGUI4(".x%x.c delete %xLISTENERNUM%d\n", canvas, x, ei );
+      SYS_VGUI4(".x%lx.c delete %xOUT%d\n", canvas, x, ei );
+      SYS_VGUI4(".x%lx.c delete %xILISTENER%d\n", canvas, x, ei );
+      SYS_VGUI4(".x%lx.c delete %xLISTENERNUM%d\n", canvas, x, ei );
       // SYS_VGUI3("image delete %xLISTENER%d\n", x, ei );
     }
 }
@@ -338,11 +338,11 @@ static void audience_draw_select(t_audience_tilde* x,t_glist* glist)
     if(x->x_selected)
     {
         /* sets the item in blue */
-	SYS_VGUI3(".x%x.c itemconfigure %xAAUDIENCE -outline #0000FF\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xAAUDIENCE -outline #0000FF\n", canvas, x);
     }
     else
     {
-	SYS_VGUI3(".x%x.c itemconfigure %xAAUDIENCE -outline #000000\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xAAUDIENCE -outline #000000\n", canvas, x);
     }
 }
 

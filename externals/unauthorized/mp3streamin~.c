@@ -312,8 +312,8 @@ static int mp3streamin_decode_input(t_mp3streamin *x)
         int minpackets = ( MIN_AUDIO_INPUT/LAME_AUDIO_CHUNK_SIZE )-2; // audio loop has eaten some already
 
 
-            sys_vgui(".x%x.c delete rectangle %xSTATUS\n", x->x_canvas, x );
-            sys_vgui(".x%x.c delete line %xTHRESHOLD\n", x->x_canvas, x );
+            sys_vgui(".x%lx.c delete rectangle %xSTATUS\n", x->x_canvas, x );
+            sys_vgui(".x%lx.c delete line %xTHRESHOLD\n", x->x_canvas, x );
             if ( x->x_outunread > 0 )
             {
              t_int width;
@@ -327,11 +327,11 @@ static int mp3streamin_decode_input(t_mp3streamin *x)
                strcpy( color, "lightgreen" );
               }
               width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-              sys_vgui(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xSTATUS\n",
+              sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xSTATUS\n",
                   x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix+(x->x_inpackets*x->x_packetsize*width)/INPUT_BUFFER_SIZE, 
                   x->x_obj.te_ypix - 1, color, x );
-              sys_vgui(".x%x.c create line %d %d %d %d -fill red -tags %xTHRESHOLD\n",
+              sys_vgui(".x%lx.c create line %d %d %d %d -fill red -tags %xTHRESHOLD\n",
                   x->x_canvas, x->x_obj.te_xpix+(minpackets*x->x_packetsize*width)/INPUT_BUFFER_SIZE, 
                   x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix+(minpackets*x->x_packetsize*width)/INPUT_BUFFER_SIZE, 
@@ -343,8 +343,8 @@ static int mp3streamin_decode_input(t_mp3streamin *x)
               if ( x->x_shutdown )
               {
                  x->x_shutdown=0;
-                 sys_vgui(".x%x.c delete rectangle %xPBAR\n", x->x_canvas, x );
-                 sys_vgui(".x%x.c delete line %xTHRESHOLD\n", x->x_canvas, x );
+                 sys_vgui(".x%lx.c delete rectangle %xPBAR\n", x->x_canvas, x );
+                 sys_vgui(".x%lx.c delete line %xTHRESHOLD\n", x->x_canvas, x );
               }
             }
      }
@@ -433,7 +433,7 @@ static void mp3streamin_acceptconnection(t_mp3streamin *x)
       t_int width;
  
        width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-       sys_vgui(".x%x.c create rectangle %d %d %d %d -fill lightblue -tags %xPBAR\n",
+       sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill lightblue -tags %xPBAR\n",
               x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix + width, x->x_obj.te_ypix - 1, x );
     }

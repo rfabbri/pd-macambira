@@ -382,7 +382,7 @@ static int mp3amp_decode_input(t_mp3amp *x)
         t_int width;
 
             width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-            SYS_VGUI3(".x%x.c delete rectangle %xSTATUS\n", x->x_canvas, x );
+            SYS_VGUI3(".x%lx.c delete rectangle %xSTATUS\n", x->x_canvas, x );
             if ( x->x_inframes < (MIN_AUDIO_INPUT/LAME_AUDIO_CHUNK_SIZE) )
             {
                strcpy( color, "red" );
@@ -391,7 +391,7 @@ static int mp3amp_decode_input(t_mp3amp *x)
             {
                strcpy( color, "lightgreen" );
             }
-            SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xSTATUS\n",
+            SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xSTATUS\n",
                   x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix+(x->x_inwriteposition*width)/INPUT_BUFFER_SIZE,
                   x->x_obj.te_ypix - 1, color, x );
@@ -1039,8 +1039,8 @@ static void *mp3amp_do_connect(void *tdata )
       t_int width;
 
        width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-       SYS_VGUI3(".x%x.c delete rectangle %xPBAR\n", x->x_canvas, x );
-       SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill lightblue -tags %xPBAR\n",
+       SYS_VGUI3(".x%lx.c delete rectangle %xPBAR\n", x->x_canvas, x );
+       SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill lightblue -tags %xPBAR\n",
                   x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix + width, x->x_obj.te_ypix - 1, x );
     }
@@ -1157,8 +1157,8 @@ static void mp3amp_disconnect(t_mp3amp *x)
     InitMP3(&mps[x->x_instance]);
     if ( x->x_graphic )
     {
-       SYS_VGUI3(".x%x.c delete rectangle %xPBAR\n", x->x_canvas, x );
-       SYS_VGUI3(".x%x.c delete rectangle %xSTATUS\n", x->x_canvas, x ); 
+       SYS_VGUI3(".x%lx.c delete rectangle %xPBAR\n", x->x_canvas, x );
+       SYS_VGUI3(".x%lx.c delete rectangle %xSTATUS\n", x->x_canvas, x ); 
     }
     post("mp3amp~: connection closed");
     outlet_float(x->x_connection, 0);

@@ -56,7 +56,7 @@ static char *photo_tk_options[] = {
 							fname, MAXPDSTRING);
 
         sys_vgui("image create photo img%x -file {%s}\n", x, fname);
-        sys_vgui(".x%x.c create image %d %d -image img%x -anchor nw -tags %xS\n", 
+        sys_vgui(".x%lx.c create image %d %d -image img%x -anchor nw -tags %xS\n", 
                  glist_getcanvas(glist),text_xpix(&x->x_obj, glist), 
                  text_ypix(&x->x_obj, glist),x,x);
 
@@ -66,7 +66,7 @@ static char *photo_tk_options[] = {
     }     
     else 
     {
-        sys_vgui(".x%x.c coords %xS %d %d\n",
+        sys_vgui(".x%lx.c coords %xS %d %d\n",
                  glist_getcanvas(glist), x,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
     }
@@ -77,7 +77,7 @@ static char *photo_tk_options[] = {
 void photo_erase(t_photo* x,t_glist* glist)
 {
     int n;
-    sys_vgui(".x%x.c delete %xS\n",
+    sys_vgui(".x%lx.c delete %xS\n",
              glist_getcanvas(glist), x);
 
 }
@@ -104,7 +104,7 @@ static void photo_displace(t_gobj *z, t_glist *glist,
     t_photo *x = (t_photo *)z;
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
-    sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %xSEL %d %d %d %d\n",
              glist_getcanvas(glist), x,
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
              text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height);
@@ -117,7 +117,7 @@ static void photo_select(t_gobj *z, t_glist *glist, int state)
 {
     t_photo *x = (t_photo *)z;
     if (state) {
-        sys_vgui(".x%x.c create rectangle \
+        sys_vgui(".x%lx.c create rectangle \
 %d %d %d %d -tags %xSEL -outline blue\n",
                  glist_getcanvas(glist),
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
@@ -126,7 +126,7 @@ static void photo_select(t_gobj *z, t_glist *glist, int state)
     }
     else 
     {
-        sys_vgui(".x%x.c delete %xSEL\n",
+        sys_vgui(".x%lx.c delete %xSEL\n",
                  glist_getcanvas(glist), x);
     }
 }

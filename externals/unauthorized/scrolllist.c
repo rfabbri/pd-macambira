@@ -138,7 +138,7 @@ static void scrolllist_erase(t_scrolllist *x, t_glist *glist)
     // delete previous entries
     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
     {
-        SYS_VGUI4(".x%x.c delete %xITEM%d\n", canvas, x, i);
+        SYS_VGUI4(".x%lx.c delete %xITEM%d\n", canvas, x, i);
     }
 }
 
@@ -157,7 +157,7 @@ static void scrolllist_update(t_scrolllist *x, t_glist *glist)
        // display the entry if displayable
        if ( ( (i-x->x_firstseen)*x->x_charheight < x->x_height ) && ( x->x_items[i] != NULL ) )
        {
-          SYS_VGUI11(".x%x.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xITEM%d\n",
+          SYS_VGUI11(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xITEM%d\n",
                     canvas,
                     text_xpix(&x->x_obj, glist)+5,
                     text_ypix(&x->x_obj, glist)+5+(i-x->x_firstseen)*x->x_charheight,
@@ -170,7 +170,7 @@ static void scrolllist_update(t_scrolllist *x, t_glist *glist)
         }
         if ( ( x->x_itemselected >= x->x_firstseen ) && ( x->x_itemselected <= x->x_lastseen ) )
         {
-          SYS_VGUI5(".x%x.c itemconfigure %xITEM%d -fill %s\n", 
+          SYS_VGUI5(".x%lx.c itemconfigure %xITEM%d -fill %s\n", 
                      canvas, x, x->x_itemselected, x->x_secolor); 
         }
     }
@@ -191,14 +191,14 @@ static void scrolllist_draw_new(t_scrolllist *x, t_glist *glist)
     x->x_glist = glist;
     if ( x->x_graphics )
     {
-      SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xTEXTLIST\n",
+      SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xTEXTLIST\n",
              canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
              text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
              x->x_bgcolor, x); 
     }
     else
     {
-      SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline white -fill white -tags %xTEXTLIST\n",
+      SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -outline white -fill white -tags %xTEXTLIST\n",
              canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
              text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height, x); 
     }
@@ -215,7 +215,7 @@ static void scrolllist_draw_move(t_scrolllist *x, t_glist *glist)
     tv.tv_sec = 0;
     tv.tv_nsec = 10000000;
 
-    SYS_VGUI7(".x%x.c coords %xTEXTLIST %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xTEXTLIST %d %d %d %d\n",
            canvas, x,
            text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
            text_xpix(&x->x_obj, glist)+x->x_width, 
@@ -223,7 +223,7 @@ static void scrolllist_draw_move(t_scrolllist *x, t_glist *glist)
     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
     {
        // nanosleep( &tv, NULL );
-       SYS_VGUI6(".x%x.c coords %xITEM%d %d %d\n",
+       SYS_VGUI6(".x%lx.c coords %xITEM%d %d %d\n",
              canvas, x, i,
              text_xpix(&x->x_obj, glist)+5,
              text_ypix(&x->x_obj, glist)+5+(i-x->x_firstseen)*x->x_charheight);
@@ -237,10 +237,10 @@ static void scrolllist_draw_erase(t_scrolllist* x, t_glist* glist)
  t_canvas *canvas=glist_getcanvas(glist);
  t_int i;
  
-    SYS_VGUI3(".x%x.c delete %xTEXTLIST\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xTEXTLIST\n", canvas, x);
     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
     {
-        SYS_VGUI4(".x%x.c delete %xITEM%d\n", canvas, x, i); 
+        SYS_VGUI4(".x%lx.c delete %xITEM%d\n", canvas, x, i); 
     }
 } 
 
@@ -252,11 +252,11 @@ static void scrolllist_draw_select(t_scrolllist* x, t_glist* glist)
     if(x->x_selected)
     {
         /* sets the item in blue */
-        SYS_VGUI3(".x%x.c itemconfigure %xTEXTLIST -outline #0000FF\n", canvas, x);
+        SYS_VGUI3(".x%lx.c itemconfigure %xTEXTLIST -outline #0000FF\n", canvas, x);
     }
     else
     {
-        SYS_VGUI3(".x%x.c itemconfigure %xTEXTLIST -outline #000000\n", canvas, x);
+        SYS_VGUI3(".x%lx.c itemconfigure %xTEXTLIST -outline #000000\n", canvas, x);
     }
 }       
 
@@ -404,10 +404,10 @@ static int scrolllist_click(t_gobj *z, struct _glist *glist,
     if (doit) 
     {
       // deselect previously selected item
-      SYS_VGUI5(".x%x.c itemconfigure %xITEM%d -fill %s\n", 
+      SYS_VGUI5(".x%lx.c itemconfigure %xITEM%d -fill %s\n", 
                  canvas, x, x->x_itemselected, x->x_fgcolor); 
       x->x_itemselected = x->x_firstseen + (ypix-text_ypix(&x->x_obj, glist))/x->x_charheight;
-      SYS_VGUI5(".x%x.c itemconfigure %xITEM%d -fill %s\n", 
+      SYS_VGUI5(".x%lx.c itemconfigure %xITEM%d -fill %s\n", 
                  canvas, x, x->x_itemselected, x->x_secolor); 
       // post( "scrolllist : selected item : %d", x->x_itemselected );
       if ( x->x_items && ( x->x_itemselected < x->x_nitems ) )
@@ -811,9 +811,9 @@ static void scrolllist_seek(t_scrolllist *x, t_floatarg fseeked)
    if ( x->x_nitems == 0 ) return;
 
    iout = (t_int)fseeked % (x->x_nitems);
-   SYS_VGUI5(".x%x.c itemconfigure %xITEM%d -fill %s\n", canvas, x, x->x_itemselected, x->x_fgcolor); 
+   SYS_VGUI5(".x%lx.c itemconfigure %xITEM%d -fill %s\n", canvas, x, x->x_itemselected, x->x_fgcolor); 
    x->x_itemselected = iout;
-   SYS_VGUI5(".x%x.c itemconfigure %xITEM%d -fill %s\n", canvas, x, x->x_itemselected, x->x_secolor); 
+   SYS_VGUI5(".x%lx.c itemconfigure %xITEM%d -fill %s\n", canvas, x, x->x_itemselected, x->x_secolor); 
    scrolllist_output_current(x);
 }
 

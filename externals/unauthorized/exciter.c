@@ -115,7 +115,7 @@ static void exciter_draw_gem(t_exciter *x, t_glist *glist, t_int ix, t_int iy)
   t_int polyray = ( x->x_height / x->x_nbevents) / 2;
   t_canvas *canvas=glist_getcanvas(glist);
 
-    SYS_VGUI13(".x%x.c create polygon %d %d %d %d %d %d %d %d -outline #000000 -fill #FFFFFF -tags %xEVENT%.4d%.4d\n",
+    SYS_VGUI13(".x%lx.c create polygon %d %d %d %d %d %d %d %d -outline #000000 -fill #FFFFFF -tags %xEVENT%.4d%.4d\n",
 	     canvas, 
              text_xpix(&x->x_obj, glist) + ix*EXCITER_PIXEL_GRAIN, 
              text_ypix(&x->x_obj, glist) + x->x_height - (iy+1)*x->x_height/x->x_nbevents + 2*polyray,
@@ -133,7 +133,7 @@ static void exciter_delete_gem(t_exciter *x, t_glist *glist, t_int ix, t_int iy)
 {
   t_canvas *canvas=glist_getcanvas(glist);
 
-    SYS_VGUI5(".x%x.c delete %xEVENT%.4d%.4d\n", canvas, x, ix, iy );
+    SYS_VGUI5(".x%lx.c delete %xEVENT%.4d%.4d\n", canvas, x, ix, iy );
 }
 
 static void exciter_draw_update(t_exciter *x, t_glist *glist)
@@ -162,16 +162,16 @@ static void exciter_draw_new(t_exciter *x, t_glist *glist)
   t_canvas *canvas=glist_getcanvas(glist);
   t_int ei;
 
-    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #902181 -tags %xLINE\n",
+    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #902181 -tags %xLINE\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height,
 	     x);
-    SYS_VGUI5(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0 s\" -tags %xLOWERCAPTION\n",
+    SYS_VGUI5(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0 s\" -tags %xLOWERCAPTION\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height + 10, x );
-    SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%.2f s\" -tags %xHIGHERCAPTION\n",
+    SYS_VGUI6(".x%lx.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%.2f s\" -tags %xHIGHERCAPTION\n",
 	     canvas, text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height + 10, 
              x->x_width/EXCITER_PIXEL_GRAIN*x->x_timegrain , x);
-    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN\n",
+    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN\n",
 	     canvas, text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist) - 2,
 	     text_xpix(&x->x_obj, glist) + 5, 
@@ -181,7 +181,7 @@ static void exciter_draw_new(t_exciter *x, t_glist *glist)
     {
       for ( ei=0; ei<x->x_nbevents; ei++ )
       {
-         SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
+         SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
 	     canvas, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1), 
              text_ypix(&x->x_obj, glist) + x->x_height,
 	     text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1) + 5, 
@@ -191,7 +191,7 @@ static void exciter_draw_new(t_exciter *x, t_glist *glist)
     }
     else
     {
-       SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
+       SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
 	     canvas, text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist) + x->x_height,
 	     text_xpix(&x->x_obj, glist) + 5, 
@@ -207,15 +207,15 @@ static void exciter_draw_move(t_exciter *x, t_glist *glist)
   t_int polyray = ( x->x_height / x->x_nbevents) / 2;
   t_int ei, gi;
 
-    SYS_VGUI7(".x%x.c coords %xLINE %d %d %d %d \n",
+    SYS_VGUI7(".x%lx.c coords %xLINE %d %d %d %d \n",
 	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height
 	     );
-    SYS_VGUI5(".x%x.c coords %xLOWERCAPTION %d %d\n",
+    SYS_VGUI5(".x%lx.c coords %xLOWERCAPTION %d %d\n",
 	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height + 10 );
-    SYS_VGUI5(".x%x.c coords %xHIGHERCAPTION %d %d\n",
+    SYS_VGUI5(".x%lx.c coords %xHIGHERCAPTION %d %d\n",
 	     canvas, x, text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height + 10);
-    SYS_VGUI7(".x%x.c coords %xIN %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xIN %d %d %d %d\n",
 	     canvas, x, text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist) - 2,
 	     text_xpix(&x->x_obj, glist) + 5, 
@@ -225,7 +225,7 @@ static void exciter_draw_move(t_exciter *x, t_glist *glist)
     {
       for ( ei=0; ei<x->x_nbevents; ei++ )
       {
-         SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
+         SYS_VGUI8(".x%lx.c coords %xOUT%d %d %d %d %d\n",
 	     canvas, x, ei, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1), 
              text_ypix(&x->x_obj, glist) + x->x_height,
 	     text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1) + 5, 
@@ -235,7 +235,7 @@ static void exciter_draw_move(t_exciter *x, t_glist *glist)
     }
     else
     {
-       SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
+       SYS_VGUI8(".x%lx.c coords %xOUT%d %d %d %d %d\n",
 	     canvas, x, 0, text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist) + x->x_height,
 	     text_xpix(&x->x_obj, glist) + 5, 
@@ -246,7 +246,7 @@ static void exciter_draw_move(t_exciter *x, t_glist *glist)
     {
       for ( gi=0; gi<(x->x_width/EXCITER_PIXEL_GRAIN); gi++ )
       {
-         SYS_VGUI13(".x%x.c coords %xEVENT%.4d%.4d %d %d %d %d %d %d %d %d\n",
+         SYS_VGUI13(".x%lx.c coords %xEVENT%.4d%.4d %d %d %d %d %d %d %d %d\n",
 	     canvas, x, gi, ei,  
              text_xpix(&x->x_obj, glist) + gi*EXCITER_PIXEL_GRAIN, 
              text_ypix(&x->x_obj, glist) + x->x_height - (ei+1)*x->x_height/x->x_nbevents + 2*polyray,
@@ -267,10 +267,10 @@ static void exciter_draw_erase(t_exciter* x,t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   int i, ei, gi;
 
-    SYS_VGUI3(".x%x.c delete %xLINE\n", canvas, x );
-    SYS_VGUI3(".x%x.c delete %xLOWERCAPTION\n", canvas, x );
-    SYS_VGUI3(".x%x.c delete %xHIGHERCAPTION\n", canvas, x );
-    SYS_VGUI3(".x%x.c delete %xIN\n", canvas, x );
+    SYS_VGUI3(".x%lx.c delete %xLINE\n", canvas, x );
+    SYS_VGUI3(".x%lx.c delete %xLOWERCAPTION\n", canvas, x );
+    SYS_VGUI3(".x%lx.c delete %xHIGHERCAPTION\n", canvas, x );
+    SYS_VGUI3(".x%lx.c delete %xIN\n", canvas, x );
     for ( ei=0; ei<x->x_nbevents; ei++ )
     {
       for ( gi=0; gi<(x->x_width/EXCITER_PIXEL_GRAIN); gi++ )
@@ -280,7 +280,7 @@ static void exciter_draw_erase(t_exciter* x,t_glist* glist)
            exciter_delete_gem( x, glist, gi, ei );
         }
       }
-      SYS_VGUI4(".x%x.c delete %xOUT%d\n", canvas, x, ei );
+      SYS_VGUI4(".x%lx.c delete %xOUT%d\n", canvas, x, ei );
     }
 }
 
@@ -291,13 +291,13 @@ static void exciter_draw_select(t_exciter* x,t_glist* glist)
     if(x->x_selected)
     {
         /* sets the main item in blue */
-	SYS_VGUI3(".x%x.c itemconfigure %xLINE -outline #0000FF\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xLINE -outline #0000FF\n", canvas, x);
 
     }
     else
     {
         /* sets the main item in black */
-	SYS_VGUI3(".x%x.c itemconfigure %xLINE -outline #000000\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xLINE -outline #000000\n", canvas, x);
     }
 }
 
@@ -734,7 +734,7 @@ static t_int *exciter_perform(t_int *w)
              if ( *(x->x_sbangs+ei*(x->x_width/EXCITER_PIXEL_GRAIN)+gi ) == 1 )
              {
                 outlet_bang( x->x_bangs[ ei ] );
-	        SYS_VGUI5(".x%x.c itemconfigure %xEVENT%.4d%.4d -fill #00FF00\n", 
+	        SYS_VGUI5(".x%lx.c itemconfigure %xEVENT%.4d%.4d -fill #00FF00\n", 
                           canvas, x, gi, ei);
              }
            }
@@ -749,7 +749,7 @@ static t_int *exciter_perform(t_int *w)
            {
              if ( *(x->x_sbangs+ei*(x->x_width/EXCITER_PIXEL_GRAIN)+gi ) == 1 )
              {
-	        SYS_VGUI5(".x%x.c itemconfigure %xEVENT%.4d%.4d -fill #FFFFFF\n", 
+	        SYS_VGUI5(".x%lx.c itemconfigure %xEVENT%.4d%.4d -fill #FFFFFF\n", 
                           canvas, x, gi, ei);
              }
            }

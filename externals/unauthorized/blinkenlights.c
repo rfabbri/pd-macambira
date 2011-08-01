@@ -194,12 +194,12 @@ static void blinkenlights_draw_new(t_blinkenlights* x)
   t_canvas *canvas=glist_getcanvas(x->x_glist);
   t_int xi, yi;
 
-  SYS_VGUI4("toplevel .x%x -width %d -height %d -borderwidth 0 -background #000000\n", x,
+  SYS_VGUI4("toplevel .x%lx -width %d -height %d -borderwidth 0 -background #000000\n", x,
             x->x_width*x->x_xsize, x->x_height*x->x_ysize );
-  SYS_VGUI2("frame .x%x.m -relief raised -bd 2\n", x);
-  SYS_VGUI2("wm title .x%x blinkenlights\n", x);
+  SYS_VGUI2("frame .x%lx.m -relief raised -bd 2\n", x);
+  SYS_VGUI2("wm title .x%lx blinkenlights\n", x);
 
-  SYS_VGUI4("canvas .x%x.c -width %d -height %d\n", 
+  SYS_VGUI4("canvas .x%lx.c -width %d -height %d\n", 
              x, 
              x->x_width*x->x_xsize, x->x_height*x->x_ysize );
   x->x_ecanvas = 1;
@@ -208,7 +208,7 @@ static void blinkenlights_draw_new(t_blinkenlights* x)
   {
     for ( yi=1; yi<=x->x_height; yi++ )
     {
-      SYS_VGUI10(".x%x.c create rectangle %d %d %d %d -fill %s -outline #555555 -tags %xPIX%.5d%.5d\n",
+      SYS_VGUI10(".x%lx.c create rectangle %d %d %d %d -fill %s -outline #555555 -tags %xPIX%.5d%.5d\n",
              x,
              (xi-1)*x->x_xsize, (yi-1)*x->x_ysize,
              xi*x->x_xsize, yi*x->x_ysize, 
@@ -217,10 +217,10 @@ static void blinkenlights_draw_new(t_blinkenlights* x)
     }
   }
 
-  SYS_VGUI2("pack .x%x.c -side left -expand 1 -fill both\n", x);
-  SYS_VGUI2("pack .x%x.m -side top -fill x\n", x);
-  SYS_VGUI2("wm geometry .x%x +0+0\n", x);
-  SYS_VGUI2("wm geometry .x%x +0+0\n", x);
+  SYS_VGUI2("pack .x%lx.c -side left -expand 1 -fill both\n", x);
+  SYS_VGUI2("pack .x%lx.m -side top -fill x\n", x);
+  SYS_VGUI2("wm geometry .x%lx +0+0\n", x);
+  SYS_VGUI2("wm geometry .x%lx +0+0\n", x);
 
 }
 
@@ -246,10 +246,10 @@ static void blinkenlights_erase(t_blinkenlights* x)
   {
     for ( yi=1; yi<=x->x_height; yi++ )
     {
-      SYS_VGUI5(".x%x.c delete %xPIX%.5d%.5d\n", x, x, xi, yi);
+      SYS_VGUI5(".x%lx.c delete %xPIX%.5d%.5d\n", x, x, xi, yi);
     }
   }
-  SYS_VGUI2("destroy .x%x\n", x);
+  SYS_VGUI2("destroy .x%lx\n", x);
   x->x_ecanvas=0;
 }
 
@@ -375,7 +375,7 @@ static void blinkenlights_pixon(t_blinkenlights* x, t_float fX, t_float fY)
      post("blinkenlights : pixon : wrong y coordinate : %d : should be in [1,%d]", (int)fY, x->x_height );
      return;
   }
-  SYS_VGUI6(".x%x.c itemconfigure %xPIX%.5d%.5d -fill %s\n", x, x, (int)fX, (int)fY, x->x_foreground );
+  SYS_VGUI6(".x%lx.c itemconfigure %xPIX%.5d%.5d -fill %s\n", x, x, (int)fX, (int)fY, x->x_foreground );
 }
 
 static void blinkenlights_pixoff(t_blinkenlights* x, t_float fX, t_float fY)
@@ -395,7 +395,7 @@ static void blinkenlights_pixoff(t_blinkenlights* x, t_float fX, t_float fY)
      post("blinkenlights : pixoff : wrong y coordinate : %d : should be in [1,%d]", (int)fY, x->x_height );
      return;
   }
-  SYS_VGUI6(".x%x.c itemconfigure %xPIX%.5d%.5d -fill %s\n", x, x, (int)fX, (int)fY, x->x_background );
+  SYS_VGUI6(".x%lx.c itemconfigure %xPIX%.5d%.5d -fill %s\n", x, x, (int)fX, (int)fY, x->x_background );
 }
 
 static void blinkenlights_pixel(t_blinkenlights* x, t_float fX, t_float fY, t_float fR, t_float fG, t_float fB)
@@ -430,7 +430,7 @@ static void blinkenlights_pixel(t_blinkenlights* x, t_float fX, t_float fY, t_fl
     post("blinkenlights : pixel : wrong color component : fB : %d", fB);   
     return;
   }
-  SYS_VGUI8(".x%x.c itemconfigure %xPIX%.5d%.5d -fill #%.2X%.2X%.2X\n", x, x, (int)fX, (int)fY, (int)fR, (int)fG, (int)fB );
+  SYS_VGUI8(".x%lx.c itemconfigure %xPIX%.5d%.5d -fill #%.2X%.2X%.2X\n", x, x, (int)fX, (int)fY, (int)fR, (int)fG, (int)fB );
 }
 
 static void blinkenlights_clear(t_blinkenlights* x)

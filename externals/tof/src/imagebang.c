@@ -42,11 +42,11 @@ static void imagebang_bang(t_imagebang *x)
 	
 	t_glist* glist = glist_getcanvas(x->glist);
     if(x->flashing) {
-		sys_vgui(".x%x.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_a);
+		sys_vgui(".x%lx.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_a);
         clock_delay(x->clock_brk, 50);
         //x->flashed = 1;
     } else  {
-		sys_vgui(".x%x.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_b);
+		sys_vgui(".x%lx.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_b);
         x->flashing = 1;
         
     }
@@ -63,7 +63,7 @@ static void imagebang_flash_timeout(t_imagebang *x)
 {
 	t_glist* glist = glist_getcanvas(x->glist);
     x->flashing = 0;
-    sys_vgui(".x%x.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_a);
+    sys_vgui(".x%lx.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_a);
     
 }
 
@@ -71,7 +71,7 @@ static void imagebang_brk_timeout(t_imagebang *x)
 {
 	t_glist* glist = glist_getcanvas(x->glist);
     x->flashing = 1;
-    sys_vgui(".x%x.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_b);
+    sys_vgui(".x%lx.c itemconfigure %ximage -image %x_imagebang \n", glist, x,x->image_b);
     
 }
 
@@ -111,7 +111,7 @@ static void imagebang_drawme(t_imagebang *x, t_glist *glist, int firsttime) {
 		 
 		 DEBUG(post("Rendering: \n   %x_imagebang:%s \n   %x_imagebang:%s",x->image_a,x->image_a->s_name,x->image_b,x->image_b->s_name);)
 		 
-		sys_vgui(".x%x.c create image %d %d -anchor nw -image %x_imagebang -disabledimage %x_imagebang -tags %ximage\n", 
+		sys_vgui(".x%lx.c create image %d %d -anchor nw -image %x_imagebang -disabledimage %x_imagebang -tags %ximage\n", 
 			glist_getcanvas(glist),
 			text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x->image_a,x->image_b,x);
 	  
@@ -120,7 +120,7 @@ static void imagebang_drawme(t_imagebang *x, t_glist *glist, int firsttime) {
 	   
 	   
      } else {
-	  sys_vgui(".x%x.c coords %ximage %d %d\n",
+	  sys_vgui(".x%lx.c coords %ximage %d %d\n",
 		   glist_getcanvas(glist), x,
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
      }
@@ -131,7 +131,7 @@ static void imagebang_drawme(t_imagebang *x, t_glist *glist, int firsttime) {
 void imagebang_erase(t_imagebang* x,t_glist* glist)
 {
      int n;
-     sys_vgui(".x%x.c delete %ximage\n",
+     sys_vgui(".x%lx.c delete %ximage\n",
 	      glist_getcanvas(glist), x);
 
 }
@@ -162,7 +162,7 @@ static void imagebang_displace(t_gobj *z, t_glist *glist,
     t_imagebang *x = (t_imagebang *)z;
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
-    sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %xSEL %d %d %d %d\n",
 		   glist_getcanvas(glist), x,
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 		   text_xpix(&x->x_obj, glist) + x->width, text_ypix(&x->x_obj, glist) + x->height);
@@ -175,7 +175,7 @@ static void imagebang_select(t_gobj *z, t_glist *glist, int state)
 {
      t_imagebang *x = (t_imagebang *)z;
      if (state) {
-	  sys_vgui(".x%x.c create rectangle \
+	  sys_vgui(".x%lx.c create rectangle \
 %d %d %d %d -tags %xSEL -outline blue\n",
 		   glist_getcanvas(glist),
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
@@ -183,7 +183,7 @@ static void imagebang_select(t_gobj *z, t_glist *glist, int state)
 		   x);
      }
      else {
-	  sys_vgui(".x%x.c delete %xSEL\n",
+	  sys_vgui(".x%lx.c delete %xSEL\n",
 		   glist_getcanvas(glist), x);
      }
 

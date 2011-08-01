@@ -239,7 +239,7 @@ static void menubutton_colors(t_menubutton* x, t_symbol* s, int argc, t_atom* ar
     }
     
 	if(menubutton_w_is_visible(x)) {
-		//sys_vgui(".x%x.c.s%x configure -background \"%s\" -foreground \"%s\"\n", x->x_glist, x, x->bg_color->s_name,x->fg_color->s_name);
+		//sys_vgui(".x%lx.c.s%x configure -background \"%s\" -foreground \"%s\"\n", x->x_glist, x, x->bg_color->s_name,x->fg_color->s_name);
 	    menubutton_w_apply_colors(x);
 	}
 }
@@ -367,7 +367,7 @@ static void menubutton_align( t_menubutton* x, t_float f) {
 		x->halign = -1;
 	}
 	if(menubutton_w_is_visible(x)) {
-		//sys_vgui(".x%x.c.s%x configure -background \"%s\" -foreground \"%s\"\n", x->x_glist, x, x->bg_color->s_name,x->fg_color->s_name);
+		//sys_vgui(".x%lx.c.s%x configure -background \"%s\" -foreground \"%s\"\n", x->x_glist, x, x->bg_color->s_name,x->fg_color->s_name);
 	    menubutton_w_set_align(x);
 	}
 }

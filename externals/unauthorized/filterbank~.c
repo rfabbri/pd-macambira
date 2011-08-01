@@ -132,7 +132,7 @@ static void filterbank_draw_new(t_filterbank_tilde *x, t_glist *glist)
     // draw the square 
     {
 
-      SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xFILTERBANK\n",
+      SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xFILTERBANK\n",
              canvas, 
              text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist),
@@ -140,7 +140,7 @@ static void filterbank_draw_new(t_filterbank_tilde *x, t_glist *glist)
              text_ypix(&x->x_obj, glist) + x->x_height,
              x);
 
-      SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #000000 -tags %xSIN\n",
+      SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #000000 -tags %xSIN\n",
              canvas, 
              text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist)-1,
@@ -154,7 +154,7 @@ static void filterbank_draw_new(t_filterbank_tilde *x, t_glist *glist)
 
          sprintf( color, "#%.2x%.2x%.2x", (int)random() % 256, (int)random() % 256, (int)random() % 256 );
 
-         SYS_VGUI11(".x%x.c create polygon %d %d %d %d %d %d -outline #000000 -fill %s -tags %xFILTER%d\n",
+         SYS_VGUI11(".x%lx.c create polygon %d %d %d %d %d %d -outline #000000 -fill %s -tags %xFILTER%d\n",
              canvas,
              text_xpix(&x->x_obj, glist) + fi*x->x_width/x->x_nbfilters,
              text_ypix(&x->x_obj, glist),
@@ -174,7 +174,7 @@ static void filterbank_draw_move(t_filterbank_tilde *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
     t_int fi;
 
-    SYS_VGUI7(".x%x.c coords %xFILTERBANK %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xFILTERBANK %d %d %d %d\n",
              canvas, x, 
              text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist),
@@ -182,7 +182,7 @@ static void filterbank_draw_move(t_filterbank_tilde *x, t_glist *glist)
              text_ypix(&x->x_obj, glist) + x->x_height
              );
 
-    SYS_VGUI7(".x%x.c coords %xSIN %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xSIN %d %d %d %d\n",
              canvas, x, 
              text_xpix(&x->x_obj, glist), 
              text_ypix(&x->x_obj, glist)-1,
@@ -192,7 +192,7 @@ static void filterbank_draw_move(t_filterbank_tilde *x, t_glist *glist)
 
     for ( fi=0; fi<x->x_nbfilters; fi++ )
     {
-         SYS_VGUI10(".x%x.c coords %xFILTER%d %d %d %d %d %d %d\n",
+         SYS_VGUI10(".x%lx.c coords %xFILTER%d %d %d %d %d %d %d\n",
              canvas, x, fi,
              text_xpix(&x->x_obj, glist) + fi*x->x_width/x->x_nbfilters,
              text_ypix(&x->x_obj, glist),
@@ -211,11 +211,11 @@ static void filterbank_draw_erase(t_filterbank_tilde* x,t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   int fi;
     
-    SYS_VGUI3(".x%x.c delete %xFILTERBANK\n", canvas, x );
-    SYS_VGUI3(".x%x.c delete %xSIN\n", canvas, x );
+    SYS_VGUI3(".x%lx.c delete %xFILTERBANK\n", canvas, x );
+    SYS_VGUI3(".x%lx.c delete %xSIN\n", canvas, x );
     for ( fi=0; fi<x->x_nbfilters; fi++ )
     {
-      SYS_VGUI4(".x%x.c delete %xFILTER%d\n", canvas, x, fi );
+      SYS_VGUI4(".x%lx.c delete %xFILTER%d\n", canvas, x, fi );
     }
 
 }
@@ -227,11 +227,11 @@ static void filterbank_draw_select(t_filterbank_tilde* x,t_glist* glist)
     if(x->x_selected)
     {
         /* sets the item in blue */
-	SYS_VGUI3(".x%x.c itemconfigure %xFILTERBANK -outline #0000FF\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xFILTERBANK -outline #0000FF\n", canvas, x);
     }
     else
     {
-	SYS_VGUI3(".x%x.c itemconfigure %xFILTERBANK -outline #000000\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xFILTERBANK -outline #000000\n", canvas, x);
     }
 }
 

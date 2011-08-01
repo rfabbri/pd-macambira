@@ -106,8 +106,8 @@ static void pianoroll_draw_update(t_pianoroll *x, t_glist *glist)
 
        x->x_ivolumes[ si ] = vi;
        x->x_ipeaches[ si ] = pi;
-       SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, si, pi);
-       SYS_VGUI5(".x%x.c itemconfigure %xVOLUME%.4d%.4d -fill #FF0000\n", canvas, x, si, vi);
+       SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, si, pi);
+       SYS_VGUI5(".x%lx.c itemconfigure %xVOLUME%.4d%.4d -fill #FF0000\n", canvas, x, si, vi);
     }
 }
 
@@ -124,14 +124,14 @@ static void pianoroll_draw_new(t_pianoroll *x, t_glist *glist)
        {
          for ( gj=0; gj<x->x_nbgrades; gj++ )
          {
-           SYS_VGUI9(".x%x.c create rectangle %d %d %d %d -fill #771623 -outline #998121 -tags %xPITCH%.4d%.4d\n",
+           SYS_VGUI9(".x%lx.c create rectangle %d %d %d %d -fill #771623 -outline #998121 -tags %xPITCH%.4d%.4d\n",
 	     canvas, 
              text_xpix(&x->x_obj, glist)+(int)(gi*xgstep), 
              text_ypix(&x->x_obj, glist)+(int)(gj*ygstep),
 	     text_xpix(&x->x_obj, glist)+(int)(gi*xgstep)+(int)(2*xgstep/3), 
              text_ypix(&x->x_obj, glist)+(int)((gj+1)*ygstep),
 	     x, gi, gj );
-           SYS_VGUI9(".x%x.c create rectangle %d %d %d %d -fill #562663 -outline #998121 -tags %xVOLUME%.4d%.4d\n",
+           SYS_VGUI9(".x%lx.c create rectangle %d %d %d %d -fill #562663 -outline #998121 -tags %xVOLUME%.4d%.4d\n",
 	     canvas, 
 	     text_xpix(&x->x_obj, glist)+(int)(gi*xgstep)+(int)(2*xgstep/3), 
              text_ypix(&x->x_obj, glist)+(int)(gj*ygstep),
@@ -144,15 +144,15 @@ static void pianoroll_draw_new(t_pianoroll *x, t_glist *glist)
        x->x_width = (int)((x->x_nbsteps)*xgstep);
        x->x_height = (int)((x->x_nbgrades)*ygstep);
     }
-    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %xIN\n",
+    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %xIN\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) - 1,
 	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist),
 	     x);
-    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %xOUTL\n",
+    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %xOUTL\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2,
 	     x);
-    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %xOUTR\n",
+    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %xOUTR\n",
 	     canvas, text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2,
 	     x);
@@ -173,14 +173,14 @@ static void pianoroll_draw_move(t_pianoroll *x, t_glist *glist)
        {
          for ( gj=0; gj<x->x_nbgrades; gj++ )
          {
-           SYS_VGUI9(".x%x.c coords  %xPITCH%.4d%.4d %d %d %d %d\n",
+           SYS_VGUI9(".x%lx.c coords  %xPITCH%.4d%.4d %d %d %d %d\n",
 	     canvas, x, gi, gj,
              text_xpix(&x->x_obj, glist)+(int)(gi*xgstep), 
              text_ypix(&x->x_obj, glist)+(int)(gj*ygstep),
 	     text_xpix(&x->x_obj, glist)+(int)(gi*xgstep)+(int)(2*xgstep/3), 
              text_ypix(&x->x_obj, glist)+(int)((gj+1)*ygstep)
 	     );
-           SYS_VGUI9(".x%x.c coords %xVOLUME%.4d%.4d %d %d %d %d\n",
+           SYS_VGUI9(".x%lx.c coords %xVOLUME%.4d%.4d %d %d %d %d\n",
 	     canvas, x, gi, gj,
 	     text_xpix(&x->x_obj, glist)+(int)(gi*xgstep)+(int)(2*xgstep/3), 
              text_ypix(&x->x_obj, glist)+(int)(gj*ygstep),
@@ -190,15 +190,15 @@ static void pianoroll_draw_move(t_pianoroll *x, t_glist *glist)
          }
        }
     }
-    SYS_VGUI7(".x%x.c coords %xIN %d %d %d %d \n",
+    SYS_VGUI7(".x%lx.c coords %xIN %d %d %d %d \n",
 	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) - 1,
 	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist)
 	     );
-    SYS_VGUI7(".x%x.c coords %xOUTL %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xOUTL %d %d %d %d\n",
 	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2
 	     );
-    SYS_VGUI7(".x%x.c coords %xOUTR %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xOUTR %d %d %d %d\n",
 	     canvas, x, text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2
 	     );
@@ -210,9 +210,9 @@ static void pianoroll_draw_erase(t_pianoroll* x,t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   t_int i;
 
-    SYS_VGUI3(".x%x.c delete %xIN\n", canvas, x);
-    SYS_VGUI3(".x%x.c delete %xOUTL\n", canvas, x);
-    SYS_VGUI3(".x%x.c delete %xOUTR\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xIN\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xOUTL\n", canvas, x);
+    SYS_VGUI3(".x%lx.c delete %xOUTR\n", canvas, x);
     // delete the grid
     {
        int gi, gj;
@@ -220,8 +220,8 @@ static void pianoroll_draw_erase(t_pianoroll* x,t_glist* glist)
        {
          for ( gj=0; gj<x->x_nbgrades; gj++ )
          {
-            SYS_VGUI5(".x%x.c delete %xPITCH%.4d%.4d\n", canvas, x, gi, gj);
-            SYS_VGUI5(".x%x.c delete %xVOLUME%.4d%.4d\n", canvas, x, gi, gj);
+            SYS_VGUI5(".x%lx.c delete %xPITCH%.4d%.4d\n", canvas, x, gi, gj);
+            SYS_VGUI5(".x%lx.c delete %xVOLUME%.4d%.4d\n", canvas, x, gi, gj);
          }
        }
     }
@@ -431,21 +431,21 @@ static int pianoroll_click(t_gobj *z, struct _glist *glist,
          if ( ( xpix - text_xpix(&x->x_obj, glist) ) > ( si*xgstep+2*xgstep/3 ) )
          {
             {
-              SYS_VGUI5(".x%x.c itemconfigure %xVOLUME%.4d%.4d -fill #562663\n", canvas, x, si, x->x_ivolumes[ si ] );
+              SYS_VGUI5(".x%lx.c itemconfigure %xVOLUME%.4d%.4d -fill #562663\n", canvas, x, si, x->x_ivolumes[ si ] );
             }
 
             x->x_volumes[ si ] = (((float)x->x_nbgrades-1-(float)gi))/(float)(x->x_nbgrades-1);
-            SYS_VGUI5(".x%x.c itemconfigure %xVOLUME%.4d%.4d -fill #FF0000\n", canvas, x, si, gi);
+            SYS_VGUI5(".x%lx.c itemconfigure %xVOLUME%.4d%.4d -fill #FF0000\n", canvas, x, si, gi);
             x->x_ivolumes[ si ] = gi; 
          } 
          else
          {
             {
-              SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #761623\n", canvas, x, si, x->x_ipeaches[ si ]);
+              SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #761623\n", canvas, x, si, x->x_ipeaches[ si ]);
             }
 
             x->x_peaches[ si ] = x->x_pmin+(float)(x->x_nbgrades-1-gi)/(float)(x->x_nbgrades-1)*(float)(x->x_pmax-x->x_pmin);
-            SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, si, gi);
+            SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, si, gi);
             x->x_ipeaches[ si ] = gi; 
          }
       }
@@ -567,11 +567,11 @@ static void pianoroll_pitch(t_pianoroll *x, t_floatarg fpos, t_floatarg fpitch)
   }
 
   {
-     SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #761623\n", canvas, x, ipos, x->x_ipeaches[ ipos ]);
+     SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #761623\n", canvas, x, ipos, x->x_ipeaches[ ipos ]);
 
      x->x_ipeaches[ ipos ] = (t_int) ( ( ( x->x_pmax - fpitch ) / ( x->x_pmax - x->x_pmin ) ) * ( x->x_nbgrades - 1 ) );
      x->x_peaches[ ipos ] = x->x_pmin+(float)(x->x_nbgrades-1-x->x_ipeaches[ ipos ])/(float)(x->x_nbgrades-1)*(float)(x->x_pmax-x->x_pmin);
-     SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, ipos, x->x_ipeaches[ ipos ]);
+     SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, ipos, x->x_ipeaches[ ipos ]);
   }
 }
  
@@ -593,11 +593,11 @@ static void pianoroll_volume(t_pianoroll *x, t_floatarg fpos, t_floatarg fvol)
   }
 
   {
-      SYS_VGUI5(".x%x.c itemconfigure %xVOLUME%.4d%.4d -fill #562663\n", canvas, x, ipos, x->x_ivolumes[ ipos ] );
+      SYS_VGUI5(".x%lx.c itemconfigure %xVOLUME%.4d%.4d -fill #562663\n", canvas, x, ipos, x->x_ivolumes[ ipos ] );
    
       x->x_ivolumes[ ipos ] = (t_int) ( ( 1 - fvol ) * (x->x_nbgrades-1) );
       x->x_volumes[ ipos ] = (((float)x->x_nbgrades-1-(float)x->x_ivolumes[ ipos ]))/(float)(x->x_nbgrades-1);
-      SYS_VGUI5(".x%x.c itemconfigure %xVOLUME%.4d%.4d -fill #FF0000\n", canvas, x, ipos, x->x_ivolumes[ ipos ] );
+      SYS_VGUI5(".x%lx.c itemconfigure %xVOLUME%.4d%.4d -fill #FF0000\n", canvas, x, ipos, x->x_ivolumes[ ipos ] );
   }
 }
 
@@ -630,11 +630,11 @@ static void pianoroll_float(t_pianoroll *x, t_floatarg fposition)
     {
        if ( x->x_scurrent != -1 )
        {
-          SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, 
+          SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #FFFF00\n", canvas, x, 
                                x->x_scurrent, x->x_ipeaches[ x->x_scurrent  ]);
        }
        x->x_scurrent = rposition;
-       SYS_VGUI5(".x%x.c itemconfigure %xPITCH%.4d%.4d -fill #00FF00\n", canvas, x, 
+       SYS_VGUI5(".x%lx.c itemconfigure %xPITCH%.4d%.4d -fill #00FF00\n", canvas, x, 
                   x->x_scurrent, x->x_ipeaches[ x->x_scurrent ]);
     }
 }

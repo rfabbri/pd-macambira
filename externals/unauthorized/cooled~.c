@@ -319,17 +319,17 @@ static void *cooled_do_update_part(void *tdata)
 
    if ( glist_isvisible( x->x_glist ) )
    {
-      SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n",
+      SYS_VGUI3( ".x%lx.c delete rectangle %xCLIPZONE\n",
                canvas, x);
       if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
       {
-         SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
+         SYS_VGUI7( ".x%lx.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
                      canvas, x->x_xpos+(int)(x->x_readstart*(x->x_width)/100 ),
                           x->x_ypos, x->x_xpos+(int)(x->x_readend*(x->x_width)/100 ), 
                           x->x_ypos+x->x_height*x->x_zoom, x );
       }
       // set borders in black
-      SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #000000\n", canvas, x);
+      SYS_VGUI3(".x%lx.c itemconfigure %xCOOLED -outline #000000\n", canvas, x);
    }
 
 #ifndef _WIN32
@@ -368,32 +368,32 @@ static void cooled_update_part(t_cooled *x, t_glist *glist, int bstart, int bend
     {
       if ( ( bstart == 0 ) && ( bend == x->x_width-1 ) && !keepframe )
       {
-        SYS_VGUI3(".x%x.c delete %xCOOLEDL\n", canvas, x );
-        SYS_VGUI3(".x%x.c delete %xCOOLEDR\n", canvas, x );
-        SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDR\n",
+        SYS_VGUI3(".x%lx.c delete %xCOOLEDL\n", canvas, x );
+        SYS_VGUI3(".x%lx.c delete %xCOOLEDR\n", canvas, x );
+        SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDR\n",
 	     canvas, x->x_xpos, x->x_ypos,
 	     x->x_xpos + x->x_width*x->x_zoom, 
              x->x_ypos + x->x_height/2*x->x_zoom,
 	     x);
-        SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDL\n",
+        SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDL\n",
 	     canvas, x->x_xpos,
              x->x_ypos + x->x_height/2*x->x_zoom,
 	     x->x_xpos + x->x_width*x->x_zoom, 
              x->x_ypos + x->x_height*x->x_zoom,
 	     x);
         SYS_VGUI2("image delete COOLEDIMAGE%x\n", x );
-        SYS_VGUI3(".x%x.c delete ICOOLEDIMAGE%x\n", canvas, x );
+        SYS_VGUI3(".x%lx.c delete ICOOLEDIMAGE%x\n", canvas, x );
         SYS_VGUI4("image create photo COOLEDIMAGE%x -format gif -width %d -height %d\n", 
                           x, x->x_width*x->x_zoom, x->x_height*x->x_zoom );
         SYS_VGUI2("COOLEDIMAGE%x blank\n", x );
-        SYS_VGUI6(".x%x.c create image %d %d -image COOLEDIMAGE%x -tags ICOOLEDIMAGE%x\n", 
+        SYS_VGUI6(".x%lx.c create image %d %d -image COOLEDIMAGE%x -tags ICOOLEDIMAGE%x\n", 
                           canvas, 
                           x->x_xpos+(x->x_width*x->x_zoom)/2, 
                           x->x_ypos+(x->x_height*x->x_zoom)/2, x, x );
         canvas_fixlinesfor( canvas, (t_text*)x );
       }
       // set borders in red
-      SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #FF0000\n", canvas, x);
+      SYS_VGUI3(".x%lx.c itemconfigure %xCOOLED -outline #FF0000\n", canvas, x);
     }
 
     // launch update thread
@@ -425,12 +425,12 @@ static void cooled_draw_new(t_cooled *x, t_glist *glist)
    x->x_xpos=text_xpix(&x->x_obj, glist);
    x->x_ypos=text_ypix(&x->x_obj, glist);
    x->x_xdraw=text_xpix(&x->x_obj, glist);
-   SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDR\n",
+   SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDR\n",
 	     canvas, x->x_xpos, x->x_ypos,
 	     x->x_xpos + x->x_width*x->x_zoom, 
              x->x_ypos + x->x_height/2*x->x_zoom,
 	     x);
-   SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDL\n",
+   SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDL\n",
 	     canvas, x->x_xpos,
              x->x_ypos + x->x_height/2*x->x_zoom,
 	     x->x_xpos + x->x_width*x->x_zoom, 
@@ -439,7 +439,7 @@ static void cooled_draw_new(t_cooled *x, t_glist *glist)
     SYS_VGUI4("image create photo COOLEDIMAGE%x -format gif -width %d -height %d\n", 
                           x, x->x_width*x->x_zoom, x->x_height*x->x_zoom );
     SYS_VGUI2("COOLEDIMAGE%x blank\n", x );
-    SYS_VGUI6(".x%x.c create image %d %d -image COOLEDIMAGE%x -tags ICOOLEDIMAGE%x\n", 
+    SYS_VGUI6(".x%lx.c create image %d %d -image COOLEDIMAGE%x -tags ICOOLEDIMAGE%x\n", 
                           canvas, 
                           x->x_xpos+(x->x_width*x->x_zoom)/2, 
                           x->x_ypos+(x->x_height*x->x_zoom)/2, x, x );
@@ -453,15 +453,15 @@ static void cooled_draw_delete(t_cooled *x, t_glist *glist)
 
     if ( glist_isvisible( glist ) )
     {
-       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", canvas, x );
+       SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
        if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
        {
-          SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n", canvas, x);
+          SYS_VGUI3( ".x%lx.c delete rectangle %xCLIPZONE\n", canvas, x);
        }
-       SYS_VGUI3( ".x%x.c delete line %xINSERTHERE\n", canvas, x);
-       SYS_VGUI3(".x%x.c delete %xCOOLEDR\n", canvas, x );
-       SYS_VGUI3(".x%x.c delete %xCOOLEDL\n", canvas, x );
-       SYS_VGUI3(".x%x.c delete ICOOLEDIMAGE%x\n", canvas, x );
+       SYS_VGUI3( ".x%lx.c delete line %xINSERTHERE\n", canvas, x);
+       SYS_VGUI3(".x%lx.c delete %xCOOLEDR\n", canvas, x );
+       SYS_VGUI3(".x%lx.c delete %xCOOLEDL\n", canvas, x );
+       SYS_VGUI3(".x%lx.c delete ICOOLEDIMAGE%x\n", canvas, x );
        SYS_VGUI2("image delete COOLEDIMAGE%x\n", x );
     }
 }
@@ -472,12 +472,12 @@ static void cooled_draw_move(t_cooled *x, t_glist *glist)
 
    if ( glist_isvisible( x->x_glist ) )
    {
-    SYS_VGUI7(".x%x.c coords %xCOOLEDR %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xCOOLEDR %d %d %d %d\n",
 	     canvas, x,
 	     x->x_xpos, x->x_ypos,
 	     x->x_xpos + x->x_width*x->x_zoom, 
              x->x_ypos + x->x_height/2*x->x_zoom);
-    SYS_VGUI7(".x%x.c coords %xCOOLEDL %d %d %d %d\n",
+    SYS_VGUI7(".x%lx.c coords %xCOOLEDL %d %d %d %d\n",
 	     canvas, x,
 	     x->x_xpos,
              x->x_ypos + x->x_height/2*x->x_zoom,
@@ -485,20 +485,20 @@ static void cooled_draw_move(t_cooled *x, t_glist *glist)
              x->x_ypos + x->x_height*x->x_zoom );
     if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
     {
-       SYS_VGUI7(".x%x.c coords %xCLIPZONE %d %d %d %d\n",
+       SYS_VGUI7(".x%lx.c coords %xCLIPZONE %d %d %d %d\n",
 	     canvas, x,
              x->x_xpos+(int)(x->x_readstart*(x->x_width)/100*x->x_zoom ),
              x->x_ypos, 
              x->x_xpos+(int)(x->x_readend*(x->x_width)/100*x->x_zoom ), 
              x->x_ypos+x->x_height*x->x_zoom );
      }
-     SYS_VGUI7(".x%x.c coords %xINSERTHERE %d %d %d %d\n",
+     SYS_VGUI7(".x%lx.c coords %xINSERTHERE %d %d %d %d\n",
 	     canvas, x,
              x->x_xdraw,
              x->x_ypos, 
              x->x_xdraw,
              x->x_ypos+x->x_height*x->x_zoom );
-     SYS_VGUI5(".x%x.c coords ICOOLEDIMAGE%x %d %d\n",
+     SYS_VGUI5(".x%lx.c coords ICOOLEDIMAGE%x %d %d\n",
   	     canvas, x,
              x->x_xpos+((x->x_width*x->x_zoom)/2), 
              (x->x_ypos+((x->x_height*x->x_zoom)/2)) );
@@ -515,13 +515,13 @@ static void cooled_draw_select(t_cooled* x,t_glist* glist)
     if(x->x_selected)
     {
         /* sets the item in blue */
-	SYS_VGUI3(".x%x.c itemconfigure %xCOOLEDR -outline #0000FF\n", canvas, x);
-	SYS_VGUI3(".x%x.c itemconfigure %xCOOLEDL -outline #0000FF\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xCOOLEDR -outline #0000FF\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xCOOLEDL -outline #0000FF\n", canvas, x);
     }
     else
     {
-	SYS_VGUI3(".x%x.c itemconfigure %xCOOLEDR -outline #000000\n", canvas, x);
-	SYS_VGUI3(".x%x.c itemconfigure %xCOOLEDL -outline #000000\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xCOOLEDR -outline #000000\n", canvas, x);
+	SYS_VGUI3(".x%lx.c itemconfigure %xCOOLEDL -outline #000000\n", canvas, x);
     }
    }
 }
@@ -543,11 +543,11 @@ static void cooled_readstart(t_cooled *x, t_floatarg fstart)
     if ( ( x->x_readstart < x->x_readend ) && ( x->x_readspeed < 0 ) ) x->x_readspeed = -x->x_readspeed;
     if ( glist_isvisible( x->x_glist ) )
     {
-       SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n",
+       SYS_VGUI3( ".x%lx.c delete rectangle %xCLIPZONE\n",
                    canvas, x);
        if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
        {
-          SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
+          SYS_VGUI7( ".x%lx.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
                       canvas, x->x_xpos+(int)(x->x_readstart*x->x_width*x->x_zoom/100 ),
                           x->x_ypos, x->x_xpos+(int)(x->x_readend*x->x_width*x->x_zoom/100 ), 
                           x->x_ypos+x->x_height*x->x_zoom, x );
@@ -570,11 +570,11 @@ static void cooled_readend(t_cooled *x, t_floatarg fend)
     if ( ( x->x_readstart < x->x_readend ) && ( x->x_readspeed < 0 ) ) x->x_readspeed = -x->x_readspeed;
     if ( glist_isvisible( x->x_glist ) )
     {
-       SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n",
+       SYS_VGUI3( ".x%lx.c delete rectangle %xCLIPZONE\n",
                    canvas, x);
        if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
        {
-          SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
+          SYS_VGUI7( ".x%lx.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
                canvas, 
                x->x_xpos+(int)(x->x_readstart*x->x_width*x->x_zoom/100 ),
                x->x_ypos, x->x_xpos+(int)(x->x_readend*x->x_width*x->x_zoom/100 ), 
@@ -869,9 +869,9 @@ static int cooled_click(t_gobj *z, struct _glist *glist,
          // draw insertion line
          if ( glist_isvisible( x->x_glist ) )
          {
-            SYS_VGUI3( ".x%x.c delete line %xINSERTHERE\n",
+            SYS_VGUI3( ".x%lx.c delete line %xINSERTHERE\n",
                         canvas, x);
-            SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #00FFFF -tags %xINSERTHERE -width 2\n",
+            SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #00FFFF -tags %xINSERTHERE -width 2\n",
                         canvas, x->x_xdraw,
                x->x_ypos, x->x_xdraw,
                x->x_ypos+x->x_height*x->x_zoom, x );

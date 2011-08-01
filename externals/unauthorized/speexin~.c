@@ -273,8 +273,8 @@ static void speexin_decode_input(t_speexin *x)
         int minpackets = ( MIN_AUDIO_INPUT/x->x_framesize)-2; // audio loop has eaten some already
 
 
-            sys_vgui(".x%x.c delete rectangle %xSTATUS\n", x->x_canvas, x );
-            sys_vgui(".x%x.c delete line %xTHRESHOLD\n", x->x_canvas, x );
+            sys_vgui(".x%lx.c delete rectangle %xSTATUS\n", x->x_canvas, x );
+            sys_vgui(".x%lx.c delete line %xTHRESHOLD\n", x->x_canvas, x );
             if ( x->x_outunread > 0 )
             {
              t_int width;
@@ -288,11 +288,11 @@ static void speexin_decode_input(t_speexin *x)
                strcpy( color, "lightgreen" );
               }
               width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-              sys_vgui(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xSTATUS\n",
+              sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xSTATUS\n",
                   x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix+(x->x_inpackets*x->x_packetsize*width)/INPUT_BUFFER_SIZE, 
                   x->x_obj.te_ypix - 1, color, x );
-              sys_vgui(".x%x.c create line %d %d %d %d -fill red -tags %xTHRESHOLD\n",
+              sys_vgui(".x%lx.c create line %d %d %d %d -fill red -tags %xTHRESHOLD\n",
                   x->x_canvas, x->x_obj.te_xpix+(minpackets*x->x_packetsize*width)/INPUT_BUFFER_SIZE, 
                   x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix+(minpackets*x->x_packetsize*width)/INPUT_BUFFER_SIZE, 
@@ -333,9 +333,9 @@ static void speexin_recv(t_speexin *x)
            post( "speexin~ : closing connection ( s=%d )", x->x_socket );
 	   speexin_closesocket(x->x_socket);
            x->x_socket = -1;
-           sys_vgui(".x%x.c delete rectangle %xPBAR\n", x->x_canvas, x );
-           sys_vgui(".x%x.c delete line %xTHRESHOLD\n", x->x_canvas, x );
-           sys_vgui(".x%x.c delete rectangle %xSTATUS\n", x->x_canvas, x );
+           sys_vgui(".x%lx.c delete rectangle %xPBAR\n", x->x_canvas, x );
+           sys_vgui(".x%lx.c delete line %xTHRESHOLD\n", x->x_canvas, x );
+           sys_vgui(".x%lx.c delete rectangle %xSTATUS\n", x->x_canvas, x );
            outlet_symbol( x->x_connectionip, gensym("") );
         }
         else
@@ -378,7 +378,7 @@ static void speexin_acceptconnection(t_speexin *x)
       t_int width;
  
        width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-       sys_vgui(".x%x.c create rectangle %d %d %d %d -fill lightblue -tags %xPBAR\n",
+       sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill lightblue -tags %xPBAR\n",
               x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix-BARHEIGHT-1,
                   x->x_obj.te_xpix + width, x->x_obj.te_ypix - 1, x );
     }
