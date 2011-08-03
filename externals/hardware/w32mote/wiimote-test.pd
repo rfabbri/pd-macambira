@@ -1,0 +1,48 @@
+#N canvas 168 53 722 577 12;
+#X obj 72 435 wiimote;
+#X obj 367 187 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 361 217 reportIR \$1;
+#X msg 10 186 discover;
+#X obj 162 470 print state;
+#X obj 71 471 print data;
+#X msg 65 327 disconnect;
+#X msg 247 125 setLED \$1;
+#X obj 235 100 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X obj 246 47 metro 100;
+#X obj 246 72 random 32;
+#X obj 249 20 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 517 458 setRumble \$1;
+#X obj 519 436 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 371 336 play foo;
+#X msg 365 286 reportAcceleration \$1;
+#X obj 370 264 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 508 85 osc~ 440;
+#X obj 508 110 tabwrite~ foo;
+#X msg 595 78 bang;
+#X obj 35 29 table foo 4410;
+#X floatatom 514 51 5 0 0 0 - - -;
+#X text 446 334 spielt die table "foo" (sound);
+#X connect 0 0 5 0;
+#X connect 0 1 4 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
+#X connect 9 0 10 0;
+#X connect 10 0 7 0;
+#X connect 11 0 9 0;
+#X connect 12 0 0 0;
+#X connect 13 0 12 0;
+#X connect 14 0 0 0;
+#X connect 15 0 0 0;
+#X connect 16 0 15 0;
+#X connect 17 0 18 0;
+#X connect 19 0 18 0;
+#X connect 21 0 17 0;
