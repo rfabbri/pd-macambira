@@ -113,16 +113,16 @@ static void iem_image_draw_new(t_iem_image *x, t_glist *glist)
 
   if(correct_name = iem_image_calc_size(x))
   {
-    sys_vgui("image create photo %xPHOTOIMAGE -file {%s} -format gif -width %d -height %d\n",
+    sys_vgui("image create photo %lxPHOTOIMAGE -file {%s} -format gif -width %d -height %d\n",
       x, correct_name->s_name, x->x_gui.x_w, x->x_gui.x_h);
-    sys_vgui(".x%x.c create image %d %d -image %xPHOTOIMAGE -tags %xPHOTO\n",
+    sys_vgui(".x%lx.c create image %d %d -image %lxPHOTOIMAGE -tags %lxPHOTO\n",
       canvas, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2, x, x);
 
     x->x_have_image=1;
   } 
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -outline #%6.6x -tags %xBASE\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -outline #%6.6x -tags %lxBASE\n",
     canvas, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h, IEM_GUI_COLOR_SELECTED, x);
 }
 
@@ -133,9 +133,9 @@ static void iem_image_draw_move(t_iem_image *x, t_glist *glist)
   t_canvas *canvas=glist_getcanvas(glist);
   
   if(x->x_have_image)
-    sys_vgui(".x%x.c coords %xPHOTO %d %d\n", canvas, x, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2);
+    sys_vgui(".x%lx.c coords %lxPHOTO %d %d\n", canvas, x, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2);
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c coords %xBASE %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxBASE %d %d %d %d\n",
     canvas, x, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h);
   canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
 }
@@ -145,11 +145,11 @@ static void iem_image_draw_erase(t_iem_image* x, t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
+    sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
   if(x->x_have_image)
   {
-    sys_vgui("image delete %xPHOTOIMAGE\n", x);
-    sys_vgui(".x%x.c delete %xPHOTO\n", canvas, x);    
+    sys_vgui("image delete %lxPHOTOIMAGE\n", x);
+    sys_vgui(".x%lx.c delete %lxPHOTO\n", canvas, x);    
     x->x_have_image=0;
   }
 }
@@ -163,12 +163,12 @@ static void iem_image_draw_select(t_iem_image* x, t_glist* glist)
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -outline #%6.6x -tags %xBASE\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -outline #%6.6x -tags %lxBASE\n",
       canvas, xpos, ypos, xpos + x->x_gui.x_w,
       ypos + x->x_gui.x_h, IEM_GUI_COLOR_SELECTED, x);
   }
   else
-    sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
+    sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
 }
 
 static void iem_image_draw(t_iem_image *x, t_glist *glist, int mode)

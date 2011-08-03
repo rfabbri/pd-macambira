@@ -235,7 +235,7 @@ static void numberbox_matrix_draw_update(t_numberbox_matrix *x, t_glist *glist)
           if(sl >= x->x_gui.x_w)
             cp += sl - x->x_gui.x_w + 1;
           sys_vgui(
-            ".x%x.c itemconfigure %xNUMBER_%d_%d -fill %s -text {%s} \n",
+            ".x%lx.c itemconfigure %lxNUMBER_%d_%d -fill %s -text {%s} \n",
             glist_getcanvas(glist), x, ir, jc, IEM_GUI_NBXM_COLOR_EDITED, cp);
           x->x_buf[sl] = 0;
         }
@@ -245,7 +245,7 @@ static void numberbox_matrix_draw_update(t_numberbox_matrix *x, t_glist *glist)
           k *= x->x_n_column;
           k += x->x_sel_column + 3;
           numberbox_matrix_ftoa(x, atom_getfloat(x->x_matrix+k), x->x_buf);
-          sys_vgui(".x%x.c itemconfigure %xNUMBER_%d_%d  -fill %s -text {%s} \n",
+          sys_vgui(".x%lx.c itemconfigure %lxNUMBER_%d_%d  -fill %s -text {%s} \n",
             glist_getcanvas(glist), x, ir, jc, IEM_GUI_NBXM_COLOR_EDITED, x->x_buf);
           x->x_buf[0] = 0;
         }
@@ -256,7 +256,7 @@ static void numberbox_matrix_draw_update(t_numberbox_matrix *x, t_glist *glist)
         k *= x->x_n_column;
         k += x->x_sel_column + 3;
         numberbox_matrix_ftoa(x, atom_getfloat(x->x_matrix+k), x->x_buf);
-        sys_vgui(".x%x.c itemconfigure %xNUMBER_%d_%d -fill %s -text {%s} \n",
+        sys_vgui(".x%lx.c itemconfigure %lxNUMBER_%d_%d -fill %s -text {%s} \n",
           glist_getcanvas(glist), x, ir, jc, x->x_front_color->s_name, x->x_buf);
         x->x_buf[0] = 0;
       }
@@ -274,7 +274,7 @@ static void numberbox_matrix_draw_update(t_numberbox_matrix *x, t_glist *glist)
           x->x_val = atom_getfloat(x->x_matrix+k);
           k++;
           numberbox_matrix_ftoa(x, x->x_val, x->x_buf);
-          sys_vgui(".x%x.c itemconfigure %xNUMBER_%d_%d -fill %s -text {%s} \n",
+          sys_vgui(".x%lx.c itemconfigure %lxNUMBER_%d_%d -fill %s -text {%s} \n",
             glist_getcanvas(glist), x, i, j, x->x_front_color->s_name, x->x_buf);
         }
       }
@@ -290,7 +290,7 @@ static void numberbox_matrix_draw_update(t_numberbox_matrix *x, t_glist *glist)
         x->x_val = atom_getfloat(x->x_matrix+k);
         k++;
         numberbox_matrix_ftoa(x, x->x_val, x->x_buf);
-        sys_vgui(".x%x.c itemconfigure %xNUMBER_%d_%d -fill %s -text {%s} \n",
+        sys_vgui(".x%lx.c itemconfigure %lxNUMBER_%d_%d -fill %s -text {%s} \n",
           glist_getcanvas(glist), x, ir, j, x->x_front_color->s_name, x->x_buf);
       }
     }
@@ -306,7 +306,7 @@ static void numberbox_matrix_draw_update(t_numberbox_matrix *x, t_glist *glist)
         x->x_val = atom_getfloat(x->x_matrix+k);
         k += c;
         numberbox_matrix_ftoa(x, x->x_val, x->x_buf);
-        sys_vgui(".x%x.c itemconfigure %xNUMBER_%d_%d -fill %s -text {%s} \n",
+        sys_vgui(".x%lx.c itemconfigure %lxNUMBER_%d_%d -fill %s -text {%s} \n",
           glist_getcanvas(glist), x, i, jc, x->x_front_color->s_name, x->x_buf);
       }
     }
@@ -326,10 +326,10 @@ static void numberbox_matrix_draw_new(t_numberbox_matrix *x, t_glist *glist)
   r = x->x_n_row;
   c = x->x_n_column;
   for(i=0; i<c; i+=2)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xCOLUMNS_%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxCOLUMNS_%d\n",
     canvas, xpos + x->x_numwidth*i, ypos, xpos + x->x_numwidth*(i+1), ypos + x->x_gui.x_h*r, x, i);
   for(i=0; i<r; i+=2)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xROWS_%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxROWS_%d\n",
     canvas, xpos, ypos + x->x_gui.x_h*i, xpos + x->x_numwidth*c, ypos + x->x_gui.x_h*(i+1), x, i);
   k = 3;
   yy = ypos + hh;
@@ -341,24 +341,24 @@ static void numberbox_matrix_draw_new(t_numberbox_matrix *x, t_glist *glist)
       x->x_val = atom_getfloat(x->x_matrix+k);
       k++;
       numberbox_matrix_ftoa(x, x->x_val, x->x_buf);
-      sys_vgui(".x%x.c create text %d %d -text {%s} -anchor c \
-        -font {%s %d bold} -fill %s -tags %xNUMBER_%d_%d\n", canvas, xx, yy,
+      sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor c \
+        -font {%s %d bold} -fill %s -tags %lxNUMBER_%d_%d\n", canvas, xx, yy,
         x->x_buf, x->x_gui.x_font, x->x_gui.x_fontsize, x->x_front_color->s_name, x, i, j);
       xx += w;
     }
     yy += h;
   }
   
-  sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xFRAME\n",
+  sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxFRAME\n",
     canvas, xpos, ypos, xpos + x->x_numwidth*c, ypos + x->x_gui.x_h*r, x);
   if(!x->x_gui.x_fsf.x_snd_able)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
     canvas,
     xpos, ypos + x->x_gui.x_h*r-1,
     xpos+IOWIDTH, ypos + x->x_gui.x_h*r,
     x, 0);
   if(!x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxIN%d\n",
     canvas,
     xpos, ypos,
     xpos+IOWIDTH, ypos+1,
@@ -378,10 +378,10 @@ static void numberbox_matrix_draw_move(t_numberbox_matrix *x, t_glist *glist)
   c = x->x_n_column;
   
   for(i=0; i<c; i+=2)
-    sys_vgui(".x%x.c coords %xCOLUMNS_%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxCOLUMNS_%d %d %d %d %d\n",
     canvas, x, i, xpos + x->x_numwidth*i, ypos, xpos + x->x_numwidth*(i+1), ypos + x->x_gui.x_h*r);
   for(i=0; i<r; i+=2)
-    sys_vgui(".x%x.c coords %xROWS_%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxROWS_%d %d %d %d %d\n",
     canvas, x, i, xpos, ypos + x->x_gui.x_h*i, xpos + x->x_numwidth*c, ypos + x->x_gui.x_h*(i+1));
   
   yy = ypos + hh;
@@ -390,22 +390,22 @@ static void numberbox_matrix_draw_move(t_numberbox_matrix *x, t_glist *glist)
     xx = xpos + hw;
     for(j=0; j<c; j++)
     {
-      sys_vgui(".x%x.c coords %xNUMBER_%d_%d %d %d\n",
+      sys_vgui(".x%lx.c coords %lxNUMBER_%d_%d %d %d\n",
         canvas, x, i, j, xx, yy);
       xx += w;
     }
     yy += h;
   }
   
-  sys_vgui(".x%x.c coords %xFRAME %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxFRAME %d %d %d %d\n",
     canvas, x, xpos, ypos, xpos + x->x_numwidth*c, ypos + x->x_gui.x_h*r);
   if(!x->x_gui.x_fsf.x_snd_able)
-    sys_vgui(".x%x.c coords %xOUT%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxOUT%d %d %d %d %d\n",
     canvas, x, 0,
     xpos, ypos + x->x_gui.x_h*r-1,
     xpos+IOWIDTH, ypos + x->x_gui.x_h*r);
   if(!x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxIN%d %d %d %d %d\n",
     canvas, x, 0,
     xpos, ypos,
     xpos+IOWIDTH, ypos+1);
@@ -419,23 +419,23 @@ static void numberbox_matrix_draw_erase(t_numberbox_matrix* x, t_glist* glist)
   r = x->x_n_row;
   c = x->x_n_column;
   for(i=0; i<c; i+=2)
-    sys_vgui(".x%x.c delete %xCOLUMNS_%d\n", canvas, x, i);
+    sys_vgui(".x%lx.c delete %lxCOLUMNS_%d\n", canvas, x, i);
   for(i=0; i<r; i+=2)
-    sys_vgui(".x%x.c delete %xROWS_%d\n", canvas, x, i);
+    sys_vgui(".x%lx.c delete %lxROWS_%d\n", canvas, x, i);
   
   for(i=0; i<r; i++)
   {
     for(j=0; j<c; j++)
     {
-      sys_vgui(".x%x.c delete %xNUMBER_%d_%d\n", canvas, x, i, j);
+      sys_vgui(".x%lx.c delete %lxNUMBER_%d_%d\n", canvas, x, i, j);
     }
   }
   
-  sys_vgui(".x%x.c delete %xFRAME\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxFRAME\n", canvas, x);
   if(!x->x_gui.x_fsf.x_snd_able)
-    sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxOUT%d\n", canvas, x, 0);
   if(!x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxIN%d\n", canvas, x, 0);
 }
 
 static void numberbox_matrix_draw_select(t_numberbox_matrix *x, t_glist *glist)
@@ -451,12 +451,12 @@ static void numberbox_matrix_draw_select(t_numberbox_matrix *x, t_glist *glist)
   x->x_buf[0] = 0;
   (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
   }*/
-    sys_vgui(".x%x.c itemconfigure %xFRAME -outline %s\n",
+    sys_vgui(".x%lx.c itemconfigure %lxFRAME -outline %s\n",
       canvas, x, IEM_GUI_NBXM_COLOR_SELECTED);
   }
   else
   {
-    sys_vgui(".x%x.c itemconfigure %xFRAME -outline %s\n",
+    sys_vgui(".x%lx.c itemconfigure %lxFRAME -outline %s\n",
       canvas, x, IEM_GUI_NBXM_COLOR_NORMAL);
   }
 }
@@ -469,21 +469,21 @@ static void numberbox_matrix_draw_io(t_numberbox_matrix* x,t_glist* glist, int o
   t_int r=x->x_n_row;
   
   if((old_snd_rcv_flags & IEM_GUI_OLD_SND_FLAG) && !x->x_gui.x_fsf.x_snd_able)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
     canvas,
     xpos, ypos + x->x_gui.x_h*r-1,
     xpos+IOWIDTH, ypos + x->x_gui.x_h*r,
     x, 0);
   if(!(old_snd_rcv_flags & IEM_GUI_OLD_SND_FLAG) && x->x_gui.x_fsf.x_snd_able)
-    sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxOUT%d\n", canvas, x, 0);
   if((old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && !x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxIN%d\n",
     canvas,
     xpos, ypos,
     xpos+IOWIDTH, ypos+1,
     x, 0);
   if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxIN%d\n", canvas, x, 0);
 }
 
 void numberbox_matrix_draw(t_numberbox_matrix *x, t_glist *glist, int mode)

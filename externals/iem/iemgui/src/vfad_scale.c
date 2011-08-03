@@ -1,4 +1,4 @@
-/* For information on usage and redistribution, and for a DISCLAIMER OF ALL
+%lx/* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
 iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */

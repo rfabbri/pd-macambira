@@ -53,7 +53,7 @@ static void iem_event_draw_new(t_iem_event *x, t_glist *glist)
   t_canvas *canvas=glist_getcanvas(glist);
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d  -outline %s -tags %xBASE\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d  -outline %s -tags %lxBASE\n",
     canvas, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h, IEM_GUI_IVNT_COLOR_SELECTED, x);
 }
 static void iem_event_draw_move(t_iem_event *x, t_glist *glist)
@@ -63,7 +63,7 @@ static void iem_event_draw_move(t_iem_event *x, t_glist *glist)
   t_canvas *canvas=glist_getcanvas(glist);
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c coords %xBASE %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxBASE %d %d %d %d\n",
     canvas, x, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h);
 }
 
@@ -72,7 +72,7 @@ static void iem_event_draw_erase(t_iem_event* x, t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
+    sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
 }
 
 static void iem_event_draw_select(t_iem_event *x, t_glist *glist)
@@ -84,11 +84,11 @@ static void iem_event_draw_select(t_iem_event *x, t_glist *glist)
     t_int xpos=text_xpix(&x->x_gui.x_obj, glist);
     t_int ypos=text_ypix(&x->x_gui.x_obj, glist);
     
-    sys_vgui(".x%x.c create rectangle %d %d %d %d  -outline %s -tags %xBASE\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d  -outline %s -tags %lxBASE\n",
       canvas, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h, IEM_GUI_IVNT_COLOR_SELECTED, x);
   }
   else
-    sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
+    sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
 }
 
 void iem_event_draw(t_iem_event *x, t_glist *glist, int mode)

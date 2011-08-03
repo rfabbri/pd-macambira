@@ -88,7 +88,7 @@ static void room_sim_2d_draw_update(t_room_sim_2d *x, t_glist *glist)
     
     dx = -(int)((t_float)x->x_pix_rad*(t_float)sin(x->x_rho_head*0.0174533f) + 0.49999f);
     dy = -(int)((t_float)x->x_pix_rad*(t_float)cos(x->x_rho_head*0.0174533f) + 0.49999f);
-    sys_vgui(".x%x.c coords %xNOSE %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxNOSE %d %d %d %d\n",
       canvas, x, xpos+x->x_pix_src_x[0], ypos+x->x_pix_src_y[0],
       xpos+x->x_pix_src_x[0]+dx, ypos+x->x_pix_src_y[0]+dy);
   }
@@ -103,24 +103,24 @@ void room_sim_2d_draw_new(t_room_sim_2d *x, t_glist *glist)
   int fs=x->x_fontsize;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %xBASE\n",
+  sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %lxBASE\n",
     canvas, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h,
     x->x_gui.x_bcol, x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:IEM_GUI_COLOR_NORMAL, x);
   for(i=1; i<=n; i++)
   {
-  sys_vgui(".x%x.c create text %d %d -text {%d} -anchor c \
-    -font {times %d bold} -fill #%6.6x -tags %xSRC%d\n",
+  sys_vgui(".x%lx.c create text %d %d -text {%d} -anchor c \
+    -font {times %d bold} -fill #%6.6x -tags %lxSRC%d\n",
     canvas, xpos+x->x_pix_src_x[i], ypos+x->x_pix_src_y[i], i, fs,
     x->x_col_src[i], x, i);
   }
   
-  sys_vgui(".x%x.c create oval %d %d %d %d -outline #%6.6x -tags %xHEAD\n",
+  sys_vgui(".x%lx.c create oval %d %d %d %d -outline #%6.6x -tags %lxHEAD\n",
     canvas, xpos+x->x_pix_src_x[0]-x->x_pix_rad, ypos+x->x_pix_src_y[0]-x->x_pix_rad,
     xpos+x->x_pix_src_x[0]+x->x_pix_rad-1, ypos+x->x_pix_src_y[0]+x->x_pix_rad-1,
     x->x_gui.x_fcol, x);
   dx = -(int)((t_float)x->x_pix_rad*(t_float)sin(x->x_rho_head*0.0174533f) + 0.49999f);
   dy = -(int)((t_float)x->x_pix_rad*(t_float)cos(x->x_rho_head*0.0174533f) + 0.49999f);
-  sys_vgui(".x%x.c create line %d %d %d %d -width 3 -fill #%6.6x -tags %xNOSE\n",
+  sys_vgui(".x%lx.c create line %d %d %d %d -width 3 -fill #%6.6x -tags %lxNOSE\n",
     canvas, xpos+x->x_pix_src_x[0], ypos+x->x_pix_src_y[0],
     xpos+x->x_pix_src_x[0]+dx, ypos+x->x_pix_src_y[0]+dy,
     x->x_gui.x_fcol, x);
@@ -134,21 +134,21 @@ void room_sim_2d_draw_move(t_room_sim_2d *x, t_glist *glist)
   int i, n;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c coords %xBASE %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxBASE %d %d %d %d\n",
     canvas, x, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h);
   n = x->x_nr_src;
   for(i=1; i<=n; i++)
   {
-    sys_vgui(".x%x.c coords %xSRC%d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxSRC%d %d %d\n",
       canvas, x, i, xpos+x->x_pix_src_x[i], ypos+x->x_pix_src_y[i]);
   }
   
-  sys_vgui(".x%x.c coords %xHEAD %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxHEAD %d %d %d %d\n",
     canvas, x, xpos+x->x_pix_src_x[0]-x->x_pix_rad, ypos+x->x_pix_src_y[0]-x->x_pix_rad,
     xpos+x->x_pix_src_x[0]+x->x_pix_rad-1, ypos+x->x_pix_src_y[0]+x->x_pix_rad-1);
   dx = -(int)((t_float)x->x_pix_rad*(t_float)sin(x->x_rho_head*0.0174533f) + 0.49999f);
   dy = -(int)((t_float)x->x_pix_rad*(t_float)cos(x->x_rho_head*0.0174533f) + 0.49999f);
-  sys_vgui(".x%x.c coords %xNOSE %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxNOSE %d %d %d %d\n",
     canvas, x, xpos+x->x_pix_src_x[0], ypos+x->x_pix_src_y[0],
     xpos+x->x_pix_src_x[0]+dx, ypos+x->x_pix_src_y[0]+dy);
 }
@@ -158,14 +158,14 @@ void room_sim_2d_draw_erase(t_room_sim_2d* x, t_glist* glist)
   int i, n;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
   n = x->x_nr_src;
   for(i=1; i<=n; i++)
   {
-    sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, i);
+    sys_vgui(".x%lx.c delete %lxSRC%d\n", canvas, x, i);
   }
-  sys_vgui(".x%x.c delete %xHEAD\n", canvas, x);
-  sys_vgui(".x%x.c delete %xNOSE\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxHEAD\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxNOSE\n", canvas, x);
 }
 
 void room_sim_2d_draw_select(t_room_sim_2d* x, t_glist* glist)
@@ -177,11 +177,11 @@ void room_sim_2d_draw_select(t_room_sim_2d* x, t_glist* glist)
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     
-    sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
+    sys_vgui(".x%lx.c itemconfigure %lxBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
   }
   else
   {
-    sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
+    sys_vgui(".x%lx.c itemconfigure %lxBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
   }
 }
 
@@ -271,12 +271,12 @@ static void room_sim_2d_motion(t_room_sim_2d *x, t_floatarg dx, t_floatarg dy)
     if(x->x_pix_src_y[0] > x->x_gui.x_h)
       x->x_pix_src_y[0] = x->x_gui.x_h;
     room_sim_2d_out_para(x);
-    sys_vgui(".x%x.c coords %xHEAD %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxHEAD %d %d %d %d\n",
       canvas, x, xpos+x->x_pix_src_x[0]-pixrad, ypos+x->x_pix_src_y[0]-pixrad,
       xpos+x->x_pix_src_x[0]+pixrad-1, ypos+x->x_pix_src_y[0]+pixrad-1);
     ddx = -(int)((t_float)pixrad*(t_float)sin(x->x_rho_head*0.0174533f) + 0.49999f);
     ddy = -(int)((t_float)pixrad*(t_float)cos(x->x_rho_head*0.0174533f) + 0.49999f);
-    sys_vgui(".x%x.c coords %xNOSE %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxNOSE %d %d %d %d\n",
       canvas, x, xpos+x->x_pix_src_x[0], ypos+x->x_pix_src_y[0],
       xpos+x->x_pix_src_x[0]+ddx, ypos+x->x_pix_src_y[0]+ddy);
   }
@@ -295,7 +295,7 @@ static void room_sim_2d_motion(t_room_sim_2d *x, t_floatarg dx, t_floatarg dy)
     if(x->x_pix_src_y[sel] > x->x_gui.x_h)
       x->x_pix_src_y[sel] = x->x_gui.x_h;
     room_sim_2d_out_para(x);
-    sys_vgui(".x%x.c coords %xSRC%d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxSRC%d %d %d\n",
       canvas, x, sel, xpos+x->x_pix_src_x[sel], ypos+x->x_pix_src_y[sel]);
   }
 }
@@ -406,7 +406,7 @@ static void room_sim_2d_src_font(t_room_sim_2d *x, t_floatarg ff)
   
   for(i=1; i<=n; i++)
   {
-    sys_vgui(".x%x.c itemconfigure %xSRC%d -font {times %d bold}\n", canvas, x, i, fs);
+    sys_vgui(".x%lx.c itemconfigure %lxSRC%d -font {times %d bold}\n", canvas, x, i, fs);
   }
 }
 
@@ -458,7 +458,7 @@ static void room_sim_2d_set_src_xy(t_room_sim_2d *x, t_symbol *s, int argc, t_at
     
     x->x_pix_src_x[i] = w2 - (int)(x->x_cnvrt_roomlx2pixh * xsrc + 0.49999f);
     x->x_pix_src_y[i] = h2 - (int)(x->x_cnvrt_roomlx2pixh * ysrc + 0.49999f);
-    sys_vgui(".x%x.c coords %xSRC%d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxSRC%d %d %d\n",
       canvas, x, i, xpos+x->x_pix_src_x[i], ypos+x->x_pix_src_y[i]);
   }
 }
@@ -499,12 +499,12 @@ static void room_sim_2d_set_head_xy(t_room_sim_2d *x, t_symbol *s, int argc, t_a
   x->x_pix_src_x[0] = w2 - (int)(x->x_cnvrt_roomlx2pixh * xh + 0.49999f);
   x->x_pix_src_y[0] = h2 - (int)(x->x_cnvrt_roomlx2pixh * yh + 0.49999f);
   
-  sys_vgui(".x%x.c coords %xHEAD %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxHEAD %d %d %d %d\n",
     canvas, x, xpos+x->x_pix_src_x[0]-pixrad, ypos+x->x_pix_src_y[0]-pixrad,
     xpos+x->x_pix_src_x[0]+pixrad-1, ypos+x->x_pix_src_y[0]+pixrad-1);
   ddx = -(int)((t_float)pixrad*(t_float)sin(x->x_rho_head*0.0174533f) + 0.49999f);
   ddy = -(int)((t_float)pixrad*(t_float)cos(x->x_rho_head*0.0174533f) + 0.49999f);
-  sys_vgui(".x%x.c coords %xNOSE %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxNOSE %d %d %d %d\n",
     canvas, x, xpos+x->x_pix_src_x[0], ypos+x->x_pix_src_y[0],
     xpos+x->x_pix_src_x[0]+ddx, ypos+x->x_pix_src_y[0]+ddy);
 }
@@ -582,7 +582,7 @@ static void room_sim_2d_room_col(t_room_sim_2d *x, t_floatarg fcol)
       col = 29;
     x->x_gui.x_bcol = my_iemgui_color_hex[col];
   }
-  sys_vgui(".x%x.c itemconfigure %xBASE -fill #%6.6x\n", canvas, x, x->x_gui.x_bcol);
+  sys_vgui(".x%lx.c itemconfigure %lxBASE -fill #%6.6x\n", canvas, x, x->x_gui.x_bcol);
 }
 
 static void room_sim_2d_head_col(t_room_sim_2d *x, t_floatarg fcol)
@@ -602,8 +602,8 @@ static void room_sim_2d_head_col(t_room_sim_2d *x, t_floatarg fcol)
       col = 29;
     x->x_gui.x_fcol = my_iemgui_color_hex[col];
   }
-  sys_vgui(".x%x.c itemconfigure %xHEAD -outline #%6.6x\n", canvas, x, x->x_gui.x_fcol);
-  sys_vgui(".x%x.c itemconfigure %xNOSE -fill #%6.6x\n", canvas, x, x->x_gui.x_fcol);
+  sys_vgui(".x%lx.c itemconfigure %lxHEAD -outline #%6.6x\n", canvas, x, x->x_gui.x_fcol);
+  sys_vgui(".x%lx.c itemconfigure %lxNOSE -fill #%6.6x\n", canvas, x, x->x_gui.x_fcol);
 }
 
 static void room_sim_2d_src_col(t_room_sim_2d *x, t_symbol *s, int argc, t_atom *argv)
@@ -629,7 +629,7 @@ static void room_sim_2d_src_col(t_room_sim_2d *x, t_symbol *s, int argc, t_atom 
           col = 29;
         x->x_col_src[j] = my_iemgui_color_hex[col];
       }
-      sys_vgui(".x%x.c itemconfigure %xSRC%d -fill #%6.6x\n", canvas, x, j, x->x_col_src[j]);
+      sys_vgui(".x%lx.c itemconfigure %lxSRC%d -fill #%6.6x\n", canvas, x, j, x->x_col_src[j]);
     }
   }
 }
@@ -788,7 +788,6 @@ void room_sim_2d_setup(void)
 {
   room_sim_2d_class = class_new(gensym("room_sim_2d"), (t_newmethod)room_sim_2d_new,
     (t_method)room_sim_2d_ff, sizeof(t_room_sim_2d), 0, A_GIMME, 0);
-//  class_addcreator((t_newmethod)room_sim_2d_new, gensym("room_sim_2d"), A_GIMME, 0);
   class_addmethod(room_sim_2d_class, (t_method)room_sim_2d_click, gensym("click"),
     A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod(room_sim_2d_class, (t_method)room_sim_2d_motion, gensym("motion"),

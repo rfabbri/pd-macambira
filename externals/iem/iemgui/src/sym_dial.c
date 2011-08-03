@@ -45,10 +45,10 @@ static void sym_dial_draw_swap(t_sym_dial *x, t_glist *glist, int swap)
 {
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c itemconfigure %xBASE -fill #%6.6x\n",
+  sys_vgui(".x%lx.c itemconfigure %lxBASE -fill #%6.6x\n",
     canvas, x,
     swap?x->x_gui.x_fcol:x->x_gui.x_bcol);
-  sys_vgui(".x%x.c itemconfigure %xSYMBOL -fill #%6.6x\n",
+  sys_vgui(".x%lx.c itemconfigure %lxSYMBOL -fill #%6.6x\n",
     canvas, x,
     swap?x->x_gui.x_bcol:x->x_gui.x_fcol);
 }
@@ -91,7 +91,7 @@ static void sym_dial_draw_update(t_sym_dial *x, t_glist *glist)
       string[x->x_gui.x_w-1] = '~';
       string[x->x_gui.x_w] = 0;
     }
-    sys_vgui(".x%x.c itemconfigure %xSYMBOL -fill #%6.6x -text {%s} \n",
+    sys_vgui(".x%lx.c itemconfigure %lxSYMBOL -fill #%6.6x -text {%s} \n",
       glist_getcanvas(glist), x,
       x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol,
       string);
@@ -115,7 +115,7 @@ static void sym_dial_draw_new(t_sym_dial *x, t_glist *glist)
     string[x->x_gui.x_w+1] = 0;
   }
   
-  sys_vgui(".x%x.c create polygon %d %d %d %d %d %d %d %d %d %d %d %d -outline #%6.6x -fill #%6.6x -tags %xBASE\n",
+  sys_vgui(".x%lx.c create polygon %d %d %d %d %d %d %d %d %d %d %d %d -outline #%6.6x -fill #%6.6x -tags %lxBASE\n",
     canvas, xpos-1, ypos,
     xpos + x->x_symwidth-4, ypos,
     xpos + x->x_symwidth, ypos+4,
@@ -123,29 +123,29 @@ static void sym_dial_draw_new(t_sym_dial *x, t_glist *glist)
     xpos-1, ypos + x->x_gui.x_h,
     xpos+half-1, ypos+half,
     IEM_GUI_COLOR_NORMAL, x->x_gui.x_bcol, x);
-    sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
-      -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
+    sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
+      -font {%s %d bold} -fill #%6.6x -tags %lxLABEL\n",
       canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
       strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
       x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_lcol, x);
-      sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
-        -font {%s %d bold} -fill #%6.6x -tags %xSYMBOL\n",
+      sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
+        -font {%s %d bold} -fill #%6.6x -tags %lxSYMBOL\n",
         canvas, xpos+half+2, ypos+half+d,
         string, x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_fcol, x);
       if(!x->x_gui.x_fsf.x_snd_able)
       {
-        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
           canvas,
           xpos, ypos + x->x_gui.x_h-1,
           xpos+IOWIDTH, ypos + x->x_gui.x_h,
           x, 0);
-        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
           canvas,
           xpos+x->x_symwidth-IOWIDTH, ypos + x->x_gui.x_h-1,
           xpos+x->x_symwidth, ypos + x->x_gui.x_h, x, 1);
       }
       if(!x->x_gui.x_fsf.x_rcv_able)
-        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxIN%d\n",
         canvas, xpos, ypos, xpos+IOWIDTH, ypos+1, x, 0);
 }
 
@@ -156,30 +156,30 @@ static void sym_dial_draw_move(t_sym_dial *x, t_glist *glist)
   int ypos=text_ypix(&x->x_gui.x_obj, glist);
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c coords %xBASE %d %d %d %d %d %d %d %d %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxBASE %d %d %d %d %d %d %d %d %d %d %d %d\n",
     canvas, x, xpos-1, ypos,
     xpos + x->x_symwidth-4, ypos,
     xpos + x->x_symwidth, ypos+4,
     xpos + x->x_symwidth, ypos + x->x_gui.x_h,
     xpos-1, ypos + x->x_gui.x_h,
     xpos+half-1, ypos+half);
-  sys_vgui(".x%x.c coords %xLABEL %d %d\n",
+  sys_vgui(".x%lx.c coords %lxLABEL %d %d\n",
     canvas, x, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy);
-  sys_vgui(".x%x.c coords %xSYMBOL %d %d\n",
+  sys_vgui(".x%lx.c coords %lxSYMBOL %d %d\n",
     canvas, x, xpos+half+2, ypos+half+d);
   if(!x->x_gui.x_fsf.x_snd_able)
   {
-    sys_vgui(".x%x.c coords %xOUT%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxOUT%d %d %d %d %d\n",
       canvas, x, 0,
       xpos, ypos + x->x_gui.x_h-1,
       xpos+IOWIDTH, ypos + x->x_gui.x_h);
-    sys_vgui(".x%x.c coords %xOUT%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxOUT%d %d %d %d %d\n",
       canvas, x, 1,
       xpos+x->x_symwidth-IOWIDTH, ypos + x->x_gui.x_h-1,
       xpos+x->x_symwidth, ypos + x->x_gui.x_h);
   }
   if(!x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxIN%d %d %d %d %d\n",
     canvas, x, 0,
     xpos, ypos,
     xpos+IOWIDTH, ypos+1);
@@ -189,30 +189,30 @@ static void sym_dial_draw_erase(t_sym_dial* x,t_glist* glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
-  sys_vgui(".x%x.c delete %xLABEL\n", canvas, x);
-  sys_vgui(".x%x.c delete %xSYMBOL\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxLABEL\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxSYMBOL\n", canvas, x);
   if(!x->x_gui.x_fsf.x_snd_able)
   {
-    sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
-    sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 1);
+    sys_vgui(".x%lx.c delete %lxOUT%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxOUT%d\n", canvas, x, 1);
   }
   if(!x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxIN%d\n", canvas, x, 0);
 }
 
 static void sym_dial_draw_config(t_sym_dial* x,t_glist* glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
+  sys_vgui(".x%lx.c itemconfigure %lxLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
     canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
     x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_lcol,
     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
-  sys_vgui(".x%x.c itemconfigure %xSYMBOL -font {%s %d bold} -fill #%6.6x \n",
+  sys_vgui(".x%lx.c itemconfigure %lxSYMBOL -font {%s %d bold} -fill #%6.6x \n",
     canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
     x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol);
-  sys_vgui(".x%x.c itemconfigure %xBASE -fill #%6.6x\n", canvas,
+  sys_vgui(".x%lx.c itemconfigure %lxBASE -fill #%6.6x\n", canvas,
     x, x->x_gui.x_bcol);
 }
 
@@ -224,12 +224,12 @@ static void sym_dial_draw_io(t_sym_dial* x,t_glist* glist, int old_snd_rcv_flags
   
   if((old_snd_rcv_flags & IEM_GUI_OLD_SND_FLAG) && !x->x_gui.x_fsf.x_snd_able)
   {
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
       canvas,
       xpos, ypos + x->x_gui.x_h-1,
       xpos+IOWIDTH, ypos + x->x_gui.x_h,
       x, 0);
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
       canvas,
       xpos+x->x_symwidth-IOWIDTH, ypos + x->x_gui.x_h-1,
       xpos+x->x_symwidth, ypos + x->x_gui.x_h,
@@ -237,17 +237,17 @@ static void sym_dial_draw_io(t_sym_dial* x,t_glist* glist, int old_snd_rcv_flags
   }
   if(!(old_snd_rcv_flags & IEM_GUI_OLD_SND_FLAG) && x->x_gui.x_fsf.x_snd_able)
   {
-    sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
-    sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 1);
+    sys_vgui(".x%lx.c delete %lxOUT%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxOUT%d\n", canvas, x, 1);
   }
   if((old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && !x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxIN%d\n",
     canvas,
     xpos, ypos,
     xpos+IOWIDTH, ypos+1,
     x, 0);
   if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
-    sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+    sys_vgui(".x%lx.c delete %lxIN%d\n", canvas, x, 0);
 }
 
 static void sym_dial_draw_select(t_sym_dial *x, t_glist *glist)
@@ -257,16 +257,16 @@ static void sym_dial_draw_select(t_sym_dial *x, t_glist *glist)
   if(x->x_gui.x_fsf.x_selected)
   {
     //  pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym2);
-    sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
-    sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
-    sys_vgui(".x%x.c itemconfigure %xSYMBOL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
+    sys_vgui(".x%lx.c itemconfigure %lxBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
+    sys_vgui(".x%lx.c itemconfigure %lxLABEL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
+    sys_vgui(".x%lx.c itemconfigure %lxSYMBOL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
   }
   else
   {
     //  pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym2);
-    sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
-    sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
-    sys_vgui(".x%x.c itemconfigure %xSYMBOL -fill #%6.6x\n", canvas, x, x->x_gui.x_fcol);
+    sys_vgui(".x%lx.c itemconfigure %lxBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
+    sys_vgui(".x%lx.c itemconfigure %lxLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
+    sys_vgui(".x%lx.c itemconfigure %lxSYMBOL -fill #%6.6x\n", canvas, x, x->x_gui.x_fcol);
   }
 }
 

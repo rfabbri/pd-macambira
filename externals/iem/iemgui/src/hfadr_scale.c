@@ -33,13 +33,13 @@ static void hfadr_scale_draw_new(t_hfadr_scale *x, t_glist *glist)
   int ypos=text_ypix(&x->x_gui.x_obj, glist);
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui("image create photo %xPHOTOIMAGE -format gif -data {%s} -width %d -height %d\n",
+  sys_vgui("image create photo %lxPHOTOIMAGE -format gif -data {%s} -width %d -height %d\n",
     x, x->x_gif, x->x_gui.x_w, x->x_gui.x_h);
-  sys_vgui(".x%x.c create image %d %d -image %xPHOTOIMAGE -tags %xPHOTO\n",
+  sys_vgui(".x%lx.c create image %d %d -image %lxPHOTOIMAGE -tags %lxPHOTO\n",
     canvas, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2-1, x, x);
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -outline #%6.6x -tags %xBASE\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -outline #%6.6x -tags %lxBASE\n",
     canvas, xpos-1, ypos+1,
     xpos + x->x_gui.x_w-1, ypos + x->x_gui.x_h,
     IEM_GUI_COLOR_SELECTED, x);
@@ -51,10 +51,10 @@ static void hfadr_scale_draw_move(t_hfadr_scale *x, t_glist *glist)
   int ypos=text_ypix(&x->x_gui.x_obj, glist);
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c coords %xPHOTO %d %d\n",
+  sys_vgui(".x%lx.c coords %lxPHOTO %d %d\n",
     canvas, x, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2-1);
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c coords %xBASE %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxBASE %d %d %d %d\n",
     canvas, x, xpos-1, ypos+1,
     xpos + x->x_gui.x_w-1, ypos + x->x_gui.x_h);
   canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
@@ -65,9 +65,9 @@ static void hfadr_scale_draw_erase(t_hfadr_scale* x, t_glist* glist)
   t_canvas *canvas=glist_getcanvas(glist);
   
   if(x->x_gui.x_fsf.x_selected)
-    sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
-  sys_vgui("image delete %xPHOTOIMAGE\n", x);
-  sys_vgui(".x%x.c delete %xPHOTO\n", canvas, x);
+    sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
+  sys_vgui("image delete %lxPHOTOIMAGE\n", x);
+  sys_vgui(".x%lx.c delete %lxPHOTO\n", canvas, x);
 }
 
 static void hfadr_scale_draw_select(t_hfadr_scale* x, t_glist* glist)
@@ -79,12 +79,12 @@ static void hfadr_scale_draw_select(t_hfadr_scale* x, t_glist* glist)
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -outline #%6.6x -tags %xBASE\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -outline #%6.6x -tags %lxBASE\n",
       canvas, xpos-1, ypos+1, xpos + x->x_gui.x_w-1,
       ypos + x->x_gui.x_h, IEM_GUI_COLOR_SELECTED, x);
   }
   else
-    sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
+    sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
 }
 
 static void hfadr_scale_draw(t_hfadr_scale *x, t_glist *glist, int mode)
@@ -126,7 +126,7 @@ static void hfadr_scale_color(t_hfadr_scale *x, t_symbol *s, int argc, t_atom *a
       x->x_gui.x_lcol = (-1 - i) & 0xffffff;
     my_iemgui_change_scale_col(x->x_gif, x->x_gui.x_lcol);
     if(glist_isvisible(x->x_gui.x_glist))
-      sys_vgui("%xPHOTOIMAGE configure -data {%s}\n", x, x->x_gif);
+      sys_vgui("%lxPHOTOIMAGE configure -data {%s}\n", x, x->x_gif);
   }
 }
 

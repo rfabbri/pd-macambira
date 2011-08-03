@@ -146,21 +146,21 @@ void cube_sphere_draw_new(t_cube_sphere *x, t_glist *glist)
   int i, n=x->x_n_src;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c create rectangle %d %d %d %d -outline #%6.6x -tags %xBASE\n",
+  sys_vgui(".x%lx.c create rectangle %d %d %d %d -outline #%6.6x -tags %lxBASE\n",
     canvas, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h,
     x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol, x);
-  sys_vgui(".x%x.c create oval %d %d %d %d -fill #%6.6x -tags %xCIRC_AQ\n",
+  sys_vgui(".x%lx.c create oval %d %d %d %d -fill #%6.6x -tags %lxCIRC_AQ\n",
     canvas, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h, x->x_gui.x_bcol, x);
-  sys_vgui(".x%x.c create oval %d %d %d %d -tags %xCIRC_WK\n",
+  sys_vgui(".x%lx.c create oval %d %d %d %d -tags %lxCIRC_WK\n",
     canvas, x2-2*r3, y2-2*r3, x2+2*r3, y2+2*r3, x);
-  sys_vgui(".x%x.c create oval %d %d %d %d -tags %xCIRC_PK\n",
+  sys_vgui(".x%lx.c create oval %d %d %d %d -tags %lxCIRC_PK\n",
     canvas, x2-r3, y2-r3, x2+r3, y2+r3, x);
-  sys_vgui(".x%x.c create oval %d %d %d %d -tags %xCIRC_NP\n",
+  sys_vgui(".x%lx.c create oval %d %d %d %d -tags %lxCIRC_NP\n",
     canvas, x2-2, y2-2, x2+2, y2+2, x);
   if(x->x_null)
   {
-  sys_vgui(".x%x.c create text %d %d -text {+} -anchor c \
-    -font {times %d bold} -fill #%6.6x -tags %xSRC0\n",
+  sys_vgui(".x%lx.c create text %d %d -text {+} -anchor c \
+    -font {times %d bold} -fill #%6.6x -tags %lxSRC0\n",
     canvas, xpos+x->x_pix_src_x[0], ypos+x->x_pix_src_y[0], x->x_fontsize,
     x->x_col_src[0], x);
   }
@@ -169,8 +169,8 @@ void cube_sphere_draw_new(t_cube_sphere *x, t_glist *glist)
     for(i=0; i<n; i++)
     {
       if(x->x_vis_src[i])
-      sys_vgui(".x%x.c create text %d %d -text {%d} -anchor c \
-      -font {times %d bold} -fill #%6.6x -tags %xSRC%d\n",
+      sys_vgui(".x%lx.c create text %d %d -text {%d} -anchor c \
+      -font {times %d bold} -fill #%6.6x -tags %lxSRC%d\n",
       canvas, xpos+x->x_pix_src_x[i], ypos+x->x_pix_src_y[i], i+1, x->x_fontsize,
       x->x_col_src[i], x, i);
     }
@@ -187,20 +187,20 @@ void cube_sphere_draw_move(t_cube_sphere *x, t_glist *glist)
   int i, n=x->x_n_src;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c coords %xBASE %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxBASE %d %d %d %d\n",
     canvas, x, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h);
-  sys_vgui(".x%x.c coords %xCIRC_AQ %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxCIRC_AQ %d %d %d %d\n",
     canvas, x, xpos, ypos, xpos + x->x_gui.x_w, ypos + x->x_gui.x_h);
-  sys_vgui(".x%x.c coords %xCIRC_WK %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxCIRC_WK %d %d %d %d\n",
     canvas, x, x2-2*r3, y2-2*r3, x2+2*r3, y2+2*r3);
-  sys_vgui(".x%x.c coords %xCIRC_PK %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxCIRC_PK %d %d %d %d\n",
     canvas, x, x2-r3, y2-r3, x2+r3, y2+r3);
-  sys_vgui(".x%x.c coords %xCIRC_NP %d %d %d %d\n",
+  sys_vgui(".x%lx.c coords %lxCIRC_NP %d %d %d %d\n",
     canvas, x, x2-2, y2-2, x2+2, y2+2);
   for(i=0; i<n; i++)
   {
     if(x->x_vis_src[i])
-      sys_vgui(".x%x.c coords %xSRC%d %d %d\n",
+      sys_vgui(".x%lx.c coords %lxSRC%d %d %d\n",
       canvas, x, i, xpos+x->x_pix_src_x[i], ypos+x->x_pix_src_y[i]);
   }
 }
@@ -210,16 +210,16 @@ void cube_sphere_draw_erase(t_cube_sphere* x, t_glist* glist)
   int i, n;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
-  sys_vgui(".x%x.c delete %xCIRC_AQ\n", canvas, x);
-  sys_vgui(".x%x.c delete %xCIRC_WK\n", canvas, x);
-  sys_vgui(".x%x.c delete %xCIRC_PK\n", canvas, x);
-  sys_vgui(".x%x.c delete %xCIRC_NP\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxBASE\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxCIRC_AQ\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxCIRC_WK\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxCIRC_PK\n", canvas, x);
+  sys_vgui(".x%lx.c delete %lxCIRC_NP\n", canvas, x);
   n = x->x_n_src;
   for(i=0; i<n; i++)
   {
     if(x->x_vis_src[i])
-      sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, i);
+      sys_vgui(".x%lx.c delete %lxSRC%d\n", canvas, x, i);
   }
 }
 
@@ -227,7 +227,7 @@ void cube_sphere_draw_select(t_cube_sphere* x, t_glist* glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
   
-  sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n",
+  sys_vgui(".x%lx.c itemconfigure %lxBASE -outline #%6.6x\n",
     canvas, x, x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol);
 }
 
@@ -314,7 +314,7 @@ static void cube_sphere_motion(t_cube_sphere *x, t_floatarg dx, t_floatarg dy)
       x->x_pix_src_x[sel] = rad + xx;
     }
     cube_sphere_out_sel(x);
-    sys_vgui(".x%x.c coords %xSRC%d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxSRC%d %d %d\n",
       canvas, x, sel, xpos+x->x_pix_src_x[sel], ypos+x->x_pix_src_y[sel]);
   }
 }
@@ -405,7 +405,7 @@ static void cube_sphere_src_font(t_cube_sphere *x, t_floatarg ff)
     for(i=0; i<n; i++)
     {
       if(x->x_vis_src[i])
-        sys_vgui(".x%x.c itemconfigure %xSRC%d -font {times %d bold}\n", canvas, x, i, fs);
+        sys_vgui(".x%lx.c itemconfigure %lxSRC%d -font {times %d bold}\n", canvas, x, i, fs);
     }
   }
 }
@@ -439,7 +439,7 @@ static void cube_sphere_src_dp(t_cube_sphere *x, t_symbol *s, int argc, t_atom *
     x->x_pix_src_x[i] = x->x_radius - (int)(delta*sin(phi) + 0.49999f);
     x->x_pix_src_y[i] = x->x_radius - (int)(delta*cos(phi) + 0.49999f);
     if(glist_isvisible(x->x_gui.x_glist) && x->x_vis_src[i])
-      sys_vgui(".x%x.c coords %xSRC%d %d %d\n",
+      sys_vgui(".x%lx.c coords %lxSRC%d %d %d\n",
       canvas, x, i, xpos+x->x_pix_src_x[i], ypos+x->x_pix_src_y[i]);
   }
 }
@@ -488,7 +488,7 @@ static void cube_sphere_size(t_cube_sphere *x, t_floatarg size)
   if(glist_isvisible(x->x_gui.x_glist))
   {
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-    canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+    canvas_fixlinesfor(x->x_gui.x_glist, (t_text*)x);
   }
 }
 
@@ -515,15 +515,15 @@ static void cube_sphere_vis(t_cube_sphere *x, t_symbol *s, int argc, t_atom *arg
     if(newstate && !oldstate)
     {
       if(glist_isvisible(x->x_gui.x_glist))
-      sys_vgui(".x%x.c create text %d %d -text {%d} -anchor c \
-      -font {times %d bold} -fill #%6.6x -tags %xSRC%d\n",
+      sys_vgui(".x%lx.c create text %d %d -text {%d} -anchor c \
+      -font {times %d bold} -fill #%6.6x -tags %lxSRC%d\n",
       canvas, xpos+x->x_pix_src_x[iindex], ypos+x->x_pix_src_y[iindex], iindex+1, x->x_fontsize,
       x->x_col_src[iindex], x, iindex);
     }
     else if(!newstate && oldstate)
     {
       if(glist_isvisible(x->x_gui.x_glist))
-        sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, iindex);
+        sys_vgui(".x%lx.c delete %lxSRC%d\n", canvas, x, iindex);
     }
     x->x_vis_src[iindex] = newstate;
   }
@@ -536,15 +536,15 @@ static void cube_sphere_vis(t_cube_sphere *x, t_symbol *s, int argc, t_atom *arg
       if(newstate && !oldstate)
       {
         if(glist_isvisible(x->x_gui.x_glist))
-        sys_vgui(".x%x.c create text %d %d -text {%d} -anchor c \
-        -font {times %d bold} -fill #%6.6x -tags %xSRC%d\n",
+        sys_vgui(".x%lx.c create text %d %d -text {%d} -anchor c \
+        -font {times %d bold} -fill #%6.6x -tags %lxSRC%d\n",
         canvas, xpos+x->x_pix_src_x[iindex], ypos+x->x_pix_src_y[iindex], iindex+1, x->x_fontsize,
         x->x_col_src[iindex], x, iindex);
       }
       else if(!newstate && oldstate)
       {
         if(glist_isvisible(x->x_gui.x_glist))
-          sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, iindex);
+          sys_vgui(".x%lx.c delete %lxSRC%d\n", canvas, x, iindex);
       }
       x->x_vis_src[iindex] = newstate;
     }
@@ -569,7 +569,7 @@ static void cube_sphere_sphere_col(t_cube_sphere *x, t_floatarg fcol)
     x->x_gui.x_bcol = my_iemgui_color_hex[col];
   }
   if(glist_isvisible(x->x_gui.x_glist))
-    sys_vgui(".x%x.c itemconfigure %xCIRC_AQ -fill #%6.6x\n", canvas, x, x->x_gui.x_bcol);
+    sys_vgui(".x%lx.c itemconfigure %lxCIRC_AQ -fill #%6.6x\n", canvas, x, x->x_gui.x_bcol);
 }
 
 static void cube_sphere_frame_col(t_cube_sphere *x, t_floatarg fcol)
@@ -590,7 +590,7 @@ static void cube_sphere_frame_col(t_cube_sphere *x, t_floatarg fcol)
     x->x_gui.x_fcol = my_iemgui_color_hex[col];
   }
   if(glist_isvisible(x->x_gui.x_glist))
-    sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n",
+    sys_vgui(".x%lx.c itemconfigure %lxBASE -outline #%6.6x\n",
     canvas, x, x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol);
 }
 
@@ -618,7 +618,7 @@ static void cube_sphere_src_col(t_cube_sphere *x, t_symbol *s, int argc, t_atom 
         x->x_col_src[src_index] = my_iemgui_color_hex[col];
       }
       if((x->x_vis_src[src_index]) && glist_isvisible(x->x_gui.x_glist))
-        sys_vgui(".x%x.c itemconfigure %xSRC%d -fill #%6.6x\n", canvas, x, src_index, x->x_col_src[src_index]);
+        sys_vgui(".x%lx.c itemconfigure %lxSRC%d -fill #%6.6x\n", canvas, x, src_index, x->x_col_src[src_index]);
     }
   }
 }
@@ -755,7 +755,6 @@ void cube_sphere_setup(void)
 {
   cube_sphere_class = class_new(gensym("cube_sphere"), (t_newmethod)cube_sphere_new,
     (t_method)cube_sphere_ff, sizeof(t_cube_sphere), 0, A_GIMME, 0);
-//  class_addcreator((t_newmethod)cube_sphere_new, gensym("cube_sphere"), A_GIMME, 0);
   class_addmethod(cube_sphere_class, (t_method)cube_sphere_click, gensym("click"),
     A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod(cube_sphere_class, (t_method)cube_sphere_motion, gensym("motion"),
