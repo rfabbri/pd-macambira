@@ -1,4 +1,4 @@
-## Pd library template version 1.0.7
+## Pd library template version 1.0.9
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 #
@@ -9,12 +9,13 @@
 LIBRARY_NAME = OSC
 
 # add your .c source files, one object per file, to the SOURCES
-# variable, help files will be included automatically
-SOURCES = packOSC.c pipelist.c routeOSC.c unpackOSC.c
+# variable, help files will be included automatically, and for GUI
+# objects, the matching .tcl file too
+SOURCES = packOSC.c  pipelist.c  routeOSC.c  unpackOSC.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = 
+PDOBJECTS = packOSCstream.pd unpackOSCstream.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = 
@@ -29,10 +30,11 @@ MANUAL =
 EXTRA_DIST = 
 
 
-
-DEFS =
-
-
+HELPPATCHES = \
+	packOSC-help.pd \
+	packOSCstream-help.pd \
+	pipelist-help.pd routeOSC-help.pd \
+	unpackOSCstream-help.pd
 
 #------------------------------------------------------------------------------#
 #
@@ -40,7 +42,7 @@ DEFS =
 #
 #------------------------------------------------------------------------------#
 
-# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
+# -I"$(PD_INCLUDE)" supports the header location for 0.43
 ALL_CFLAGS = -I"$(PD_INCLUDE)"
 ALL_LDFLAGS =  
 ALL_LIBS = 
@@ -59,7 +61,7 @@ LIBS=
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"' $(DEFS)
+ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
 PD_INCLUDE = $(PD_PATH)/include/pd
 # where to install the library, overridden below depending on platform
@@ -104,7 +106,7 @@ ifeq ($(UNAME),Darwin)
     EXTENSION = pd_darwin
     OS = macosx
     PD_PATH = /Applications/Pd-extended.app/Contents/Resources
-    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 
+    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
 # build universal 32-bit on 10.4 and 32/64 on newer
     ifeq ($(shell uname -r | sed 's|\([0-9][0-9]*\)\.[0-9][0-9]*\.[0-9][0-9]*|\1|'), 8)
       FAT_FLAGS = -arch ppc -arch i386 -mmacosx-version-min=10.4
@@ -131,15 +133,18 @@ ifeq ($(UNAME),ANDROID)
   EXTENSION = pd_linux
   OS = android
   PD_PATH = /usr
-  NDK_BASE=/usr/local/android-ndk
-  NDK_SYSROOT=$(NDK_BASE)/platforms/android-5/arch-arm
-  NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86
-  CC=$(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
+  NDK_BASE := /usr/local/android-ndk
+  NDK_PLATFORM_VERSION := 5
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_VERSION)/arch-arm
+  NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
+  NDK_TOOLCHAIN_BASE=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
+  CC := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-gcc --sysroot=$(NDK_SYSROOT)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC -I$(NDK_SYSROOT)/usr/include
-  LDFLAGS += -Wl,--export-dynamic -L$(NDK_SYSROOT)/usr/lib -shared -fPIC
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared
   LIBS += -lc
-  STRIP = strip --strip-unneeded -R .note -R .comment
+  STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
+	--strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq ($(UNAME),Linux)
@@ -147,9 +152,8 @@ ifeq ($(UNAME),Linux)
   SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
   OS = linux
-  PD_PATH = /usr/local
-  OPT_CFLAGS = -g -O0
-#  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
   ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   ALL_LIBS += -lc
@@ -247,6 +251,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -287,7 +294,6 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 distclean: clean
-	-rm -f -- *~
 	-rm -f -- $(DISTBINDIR).tar.gz
 	-rm -rf -- $(DISTBINDIR)
 	-rm -f -- $(DISTDIR).tar.gz
@@ -320,6 +326,8 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(strip $(shell ls $(ALLSOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
