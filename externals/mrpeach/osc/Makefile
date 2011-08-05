@@ -1,4 +1,4 @@
-## Pd library template version 1.0.9
+## Pd library template version 1.0.9-zmoelnig
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 #
@@ -6,7 +6,7 @@
 # the name of this library
 # must not contain any spaces or weird characters (as it's used for
 # filenames,...)
-LIBRARY_NAME = OSC
+LIBRARY_NAME = osc
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically, and for GUI
