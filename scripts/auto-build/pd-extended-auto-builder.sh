@@ -44,7 +44,9 @@ rsync_distro "$auto_build_root_dir"
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" set_version
 make test_locations
-echo "mounts ----------------------------------------"
+echo "--- environment ----------------------------------------"
+set
+echo "--- mounts ----------------------------------------"
 mount
 print_ip_address
 make package_clean
