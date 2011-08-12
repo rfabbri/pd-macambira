@@ -273,7 +273,7 @@ static void ms_params_get(t_ms_params*parms) {
   parms->num_indev =(indevs >0)?indevs:0;
   parms->num_outdev=(outdevs>0)?outdevs:0;
 
-  //  ms_params_print(parms);
+  // ms_params_print(parms);
 }
 
 
@@ -322,7 +322,10 @@ static void midisettings_listdevices_devices(t_outlet *outlet,
       dummy[MAXPDSTRING-1]=0;
       devname=dummy;
     } else {
-      devname=ms_symkeys_getname(devices, i)->s_name;
+      t_symbol *s_devname=ms_symkeys_getname(devices, i);
+      if(s_devname) {
+          devname=s_devname->s_name;
+      }
     }
     if(devname) {
       SETSYMBOL(atoms+count+1, gensym(devname));
@@ -422,7 +425,7 @@ static void midisettings_params_apply(t_midisettings*x) {
   int alsamidi=(API_ALSA==sys_midiapi);
 
   t_atom argv [MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2];
-  int    argc= MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2;
+  unsigned int    argc= MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2;
 
   unsigned int i=0;
 
