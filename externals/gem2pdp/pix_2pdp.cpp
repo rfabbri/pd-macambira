@@ -57,6 +57,10 @@ void pix_2pdp::bangMess()
     // make pdp packet
     psize = gem_xsize * gem_ysize;
     m_packet0 = pdp_packet_new_image_YCrCb( gem_xsize, gem_ysize);
+    if(!m_packet0) {
+      error("couldn't allocate new pdp packet...");
+      return;
+    }
     m_header = pdp_packet_header(m_packet0);
     m_data = (short int *)pdp_packet_data(m_packet0);
 
