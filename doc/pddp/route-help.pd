@@ -5,25 +5,25 @@
 -204280 -1 0;
 #X obj 0 240 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
-#N canvas 52 220 494 392 META 0;
-#X text 12 75 PLATFORM windows macosx gnulinux;
-#X text 12 155 LIBRARY internal;
-#X text 12 195 WEBSITE http://crca.ucsd.edu/~msp/;
+#N canvas 50 229 494 392 META 0;
+#X text 12 85 PLATFORM windows macosx gnulinux;
+#X text 12 165 LIBRARY internal;
+#X text 12 205 WEBSITE http://crca.ucsd.edu/~msp/;
 #X text 12 35 LICENSE SIBSD;
-#X text 12 175 AUTHOR Miller Puckette;
-#X text 12 235 HELP_PATCH_AUTHORS This help patch was updated for Pd
+#X text 12 185 AUTHOR Miller Puckette;
+#X text 12 245 HELP_PATCH_AUTHORS This help patch was updated for Pd
 version 0.38.4 by Dave Sabine and Hans-Christoph Steiner as part of
 a project called pddp proposed by Krzysztof Czaja to build comprehensive
 documentation for Pd. Jonathan Wilkes revised the patch to conform
 to the PDDP template for Pd version 0.42.;
-#X text 12 55 DESCRIPTION route message according to their first element
-;
-#X text 12 95 INLET_0 anything;
-#X text 12 115 OUTLET_N anything;
-#X text 12 135 OUTLET_R anything;
+#X text 12 105 INLET_0 anything;
+#X text 12 125 OUTLET_N anything;
+#X text 12 145 OUTLET_R anything;
 #X text 12 5 KEYWORDS control needs_work list_op symbol_op list_op
 anything_op;
-#X text 12 215 RELEASE_DATE 1997;
+#X text 12 225 RELEASE_DATE 1997;
+#X text 12 55 DESCRIPTION route a message according to the selector
+or first element;
 #X restore 500 597 pd META;
 #X obj 0 362 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
@@ -60,7 +60,6 @@ pdpedia: route;
 #X obj 187 136 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X msg 300 61 7 17;
-#X text 11 23 route messages according to their first element;
 #N canvas 11 63 516 509 float_mode 0;
 #X text 89 271 float;
 #X text 89 365 list;
@@ -239,10 +238,13 @@ be sent to the rejection outlet.;
 are used \, [route] operates in "float mode"-- if symbols are used
 \, float operates in "selector mode." See the subpatches above to see
 how incoming data is handled in each mode.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 100 572 pddp/pddplink ../2.control.examples/18.conditional.pd
 -text doc/2.control.examples/18.conditional.pd;
 #X msg 300 85 Grizabella;
+#X text 11 23 route a message according to the selector or first element
+;
 #X connect 12 0 17 0;
 #X connect 12 0 21 0;
 #X connect 12 1 19 0;
@@ -253,4 +255,4 @@ how incoming data is handled in each mode.;
 #X connect 14 0 12 0;
 #X connect 15 0 12 0;
 #X connect 22 0 12 0;
-#X connect 41 0 12 0;
+#X connect 40 0 12 0;
