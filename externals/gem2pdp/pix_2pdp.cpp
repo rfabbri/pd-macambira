@@ -92,8 +92,9 @@ void pix_2pdp::bangMess()
             *(pV) = ( yuv_RGBtoV( (g1<<16) +  (g2<<8) +  g3 ) - 128 ) << 8;
             *(pU) = ( yuv_RGBtoU( (g1<<16) +  (g2<<8) +  g3 ) - 128 ) << 8;
             pY++;
-            if ( (px%2==0) && (py%2==0) )
+            if ( (px%2==0) && (py%2==0) ) {
               pV++; pU++;
+	    }
           }
         }
         pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
