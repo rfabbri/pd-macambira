@@ -886,26 +886,11 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
    x->x_dentries = NULL;
 
    // get current directory full path
-   x->x_curdir = ( char * ) getbytes( MAX_DIR_LENGTH );
- 
-#ifdef _WIN32  
-   char path[_MAX_DIR]; 
-
-   _getcwd (path, _MAX_DIR); 
-	post ("Current directory is: %s", path);
-	tmpcurdir = path;
-	
-#else
-	tmpcurdir = getenv( "PWD" );
-#endif
-	
-   if ( tmpcurdir == NULL )
-   {
-     post( "playlist : could not get current directory ( where the hell are you ??? )" ); 
-     return NULL; 
-   }
-   strncpy( x->x_curdir, tmpcurdir, strlen( tmpcurdir ) );
-   x->x_curdir[ strlen( tmpcurdir ) ] = '\0';
+   t_symbol *cwd = canvas_getdir(canvas_getcurrent());
+   int cwdlen = strlen(cwd->s_name);
+   x->x_curdir = ( char * ) getbytes( cwdlen );
+   strncpy( x->x_curdir, cwd->s_name, cwdlen );
+   x->x_curdir[ cwdlen ] = '\0';
 
    x->x_selected = 0;
    x->x_itemselected = -1;
