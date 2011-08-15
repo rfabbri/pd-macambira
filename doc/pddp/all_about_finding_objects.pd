@@ -1,23 +1,19 @@
-#N canvas 278 26 448 150 10;
-#X obj 1 1 cnv 15 445 20 empty \$0-pddp.cnv.header finding_pd_objects
+#N canvas 0 0 448 447 10;
+#X obj 1 1 cnv 15 445 20 empty \$0-pddp.cnv.header Pure_Data_search
 20 10 1 18 -261106 -33289 0;
 #X obj 407 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#X obj 1 123 cnv 15 445 20 empty \$0-pddp.cnv.footer empty 20 12 0
+#X obj 1 425 cnv 15 445 20 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -233017 -33289 0;
-#N canvas 278 205 494 284 META 0;
+#N canvas 274 223 494 284 META 0;
 #X text 12 65 LIBRARY PDDP;
 #X text 12 5 GENRE all_about_pd;
 #X text 12 45 DESCRIPTION tips for searching for objects;
 #X text 12 25 KEYWORDS help;
-#X msg 19 114 tot destroy .^.m;
-#X obj 19 142 tot .parent;
 #X text 12 85 HELP_PATCH_AUTHORS Jonathan Wilkes \, Pd-ext 0.42.;
-#X connect 4 0 5 0;
-#X connect 5 3 4 0;
-#X restore 392 125 pd META;
-#X obj 6 125 pddp/pddplink all_about.pd -text All About Pd;
-#N canvas 13 162 428 183 References 0;
+#X restore 392 427 pd META;
+#X obj 6 427 pddp/pddplink all_about.pd -text All About Pd;
+#N canvas 9 180 428 183 References 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -261106 -33289 0;
 #X text 7 2 Searching for Objects;
@@ -25,10 +21,31 @@
 #X text 32 59 * mailing lists;
 #X text 32 79 * google;
 #X text 32 99 * your own harddrive;
-#X restore 103 125 pd References;
-#X text 19 26 Enter search terms to match the descriptions in the help
-files. (This will match the description in the help patch);
-#X text 19 56 You can also specify specific PDDP keywords preceded
-by an '@' sign. For example \, '@AUTHOR Puckette'. '@AUTHOR Puckette
-@INLET_0 symbol' matches all objects by Miller Puckette that accept
-a symbol at the left inlet.;
+#X restore 103 427 pd References;
+#X text 19 121 Advanced Search;
+#X text 19 26 Simple Search;
+#X text 19 26 _____________;
+#X text 19 121 _______________;
+#X text 19 46 Enter your search terms and click "Search" \, or click
+a keyword. You can use the drop-down menu below the search bar to filter
+the results by category.;
+#X text 19 176 You can use regular expressions \, too:;
+#X text 19 91 Searches are not case sensitive.;
+#X text 19 196 "obj [0-9]+ [0-9]+ osc~ [0-9]+" will match all help
+patches that have an [osc~] object with a creation argument.;
+#X text 19 141 Use quotes to search for a specific phrase \, such as:
+"frequency modulation";
+#X obj 24 261 pddp/pddplink http://www.tcl.tk/man/tcl8.5/TclCmd/re_syntax.htm
+;
+#X text 19 226 Pd search uses the regex syntax from the Tcl language
+\, which is documented here:;
+#X text 19 286 Finally \, you can make use of PDDP keywords to refine
+your search. For example:;
+#X text 19 336 OUTLET_0.*symbol ..... sends a symbol from the left
+outlet;
+#X text 19 316 AUTHOR.*Puckette ..... all objects authored by Miller
+;
+#X text 19 356 LICENSE.*GPL ......... objects are licensed under the
+GPL;
+#X text 19 376 For more details on PDDP tags \, see:;
+#X obj 24 396 pddp/pddplink all_about_pd_META.pd;
