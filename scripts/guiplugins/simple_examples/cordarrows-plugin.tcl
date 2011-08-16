@@ -13,4 +13,4 @@ proc add_arrows_to_cords {mytoplevel} {
 }
 
 
-bind all <<EditMode>> {+add_arrows_to_cords %W}
+bind PatchWindow <<EditMode>> {+add_arrows_to_cords %W}
