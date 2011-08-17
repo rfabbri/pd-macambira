@@ -558,8 +558,9 @@ $(gem_src)/configure:
 $(gem_src)/Gem.dll: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
-		--prefix=/ \
+		--prefix=$(prefix) \
 		--libdir=$(objectsdir) \
+		--disable-rpath \
 		--enable-sse2 \
 		--without-quicktime \
 		--with-video=plugins \
