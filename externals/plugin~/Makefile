@@ -1,4 +1,4 @@
-## Pd library template version 1.0.6
+## Pd library template version 1.0.10
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = plugin~
@@ -111,6 +111,28 @@ ifeq ($(UNAME),Darwin)
     pkglibdir=$(HOME)/Library/Pd
   endif
 endif
+# Tho Android uses Linux, we use this fake uname to provide an easy way to
+# setup all this things needed to cross-compile for Android using the NDK
+ifeq ($(UNAME),ANDROID)
+  CPU := arm
+  SOURCES += $(SOURCES_android)
+  EXTENSION = pd_linux
+  OS = android
+  PD_PATH = /usr
+  NDK_BASE := /usr/local/android-ndk
+  NDK_PLATFORM_VERSION := 5
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_VERSION)/arch-arm
+  NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
+  NDK_TOOLCHAIN_BASE=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
+  CC := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-gcc --sysroot=$(NDK_SYSROOT)
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared
+  LIBS += -lc
+  STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
+	--strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
 ifeq ($(UNAME),Linux)
   CPU := $(shell uname -m)
   SOURCES += $(SOURCES_linux)
@@ -157,7 +179,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   SOURCES += $(SOURCES_cygwin)
   EXTENSION = dll
   OS = cygwin
-  PD_PATH = $(cygpath $(PROGRAMFILES))/pd
+  PD_PATH = $(shell cygpath $$PROGRAMFILES)/pd
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
@@ -170,7 +192,9 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   SOURCES += $(SOURCES_windows)
   EXTENSION = dll
   OS = windows
-  PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
+  PD_PATH = $(shell cd "$$PROGRAMFILES/pd" && pwd)
+  # MinGW doesn't seem to include cc so force gcc
+  CC=gcc
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
@@ -212,6 +236,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -246,8 +273,7 @@ install-manual:
 
 
 clean:
-	-rm -f -- $(EXTRA_SOURCES:.c=.o)
-	-rm -f -- $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o)
+	-rm -f -- $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o) $(EXTRA_SOURCES:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
 	-rm -f -- $(LIBRARY_NAME).o
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
@@ -282,10 +308,11 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) Makefile  $(DISTDIR)
 	$(INSTALL_DATA) README.txt $(DISTDIR)
 	$(INSTALL_DATA) LICENSE.txt $(DISTDIR)
-	$(INSTALL_DATA) $(EXTRA_SOURCES) $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(strip $(shell ls $(ALLSOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
@@ -318,6 +345,7 @@ etags:
 	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showsetup:
+	@echo "CC: $(CC)"
 	@echo "CFLAGS: $(CFLAGS)"
 	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo "LIBS: $(LIBS)"
