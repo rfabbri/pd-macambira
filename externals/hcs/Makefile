@@ -1,4 +1,4 @@
-## Pd library template version 1.0.9
+## Pd library template version 1.0.10
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = hcs
@@ -182,7 +182,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   SOURCES += $(SOURCES_cygwin)
   EXTENSION = dll
   OS = cygwin
-  PD_PATH = $(cygpath $(PROGRAMFILES))/pd
+  PD_PATH = $(shell cygpath $$PROGRAMFILES)/pd
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
@@ -195,7 +195,9 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   SOURCES += $(SOURCES_windows)
   EXTENSION = dll
   OS = windows
-  PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
+  PD_PATH = $(shell cd "$$PROGRAMFILES/pd" && pwd)
+  # MinGW doesn't seem to include cc so force gcc
+  CC=gcc
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
@@ -346,6 +348,7 @@ etags:
 	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showsetup:
+	@echo "CC: $(CC)"
 	@echo "CFLAGS: $(CFLAGS)"
 	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo "LIBS: $(LIBS)"
