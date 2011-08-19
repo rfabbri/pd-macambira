@@ -6,7 +6,10 @@ LIBRARY_NAME = unauthorized
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
-SOURCES = audience~.c beatify~.c blinkenlights.c compressor~.c cooled~.c countund.c disto~.c exciter.c filterbank~.c formant~.c grid.c mp3amp~.c mp3cast~.c mp3fileout~.c mp3streamin~.c mp3streamout~.c mp3write~.c pianoroll.c playlist.c probalizer.c randomblock~.c samplebox~.c scratcher~.c scrolllist.c sonogram~.c speexin~.c speexout~.c spigot~.c wahwah~.c
+SOURCES = audience~.c beatify~.c blinkenlights.c compressor~.c cooled~.c countund.c disto~.c exciter.c filterbank~.c formant~.c grid.c mp3cast~.c mp3fileout~.c mp3streamin~.c mp3streamout~.c mp3write~.c pianoroll.c playlist.c probalizer.c randomblock~.c samplebox~.c scratcher~.c scrolllist.c sonogram~.c speexin~.c speexout~.c spigot~.c wahwah~.c
+
+SOURCES_linux = mp3amp~.c
+SOURCES_macosx = mp3amp~.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
