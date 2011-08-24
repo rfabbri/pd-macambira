@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb gem ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp loaders-pdlua pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp loaders-pdlua pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -136,13 +136,13 @@ ifeq ($(OS_NAME),windows)
 else
   ifeq ($(OS_NAME),darwin)
 # on Mac OS X 10.6/Snow Leopard don't build hid since it needs Carbon
-    LIB_TARGETS += pdp gem2pdp iem16 apple
+    LIB_TARGETS += gem pdp gem2pdp iem16 apple
     ifneq ($(shell uname -r | sed 's|10\.[0-9][0-9]*\.[0-9][0-9]*|10|'),10)
       LIB_TARGETS += hid
     endif
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp gem2pdp iem16
+    LIB_TARGETS += gem hid pdp gem2pdp iem16
   endif
 endif
 
