@@ -1,5 +1,5 @@
-#N canvas 117 9 858 468 12;
-#N canvas 445 134 647 348 creation 0;
+#N canvas 1 53 858 468 12;
+#N canvas 376 163 647 348 creation 0;
 #X obj 52 235 outlet;
 #X text 246 38 specifying all;
 #X text 159 216 TIP:don't set the layers param too high;
@@ -8,7 +8,7 @@
 #X msg 59 38 create 2 1 5 3 3 1 0.7;
 #X text 159 179 params: num_input \, num_output \, frames \, num_layers
 \, num_neurons_hidden \, connection_rate \, learning_rate;
-#N canvas 218 152 650 413 what 0;
+#N canvas 219 181 650 413 what 0;
 #X text 37 134 you pass [0 0.1] to ann_tdnn;
 #X text 34 152 internally now there is this array: [0 0.1 0 0 0 0]
 ;
@@ -40,7 +40,7 @@ an input is internally held in the input array;
 #X connect 3 0 0 0;
 #X connect 5 0 0 0;
 #X restore 93 68 pd creation examples;
-#N canvas 136 60 728 356 run 0;
+#N canvas 137 89 728 356 run 0;
 #X obj 90 219 outlet;
 #X msg 123 69 0 1;
 #X msg 124 92 1 0;
@@ -58,7 +58,7 @@ directory;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
 #X restore 107 180 pd run the net;
-#N canvas 0 0 619 610 other 0;
+#N canvas 1 53 619 610 other 0;
 #X obj 43 401 outlet;
 #X msg 102 37 train;
 #X msg 103 63 run;
@@ -66,7 +66,7 @@ directory;
 #X msg 153 63 setmode 1;
 #X text 249 40 set training/running mode;
 #X text 247 63 training mode currently not implemented;
-#N canvas 265 255 690 335 training 0;
+#N canvas 266 284 690 335 training 0;
 #X obj 71 288 outlet;
 #X msg 82 195 FANN_TRAIN_INCREMENTAL;
 #X msg 82 216 FANN_TRAIN_BATCH;
@@ -83,7 +83,7 @@ http://fann.sourceforge.net/html/r1996.html;
 #X connect 4 0 0 0;
 #X restore 150 153 pd training algorithm;
 #X text 360 175 some advanced param;
-#N canvas 371 92 698 395 training 0;
+#N canvas 325 121 698 395 training 0;
 #X obj 52 230 outlet;
 #X msg 69 118 desired_error 0.01;
 #X msg 79 146 max_iterations 500000;
@@ -94,7 +94,7 @@ details (http://fann.sourceforge.net);
 #X connect 2 0 0 0;
 #X connect 3 0 0 0;
 #X restore 151 179 pd training params;
-#N canvas 371 92 694 391 activation 0;
+#N canvas 329 121 694 391 activation 0;
 #X obj 49 335 outlet;
 #X text 40 28 you can set ti output activation algorithm passing a
 message to nn. see the FANN manual for description of the algorithms
@@ -131,7 +131,7 @@ message to nn. see the FANN manual for description of the algorithms
 #X connect 11 0 0 0;
 #X connect 13 0 0 0;
 #X restore 128 258 pd other commands;
-#N canvas 0 0 665 525 save 0;
+#N canvas 1 53 665 525 save 0;
 #X obj 39 264 outlet;
 #X msg 64 20 filename test.net;
 #X msg 66 46 save;
@@ -170,7 +170,7 @@ don't use the same output for 2 meanings \, use 2 outputs intead \,
 #X text 272 371 an interface to fann classes (http://fann.sourceforge.net)
 ;
 #X text 274 389 by Davide Morelli - info@davidemorelli.it;
-#N canvas 227 183 580 411 train 0;
+#N canvas 228 212 580 411 train 0;
 #X obj 32 241 outlet;
 #N canvas 100 44 892 558 train 0;
 #X obj 57 397 outlet;
@@ -228,6 +228,20 @@ like:;
 #X text 148 331 see [pd creation examples] for details;
 #X obj 33 319 ann_td 2 5;
 #X text 9 2 ann_td: time delay neural networks in pd;
+#N canvas 406 195 494 332 META 0;
+#X text 12 210 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 5 KEYWORDS control;
+#X text 12 150 OUTLET_0;
+#X text 12 170 OUTLET_1;
+#X text 12 190 AUTHOR Davide Morelli - info@davidemorelli.it;
+#X text 12 45 DESCRIPTION time delay neural networks in pd;
+#X text 12 65 INLET_0 list create train train-on-file filename save
+load setmode run FANN_TRAIN_INCREMENTAL FANN_TRAIN_BATCH FANN_TRAIN_RPROP
+FANN_TRAIN_QUICKPROP desired_error max_iterations iterations_between_reports
+set_activation_function_output;
+#X restore 734 408 pd META;
 #X connect 0 0 16 0;
 #X connect 1 0 16 0;
 #X connect 2 0 16 0;
