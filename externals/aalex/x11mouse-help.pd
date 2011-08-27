@@ -1,4 +1,4 @@
-#N canvas 63 104 997 560 10;
+#N canvas 1 53 997 581 10;
 #X obj 13 10 cnv 15 150 140 empty empty empty 20 12 0 14 -258699 -66577
 0;
 #X obj 385 63 cnv 15 100 100 empty empty empty 20 12 0 14 -258699 -66577
@@ -18,7 +18,7 @@
 #X obj 848 95 f 0;
 #X obj 889 95 + 1;
 #X msg 927 58 0;
-#X obj 802 41 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 802 41 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X msg 810 186 move \$1 \$1;
 #X obj 848 125 > 50;
@@ -49,6 +49,16 @@ is likely to change.;
 #X text 545 337 Try all examples.;
 #X text 221 297 press 1 on;
 #X text 218 320 press 1 off;
+#N canvas 455 314 494 251 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 85 AUTHOR Alexandre Quessy;
+#X text 12 105 WEBSITE http://alexandre.quessy.net/;
+#X text 12 5 KEYWORDS control user_input;
+#X text 12 45 DESCRIPTION simulate X11 mouse events;
+#X text 12 65 INLET_0 help click press move;
+#X restore 906 533 pd META;
 #X connect 7 0 6 0;
 #X connect 7 0 18 0;
 #X connect 8 0 6 0;

@@ -1,4 +1,4 @@
-#N canvas 290 25 528 547 10;
+#N canvas 1 53 528 547 10;
 #X text 132 380 current state;
 #X msg 221 149 size 4;
 #X obj 138 111 t b b b b b;
@@ -39,6 +39,18 @@
 using an adjacency matrix for storing probabilities to obtain every
 other state next \, It can be illustrated as an oriented graph. Probabilities
 are calculated on the sum of each numbers or every row.;
+#N canvas 345 236 494 251 META 0;
+#X text 12 175 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 45 DESCRIPTION weighted finite states machine using an adjacency
+matrix for storing probabilities to obtain every other state next;
+#X text 12 135 AUTHOR Alexandre Quessy;
+#X text 12 155 WEBSITE http://alexandre.quessy.net/;
+#X text 12 95 INLET_0 bang set next row content;
+#X text 12 115 OUTLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X restore 411 379 pd META;
 #X connect 1 0 4 0;
 #X connect 2 0 9 0;
 #X connect 2 1 8 0;
