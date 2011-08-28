@@ -1,4 +1,4 @@
-#N canvas 0 30 680 606 10;
+#N canvas 1 53 680 606 10;
 #X obj 201 569 dac~;
 #X obj 40 168 dirac~;
 #X msg 40 148 0;
@@ -41,6 +41,16 @@
 or equal to the block size. Larger partition sizes are more efficient
 \, to a point \, but increase latency (the delay between input and
 output is equal to the partition size minus the block size).;
+#N canvas 380 283 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control abstraction MIDI conversion;
+#X text 12 45 DESCRIPTION partitioned convolution external;
+#X text 12 65 INLET_0 signal set;
+#X text 12 85 OUTLET_0 signal;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Benjamin R. Saylor <bensaylor@fastmail.fm>;
+#X restore 594 570 pd META;
 #X connect 1 0 21 0;
 #X connect 1 0 33 0;
 #X connect 2 0 1 0;

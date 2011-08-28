@@ -1,7 +1,7 @@
-#N canvas 10 20 762 475 10;
+#N canvas 1 53 762 520 10;
 #X obj 170 445 dac~;
 #X obj 7 369 phasor~;
-#X floatatom 7 347 5 0 0;
+#X floatatom 7 347 5 0 0 0 - - -;
 #X obj 145 329 sig~;
 #X obj 190 329 sig~;
 #X obj 97 257 mtof;
@@ -13,9 +13,9 @@
 -1 -1 0 1;
 #X obj 97 329 line~;
 #X msg 97 306 \$1 100;
-#X floatatom 200 281 5 0 0;
-#X floatatom 155 281 5 0 0;
-#X floatatom 97 281 7 0 0;
+#X floatatom 200 281 5 0 0 0 - - -;
+#X floatatom 155 281 5 0 0 0 - - -;
+#X floatatom 97 281 7 0 0 0 - - -;
 #X msg 361 123 low;
 #X msg 361 147 high;
 #X msg 361 171 band;
@@ -31,7 +31,7 @@
 #X msg 37 180 0;
 #X text 141 13 CALCULATE HANNING;
 #X text 141 27 WINDOW TABLE;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array hanning 512 float 0;
 #X coords 0 1 511 0 256 128 1;
 #X restore 305 93 graph;
@@ -90,7 +90,7 @@
 #X connect 10 0 9 0;
 #X connect 11 0 6 0;
 #X restore 216 421 pd fft-analysis;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array response 256 float 0;
 #X coords 0 1 255 0 256 140 1;
 #X restore 478 10 graph;
@@ -112,10 +112,25 @@ Bandpass frequency seems to be in Hz. If the frequency is set too high
 \, LOUD aliasing is produced.;
 #X text 339 418 The bandpass filter is very sensitive to q - normal
 range is 0 to 0.1.;
+#N canvas 338 198 494 403 META 0;
+#X text 12 245 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 205 LIBRARY external bsaylor;
+#X text 12 5 KEYWORDS signal filter;
+#X text 12 45 DESCRIPTION state-variable filter;
+#X text 12 65 INLET_0 signal low high band notch peak;
+#X text 12 105 INLET_2 signal;
+#X text 12 85 INLET_1 signal;
+#X text 12 125 OUTLET_0 signal;
+#X text 12 145 OUTLET_1 signal;
+#X text 12 165 OUTLET_2 signal;
+#X text 12 185 OUTLET_3 signal;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 225 AUTHOR Benjamin R. Saylor <bensaylor@fastmail.fm>;
+#X restore 690 468 pd META;
 #X connect 1 0 29 0;
 #X connect 2 0 1 0;
 #X connect 3 0 29 2;
-#X connect 4 0 29 3;
 #X connect 5 0 13 0;
 #X connect 6 0 5 0;
 #X connect 7 0 3 0;
