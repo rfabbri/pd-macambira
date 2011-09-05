@@ -1,4 +1,4 @@
-Porvides:
+Provides:
   hammimng~, hanning~, blackman~, cosine~, connes~, bartlett~,
   welch~, lanczos~, gaussian~, and kaiser~
 
