@@ -28,6 +28,7 @@
  */
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "m_pd.h"
 #include "dssi.h"
@@ -37,6 +38,9 @@
 #define EVENT_BUFSIZE     1024
 #define OSC_PORT          9998
 #define UI_TARGET_ELEMS   2
+
+/*From hexter_types.h by Sean Bolton */
+#define DX7_PERFORMANCE_SIZE 64
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
@@ -61,6 +65,8 @@ typedef struct _ph_instance {
     int              ui_hidden;
     int              ui_show;
     t_atom           ui_target[UI_TARGET_ELEMS]; /* host, port */
+    uint8_t          perf_buffer[DX7_PERFORMANCE_SIZE];
+
 
     int *plugin_port_ctlin_numbers; /*not sure if this should go here?*/
     DSSI_Program_Descriptor *plugin_pgms;

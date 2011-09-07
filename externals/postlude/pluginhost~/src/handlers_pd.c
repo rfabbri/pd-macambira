@@ -36,7 +36,7 @@
 #include "handlers_osc.h"
 #include "ph_common.h"
 
-#define DX7_VOICE_SIZE_PACKED   28 /*From hexter_types.h by Sean Bolton */
+#define DX7_VOICE_SIZE_PACKED   128 /*From hexter_types.h by Sean Bolton */
 #define DX7_DUMP_SIZE_BULK      4096+8
 #define DX7_BANK_SIZE           32
 #define DX7_MAX_PATCH_SIZE      16384
@@ -49,14 +49,18 @@
 #define TYPE_STRING_SIZE  20
 #define OSC_ADDR_MAX      8192
 
-#ifdef DEBUG
+#if DEBUG == 1
 #define CHECKSUM_PATCH_FILES_ON_LOAD 1
 #endif
+
+#define CLASS_NAME_STR "pluginhost~"
+
 
 /*From dx7_voice.h by Sean Bolton */
 typedef struct _dx7_patch_t {
     uint8_t data[128];
 } dx7_patch_t;
+
 
 /*From dx7_voice_data.c by Sean Bolton */
 static char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -155,7 +159,9 @@ static void ph_midibuf_add(ph *x, int type, unsigned int chan, int param, int va
     t_int time_ref = x->time_ref;
     t_int mapped;
 
-    mapped = x->channel_map[chan + 1] - 1;
+    //mapped = x->channel_map[chan + 1] - 1;
+    /* FIX: get rid of mapping functionality */
+    mapped = chan;
 
     x->midi_event_buf[x->buf_write_index].time.time.tv_sec = 
         (t_int)(clock_gettimesince(time_ref) * .001); 
@@ -454,16 +460,16 @@ static t_int ph_configure_buffer(ph *x, char *key,
 static t_int *ph_perform(t_int *w)
 {
     unsigned int instance;
-    unsigned int timediff;
-    unsigned int framediff;
     unsigned int i;
     unsigned int N;
+    int timediff;
+    int framediff;
     t_float **inputs;
     t_float **outputs;
     ph *x;
 
     x       = (ph *)(w[1]);
-    N       = (t_int)(w[2]);
+    N       = (unsigned int)(w[2]);
     inputs  = (t_float **)(&w[3]);
     outputs = (t_float **)(&w[3] + x->plugin_ins);
 
@@ -485,6 +491,7 @@ static t_int *ph_perform(t_int *w)
             if(instance > x->n_instances){
                 pd_error(x,
             "%s: %s: discarding spurious MIDI data, for instance %d", 
+                        CLASS_NAME_STR, 
                         x->descriptor->LADSPA_Plugin->Label, 
                         instance);
                 ph_debug_post("n_instances = %d", x->n_instances);
@@ -497,11 +504,11 @@ static t_int *ph_perform(t_int *w)
                 continue;
             }
 
-            timediff = (t_int)(clock_gettimesince(x->time_ref) * 1000) - 
+            timediff = (int)(clock_gettimesince(x->time_ref) * 1000) - 
                 x->midi_event_buf[x->buf_read_index].time.time.tv_nsec;
-            framediff = (t_int)((t_float)timediff * .000001 / x->sr_inv); 
+            framediff = (int)((t_float)timediff * .000001 / x->sr_inv); 
 
-            if (framediff >= N || framediff < 0) 
+            if (framediff >= (int)N || framediff < 0) 
                 x->midi_event_buf[x->buf_read_index].time.tick = 0;
             else
                 x->midi_event_buf[x->buf_read_index].time.tick = 
@@ -788,7 +795,7 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
                             raw_patch_data[DX7_DUMP_SIZE_BULK - 2]) {
 
                         pd_error(x, "DX7 32 voice dump with bad checksum!");
-                        count = 0;
+                        count = 0; 
 #endif
 
 
@@ -835,7 +842,9 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
             key = DSSI_PROJECT_DIRECTORY_KEY;
             value = x->project_dir;
         } else if (!strcmp(msg_type, "dir")) {
-            pd_error(x, "%s: %s %s: operation not supported", msg_type, 
+            pd_error(x, "%s: %s %s: operation not supported", 
+                    CLASS_NAME_STR,
+                    msg_type, 
                     argv[1].a_w.w_symbol->s_name);
         }
 
@@ -894,6 +903,7 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
     }
 
     if(key != NULL && value != NULL){
+
         if(instance == -1){
             while(n_instances--){
                 debug = ph_send_configure(x, key, value, n_instances);
@@ -901,9 +911,44 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
             }
         }
         /*TODO: Put some error checking in here to make sure instance is valid*/
+        /* FIX: this is all a big hack (putting UI stuff in the host). Either
+         * hexter needs to expose these settings somehow (e.g. as configure 
+         * key-value pairs), or we need a [hexter_ui] external/patch that 
+         * mirrors the functionality of hexter_gtk */
         else{
-
-            debug = ph_send_configure(x, key, value, instance);
+            if(!strcmp(key, "pitch_bend_range")){
+                x->instances[instance].perf_buffer[3] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "portamento_time"))  {
+                x->instances[instance].perf_buffer[5] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "mod_wheel_sensitivity"))  {
+                x->instances[instance].perf_buffer[9] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "foot_sensitivity")) {
+                x->instances[instance].perf_buffer[11] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "pressure_sensitivity")) {
+                x->instances[instance].perf_buffer[13] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "breath_sensitivity")) {
+                x->instances[instance].perf_buffer[4] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else {
+                debug = ph_send_configure(x, key, value, instance);
+            }
             ph_configure_buffer(x, key, value, instance);
         }
     }
@@ -993,7 +1038,7 @@ void handle_pd_reset(ph *x, int i)
     ladspa = x->descriptor->LADSPA_Plugin;
 
     for(n = 0; n < x->n_instances; n++) {
-        if (i == -1 || n == i) {
+        if (i == -1 || (int)n == i) {
             if (ladspa->deactivate && ladspa->activate){
                 ladspa->deactivate(x->instance_handles[n]);
                 ladspa->activate(x->instance_handles[n]);

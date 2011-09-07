@@ -36,5 +36,5 @@ void handle_osc_control(ph *x, t_atom *argv, int i);
 void handle_osc_midi(ph *x, t_atom *argv, unsigned int i);
 void handle_osc_configure(ph *x, t_atom *argv, int i);
 void handle_osc_exiting(ph *x, t_atom *argv, int i);
-void handle_osc_update(ph *x, t_atom *argv, int i);
+void handle_osc_update(ph *x, t_atom *argv, unsigned int i);
 

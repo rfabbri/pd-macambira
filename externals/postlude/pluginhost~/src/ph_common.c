@@ -42,7 +42,18 @@
 #include "jutils.h"
 #include "ph_common.h"
 
-#define DEBUG_STRING_SIZE 1024
+#define DEBUG_STRING_SIZE 8192
+
+/*From dx7_voice_data.c */
+uint8_t dx7_init_performance[DX7_PERFORMANCE_SIZE] = {    0,  0, 0, 2, 0,  0, 0,  0,
+    0, 15, 1, 0, 4, 15, 2, 15,
+    2,  0, 0, 0, 0,  0, 0,  0,
+    0,  0, 0, 0, 0,  0, 0,  0,
+    0,  0, 0, 0, 0,  0, 0,  0,
+    0,  0, 0, 0, 0,  0, 0,  0,
+    0,  0, 0, 0, 0,  0, 0,  0,
+    0,  0, 0, 0, 0,  0, 0,  0
+};
 
 static LADSPA_Data ph_get_port_default(ph *x, int port)
 {
@@ -224,7 +235,7 @@ static void ph_assign_ports(ph *x)
 
         x->instances[i].plugin_port_ctlin_numbers = 
             (int *)malloc(x->descriptor->LADSPA_Plugin->PortCount * 
-                    sizeof(int));/* hmmm... as we don't support instances of differing plugin types, we probably don't need to do this dynamically*/
+                    sizeof(int));
     }
 
     x->plugin_ctlin_port_numbers = 
@@ -238,9 +249,27 @@ static void ph_assign_ports(ph *x)
 static void ph_init_instance(ph *x, unsigned int i)
 {
 
-    ph_instance zero = {0};
+    x->instances[i].plugin_pgm_count = 0;
+    x->instances[i].ui_needs_pgm_update = 0;
+    x->instances[i].ui_osc_control_path = NULL;
+    x->instances[i].ui_osc_configure_path = NULL;
+    x->instances[i].ui_osc_program_path = NULL;
+    x->instances[i].ui_osc_show_path = NULL;
+    x->instances[i].ui_osc_hide_path = NULL;
+    x->instances[i].ui_osc_quit_path = NULL;
+    x->instances[i].osc_url_path = NULL;
+    x->instances[i].current_bank = 0;
+    x->instances[i].current_pgm = 0;
+    x->instances[i].pending_pgm_change = -1;
+    x->instances[i].pending_bank_lsb = -1;
+    x->instances[i].pending_bank_msb = -1;
+    x->instances[i].ui_hidden = 1;
+    x->instances[i].ui_show = 0;
+    memcpy(x->instances[i].perf_buffer, &dx7_init_performance, DX7_PERFORMANCE_SIZE);
 
-    x->instances[i] = zero;
+    //x->instances[i].plugin_port_ctlin_numbers = NULL;
+    x->instances[i].plugin_pgms = NULL;
+
     ph_debug_post("Instance %d initialized!", i);
 
 }
@@ -249,9 +278,6 @@ static void ph_connect_ports(ph *x, unsigned int i)
 {
 
     unsigned int n;
-    ph_instance *instance;
-
-    instance = &x->instances[i];
 
     for(n = 0; n < x->descriptor->LADSPA_Plugin->PortCount; n++){
         ph_debug_post("PortCount: %d of %d", n, 
@@ -260,7 +286,7 @@ static void ph_connect_ports(ph *x, unsigned int i)
         LADSPA_PortDescriptor pod =
             x->descriptor->LADSPA_Plugin->PortDescriptors[n];
 
-        instance->plugin_port_ctlin_numbers[n] = -1;
+        x->instances[i].plugin_port_ctlin_numbers[n] = -1;
 
         if (LADSPA_IS_PORT_AUDIO(pod)) {
             if (LADSPA_IS_PORT_INPUT(pod)) {
@@ -280,7 +306,8 @@ static void ph_connect_ports(ph *x, unsigned int i)
         else if (LADSPA_IS_PORT_CONTROL(pod)) {
             if (LADSPA_IS_PORT_INPUT(pod)) {
                 x->plugin_ctlin_port_numbers[x->ports_control_in] = (unsigned long) i;
-                instance->plugin_port_ctlin_numbers[n] = x->ports_control_in;
+                x->instances[i].plugin_port_ctlin_numbers[n] = 
+                    x->ports_control_in;
                 x->plugin_control_input[x->ports_control_in] = 
                     (t_float) ph_get_port_default(x, n);
                 ph_debug_post("default for port %d, control_in, %d is %.2f", n,
@@ -554,7 +581,8 @@ static void osc_setup(ph *x, unsigned int i)
     instance->osc_url_path = malloc(sizeof(char) * 
             (strlen(x->plugin_basename) + 
              strlen(x->descriptor->LADSPA_Plugin->Label) + 
-             strlen("chan00") + 3));
+             //strlen("chan00") + 3));
+             6 + 3));
     sprintf(instance->osc_url_path, "%s/%s/chan%02d", x->plugin_basename, 
             x->descriptor->LADSPA_Plugin->Label, i); 
     ph_debug_post("OSC Path is: %s", instance->osc_url_path);
@@ -565,7 +593,7 @@ static void osc_setup(ph *x, unsigned int i)
 
 void ph_debug_post(const char *fmt, ...)
 {
-#if DEBUG
+#if DEBUG == 1
     unsigned int currpos;
     char     newfmt[DEBUG_STRING_SIZE];
     char     result[DEBUG_STRING_SIZE];
@@ -601,9 +629,11 @@ void ph_quit_plugin(ph *x)
         instance = &x->instances[i];
          if(x->is_dssi){
             argc = 2;
-            SETSYMBOL(argv, gensym(instance->ui_osc_quit_path));  
-            SETSYMBOL(argv+1, gensym(""));
-            ph_instance_send_osc(x->message_out, instance, argc, argv);
+            if(instance->ui_osc_quit_path != NULL) {
+                SETSYMBOL(argv, gensym(instance->ui_osc_quit_path));  
+                SETSYMBOL(argv+1, gensym(""));
+                ph_instance_send_osc(x->message_out, instance, argc, argv);
+            }
          }
          ph_deactivate_plugin(x, i);
          ph_cleanup_plugin(x, i);
@@ -617,7 +647,7 @@ void ph_query_programs(ph *x, unsigned int i)
     ph_debug_post("querying programs");
 
     /* free old lot */
-    if (instance->plugin_pgms) {
+    if (instance->plugin_pgms != NULL) {
         for (n = 0; n < instance->plugin_pgm_count; n++) {
             free((void *)instance->plugin_pgms[n].Name);
         }
@@ -696,10 +726,14 @@ void ph_program_change(ph *x, unsigned int i)
 
             /* TODO - this is a hack to make text ui work*/
             if(x->is_dssi){
-                SETSYMBOL(argv, gensym(instance->ui_osc_program_path));
-                SETFLOAT(argv+1, instance->current_bank);
-                SETFLOAT(argv+2, instance->current_pgm);
-                ph_instance_send_osc(x->message_out, instance, argc, argv);
+                // FIX: need to check this because if we don't have a UI,
+                // update didn't get called
+                if (false) {
+                    SETSYMBOL(argv, gensym(instance->ui_osc_program_path));
+                    SETFLOAT(argv+1, instance->current_bank);
+                    SETFLOAT(argv+2, instance->current_pgm);
+                    ph_instance_send_osc(x->message_out, instance, argc, argv);
+                }
             }
 
         }
@@ -711,7 +745,7 @@ void ph_program_change(ph *x, unsigned int i)
     ph_get_current_pgm(x, i);
 }
 
-char *ph_send_configure(ph *x, const char *key, const char *value,
+char *ph_send_configure(ph *x, const char *key, const char *value, 
         unsigned int i)
 {
 

@@ -91,7 +91,7 @@ void handle_osc_program(ph *x, t_atom *argv, unsigned int i)
     }
 
     if (!found) {
-        pd_error(x, "UI requested unknown program: bank %ul, program %ul: "
+        pd_error(x, "UI requested unknown program: bank %lu, program %lu: "
                 "sending to plugin anyway (plugin should ignore it)\n", 
                 bank, program);
     }
@@ -185,7 +185,7 @@ void handle_osc_exiting(ph *x, t_atom *argv, int i)
 
 }
 
-void handle_osc_update(ph *x, t_atom *argv, int i)
+void handle_osc_update(ph *x, t_atom *argv, unsigned int i)
 {
     const char *url; 
     const char *path;
