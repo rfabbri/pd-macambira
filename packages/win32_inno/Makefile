@@ -111,7 +111,7 @@ lib_install:
 	install -p $(bin_src)/pthreadGC2.dll     $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libdl.dll          $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libgcc_s_dw2-1.dll $(DESTDIR)$(prefix)/
-	install -p $(bin_src)/libstd++-6.dll     $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libstdc++-6.dll    $(DESTDIR)$(prefix)/
 # these stay with pd.exe
 	install -d $(DESTDIR)$(bindir)
 	install -p $(bin_src)/tcl85.dll     $(DESTDIR)$(bindir)
