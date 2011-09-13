@@ -112,6 +112,8 @@ lib_install:
 	install -p $(bin_src)/libdl.dll          $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libgcc_s_dw2-1.dll $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libstdc++-6.dll    $(DESTDIR)$(prefix)/
+# very old pthread lib from pd-vanilla
+	install -p pthreadVC.dll $(DESTDIR)$(bindir)
 # these stay with pd.exe
 	install -d $(DESTDIR)$(bindir)
 	install -p $(bin_src)/tcl85.dll     $(DESTDIR)$(bindir)
@@ -120,7 +122,6 @@ lib_install:
 # if these are installed, include them in the build root
 	-install -p $(system32)/msvcp71.dll   $(DESTDIR)$(bindir)
 	-install -p $(system32)/msvcr71.dll   $(DESTDIR)$(bindir)
-	-install -p $(system32)/pthreadVC.dll $(DESTDIR)$(bindir)
 # these go into the Pd package's lib dir
 	install -d $(DESTDIR)$(libdir)/tcl8
 	cp -rp /usr/local/lib/tcl8/* $(DESTDIR)$(libdir)/tcl8
