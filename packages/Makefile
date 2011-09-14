@@ -199,17 +199,10 @@ externals_install:
 # noncvs_install
 # this is for including pre-compiled binaries in a build
 noncvs_install:
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(DESTDIR)$(bindir)
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* $(DESTDIR)$(helpdir)
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(DESTDIR)$(objectsdir)
-ifeq ($(OS_NAME),windows)
-	-install -p $(packages_src)/noncvs/windows/extra/Gem/*.* \
-		$(DESTDIR)$(objectsdir)/$(GEM_NAME)/
-endif
-	-test -d $(packages_src)/noncvs/$(OS_NAME)/gripd && \
-		install -d $(DESTDIR)$(prefix)/gripd
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/gripd/*.* \
-		$(DESTDIR)$(prefix)/gripd
+	install -d $(DESTDIR)$(objectsdir)
+	cd $(packages_src)/noncvs/$(OS_NAME)/extra/ && \
+		tar --exclude-vcs --create * | \
+		tar --extract --directory $(DESTDIR)$(objectsdir)
 
 
 #==============================================================================#
