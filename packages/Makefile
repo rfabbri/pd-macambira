@@ -200,10 +200,10 @@ externals_install:
 # this is for including pre-compiled binaries in a build
 noncvs_install:
 	install -d $(DESTDIR)$(objectsdir)
-	test -d $(packages_src)/noncvs/$(OS_NAME)/extra/ && \
-		cd $(packages_src)/noncvs/$(OS_NAME)/extra/ && \
+	test ! -d $(packages_src)/noncvs/$(OS_NAME)/extra/ || \
+		(cd $(packages_src)/noncvs/$(OS_NAME)/extra/ && \
 		tar --exclude-vcs --create * | \
-		tar --extract --directory $(DESTDIR)$(objectsdir)
+		tar --extract --directory $(DESTDIR)$(objectsdir) )
 
 
 #==============================================================================#
