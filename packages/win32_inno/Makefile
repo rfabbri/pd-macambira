@@ -14,8 +14,8 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 
-# Generic x86 (tune for Pentium III, since that's most common these days)
-OPT_CFLAGS += -mcpu=i586 -mtune=pentium3
+# compile for pentium4 so we can use SSE2
+OPT_CFLAGS += -march=pentium4 -msse2 -mfpmath=sse
 
 
 # these are sent to all of the various Makefiles so that they all copy their
