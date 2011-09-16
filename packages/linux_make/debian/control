@@ -9,7 +9,7 @@ Package: pd-extended
 Architecture: i386
 Depends: xterm | x-terminal-emulator, ttf-dejavu-core, x-ttcidfont-conf, tcllib
 Provides: pd
-Recommends: xdg-utils, puredata, pulseaudio-utils
+Recommends: xdg-utils, puredata-dev, puredata-utils, pulseaudio-utils
 Conflicts: pdextended, cyclist
 Replaces: pdextended, cyclist
 Description: Pure Data with patches and a large collection of externals

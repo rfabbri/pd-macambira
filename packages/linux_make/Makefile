@@ -109,7 +109,7 @@ deb: $(bindir)
 # files for /etc
 	install -d $(DESTDIR)/etc/bash_completion.d/
 	install -p -m0644 $(scripts_src)/bash_completion/pd \
-		$(DESTDIR)/etc/bash_completion.d
+		$(DESTDIR)/etc/bash_completion.d/pd-extended
 	install -d $(DESTDIR)/etc/default
 	install -p -m0644 $(scripts_src)/debian/default/pd-extended \
 		$(DESTDIR)/etc/default
@@ -128,11 +128,12 @@ deb: $(bindir)
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
-# delete these since they are provided by the 'puredata' package
+# delete these since they are provided by the 'puredata' package suite
 	rm -f $(DESTDIR)$(bindir)/pdsend
 	rm -f $(DESTDIR)$(bindir)/pdreceive
 	rm -f $(DESTDIR)/usr/share/man/man1/pdsend.1.gz
 	rm -f $(DESTDIR)/usr/share/man/man1/pdreceive.1.gz
+	rm -f $(DESTDIR)/usr/include/m_pd.h
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
