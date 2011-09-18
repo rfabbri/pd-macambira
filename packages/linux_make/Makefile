@@ -129,17 +129,20 @@ deb: $(bindir)
 		$(DESTDIR)/usr/share/emacs/site-lisp/
 # the 'pd' command should be handled by update-alternatives
 	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
+	mv $(DESTDIR)/usr/share/man/man1/pd.1 \
+		$(DESTDIR)/usr/share/man/man1/pd-extended.1
+	gzip $(DESTDIR)/usr/share/man/man1/pd-extended.1
 # Pd-extended uses the one in /usr/lib/pd-extended
-	rm -f -- $(DESTDIR)$(bindir)/pd-gui.tcl
+	rm -- $(DESTDIR)$(bindir)/pd-gui.tcl
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
 # delete these since they are provided by the 'puredata' package suite
-	rm -f $(DESTDIR)$(bindir)/pdsend
-	rm -f $(DESTDIR)$(bindir)/pdreceive
-	rm -f $(DESTDIR)/usr/share/man/man1/pdsend.1.gz
-	rm -f $(DESTDIR)/usr/share/man/man1/pdreceive.1.gz
-	rm -f $(DESTDIR)/usr/include/m_pd.h
+	rm -- $(DESTDIR)$(bindir)/pdsend
+	rm -- $(DESTDIR)$(bindir)/pdreceive
+	rm -- $(DESTDIR)/usr/share/man/man1/pdsend.1
+	rm -- $(DESTDIR)/usr/share/man/man1/pdreceive.1
+	rm -- $(DESTDIR)/usr/include/m_pd.h
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
