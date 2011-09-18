@@ -79,6 +79,8 @@ package: $(PACKAGE_TYPE)
 
 tarbz2: installer_makefile installer_readme
 	install -p $(packages_src)/linux_make/default.pdextended $(DESTDIR)$(libpddir)
+	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
+	ln -s $(bindir)/pd-extended $(DESTDIR)$(bindir)/pd
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
@@ -125,6 +127,10 @@ deb: $(bindir)
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p -m0644 $(scripts_src)/pd-mode.el \
 		$(DESTDIR)/usr/share/emacs/site-lisp/
+# the 'pd' command should be handled by update-alternatives
+	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
+# Pd-extended uses the one in /usr/lib/pd-extended
+	rm -f -- $(DESTDIR)$(bindir)/pd-gui.tcl
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
