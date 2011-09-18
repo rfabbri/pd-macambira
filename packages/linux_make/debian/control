@@ -3,7 +3,6 @@ Version: 0.43.1~git1-1
 Section: sound
 Priority: optional
 Maintainer: Hans-Christoph Steiner <hans@eds.org>
-Standards-Version: 3.9.2
 Homepage: http://puredata.info
 Package: pd-extended
 Architecture: i386

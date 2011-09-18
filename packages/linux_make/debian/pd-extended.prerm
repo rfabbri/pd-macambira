@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+if [ "$1" != "upgrade" ]; then
+  update-alternatives --remove pd /usr/bin/pd-extended
+fi
