@@ -98,12 +98,18 @@ deb: $(bindir)
 	install -d $(DESTDIR)/usr/share/icons/hicolor/48x48/apps
 	install -p -m0644 $(packages_src)/linux_make/pd-48x48.png \
 		$(DESTDIR)/usr/share/icons/hicolor/48x48/apps/pd.png
+	install -d $(DESTDIR)/usr/share/pixmaps
+	install -p -m0644 $(packages_src)/linux_make/pd-extended.xpm \
+		$(DESTDIR)/usr/share/pixmaps/
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/mimetypes
 	install -p -m0644 $(packages_src)/linux_make/text-x-puredata.png \
 		$(DESTDIR)/usr/share/icons/hicolor/128x128/mimetypes
 	install -d $(DESTDIR)/usr/share/applications/ 
 	install -p -m0644 $(packages_src)/linux_make/pd-extended.desktop \
 		$(DESTDIR)/usr/share/applications/
+	install -d $(DESTDIR)/usr/share/menu/
+	install -p -m0644 $(packages_src)/linux_make/pd-extended.menu \
+		$(DESTDIR)/usr/share/menu/pd-extended
 # add mime type to .pd files
 	install -d $(DESTDIR)/usr/share/mime/packages/
 	install -p -m0644 $(packages_src)/linux_make/pd-extended.xml \
