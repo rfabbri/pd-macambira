@@ -146,8 +146,10 @@ deb: $(bindir)
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
-	cp $(packages_src)/linux_make/debian/pd-extended.postrm $(DESTDIR)/DEBIAN
-	cp $(packages_src)/linux_make/debian/pd-extended.postinst $(DESTDIR)/DEBIAN
+	install -p -m0755  $(packages_src)/linux_make/debian/pd-extended.prerm \
+		$(packages_src)/linux_make/debian/pd-extended.postrm \
+	 	$(packages_src)/linux_make/debian/pd-extended.postinst \
+		$(DESTDIR)/DEBIAN
 # set build architecture and version for the package
 	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
 		$(DESTDIR)/DEBIAN/control
