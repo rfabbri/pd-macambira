@@ -811,7 +811,7 @@ void pianoroll_setup(void)
 
     class_setwidget(pianoroll_class, &pianoroll_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              pianoroll_class->c_externdir->s_name, 
              pianoroll_class->c_name->s_name);
 }

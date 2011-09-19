@@ -814,7 +814,7 @@ void scratcher_tilde_setup(void)
     class_addmethod(scratcher_class, (t_method)scratcher_reset, gensym("reset"), A_NULL);
     class_addmethod(scratcher_class, (t_method)scratcher_dialog, gensym("dialog"), A_GIMME, A_NULL);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              scratcher_class->c_externdir->s_name, 
              scratcher_class->c_name->s_name);
 }

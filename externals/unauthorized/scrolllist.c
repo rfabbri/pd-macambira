@@ -1035,7 +1035,7 @@ void scrolllist_setup(void)
 
     class_setwidget(scrolllist_class, &scrolllist_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              scrolllist_class->c_externdir->s_name, 
              scrolllist_class->c_name->s_name);
 }

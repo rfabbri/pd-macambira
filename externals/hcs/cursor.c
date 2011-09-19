@@ -161,8 +161,8 @@ void cursor_setup(void)
     class_addmethod(cursor_class, (t_method)cursor_setmethod, 
                     gensym("editmode_disconnect"), A_GIMME, 0);
 
-    /* TODO should this use t_class->c_name? */
-    sys_vgui("eval [read [open %s/cursor.tcl]]\n",
-             cursor_class->c_externdir->s_name);
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
+             cursor_class->c_externdir->s_name,
+             cursor_class->c_name->s_name);
     sys_vgui("::hcs::cursor::setup %s\n", cursor_receive_symbol->s_name);
 }

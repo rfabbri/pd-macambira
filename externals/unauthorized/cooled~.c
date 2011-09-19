@@ -1397,6 +1397,6 @@ void cooled_tilde_setup(void)
     class_addmethod(cooled_class, (t_method)cooled_loop, gensym("loop"), A_SYMBOL, A_NULL);
     class_addmethod(cooled_class, (t_method)cooled_dialog, gensym("dialog"), A_GIMME, 0);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              cooled_class->c_externdir->s_name, cooled_class->c_name->s_name);
 }

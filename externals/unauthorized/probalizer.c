@@ -703,7 +703,7 @@ void probalizer_setup(void)
     class_setwidget(probalizer_class, &probalizer_widgetbehavior);
 
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              probalizer_class->c_externdir->s_name, 
              probalizer_class->c_name->s_name);
 }

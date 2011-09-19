@@ -1059,6 +1059,6 @@ void audience_tilde_setup(void)
 
     class_setwidget(audience_class_tilde, &audience_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              audience_class_tilde->c_externdir->s_name, audience_class_tilde->c_name->s_name);
 }

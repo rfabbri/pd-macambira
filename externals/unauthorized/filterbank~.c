@@ -667,7 +667,7 @@ void filterbank_tilde_setup(void)
 #endif
     class_setwidget(filterbank_class_tilde, &filterbank_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              filterbank_class_tilde->c_externdir->s_name, 
              filterbank_class_tilde->c_name->s_name);
 }

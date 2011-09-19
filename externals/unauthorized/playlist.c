@@ -1053,7 +1053,7 @@ void playlist_setup(void)
 
     class_setwidget(playlist_class, &playlist_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              playlist_class->c_externdir->s_name, 
              playlist_class->c_name->s_name);
 }

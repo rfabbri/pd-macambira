@@ -818,6 +818,6 @@ void exciter_setup(void)
 
     class_setwidget(exciter_class, &exciter_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              exciter_class->c_externdir->s_name, exciter_class->c_name->s_name);
 }

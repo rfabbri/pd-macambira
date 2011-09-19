@@ -711,6 +711,6 @@ void grid_setup(void)
 
     class_setwidget(grid_class, &grid_widgetbehavior);
 
-    sys_vgui("eval [read [open %s/%s.tcl]]\n",
+    sys_vgui("eval [read [open {%s/%s.tcl}]]\n",
              grid_class->c_externdir->s_name, grid_class->c_name->s_name);
 }
