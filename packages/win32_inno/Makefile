@@ -135,6 +135,8 @@ lib_install:
 	cp -rp /usr/local/lib/reg1.2/* $(DESTDIR)$(libdir)/reg1.2
 	install -d $(DESTDIR)$(libdir)/tkdnd2.2
 	cp -rp /usr/local/lib/tkdnd2.2/* $(DESTDIR)$(libdir)/tkdnd2.2
+	install -d $(DESTDIR)$(libdir)/tcllib1.13
+	cp -rp /usr/local/lib/tcllib1.13/* $(DESTDIR)$(libdir)/tcllib1.13
 
 
 # tcllib install
