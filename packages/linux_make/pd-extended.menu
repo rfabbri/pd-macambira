@@ -1,4 +1,6 @@
-?package(pd-extended):needs="X11" section="Applications/Sound" \
+?package(pd-extended): \
+  needs="X11" \
+  section="Applications/Sound" \
   title="Pd-extended" \
   command="/usr/lib/pd-extended/tcl/pd-gui.tcl" \
-  icon="/usr/share/pixmaps/pd-extended.xpm" \
+  icon="/usr/share/pixmaps/pd-extended.xpm"
