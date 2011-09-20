@@ -20,7 +20,11 @@ fi
 
 if [ "$1" = "configure" ] || [ "$1" = "upgrade" ]; then
   update-alternatives --install /usr/bin/pd pd \
-                                /usr/bin/pd-extended 60 \
+                                /usr/bin/pd-extended 101 \
                       --slave /usr/share/man/man1/pd.1.gz pd.1.gz \
+                              /usr/share/man/man1/pd-extended.1.gz
+  update-alternatives --install /usr/bin/pdextended pdextended \
+                                /usr/bin/pd-extended 60
+                      --slave /usr/share/man/man1/pdextended.1.gz pdextended.1.gz \
                               /usr/share/man/man1/pd-extended.1.gz
 fi

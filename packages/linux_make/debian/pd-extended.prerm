@@ -2,4 +2,5 @@
 
 if [ "$1" != "upgrade" ]; then
   update-alternatives --remove pd /usr/bin/pd-extended
+  update-alternatives --remove pdextended /usr/bin/pd-extended
 fi
