@@ -43,7 +43,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)
+CFLAGS = -DPD -DHAVE_G_CANVAS_H -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)
 LDFLAGS =  
 LIBS = -lm
 
@@ -1715,7 +1715,8 @@ $(ZEXY_DIR)/configure: $(ZEXY_DIR)/configure.ac $(ZEXY_DIR)/aclocal.m4
 $(ZEXY_DIR)/Make.config: $(ZEXY_DIR)/Make.config.in \
 $(ZEXY_DIR)/configure
 	cd $(ZEXY_DIR) && ./configure --disable-library \
-		--with-pd=$(pd_src)
+		--with-extension=$(EXTENSION) \
+		--with-pdpath=$(pd_src)/src
 
 zexy: $(ZEXY_DIR)/Make.config
 	$(MAKE) -C $(ZEXY_DIR)
