@@ -1716,7 +1716,7 @@ $(ZEXY_DIR)/Make.config: $(ZEXY_DIR)/Make.config.in \
 $(ZEXY_DIR)/configure
 	cd $(ZEXY_DIR) && ./configure --disable-library \
 		--with-extension=$(EXTENSION) \
-		--with-pdpath=$(pd_src)/src
+		--with-pdpath=$(pd_src)
 
 zexy: $(ZEXY_DIR)/Make.config
 	$(MAKE) -C $(ZEXY_DIR)
