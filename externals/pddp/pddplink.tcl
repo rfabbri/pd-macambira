@@ -1,9 +1,9 @@
 
 proc pddplink_open {filename dir} {
     if {[string first "://" $filename] > -1} {
-        menu_openhtml $filename
+        menu_openfile $filename
     } elseif {[file pathtype $filename] eq "absolute"} {
-        menu_openhtml $filename
+        menu_openfile $filename
     } elseif {[file exists [file join $dir $filename]]} {
         set fullpath [file normalize [file join $dir $filename]]
         set dir [file dirname $fullpath]
