@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Pd-extended
-GenericName=Pure Data
+GenericName=Pd
 Comment=Visual dataflow programming platform for multimedia
 Comment[ca]=Plataforma de programació visual per aplicacions multimèdia
 Comment[de]=Grafische Datenflussprogrammierung für Multimedia
@@ -12,8 +12,7 @@ Comment[pt]=Plataforma de programação visuais para multimedia
 Exec=/usr/lib/pd-extended/tcl/pd-gui.tcl %F
 Terminal=false
 Type=Application
-Icon=pd
-TryExec=pdextended
+Icon=pd-extended.xpm
 Categories=AudioVideo;Audio;Video;Development
 MimeType=text/x-puredata;application/x-maxmsp;text/x-maxmsp;
 StartupNotify=false

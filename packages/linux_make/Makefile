@@ -91,12 +91,11 @@ deb: DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 deb: DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1~cvs\2-1|')
 deb: $(bindir)
 # free desktop menu, mime, and icon support
-# perhaps the icons should go in /usr/share/pixmaps like 'scribus'
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
-	install -p -m0644 $(packages_src)/linux_make/pd.png \
+	install -p -m0644 $(packages_src)/linux_make/pd-extended.png \
 		$(DESTDIR)/usr/share/icons/hicolor/128x128/apps/
 	install -d $(DESTDIR)/usr/share/icons/hicolor/48x48/apps
-	install -p -m0644 $(packages_src)/linux_make/pd-48x48.png \
+	install -p -m0644 $(packages_src)/linux_make/pd-extended-48x48.png \
 		$(DESTDIR)/usr/share/icons/hicolor/48x48/apps/pd.png
 	install -d $(DESTDIR)/usr/share/pixmaps
 	install -p -m0644 $(packages_src)/linux_make/pd-extended.xpm \
