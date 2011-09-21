@@ -40,6 +40,9 @@
 #include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
 #include "interface.h"   /* mpglib decoding library from lame 3.92 */ 
 #ifdef _WIN32
+#if !defined(__OBJC__) && !defined(__GNU_LIBOBJC__) && !defined(__objc_INCLUDE_GNU)
+#define BOOL WINBOOL
+#endif
 #include <winsock.h>
 #include <winbase.h>
 #include <io.h>
