@@ -28,6 +28,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h> // for open
+#include <sys/stat.h> // for open
+#include <sys/fcntl.h> // for open
 #ifdef _MSC_VER
 #include <io.h>
 #define read _read
@@ -44,6 +47,7 @@
 /* we use Pd */
 #include "m_pd.h"
 #include "s_stuff.h" // for sys_register_loader()
+#include "m_imp.h" // for struct _class
 #ifdef _MSC_VER
 #include <s_stuff.h>
 #endif
@@ -97,7 +101,7 @@
 /* EVIL: end of evil section. */
 
 /* If defined, PDLUA_DEBUG lets pdlua post a lot of text */
-// #define PDLUA_DEBUG
+//#define PDLUA_DEBUG
 /** Global Lua interpreter state, needed in the constructor. */
 static lua_State *L;
 
@@ -1348,8 +1352,7 @@ static int pdlua_loader
 /** Start the Lua runtime and register our loader hook. */
 EXTERN void pdlua_setup(void)
 {
-    char                buf[MAXPDSTRING];
-    char                *ptr;
+    char                pd_lua_path[MAXPDSTRING];
     t_pdlua_readerdata  reader;
     int                 fd;
     int                 result;
@@ -1382,13 +1385,21 @@ EXTERN void pdlua_setup(void)
     post("pdlua pdlua_init done");
 #endif // PDLUA_DEBUG
     /* "pd.lua" is the Lua part of pdlua, want to keep the C part minimal */
-    fd = canvas_open(0, "pd", ".lua", buf, &ptr, MAXPDSTRING, 1);
+    /* canvas_open can't find pd.lua unless we give the path to pd beforehand like pd -path /usr/lib/extra/pdlua */
+    /* To avoid this we can use c_externdir from m_imp.h, struct _class: t_symbol *c_externdir; */
+    /* c_externdir is the directory the extern was loaded from and is also the directory contining pd.lua */
+    sprintf(pd_lua_path, "%s/pd.lua", pdlua_proxyinlet_class->c_externdir->s_name); /* the full path to pd.lua */
 #ifdef PDLUA_DEBUG
-    post ("pd.lua loaded from %s", buf);
+    post("pd_lua_path %s", pd_lua_path);
+#endif // PDLUA_DEBUG
+    fd = open(pd_lua_path, O_RDONLY);
+/*    fd = canvas_open(canvas_getcurrent(), "pd", ".lua", buf, &ptr, MAXPDSTRING, 1);  looks all over and rarely succeeds */
+#ifdef PDLUA_DEBUG
+    post ("pd.lua loaded from %s", pd_lua_path);
     post("pdlua canvas_open done fd = %d", fd);
 #endif // PDLUA_DEBUG
     if (fd >= 0)
-    {
+    { /* pd.lua was opened */
         reader.fd = fd;
         result = lua_load(L, pdlua_reader, &reader, "pd.lua");
 #ifdef PDLUA_DEBUG
