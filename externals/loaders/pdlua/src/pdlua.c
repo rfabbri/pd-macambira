@@ -1346,8 +1346,7 @@ static int pdlua_loader
 }
 
 /** Start the Lua runtime and register our loader hook. */
-//EXPORT void lua_setup(void) {
-void pdlua_setup(void)
+EXTERN void pdlua_setup(void)
 {
     char                buf[MAXPDSTRING];
     char                *ptr;
