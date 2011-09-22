@@ -118,10 +118,14 @@ pd_install: pd
 	$(MAKE) -C $(pd_src) $(DEST_PATHS) $(PD_BUILD_FLAGS) install
 	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
-# make libdir start automatically by being in new 'startup' folder
+# make loaders start automatically by being in new 'startup' folder
 	install -d $(DESTDIR)$(libpddir)/startup
-	ln -s ../extra/libdir/libdir.$(EXTENSION) \
-		$(DESTDIR)$(libpddir)/startup/libdir.$(EXTENSION)
+# libdir
+	cd $(DESTDIR)$(libpddir)/startup && \
+		ln -s ../extra/libdir/ libdir
+# pdlua
+	cd $(DESTDIR)$(libpddir)/startup && \
+		ln -s ../extra/pdlua/ pdlua
 else
 #----------------------------------------------------------------------------#
 # old build system

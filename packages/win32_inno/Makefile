@@ -79,10 +79,6 @@ prebuilt_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
 	install -p pd-extended.bat $(DESTDIR)$(prefix)
-# make libdir start automatically by being in new 'startup' folder
-	install -d $(DESTDIR)$(libpddir)/startup
-	cp -a $(DESTDIR)$(libpddir)/extra/libdir/libdir.$(EXTENSION) \
-		$(DESTDIR)$(libpddir)/startup/libdir.$(EXTENSION)
 
 
 #==============================================================================#
