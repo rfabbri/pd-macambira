@@ -162,15 +162,15 @@ darwin_app_core: darwin_app_wrapper
 		pd_install 
 	install -d "$(PD_APP_CONTENTS)/Resources/bin"
 	cd "$(PD_APP_CONTENTS)/Resources" && \
-		ln -s tcl Scripts
+		ln -s -f tcl Scripts
 	cd "$(PD_APP_CONTENTS)/Resources/bin" && \
 		test -e pdextended || ln -s pd pdextended
 # support for Info Panel Plugins mgmt
-	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
+	cd "$(PD_APP_CONTENTS)" && ln -s -f Resources/extra Plugins
 	install -p -m0644 org.puredata.pdextended.default.plist "$(PD_APP_CONTENTS)/"
 # since Pd-vanilla on Mac OS X doesn't have an 'include/pd' folder,
 # Pd-extended will mimic Pd-vanilla's include/pd until Pd-vanilla gets one
-	ln -s pdextended "$(PD_APP_CONTENTS)/Resources/include/pd"
+	ln -s -f pdextended "$(PD_APP_CONTENTS)/Resources/include/pd"
 
 
 #==============================================================================#
@@ -190,7 +190,7 @@ dmg:
 	hdiutil attach build.dmg
 	install -p $(DESTDIR)$(manualsdir)/Pd/ReadMe.html "/Volumes/$(VOLUME_NAME)"
 # add link to /Applications for easy install
-	ln -s /Applications /Volumes/$(VOLUME_NAME)/Applications
+	ln -s -f /Applications /Volumes/$(VOLUME_NAME)/Applications
 # Install to .background for easier manual DS_Store makeing 
 	install -d "/Volumes/$(VOLUME_NAME)/.background"
 # The full path to the background image needs to be added to .DS_Store to work

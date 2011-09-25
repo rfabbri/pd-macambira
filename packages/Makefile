@@ -122,10 +122,10 @@ pd_install: pd
 	install -d $(DESTDIR)$(libpddir)/startup
 # libdir
 	cd $(DESTDIR)$(libpddir)/startup && \
-		ln -s ../extra/libdir/ libdir
+		ln -s -f ../extra/libdir/ libdir
 # pdlua
 	cd $(DESTDIR)$(libpddir)/startup && \
-		ln -s ../extra/pdlua/ pdlua
+		ln -s -f ../extra/pdlua/ pdlua
 else
 #----------------------------------------------------------------------------#
 # old build system

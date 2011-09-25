@@ -80,7 +80,7 @@ package: $(PACKAGE_TYPE)
 tarbz2: installer_makefile installer_readme
 	install -p $(packages_src)/linux_make/default.pdextended $(DESTDIR)$(libpddir)
 	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
-	ln -s $(bindir)/pd-extended $(DESTDIR)$(bindir)/pd
+	ln -s -f $(bindir)/pd-extended $(DESTDIR)$(bindir)/pd
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
@@ -125,7 +125,7 @@ deb: $(bindir)
 		$(DESTDIR)/etc/init.d/
 # default prefs file
 	install -d $(DESTDIR)/etc/pd-extended
-	ln -s $(libpddir)/default.pdextended \
+	ln -s -f $(libpddir)/default.pdextended \
 		$(DESTDIR)/etc/pd-extended/default.pdextended
 	install -p $(packages_src)/linux_make/default.pdextended $(DESTDIR)$(libpddir)
 # emacs mode for .pd files
