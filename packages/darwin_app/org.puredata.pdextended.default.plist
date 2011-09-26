@@ -7,19 +7,61 @@
 	<key>flags</key>
 	<string></string>
 	<key>loadlib1</key>
-	<string>vanilla/list</string>
-	<key>loadlib2</key>
-	<string>vanilla</string>
-	<key>loadlib3</key>
-	<string>extra</string>
-	<key>loadlib4</key>
 	<string>Gem</string>
-	<key>loadlib5</key>
+	<key>loadlib2</key>
 	<string>cyclone</string>
-	<key>loadlib6</key>
+	<key>loadlib3</key>
 	<string>zexy</string>
+	<key>loadlib4</key>
+	<string>creb</string>
+	<key>loadlib5</key>
+	<string>cxc</string>
+	<key>loadlib6</key>
+	<string>iemlib</string>
+	<key>loadlib7</key>
+	<string>list-abs</string>
+	<key>loadlib8</key>
+	<string>mapping</string>
+	<key>loadlib9</key>
+	<string>markex</string>
+	<key>loadlib10</key>
+	<string>maxlib</string>
+	<key>loadlib11</key>
+	<string>mjlib</string>
+	<key>loadlib12</key>
+	<string>motex</string>
+	<key>loadlib13</key>
+	<string>oscx</string>
+	<key>loadlib14</key>
+	<string>pddp</string>
+	<key>loadlib15</key>
+	<string>pdogg</string>
+	<key>loadlib16</key>
+	<string>pmpd</string>
+	<key>loadlib17</key>
+	<string>sigpack</string>
+	<key>loadlib18</key>
+	<string>smlib</string>
+	<key>loadlib19</key>
+	<string>unauthorized</string>
+	<key>loadlib20</key>
+	<string>pan</string>
+	<key>loadlib21</key>
+	<string>hcs</string>
+	<key>loadlib22</key>
+	<string>jmmmp</string>
+	<key>loadlib23</key>
+	<string>ext13</string>
+	<key>loadlib24</key>
+	<string>ggee</string>
+	<key>loadlib25</key>
+	<string>iem_anything</string>
+	<key>loadlib26</key>
+	<string>ekext</string>
+	<key>loadlib27</key>
+	<string>pdp</string>
 	<key>nloadlib</key>
-	<string>6</string>
+	<string>27</string>
 	<key>path1</key>
 	<string>/System/Library/Fonts</string>
 	<key>path2</key>

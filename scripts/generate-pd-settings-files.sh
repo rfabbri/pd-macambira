@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ECHO=/sw/bin/echo
-LIBS="vanilla/list vanilla extra Gem cyclone zexy"
+LIBS="Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib unauthorized pan hcs jmmmp ext13 ggee iem_anything ekext pdp"
 
 GNULINUX_FONTPATH="/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/fonts"
