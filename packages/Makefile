@@ -120,11 +120,11 @@ pd_install: pd
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
 # make loaders start automatically by being in new 'startup' folder
 	install -d $(DESTDIR)$(libpddir)/startup
-# libdir
 	cd $(DESTDIR)$(libpddir)/startup && \
-		ln -s -f ../extra/libdir/ libdir
-# pdlua
-	cd $(DESTDIR)$(libpddir)/startup && \
+		ln -s -f ../extra/libdir/libdir.$(EXTENSION) 0.libdir.$(EXTENSION) && \
+		ln -s -f ../extra/vanilla/list.$(EXTENSION) 1.list.$(EXTENSION) && \
+		ln -s -f ../extra/vanilla/ vanilla && \
+		ln -s -f ../extra/extra/ extra && \
 		ln -s -f ../extra/pdlua/ pdlua
 else
 #----------------------------------------------------------------------------#
