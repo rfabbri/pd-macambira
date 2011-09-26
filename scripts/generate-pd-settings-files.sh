@@ -166,7 +166,7 @@ print_macosx_nloadlib $i
 # run separately so some libs can be excluded on Windows
 ${ECHO} "Running for Windows:"
 
-${ECHO} -n "bin\\pd.exe " > $WINDOWS_BATCH
+${ECHO} -n "bin\\pd.exe -noprefs " > $WINDOWS_BATCH
 ${ECHO} -e $WINDOWS_HEADER > $WINDOWS_FILE
 ${ECHO} -e $WINDOWS_INNO_HEADER > $WINDOWS_INNO_REG_FILE
 
