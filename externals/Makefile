@@ -1722,25 +1722,7 @@ zexy: $(ZEXY_DIR)/Make.config
 	$(MAKE) -C $(ZEXY_DIR)
 
 zexy_install: zexy
-	install -d $(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(ZEXY_NAME) \
-		--author "IOhannes m zmoelnig <zmoelnig@iem.kug.ac.at>" \
-		--license "GNU GPL" \
-		--description "swiss army knife for pd" \
-		--version "$(ZEXY_VERSION)"
-	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
-# the below doesn't work for some reason, probably because of some kind of
-# strange make execution order <hans@at.or.at>
-#	install -p $(shell $(externals_src)/zexy/src/*.$(EXTENSION)) \
-#		$(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
-	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
-		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
-		$(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
-# an escape pattern for the abstractions with special characters
-#		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') 
-	install -p $(shell ls -1 $(externals_src)/zexy/reference/*-help.pd | \
-		sed 's|\(.*\)|"\1"|g') $(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
-	install -p $(externals_src)/zexy/zexy.pd  $(DESTDIR)$(objectsdir)
+	-$(MAKE) -C $(externals_src)/zexy/src install
 
 zexy_clean:
 	-$(MAKE) -C $(externals_src)/zexy/src clean
