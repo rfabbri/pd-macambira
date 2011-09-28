@@ -1703,26 +1703,24 @@ $(externals_src)/zexy/src/wrap.c $(externals_src)/zexy/src/z~.c
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
-# ADAPTED FROM IEM16 - previous script broke builds.
-ZEXY_DIR := $(externals_src)/zexy/src
+zexy_src := $(externals_src)/$(ZEXY_NAME)
 
-$(ZEXY_DIR)/aclocal.m4: $(ZEXY_DIR)/acinclude.m4
-	cd $(ZEXY_DIR) && aclocal
+$(zexy_src)/configure: $(zexy_src)/configure.ac
+	cd $(zexy_src) && ./autogen.sh
 
-$(ZEXY_DIR)/configure: $(ZEXY_DIR)/configure.ac $(ZEXY_DIR)/aclocal.m4
-	cd $(ZEXY_DIR) && autoconf
-
-$(ZEXY_DIR)/Make.config: $(ZEXY_DIR)/Make.config.in \
-$(ZEXY_DIR)/configure
-	cd $(ZEXY_DIR) && ./configure --disable-library \
+$(zexy_src)/Makefile: $(zexy_src)/configure $(zexy_src)/Makefile.am $(zexy_src)/src/Makefile.am
+	cd $(zexy_src) && ./configure --disable-library \
 		--with-extension=$(EXTENSION) \
+		--prefix=$(prefix) \
+		--libdir=$(objectsdir) \
 		--with-pd=$(pd_src)
 
-zexy: $(ZEXY_DIR)/Make.config
-	$(MAKE) -C $(ZEXY_DIR)
+zexy: $(zexy_src)/Makefile
+	$(MAKE) -C $(zexy_src)
 
 zexy_install: zexy
-	-$(MAKE) -C $(externals_src)/zexy/src install
+	$(MAKE) -C $(zexy_src) DESTDIR=$(DESTDIR) prefix=$(prefix) \
+		libdir=$(objectsdir) pkglibdir=$(objectsdir)/$(ZEXY_NAME) install
 
 zexy_clean:
 	-$(MAKE) -C $(externals_src)/zexy/src clean
