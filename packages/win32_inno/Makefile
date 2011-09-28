@@ -77,7 +77,7 @@ install: pd_install prebuilt_install lib_install exe_install
 prebuilt_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
-	install -p pd-settings.reg $(DESTDIR)$(prefix)
+	install -p pd-settings.reg $(DESTDIR)$(prefix)/bin
 	install -p pd-extended.bat $(DESTDIR)$(prefix)
 
 
