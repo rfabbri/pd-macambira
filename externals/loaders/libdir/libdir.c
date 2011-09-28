@@ -103,3 +103,8 @@ void libdir_setup(void)
     logpost(NULL, 3, "\tcompiled against Pd version %d.%d.%d.%s", 
             PD_MAJOR_VERSION, PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
 }
+
+void setup(void)
+{
+    libdir_setup();
+}
