@@ -28,203 +28,171 @@ noisternig_AT_iem.at; musil_AT_iem.at
 
 typedef struct NLMSerr_in_tilde
 {
-    t_object            x_obj;
+    t_object            x_obj;// common pd object structure
     t_symbol            *x_w_array_sym_name;
     t_float             *x_w_array_mem_beg;
-    t_float             *x_in_hist;// start point double buffer for sig-in history
-    t_int               x_rw_index;// read-write-index
-    t_int               x_n_order;// order of filter
-    t_int               x_update;// 2^n rounded value, downsampling of update speed
+    t_float             *x_ref_filt_in_hist;// history buffer for input signal reference for internal convolution = filter
+    t_float             *x_ref_adapt_in_hist;// history buffer for input signal reference for internal adapting filter
+    t_int               x_rw_index;// current read-write-index in circular buffer
+    t_int               x_n_order;// order of filter or convolution
+    t_int               x_update;// binary update parameter ON / OFF
     t_float             x_beta;// learn rate [0 .. 2]
-    t_float             x_gamma;// regularization
-    t_float             x_sig_in2;
+    t_float             x_gamma;// regularization Parameter = minimum
+    t_float             x_flt_sig_in1;
 } t_NLMSerr_in_tilde;
 
 t_class *NLMSerr_in_tilde_class;
 
 static t_float *NLMSerr_in_tilde_check_array(t_symbol *array_sym_name, t_int length)
 {
-    int n_points;
-    t_garray *a;
-    t_float *vec;
-
-    if(!(a = (t_garray *)pd_findbyclass(array_sym_name, garray_class)))
-    {
-        error("%s: no such array for NLMSerr_in~", array_sym_name->s_name);
-        return((t_float *)0);
-    }
-    else if(!garray_getfloatarray(a, &n_points, &vec))
-    {
-        error("%s: bad template for NLMSerr_in~", array_sym_name->s_name);
-        return((t_float *)0);
-    }
-    else if(n_points < length)
-    {
-        error("%s: bad array-size for NLMSerr_in~: %d", array_sym_name->s_name, n_points);
-        return((t_float *)0);
-    }
-    else
-    {
-        return(vec);
-    }
+  int n_points;
+  t_garray *a;
+  t_float *vec;
+  
+  if(!(a = (t_garray *)pd_findbyclass(array_sym_name, garray_class)))
+  {
+    error("%s: no such array for NLMSerr_in~", array_sym_name->s_name);
+    return((t_float *)0);
+  }
+  else if(!garray_getfloatarray(a, &n_points, &vec))
+  {
+    error("%s: bad template for NLMSerr_in~", array_sym_name->s_name);
+    return((t_float *)0);
+  }
+  else if(n_points < length)
+  {
+    error("%s: bad array-size for NLMSerr_in~: %d", array_sym_name->s_name, n_points);
+    return((t_float *)0);
+  }
+  else
+  {
+    return(vec);
+  }
 }
 
 static void NLMSerr_in_tilde_beta(t_NLMSerr_in_tilde *x, t_floatarg f) // learn rate
 {
-    if(f < 0.0f)
-        f = 0.0f;
-    if(f > 2.0f)
-        f = 2.0f;
-    
-    x->x_beta = f;
+  if(f < 0.0f)
+    f = 0.0f;
+  if(f > 2.0f)
+    f = 2.0f;
+  
+  x->x_beta = f;
 }
 
 static void NLMSerr_in_tilde_gamma(t_NLMSerr_in_tilde *x, t_floatarg f) // regularization factor (dither)
 {
-    if(f < 0.0f)
-        f = 0.0f;
-    if(f > 1.0f)
-        f = 1.0f;
-    
-    x->x_gamma = f;
+  if(f < 0.0f)
+    f = 0.0f;
+  if(f > 1.0f)
+    f = 1.0f;
+  
+  x->x_gamma = f;
 }
 
 
 static void NLMSerr_in_tilde_update(t_NLMSerr_in_tilde *x, t_floatarg f) // downsample learn-rate
 {
-    t_int i=1, u = (t_int)f;
-    
-    if(u < 0)
-        u = 0;
-    else
-    {
-        while(i <= u)   // convert u for 2^N
-            i *= 2;     // round downwards
-        i /= 2;
-        u = i;
-    }
-    x->x_update = u;
+  t_int i=1, u = (t_int)f;
+  
+  if(u != 0)
+    u = 1;
+  x->x_update = u;
 }
 
 /* ============== DSP ======================= */
 
 static t_int *NLMSerr_in_tilde_perform_zero(t_int *w)
 {
-  t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[4]);
-  t_int n = (t_int)(w[5]);
-  t_float *filt_out = (t_float *)(w[3]);
+  t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[5]);
+  t_int n = (t_int)(w[6]);
+  t_float *filt_out = (t_float *)(w[4]);
   t_int i;
   
   for(i=0; i<n; i++)
   {
     *filt_out++ = 0.0f;
   }
-  return (w+6);
+  return (w+7);
 }
 
 static t_int *NLMSerr_in_tilde_perform(t_int *w)
 {
-    t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[4]);
-    t_int n = (t_int)(w[5]);
-    t_int n_order = x->x_n_order;   /* number of filter-order */
-    t_int rw_index = x->x_rw_index;
-    t_float *filt_in = (t_float *)(w[1]);// first sig in
-    t_float *err_in = (t_float *)(w[2]);// second sig in
-    t_float *filt_out = (t_float *)(w[3]);// first sig out
-    t_float *write_in_hist1 = x->x_in_hist;
-    t_float *write_in_hist2 = write_in_hist1+n_order;
-    t_float *read_in_hist = write_in_hist2;
-    t_float *w_filt_coeff = x->x_w_array_mem_beg;
-    t_float my, my_err, sum, errin;
-    t_float beta = x->x_beta;
-    t_float gammax = x->x_gamma;
-    t_int i, j, update_counter;
-    t_int update = x->x_update;
-    t_int ord8=n_order&0xfffffff8;
-    t_int ord_residual=n_order&0x7;
+  t_int n = (t_int)(w[6]);
+  t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[5]);
+  t_float *filt_out = (t_float *)(w[4]);// first sig out
+  t_float *err_in = (t_float *)(w[3]);// third sig in
+  t_float *ref_adapt_in = (t_float *)(w[2]);// second sig in
+  t_float *ref_filt_in = (t_float *)(w[1]);// first sig in
+  t_int n_order = x->x_n_order;   /* number of filter-order */
+  t_int rw_index = x->x_rw_index;  /* current read write index in circular buffer */
+  t_int update = x->x_update;
+  t_float beta = x->x_beta;  /* learn rate */
+  t_float gammax = x->x_gamma;  /* minimum energy */
+  t_float my, my_err, sum, errin;
+  t_int i, j, k;
+  
+  if(!x->x_w_array_mem_beg)
+    goto NLMSerr_in_tildeperfzero;// this is quick&dirty Musil/Miller style
+  
+  for(i=0; i<n; i++)// store history and convolve
+  {
+    x->x_ref_filt_in_hist[rw_index] = ref_filt_in[i]; // inputs of ref_filt save to history
+    x->x_ref_adapt_in_hist[rw_index] = ref_adapt_in[i]; // inputs of ref_adapt save to history
+    errin = err_in[i];
     
-    if(!w_filt_coeff)
-        goto NLMSerr_in_tildeperfzero;// this is quick&dirty Musil/Miller style
-    
-    for(i=0, update_counter=0; i<n; i++)// store history and convolve
+		// begin convolution, filter : j++, k--, rw_index = aktueller index fuer lesen schreiben von history und convolution-beginn
+    sum = 0.0f;
+    k = rw_index;
+    for(j=0; j<n_order; j++)
     {
-        write_in_hist1[rw_index] = filt_in[i]; // save inputs to variable & history
-        write_in_hist2[rw_index] = filt_in[i];
-        errin = err_in[i];
-        
-		// begin convolution
-        sum = 0.0f;
-        w_filt_coeff = x->x_w_array_mem_beg; // Musil's special convolution buffer struct
-        read_in_hist = &write_in_hist2[rw_index];
-        for(j=0; j<ord8; j+=8)	// loop unroll 8 taps
-        {
-            sum += w_filt_coeff[0] * read_in_hist[0];
-            sum += w_filt_coeff[1] * read_in_hist[-1];
-            sum += w_filt_coeff[2] * read_in_hist[-2];
-            sum += w_filt_coeff[3] * read_in_hist[-3];
-            sum += w_filt_coeff[4] * read_in_hist[-4];
-            sum += w_filt_coeff[5] * read_in_hist[-5];
-            sum += w_filt_coeff[6] * read_in_hist[-6];
-            sum += w_filt_coeff[7] * read_in_hist[-7];
-            w_filt_coeff += 8;
-            read_in_hist -= 8;
-        }
-        for(j=0; j<ord_residual; j++)	// for filter order < 2^N
-            sum += w_filt_coeff[j] * read_in_hist[-j];
-        
-        filt_out[i] = sum;
-        
-        
-        if(update)	// downsampling for learn rate
-        {
-            update_counter++;
-            if(update_counter >= update)
-            {
-                update_counter = 0;
-                
-                sum = 0.0f;// calculate energy for last n-order samples in filter
-                read_in_hist = &write_in_hist2[rw_index];
-                for(j=0; j<ord8; j+=8)	// unrolling quadrature calc
-                {
-                    sum += read_in_hist[0] * read_in_hist[0];
-                    sum += read_in_hist[-1] * read_in_hist[-1];
-                    sum += read_in_hist[-2] * read_in_hist[-2];
-                    sum += read_in_hist[-3] * read_in_hist[-3];
-                    sum += read_in_hist[-4] * read_in_hist[-4];
-                    sum += read_in_hist[-5] * read_in_hist[-5];
-                    sum += read_in_hist[-6] * read_in_hist[-6];
-                    sum += read_in_hist[-7] * read_in_hist[-7];
-                    read_in_hist -= 8;
-                }
-                for(j=0; j<ord_residual; j++)	// residual
-                    sum += read_in_hist[-j] * read_in_hist[-j]; // [-j] only valid for Musil's double buffer structure
-                sum += gammax * gammax * (float)n_order; // convert gammax corresponding to filter order
-                my = beta / sum;// calculate mue
-                
-                
-                my_err = my * errin;
-                w_filt_coeff = x->x_w_array_mem_beg; // coefficient constraints
-                read_in_hist = &write_in_hist2[rw_index];
-                for(j=0; j<n_order; j++) // without unroll
-                    w_filt_coeff[j] += read_in_hist[-j] * my_err;
-            }
-        }
-        rw_index++;
-        if(rw_index >= n_order)
-            rw_index -= n_order;
+      sum += x->x_w_array_mem_beg[j] * x->x_ref_filt_in_hist[k];
+      k--;
+      if(k < 0)
+        k = n_order - 1;
     }
-
-    x->x_rw_index = rw_index; // back to start
-
-    return(w+6);
+    filt_out[i] = sum;
     
+    
+    if(update)	// downsampling for learn rate
+    {
+      sum = 0.0f;// calculate energy for last n-order samples in filter
+      k = rw_index;
+      for(j=0; j<n_order; j++)	// unrolling quadrature calc
+      {
+        sum += x->x_ref_adapt_in_hist[k] * x->x_ref_adapt_in_hist[k]; // energie
+        k--;
+        if(k < 0)
+          k = n_order - 1;
+      }
+      sum += gammax * gammax * (float)n_order; // convert gammax corresponding to filter order
+      my = beta / sum;// calculate mue
+      
+      my_err = my * errin;
+      
+      k = rw_index;
+      for(j=0; j<n_order; j++) // without unroll
+      {
+        x->x_w_array_mem_beg[j] += x->x_ref_adapt_in_hist[k] * my_err;
+        k--;
+        if(k < 0)
+          k = n_order - 1;
+      }
+    }
+    rw_index++;
+    if(rw_index >= n_order)
+      rw_index = 0;
+  }
+  x->x_rw_index = rw_index; // back to start
+  return(w+7);
+  
 NLMSerr_in_tildeperfzero:
-    
-    while(n--)
-    {
-        *filt_out++ = 0.0f;
-    }
-    return(w+6);
+  
+  while(n--)
+  {
+    *filt_out++ = 0.0f;
+  }
+  return(w+7);
 }
 
 static void NLMSerr_in_tilde_dsp(t_NLMSerr_in_tilde *x, t_signal **sp)
@@ -232,9 +200,9 @@ static void NLMSerr_in_tilde_dsp(t_NLMSerr_in_tilde *x, t_signal **sp)
     x->x_w_array_mem_beg = NLMSerr_in_tilde_check_array(x->x_w_array_sym_name, x->x_n_order);
 
     if(!x->x_w_array_mem_beg)
-        dsp_add(NLMSerr_in_tilde_perform_zero, 5, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, x, sp[0]->s_n);
+        dsp_add(NLMSerr_in_tilde_perform_zero, 6, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[3]->s_vec, x, sp[0]->s_n);
     else
-        dsp_add(NLMSerr_in_tilde_perform, 5, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, x, sp[0]->s_n);
+        dsp_add(NLMSerr_in_tilde_perform, 6, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[3]->s_vec, x, sp[0]->s_n);
 }
 
 
@@ -242,7 +210,8 @@ static void NLMSerr_in_tilde_dsp(t_NLMSerr_in_tilde *x, t_signal **sp)
 
 static void NLMSerr_in_tilde_free(t_NLMSerr_in_tilde *x)
 {
-    freebytes(x->x_in_hist, 2*x->x_n_order*sizeof(t_float));
+    freebytes(x->x_ref_filt_in_hist, x->x_n_order*sizeof(t_float));
+    freebytes(x->x_ref_adapt_in_hist, x->x_n_order*sizeof(t_float));
 }
 
 static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
@@ -250,7 +219,7 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
     t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)pd_new(NLMSerr_in_tilde_class);
     t_int i, n_order=39;
     t_symbol    *w_name;
-    t_float beta=0.1f;
+    t_float beta=0.01f;
     t_float gammax=0.00001f;
     
     if((argc >= 4) &&
@@ -280,19 +249,23 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
             n_order = 1111111;
         
         inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
+        inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
         outlet_new(&x->x_obj, &s_signal);
         
-        x->x_sig_in2 = 0;
+        x->x_flt_sig_in1 = 0;
         x->x_n_order = n_order;
         x->x_update = 0;
         x->x_beta = beta;
         x->x_gamma = gammax;
         // 2 times in and one time err_in memory allocation (history)
-        x->x_in_hist = (t_float *)getbytes(2*x->x_n_order*sizeof(t_float));
+        x->x_ref_filt_in_hist = (t_float *)getbytes(x->x_n_order*sizeof(t_float));
+        x->x_ref_adapt_in_hist = (t_float *)getbytes(x->x_n_order*sizeof(t_float));
         
         // table-symbols will be linked to their memory in future (dsp_routine)
         x->x_w_array_sym_name = gensym(w_name->s_name);
         x->x_w_array_mem_beg = (t_float *)0;
+        
+        x->x_rw_index = 0;
         
         return(x);
     }
@@ -308,7 +281,7 @@ void NLMSerr_in_tilde_setup(void)
 {
     NLMSerr_in_tilde_class = class_new(gensym("NLMSerr_in~"), (t_newmethod)NLMSerr_in_tilde_new, (t_method)NLMSerr_in_tilde_free,
         sizeof(t_NLMSerr_in_tilde), 0, A_GIMME, 0);
-    CLASS_MAINSIGNALIN(NLMSerr_in_tilde_class, t_NLMSerr_in_tilde, x_sig_in2);
+    CLASS_MAINSIGNALIN(NLMSerr_in_tilde_class, t_NLMSerr_in_tilde, x_flt_sig_in1);
     class_addmethod(NLMSerr_in_tilde_class, (t_method)NLMSerr_in_tilde_dsp, gensym("dsp"), 0);
     class_addmethod(NLMSerr_in_tilde_class, (t_method)NLMSerr_in_tilde_update, gensym("update"), A_FLOAT, 0); // method: downsampling factor of learning (multiple of 2^N)
     class_addmethod(NLMSerr_in_tilde_class, (t_method)NLMSerr_in_tilde_beta, gensym("beta"), A_FLOAT, 0); //method: normalized learning rate
