@@ -1356,10 +1356,23 @@ EXTERN void pdlua_setup(void)
     t_pdlua_readerdata  reader;
     int                 fd;
     int                 result;
+    char*               pdluaver = "pdlua 0.6 (GPL) 2011 Martin Peach, based on";
+    char*               luaver = "lua 0.6~svn (GPL) 2008 Claude Heiland-Allen <claudiusmaximus@goto10.org>";
+    char                compiled[MAXPDSTRING];
 
-    post("pdlua 0.6 (GPL) 2011 Martin Peach, based on");
-    post("lua 0.6~svn (GPL) 2008 Claude Heiland-Allen <claudiusmaximus@goto10.org>");
-    post("pdlua: compiled for pd-%d.%d on %s %s", PD_MAJOR_VERSION, PD_MINOR_VERSION, __DATE__, __TIME__);
+    snprintf(compiled, MAXPDSTRING, "pdlua: compiled for pd-%d.%d on %s %s",
+             PD_MAJOR_VERSION, PD_MINOR_VERSION, __DATE__, __TIME__);
+
+
+#if PD_MAJOR_VERSION==0 && PD_MINOR_VERSION<43
+    post(pdluaver);
+    post(luaver);
+    post(compiled);
+#else
+    logpost(NULL, 3, pdluaver);
+    logpost(NULL, 3, luaver);
+    logpost(NULL, 3, compiled);
+#endif
     pdlua_proxyinlet_setup();
 #ifdef PDLUA_DEBUG
     post("pdlua pdlua_proxyinlet_setup done");
