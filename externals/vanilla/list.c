@@ -541,3 +541,8 @@ void list_setup(void)
     list_length_setup();
     class_addcreator((t_newmethod)list_new, &s_list, A_GIMME, 0);
 }
+
+void setup(void)
+{
+    list_setup();
+}
