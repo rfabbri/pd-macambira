@@ -1052,7 +1052,8 @@ mapping_clean:
 #------------------------------------------------------------------------------#
 # MARKEX
 markex:
-	make -C $(externals_src)/markex PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+	make -C $(externals_src)/markex PD_PATH=$(pd_src) \
+		CFLAGS="$(CFLAGS) -DHAVE_SYS_CLOSE_AUDIO -DHAVE_SYS_CLOSE_MIDI"
 
 markex_install:
 	make -C $(externals_src)/markex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
