@@ -155,8 +155,6 @@ all: $(LIB_TARGETS)
 
 install: $(examplesdir) $(manualsdir) $(objectsdir) $(readmesdir) \
 all $(patsubst %, %_install,$(LIB_TARGETS))
-	# remove all .la (libtool archives) files created by autotools
-	find $(DESTDIR) -name "*.la" -exec rm {} \;
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -1730,6 +1728,8 @@ zexy: $(zexy_src)/Makefile
 zexy_install: zexy
 	$(MAKE) -C $(zexy_src) DESTDIR=$(DESTDIR) prefix=$(prefix) \
 		libdir=$(objectsdir) pkglibdir=$(objectsdir)/$(ZEXY_NAME) install
+	# remove all .la files (libtool archives) created by autotools
+	find $(DESTDIR)$(objectsdir)/$(ZEXY_NAME) -name "*.la" -exec rm {} \;
 
 zexy_clean:
 	-$(MAKE) -C $(externals_src)/zexy clean
