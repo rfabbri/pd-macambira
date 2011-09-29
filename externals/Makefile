@@ -1712,11 +1712,6 @@ windowing_clean:
 #------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
-ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-vxy0]*.c) \
-$(externals_src)/zexy/src/wrap.c $(externals_src)/zexy/src/z~.c
-ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
-	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
-
 zexy_src := $(externals_src)/$(ZEXY_NAME)
 
 $(zexy_src)/configure: $(zexy_src)/configure.ac
@@ -1737,14 +1732,14 @@ zexy_install: zexy
 		libdir=$(objectsdir) pkglibdir=$(objectsdir)/$(ZEXY_NAME) install
 
 zexy_clean:
-	-$(MAKE) -C $(externals_src)/zexy/src clean
-	-rm -f -- $(ZEXY_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(ZEXY_OBJECTS:.c=.d)
-	-rm -rf -- $(externals_src)/zexy/src/autom4ate
-	-rm -rf -- $(externals_src)/zexy/src/conf[0-9][0-9][0-9]*
-	-rm -f -- $(externals_src)/zexy/src/configure
-	-rm -f -- $(externals_src)/zexy/src/Make.config
-	-rm -f -- $(externals_src)/zexy/src/zexyconf.h
+	-$(MAKE) -C $(externals_src)/zexy clean
+	-rm -rf -- $(externals_src)/zexy/autom4te.cache
+	-rm -f -- $(externals_src)/zexy/aclocal.m4
+	-rm -f -- $(externals_src)/zexy/libtool
+	-rm -f -- $(externals_src)/zexy/ltmain.sh
+	-rm -f -- $(externals_src)/zexy/m4/lt*.m4
+	-rm -f -- $(externals_src)/zexy/m4/libtool.m4
+	-rm -f -- $(externals_src)/zexy/configure
 	-rm -f -- $(externals_src)/zexy/src/*.o
 	-rm -f -- $(externals_src)/zexy/src/*.bak
 	-rm -f -- $(externals_src)/*/*.*~
