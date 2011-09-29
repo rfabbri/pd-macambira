@@ -155,6 +155,8 @@ all: $(LIB_TARGETS)
 
 install: $(examplesdir) $(manualsdir) $(objectsdir) $(readmesdir) \
 all $(patsubst %, %_install,$(LIB_TARGETS))
+	# remove all .la (libtool archives) files created by autotools
+	find $(DESTDIR) -name "*.la" -exec rm {} \;
 	@echo " "
 	@echo "externals install succeeded!"
 
