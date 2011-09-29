@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp loaders-pdlua pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach osc oscx pan pdcontainer pddp loaders-pdlua pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1204,6 +1204,18 @@ mrpeach_clean:
 	-rm -f -- $(MRPEACH_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/mrpeach/*.bak
 	-rm -f -- $(externals_src)/mrpeach/*.*~
+
+
+#------------------------------------------------------------------------------#
+# OSC
+osc:
+	make -C $(externals_src)/mrpeach/osc PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+
+osc_install:
+	make -C $(externals_src)/mrpeach/osc DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+osc_clean:
+	make -C $(externals_src)/mrpeach/osc clean
 
 
 #----------------------------------------------------------------------------
