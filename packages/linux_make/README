@@ -66,13 +66,9 @@ Building Pd-extended
 ====================
 
 
-To build everything and create an generic installer for linux, do this:
+To build everything and create an generic installer for linux:
 
-
-Download and run the script from CVS which will download all the sources from
-anonymous CVS:
-
-    scripts/checkout-developer-layout.sh
+ get the source: http://puredata.info/docs/developer/GettingPdSource
 
 Now you will have all of the sources in a directory called "pure-data".  Next,
 run these commands to build in the package:
