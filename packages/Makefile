@@ -118,14 +118,6 @@ pd_install: pd
 	$(MAKE) -C $(pd_src) $(DEST_PATHS) $(PD_BUILD_FLAGS) install
 	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
-# make loaders start automatically by being in new 'startup' folder
-	install -d $(DESTDIR)$(libpddir)/startup
-	cd $(DESTDIR)$(libpddir)/startup && \
-		ln -s -f ../extra/libdir/libdir.$(EXTENSION) 0.libdir.$(EXTENSION) && \
-		ln -s -f ../extra/vanilla/list.$(EXTENSION) 1.list.$(EXTENSION) && \
-		ln -s -f ../extra/vanilla/ vanilla && \
-		ln -s -f ../extra/extra/ extra && \
-		ln -s -f ../extra/pdlua/ pdlua
 else
 #----------------------------------------------------------------------------#
 # old build system
@@ -164,7 +156,7 @@ endif
 # this is used for installing into a pre-build Pd binary
 extended_install: abstractions_install doc_install \
 externals_install readme_install welcome_install \
-license_install noncvs_install
+license_install noncvs_install pd_startup_install
 
 
 #------------------------------------------------------------------------------
@@ -208,6 +200,17 @@ noncvs_install:
 		(cd $(packages_src)/noncvs/$(OS_NAME)/extra/ && \
 		tar --exclude-vcs --create * | \
 		tar --extract --directory $(DESTDIR)$(objectsdir) )
+
+#------------------------------------------------------------------------------
+# make loaders start automatically by being in new 'startup' folder
+pd_startup_install:
+	install -d $(DESTDIR)$(libpddir)/startup
+	cd $(DESTDIR)$(libpddir)/startup && \
+		ln -s -f ../extra/libdir/libdir.$(EXTENSION) 0.libdir.$(EXTENSION) && \
+		ln -s -f ../extra/vanilla/list.$(EXTENSION) 1.list.$(EXTENSION) && \
+		ln -s -f ../extra/vanilla/ vanilla && \
+		ln -s -f ../extra/extra/ extra && \
+		ln -s -f ../extra/pdlua/ pdlua
 
 
 #==============================================================================#
@@ -428,3 +431,5 @@ test_locations:
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
 	@echo "HAVE_AUTOGEN_SH --$(HAVE_AUTOGEN_SH)--"
+
+.PHONY = abstractions doc externals pd pd_install pd_startup_install extended_install install devel_install abstractions_install doc_install extensions_install externals_install noncvs_install license_install welcome_install readme_install doc_format set_version unset_version abstractions_clean doc_clean externals_clean pd_clean clean distclean test_locations
