@@ -1026,6 +1026,21 @@ loaders-libdir_install:
 loaders-libdir_clean:
 	make -C $(externals_src)/loaders/libdir clean
 
+
+#------------------------------------------------------------------------------#
+# LOADERS-TCLPD
+
+loaders-tclpd:
+	make -C $(externals_src)/loaders/tclpd PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+
+loaders-tclpd_install: tclpd
+	make -C $(externals_src)/loaders/tclpd DESTDIR="$(DESTDIR)" \
+		objectsdir="$(objectsdir)" install
+
+loaders-tclpd_clean:
+	make -C $(externals_src)/loaders/tclpd clean
+
+
 #------------------------------------------------------------------------------#
 # LOG
 log:
@@ -1575,33 +1590,6 @@ smlib_install:
 
 smlib_clean:
 	make -C $(externals_src)/smlib clean
-
-
-#------------------------------------------------------------------------------#
-# TCLPD
-TCLPD_NAME=tclpd
-TCLPD_LIB := $(externals_src)/tclpd/tcl.$(EXTENSION)
-
-$(TCLPD_LIB):
-	cd $(externals_src)/tclpd && make
-
-tclpd: $(TCLPD_LIB)
-
-tclpd_install: tclpd
-	install -d $(DESTDIR)$(objectsdir)
-	install -p $(TCLPD_LIB) $(DESTDIR)$(objectsdir)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/tclpd/README \
-		$(DESTDIR)$(readmesdir)/$(TCLPD_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(TCLPD_NAME)
-#	install -p $(externals_src)/tclpd/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(TCLPD_NAME)
-
-tclpd_clean:
-	make -C $(externals_src)/tclpd clean
-	-rm -f -- $(TCLPD_LIB)
-	-rm -f -- $(externals_src)/tclpd/*.bak
-	-rm -f -- $(externals_src)/tclpd/*.*~
 
 
 #------------------------------------------------------------------------------#
