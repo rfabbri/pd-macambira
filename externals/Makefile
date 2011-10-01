@@ -137,7 +137,7 @@ else
   ifeq ($(OS_NAME),darwin)
 # on Mac OS X 10.6/Snow Leopard don't build hid since it needs Carbon
     LIB_TARGETS += gem pdp gem2pdp iem16 apple
-    ifneq ($(shell uname -r | sed 's|10\.0-9][0-9]*\.[0-9][0-9]*|10|'),10)
+    ifneq ($(shell uname -r | sed 's|10\.[0-9][0-9]*\.[0-9][0-9]*|10|'),10)
       LIB_TARGETS += hid
     endif
   else
