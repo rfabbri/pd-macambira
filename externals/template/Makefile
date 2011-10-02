@@ -243,7 +243,7 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
-single_install: $(LIBRARY_NAME) install-doc install-exec
+single_install: $(LIBRARY_NAME) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_PROGRAM) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
