@@ -13,7 +13,7 @@ SOURCES =
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = bitmap-help.pd bitmap-madness.pd bitmap.tcl colorpicker.tcl dynreceive-help.pd dynreceive.tcl dynroute-help.pd dynroute.tcl list_change-help.pd list_change.tcl properties.tcl slider2-help.pd slider2.tcl
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -214,7 +214,7 @@ HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags $(LIBRARY_NAME)
+.PHONY = install libdir_install single_install install-doc install-examples install-manual clean distclean dist etags $(LIBRARY_NAME)
 
 all: $(LIBRARY_NAME)
 
