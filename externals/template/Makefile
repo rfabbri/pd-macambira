@@ -155,7 +155,7 @@ ifeq ($(UNAME),GNU)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc $(LIBS_gnu)
+  LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -169,7 +169,7 @@ ifeq ($(UNAME),GNU/kFreeBSD)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc $(LIBS_kfreebsd)
+  LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
