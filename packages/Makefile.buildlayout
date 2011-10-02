@@ -41,21 +41,25 @@ ifeq ($(UNAME),Linux)
   OS_NAME = linux
   EXTENSION = pd_linux
   DYLIB_EXTENSION = so
+  LN_S = ln -s
 endif
 ifeq ($(UNAME),Darwin)
   OS_NAME = darwin
   EXTENSION = pd_darwin
   DYLIB_EXTENSION = dylib
+  LN_S = ln -s
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   OS_NAME = windows
   EXTENSION = dll
   DYLIB_EXTENSION = dll
+  LN_S = cp -a
 endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OS_NAME = windows
   EXTENSION = dll
   DYLIB_EXTENSION = dll
+  LN_S = ln -s
 endif
 # which CPU to compile for
 UNAME_MACHINE := $(shell uname -m)

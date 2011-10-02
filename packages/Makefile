@@ -206,11 +206,11 @@ noncvs_install:
 pd_startup_install:
 	install -d $(DESTDIR)$(libpddir)/startup
 	cd $(DESTDIR)$(libpddir)/startup && \
-		ln -s -f ../extra/libdir/libdir.$(EXTENSION) 0.libdir.$(EXTENSION) && \
-		ln -s -f ../extra/vanilla/list.$(EXTENSION) 1.list.$(EXTENSION) && \
-		ln -s -f ../extra/vanilla/ vanilla && \
-		ln -s -f ../extra/extra/ extra && \
-		ln -s -f ../extra/pdlua/ pdlua
+		$(LN_S) -f ../extra/libdir/libdir.$(EXTENSION) 0.libdir.$(EXTENSION) && \
+		$(LN_S) -f ../extra/vanilla/list.$(EXTENSION) 1.list.$(EXTENSION) && \
+		$(LN_S) -f ../extra/vanilla/ vanilla && \
+		$(LN_S) -f ../extra/extra/ extra && \
+		$(LN_S) -f ../extra/pdlua/ pdlua
 
 
 #==============================================================================#
@@ -431,5 +431,6 @@ test_locations:
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
 	@echo "HAVE_AUTOGEN_SH --$(HAVE_AUTOGEN_SH)--"
+	@echo "LN_S $(LN_S)"
 
 .PHONY = abstractions doc externals pd pd_install pd_startup_install extended_install install devel_install abstractions_install doc_install extensions_install externals_install noncvs_install license_install welcome_install readme_install doc_format set_version unset_version abstractions_clean doc_clean externals_clean pd_clean clean distclean test_locations
