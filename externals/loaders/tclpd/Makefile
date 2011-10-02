@@ -6,7 +6,7 @@ LIBRARY_NAME = tclpd
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
-SOURCES = tcl_wrap.c tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_setup.c tcl_typemap.c tcl_widgetbehavior.c tclpd.c
+SOURCES = 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -18,11 +18,14 @@ EXAMPLES =
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
 
+# tclpd-specific source files
+TCLPD_SOURCES = tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_typemap.c tcl_widgetbehavior.c
+
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = 
+EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl pkgIndex.tcl $(TCLPD_SOURCES)
 
 
 
@@ -36,7 +39,9 @@ EXTRA_DIST =
 INCLUDES = -I"$(PD_INCLUDE)/pd"
 CFLAGS = $(INCLUDES) -Wall -W -g -DPDSUF=\".$(EXTENSION)\" -std=c99
 LDFLAGS = 
-LIBS = -ltcl85
+LIBS_linux = -ltcl8.5
+LIBS_macosx = -framework Tcl
+LIBS_windows = -ltcl85
 
 #------------------------------------------------------------------------------#
 #
@@ -84,7 +89,7 @@ ifeq ($(UNAME),Darwin)
     OPT_CFLAGS = -fast -funroll-loops -fomit-frame-pointer
 	CFLAGS := $(IPHONE_CFLAGS) $(OPT_CFLAGS) $(CFLAGS)
     LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
-    LIBS += -lc 
+    LIBS += -lc  $(LIBS_iphoneos)
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
   else # Mac OS X
@@ -104,7 +109,7 @@ ifeq ($(UNAME),Darwin)
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
     # if the 'pd' binary exists, check the linking against it to aid with stripping
     LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
-    LIBS += -lc 
+    LIBS += -lc  $(LIBS_macosx)
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
 # install into ~/Library/Pd on Mac OS X since /usr/local isn't used much
@@ -128,7 +133,7 @@ ifeq ($(UNAME),ANDROID)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared
-  LIBS += -lc
+  LIBS += -lc $(LIBS_android)
   STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
 	--strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
@@ -142,7 +147,7 @@ ifeq ($(UNAME),Linux)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc
+  LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -156,7 +161,7 @@ ifeq ($(UNAME),GNU)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc
+  LIBS += -lc $(LIBS_gnu)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -170,7 +175,7 @@ ifeq ($(UNAME),GNU/kFreeBSD)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc
+  LIBS += -lc $(LIBS_kfreebsd)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -183,7 +188,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
-  LIBS += -lc -lpd
+  LIBS += -lc -lpd $(LIBS_cygwin)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
@@ -198,7 +203,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
@@ -211,8 +216,7 @@ CFLAGS += $(OPT_CFLAGS)
 
 .PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags $(LIBRARY_NAME)
 
-#all: $(SOURCES:.c=.$(EXTENSION))
-all: tclpd
+all: $(LIBRARY_NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
@@ -225,11 +229,12 @@ tcl_wrap.c: tcl.i tcl_extras.h Makefile
 	swig -v -tcl -o tcl_wrap.c $(INCLUDES) tcl.i
 
 # this links everything into a single binary file
-$(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
-	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
+$(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.c=.o)
+	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) \
+		$(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.c=.o) $(LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 
-install: libdir_install
+install: single_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
@@ -248,10 +253,11 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
-single_install: $(LIBRARY_NAME) install-doc install-exec
+single_install: $(LIBRARY_NAME) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_PROGRAM) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
+	$(INSTALL_DATA) pdlib.tcl pkgIndex.tcl  $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -278,6 +284,7 @@ install-manual:
 
 clean:
 	-rm -f -- $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o)
+	-rm -f -- tcl_wrap.c tcl_wrap.o $(TCLPD_SOURCES:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
 	-rm -f -- $(LIBRARY_NAME).o
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
@@ -312,6 +319,7 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) Makefile  $(DISTDIR)
 	$(INSTALL_DATA) README.txt $(DISTDIR)
 	$(INSTALL_DATA) LICENSE.txt $(DISTDIR)
+	$(INSTALL_DATA) $(TCLPD_SOURCES) $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
