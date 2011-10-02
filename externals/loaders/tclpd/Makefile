@@ -16,16 +16,17 @@ tcl_wrap.cxx:: tcl.i tcl_extras.h Makefile
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
+#EXAMPLES = bitmap-help.pd bitmap.tcl colorpicker.tcl dynreceive-help.pd dynreceive.tcl dynroute-help.pd dynroute.tcl list_change-help.pd list_change.tcl properties.tcl slider2-help.pd slider2.tcl
 EXAMPLES = 
 
 # manuals and related files, in the 'manual' subfolder
-MANUAL = AUTHORS COPYING ChangeLog INSTALL README TODO
+MANUAL =
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = bitmap-help.pd bitmap-madness.pd bitmap.tcl colorpicker.tcl dynreceive-help.pd dynreceive.tcl dynroute-help.pd dynroute.tcl list_change-help.pd list_change.tcl pdlib.tcl pkgIndex.tcl properties.tcl slider2-help.pd slider2.tcl
+EXTRA_DIST = bitmap-help.pd bitmap-madness.pd bitmap.tcl colorpicker.tcl dynreceive-help.pd dynreceive.tcl dynroute-help.pd dynroute.tcl list_change-help.pd list_change.tcl pdlib.tcl pkgIndex.tcl properties.tcl slider2-help.pd slider2.tcl AUTHORS.txt ChangeLog.txt TODO.txt
 
 
 #------------------------------------------------------------------------------#
@@ -235,15 +236,15 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(strip $(SOURCES))" || (\
-		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
-		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
-	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
-		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
-			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(strip $(PDOBJECTS))" || \
-		$(INSTALL_DATA) $(PDOBJECTS) \
-			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+#	test -z "$(strip $(SOURCES))" || (\
+#		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
+#		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+#	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
+#		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+#			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+#	test -z "$(strip $(PDOBJECTS))" || \
+#		$(INSTALL_DATA) $(PDOBJECTS) \
+#			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
