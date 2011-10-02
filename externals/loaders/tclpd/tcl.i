@@ -55,8 +55,8 @@
 %name(outlet_list) EXTERN void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 %name(outlet_anything) EXTERN void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 
-%pointer_class(t_float, t_float)
-%pointer_class(t_symbol, t_symbol)
+//%pointer_class(t_float, t_float)
+//%pointer_class(t_symbol, t_symbol)
 
 %typemap(in) t_atom * {
     t_atom *a = (t_atom*)getbytes(sizeof(t_atom));

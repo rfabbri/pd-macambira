@@ -42,7 +42,7 @@ void proxyinlet_clone(t_proxyinlet* x, t_proxyinlet* y);
 void proxyinlet_setup(void);
 
 /* tcl_wrap.cxx */
-extern "C" int Tclpd_SafeInit(Tcl_Interp *interp);
+extern int Tclpd_SafeInit(Tcl_Interp *interp);
 
 /* tcl_typemap.cxx */
 int pd_to_tcl(t_atom* input, Tcl_Obj** output);
@@ -50,7 +50,7 @@ int tcl_to_pd(Tcl_Obj* input, t_atom* output);
 
 /* tcl_setup.cxx */
 extern Tcl_Interp* tcl_for_pd;
-extern "C" void tclpd_setup(void);
+extern void tclpd_setup(void);
 void tclpd_interp_error(int result);
 
 /* tcl_class.cxx */
@@ -69,7 +69,7 @@ t_pd* tclpd_get_object_pd(const char* objectSequentialId);
 t_glist* tclpd_get_glist(const char* objectSequentialId);
 t_symbol* null_symbol();
 void poststring2(const char* s);
-extern "C" void text_save(t_gobj *z, t_binbuf *b);
+extern void text_save(t_gobj *z, t_binbuf *b);
 void tclpd_save(t_gobj* z, t_binbuf* b);
 void tclpd_properties(t_gobj* z, t_glist* owner);
 
@@ -85,10 +85,10 @@ void tclpd_guiclass_motion(t_tcl* x, t_floatarg dx, t_floatarg dy);
 void tclpd_guiclass_grab(t_tcl* x, t_glist* glist, int xpix, int ypix);
 
 /* tcl_loader.cxx */
-extern "C" int tclpd_do_load_lib(t_canvas* canvas, char* objectname);
+extern int tclpd_do_load_lib(t_canvas* canvas, char* objectname);
 /* pd loader private stuff: */
 typedef int (*loader_t)(t_canvas *canvas, char* classname);
-extern "C" void sys_register_loader(loader_t loader);
-extern "C" int sys_onloadlist(char* classname);
-extern "C" void sys_putonloadlist(char* classname);
-extern "C" void class_set_extern_dir(t_symbol* s);
+extern void sys_register_loader(loader_t loader);
+extern int sys_onloadlist(char* classname);
+extern void sys_putonloadlist(char* classname);
+extern void class_set_extern_dir(t_symbol* s);

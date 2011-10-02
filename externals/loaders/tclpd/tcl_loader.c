@@ -2,7 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 
-extern "C" int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
+extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
 #ifdef DEBUG
     post("Tcl loader: registering tcl class loader mechanism");
 #endif

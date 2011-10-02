@@ -1,10 +1,11 @@
 #include "tcl_extras.h"
+#include <stdlib.h>
 #include <unistd.h>
 #include <limits.h>
 
 Tcl_Interp *tcl_for_pd = NULL;
 
-extern "C" void tcl_setup(void) {
+extern void tcl_setup(void) {
     tclpd_setup();
 }
 
@@ -21,8 +22,8 @@ void tclpd_setup(void) {
     Tcl_Init(tcl_for_pd);
     Tclpd_SafeInit(tcl_for_pd);
 
-    char *dirname   = new char[PATH_MAX];
-    char *dirresult = new char[PATH_MAX];
+    char *dirname   = (char*)malloc(PATH_MAX);
+    char *dirresult = (char*)malloc(PATH_MAX);
     /* nameresult is only a pointer in dirresult space so don't delete[] it. */
     char *nameresult;
     if(getcwd(dirname, PATH_MAX) < 0) {
@@ -52,8 +53,8 @@ void tclpd_setup(void) {
         post("Tcl loader: loaded ~/.pd.tcl");
     }
 
-    delete[] dirresult;
-    delete[] dirname;
+    free(dirresult);
+    free(dirname);
 
     sys_register_loader(tclpd_do_load_lib);
 }
