@@ -25,7 +25,7 @@ TCLPD_SOURCES = tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_typemap.c tcl_widg
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl pkgIndex.tcl $(TCLPD_SOURCES)
+EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl pkgIndex.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS.txt TODO.txt
 
 
 
@@ -246,8 +246,8 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
-	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
-		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+	test -z "$(strip $(wildcard $(SOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(wildcard $(SOURCES:.c=.tcl)) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
@@ -324,8 +324,8 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
-	test -z "$(strip $(shell ls $(ALLSOURCES:.c=.tcl)))" || \
-		$(INSTALL_DATA) $(shell ls $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
+	test -z "$(strip $(wildcard $(ALLSOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(wildcard $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
