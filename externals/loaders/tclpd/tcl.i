@@ -45,18 +45,12 @@
     #include "tcl_extras.h"
 
     typedef t_atom t_atom_array;
-
-    /* extern "C" SWIGEXPORT int Tclpd_SafeInit(Tcl_Interp *interp); */
-    /* extern "C" { void tcl_setup() {tclpd_setup(void);} } */
 %}
 
 /* this does the trick of solving
  TypeError in method 'xyz', argument 4 of type 't_atom *' */
 %name(outlet_list) EXTERN void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 %name(outlet_anything) EXTERN void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
-
-//%pointer_class(t_float, t_float)
-//%pointer_class(t_symbol, t_symbol)
 
 %typemap(in) t_atom * {
     t_atom *a = (t_atom*)getbytes(sizeof(t_atom));

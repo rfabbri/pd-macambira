@@ -5,10 +5,6 @@
 
 Tcl_Interp *tcl_for_pd = NULL;
 
-extern void tcl_setup(void) {
-    tclpd_setup();
-}
-
 void tclpd_setup(void) {
     if(tcl_for_pd) {
         return;
