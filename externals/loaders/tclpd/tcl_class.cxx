@@ -1,20 +1,151 @@
 #include "tcl_extras.h"
-#include <map>
-#include <string>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
-using namespace std;
+#define CLASS_TABLE_SIZE (1 << 7)
+#define OBJECT_TABLE_SIZE (1 << 8)
+
+static inline uint32_t hash_str(const char *s)
+{
+	const unsigned char *p = (const unsigned char *)s;
+	uint32_t h = 5381;
+
+	while (*p) {
+		h *= 33;
+		h ^= *p++;
+	}
+
+	return h ^ (h >> 16);
+}
+
+typedef struct list_node
+{
+	const char* k;
+	void* v;
+	struct list_node* next;
+} list_node_t;
+
+static inline list_node_t* list_add(list_node_t* head, const char* k, void* v)
+{
+	list_node_t* n = (list_node_t*)malloc(sizeof(list_node_t));
+	n->next = head;
+	n->k = k;
+	n->v = v;
+	return n;
+}
+
+static inline list_node_t* list_remove(list_node_t* head, const char* k)
+{
+	list_node_t* tmp;
+
+	// head remove
+	while(head && strcmp(head->k, k) == 0)
+	{
+		tmp = head;
+		head = head->next;
+		free(tmp);
+	}
+
+	list_node_t* p = head;
+
+	// normal (non-head) remove
+	while(p->next)
+	{
+		if(strcmp(p->next->k, k) == 0)
+		{
+			tmp = p->next;
+			p->next = p->next->next;
+			free(tmp);
+			continue;
+		}
+		p = p->next;
+	}
+
+	return head;
+}
+
+static inline void* list_get(list_node_t* head, const char* k)
+{
+	while(head)
+	{
+		if(strcmp(head->k, k) == 0)
+			return head->v;
+		head = head->next;
+	}
+	return (void*)0;
+}
+
+static inline void list_print(list_node_t* head)
+{
+	if(!head)
+	{
+		printf("NULL\n");
+		return;
+	}
+	while(head)
+	{
+		printf("%s=x%8.8X", head->k, head->v);
+		if(head->next) printf(", ");
+		head = head->next;
+	}
+	printf("\n");
+}
+
+
+static list_node_t* class_tbl[CLASS_TABLE_SIZE];
+static list_node_t* object_tbl[OBJECT_TABLE_SIZE];
+
+static inline void class_table_add(const char* name, t_class* c)
+{
+	uint32_t h = hash_str(name) % CLASS_TABLE_SIZE;
+	class_tbl[h] = list_add(class_tbl[h], name, (void*)c);
+}
+
+static inline void class_table_remove(const char* name)
+{
+	uint32_t h = hash_str(name) % CLASS_TABLE_SIZE;
+	class_tbl[h] = list_remove(class_tbl[h], name);
+}
+
+static inline t_class* class_table_get(const char* name)
+{
+	uint32_t h = hash_str(name) % CLASS_TABLE_SIZE;
+	return (t_class*)list_get(class_tbl[h], name);
+}
+
+static inline void object_table_add(const char* name, t_pd* o)
+{
+	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
+	object_tbl[h] = list_add(object_tbl[h], name, (void*)o);
+}
+
+static inline void object_table_remove(const char* name)
+{
+	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
+	object_tbl[h] = list_remove(object_tbl[h], name);
+}
+
+static inline t_pd* object_table_get(const char* name)
+{
+	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
+	return (t_pd*)list_get(object_tbl[h], name);
+}
 
 static unsigned long objectSequentialId = 0;
-map<string,t_class*> class_table;
-map<string,t_pd*> object_table;
+
+static list_node_t* class_tbl[CLASS_TABLE_SIZE];
+static list_node_t* object_tbl[OBJECT_TABLE_SIZE];
 
 /* set up the class that handles loading of tcl classes */
 t_class* tclpd_class_new(const char* name, int flags) {
     t_class* c = class_new(gensym(name), (t_newmethod)tclpd_new,
         (t_method)tclpd_free, sizeof(t_tcl), flags, A_GIMME, A_NULL);
 
-    class_table[string(name)] = c;
+    if(!class_table_get(name))
+	    class_table_add(name, c);
+
     class_addanything(c, tclpd_anything);
     class_addmethod(c, (t_method)tclpd_loadbang, gensym("loadbang"), A_NULL);
     
@@ -69,7 +200,7 @@ t_class* tclpd_guiclass_new(const char* name, int flags) {
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     // lookup in class table
     const char* name = classsym->s_name;
-    t_class* qlass = class_table[string(name)];
+    t_class* qlass = class_table_get(name);
 
     t_tcl* x = (t_tcl*)pd_new(qlass);
     x->ninlets = 1 /* qlass->c_firstin ??? */;
@@ -85,7 +216,8 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     x->x_glist = (t_glist*)canvas_getcurrent();
 
     // store in object table (for later lookup)
-    object_table[string(s)] = (t_pd*)x;
+    if(!object_table_get(s))
+	    object_table_add(s, x);
 
     // build constructor command
     Tcl_Obj *av[ac+2]; InitArray(av, ac+2, NULL);
@@ -205,11 +337,11 @@ t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x) {
 }
 
 t_tcl* tclpd_get_instance(const char* objectSequentialId) {
-    return (t_tcl*)object_table[objectSequentialId];
+    return (t_tcl*)object_table_get(objectSequentialId);
 }
 
 t_pd* tclpd_get_instance_pd(const char* objectSequentialId) {
-    return (t_pd*)object_table[objectSequentialId];
+    return (t_pd*)object_table_get(objectSequentialId);
 }
 
 t_object* tclpd_get_object(const char* objectSequentialId) {
