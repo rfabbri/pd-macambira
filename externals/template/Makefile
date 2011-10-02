@@ -208,7 +208,7 @@ HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags $(LIBRARY_NAME)
+.PHONY = install libdir_install single_install install-doc install-examples install-manual clean distclean dist etags $(LIBRARY_NAME)
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
