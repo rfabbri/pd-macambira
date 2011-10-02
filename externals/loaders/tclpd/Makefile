@@ -39,6 +39,7 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl pkgIndex.tcl $(TCLPD_SOURCES)
 INCLUDES = -I"$(PD_INCLUDE)/pd"
 CFLAGS = $(INCLUDES) -Wall -W -g -DPDSUF=\".$(EXTENSION)\" -std=c99
 LDFLAGS = 
+LIBS =
 LIBS_linux = -ltcl8.5
 LIBS_macosx = -framework Tcl
 LIBS_windows = -ltcl85
