@@ -350,7 +350,7 @@ Source: build\doc\*.*; DestDir: {app}\doc; Flags: ignoreversion confirmoverwrite
 Source: build\extra\*.*; DestDir: {app}\extra; Flags: ignoreversion recursesubdirs uninsremovereadonly promptifolder; Attribs: readonly
 Source: build\include\*.*; DestDir: {app}\include; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly
 Source: build\lib\*.*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs
-Source: build\startup\*.*; DestDir: {app}\startup; Flags: ignoreversion confirmoverwrite uninsremovereadonly promptifolder; Attribs: readonly
+Source: build\startup\*.*; DestDir: {app}\startup; Flags: ignoreversion recursesubdirs confirmoverwrite uninsremovereadonly promptifolder; Attribs: readonly
 Source: build\tcl\*.*; DestDir: {app}\tcl; Flags: ignoreversion confirmoverwrite uninsremovereadonly; Attribs: readonly
 ;
 ; DLLs
