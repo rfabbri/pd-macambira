@@ -35,7 +35,7 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 #
 #------------------------------------------------------------------------------#
 
-ALL_CFLAGS = -I"$(PD_INCLUDE)" -std=c99
+ALL_CFLAGS = -I"$(PD_INCLUDE)" -std=c99 -I/usr/include/tcl8.5
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
 ALL_LIBS = 
