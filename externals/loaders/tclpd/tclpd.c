@@ -11,11 +11,8 @@ void tclpd_setup(void) {
         return;
     }
 
-#if PD_MAJOR_VERSION==0 && PD_MINOR_VERSION<43
-    post("tclpd loader v" TCLPD_VERSION);
-#else
-    logpost(NULL, 3, "tclpd loader v" TCLPD_VERSION);
-#endif
+    /* verbose(-1) post to the pd window at level 3 */
+    verbose(-1, "tclpd loader v" TCLPD_VERSION);
 
     proxyinlet_setup();
 
