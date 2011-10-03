@@ -32,10 +32,10 @@ EXTRA_DIST =
 #
 #------------------------------------------------------------------------------#
 
-# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
-CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
-LDFLAGS =  
-LIBS = 
+ALL_CFLAGS = -I"$(PD_INCLUDE)"
+ALL_LDFLAGS =  
+ALL_LIBS = 
+
 
 #------------------------------------------------------------------------------#
 #
@@ -43,12 +43,17 @@ LIBS =
 #
 #------------------------------------------------------------------------------#
 
+# these can be set from outside without (usually) breaking the build
+CFLAGS = -Wall -W -g
+LDFLAGS =
+LIBS =
+
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
+ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
-PD_INCLUDE = $(PD_PATH)/include
+PD_INCLUDE = $(PD_PATH)/include/pd
 # where to install the library, overridden below depending on platform
 prefix = /usr/local
 libdir = $(prefix)/lib
@@ -81,9 +86,9 @@ ifeq ($(UNAME),Darwin)
     ISYSROOT = -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk
     IPHONE_CFLAGS = -miphoneos-version-min=3.0 $(ISYSROOT) -arch armv6
     OPT_CFLAGS = -fast -funroll-loops -fomit-frame-pointer
-	CFLAGS := $(IPHONE_CFLAGS) $(OPT_CFLAGS) $(CFLAGS)
-    LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
-    LIBS += -lc $(LIBS_iphoneos)
+    ALL_CFLAGS := $(IPHONE_CFLAGS) $(ALL_CFLAGS)
+    ALL_LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
+    ALL_LIBS += -lc $(LIBS_iphoneos)
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
   else # Mac OS X
@@ -99,11 +104,11 @@ ifeq ($(UNAME),Darwin)
       FAT_FLAGS = -arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4
       SOURCES += $(SOURCES_iphoneos)
     endif
-    CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
-    LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
+    ALL_CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
+    ALL_LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
     # if the 'pd' binary exists, check the linking against it to aid with stripping
-    LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
-    LIBS += -lc $(LIBS_macosx)
+    ALL_LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
+    ALL_LIBS += -lc $(LIBS_macosx)
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
 # install into ~/Library/Pd on Mac OS X since /usr/local isn't used much
@@ -139,9 +144,9 @@ ifeq ($(UNAME),Linux)
   OS = linux
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC
-  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc $(LIBS_linux)
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  ALL_LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -153,9 +158,9 @@ ifeq ($(UNAME),GNU)
   OS = linux
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC
-  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc $(LIBS_linux)
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  ALL_LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -167,9 +172,9 @@ ifeq ($(UNAME),GNU/kFreeBSD)
   OS = linux
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC
-  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc $(LIBS_linux)
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  ALL_LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -180,9 +185,9 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OS = cygwin
   PD_PATH = $(shell cygpath $$PROGRAMFILES)/pd
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += 
-  LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
-  LIBS += -lc -lpd $(LIBS_cygwin)
+  ALL_CFLAGS += 
+  ALL_LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
+  ALL_LIBS += -lc -lpd $(LIBS_cygwin)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
@@ -195,9 +200,9 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   # MinGW doesn't seem to include cc so force gcc
   CC=gcc
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -mms-bitfields
-  LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
+  ALL_CFLAGS += -mms-bitfields
+  ALL_LDFLAGS += -s -shared -Wl,--enable-auto-import
+  ALL_LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
@@ -205,23 +210,24 @@ endif
 # in case somebody manually set the HELPPATCHES above
 HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 
-CFLAGS += $(OPT_CFLAGS)
-
+ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS) $(OPT_CFLAGS)
+ALL_LDFLAGS := $(LDFLAGS) $(ALL_LDFLAGS)
+ALL_LIBS := $(LIBS) $(ALL_LIBS)
 
 .PHONY = install libdir_install single_install install-doc install-examples install-manual clean distclean dist etags $(LIBRARY_NAME)
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
 %.o: %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+	$(CC) $(ALL_CFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
-	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
+	$(CC) $(ALL_LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(ALL_LIBS)
 	chmod a-x "$*.$(EXTENSION)"
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
-	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
+	$(CC) $(ALL_LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(ALL_LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 
 install: libdir_install
@@ -348,6 +354,9 @@ showsetup:
 	@echo "CFLAGS: $(CFLAGS)"
 	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo "LIBS: $(LIBS)"
+	@echo "ALL_CFLAGS: $(ALL_CFLAGS)"
+	@echo "ALL_LDFLAGS: $(ALL_LDFLAGS)"
+	@echo "ALL_LIBS: $(ALL_LIBS)"
 	@echo "PD_INCLUDE: $(PD_INCLUDE)"
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
