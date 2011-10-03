@@ -112,6 +112,8 @@ ifeq ($(UNAME),Darwin)
     # if the 'pd' binary exists, check the linking against it to aid with stripping
     BUNDLE_LOADER = $(shell test ! -e $(PD_PATH)/bin/pd || echo -bundle_loader $(PD_PATH)/bin/pd)
     ALL_LDFLAGS += $(FAT_FLAGS) -bundle $(BUNDLE_LOADER) -undefined dynamic_lookup -L/sw/lib
+    SHARED_LDFLAGS += $(FAT_FLAGS) -dynamiclib -undefined dynamic_lookup \
+	-install_name @loader_path/$(SHARED_LIB) -compatibility_version 1 -current_version 1.0
     ALL_LIBS += -lc $(LIBS_macosx)
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
@@ -216,9 +218,9 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   CC=gcc
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -mms-bitfields
-  ALL_LDFLAGS += -s -shared -Wl,--enable-auto-import
+  ALL_LDFLAGS += -s -shared -Wl,--enable-auto-import -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj"
   SHARED_LDFLAGS += -shared
-  ALL_LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
+  ALL_LIBS += -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
