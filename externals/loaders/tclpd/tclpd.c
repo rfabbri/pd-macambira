@@ -11,7 +11,11 @@ void tclpd_setup(void) {
         return;
     }
 
+#if PD_MAJOR_VERSION==0 && PD_MINOR_VERSION<43
     post("tclpd loader v" TCLPD_VERSION);
+#else
+    logpost(NULL, 3, "tclpd loader v" TCLPD_VERSION);
+#endif
 
     proxyinlet_setup();
 
@@ -19,51 +23,21 @@ void tclpd_setup(void) {
     Tcl_Init(tcl_for_pd);
     Tclpd_SafeInit(tcl_for_pd);
 
-    char *dirname   = (char*)malloc(PATH_MAX);
-    char *dirresult = (char*)malloc(PATH_MAX);
-    /* nameresult is only a pointer in dirresult space so don't delete[] it. */
-    char *nameresult;
-    if(getcwd(dirname, PATH_MAX) < 0) {
-        post("tclpd loader: FATAL: cannot get current dir");
-        /* exit(69); */ return;
-    }
-
-    int fd;
-    t_class* foo_class = class_new(gensym("tclpd_init"), 0, 0, 0, 0, 0);
-
-    if((fd = open_via_path(dirname, "tclpd", PDSUF, dirresult, &nameresult, PATH_MAX, 1)) >= 0) {
-        post("tclpd loader found at %s", dirname);
-        close(fd);
-    } else if((fd = open_via_path(foo_class->c_externdir->s_name, "tclpd", PDSUF, dirresult, &nameresult, PATH_MAX, 1)) >= 0) {
-        post("tclpd loader found at %s", foo_class->c_externdir->s_name);
-        close(fd);
-    } else {
-        post("tclpd loader: %s was not found via the -path!", "tclpd" PDSUF);
-    }
-
-    Tcl_SetVar(tcl_for_pd, "TCLPD_DIR", dirresult, 0);
     Tcl_Eval(tcl_for_pd, "package provide Tclpd " TCLPD_VERSION);
 
-    if(Tcl_Eval(tcl_for_pd, "source $TCLPD_DIR/pkgIndex.tcl") != TCL_OK) {
-        post("tclpd loader: error loading %s/pkgIndex.tcl", dirresult);
+    t_class* foo_class = class_new(gensym("tclpd_init"), 0, 0, 0, 0, 0);
+    char buf[PATH_MAX];
+    
+    snprintf(buf, PATH_MAX, "%s/pdlib.tcl", foo_class->c_externdir->s_name);
+    if(Tcl_EvalFile(tcl_for_pd, buf) != TCL_OK) {
+        error("tclpd loader: error loading %s", buf);
     }
-
-    if(Tcl_Eval(tcl_for_pd, "source $TCLPD_DIR/tcl.tcl") == TCL_OK) {
-        post("tclpd loader: loaded %s/tcl.tcl", dirresult);
-    }
-
-    if(Tcl_Eval(tcl_for_pd,"source $env(HOME)/.pd.tcl") == TCL_OK) {
-        post("tclpd loader: loaded ~/.pd.tcl");
-    }
-
-    free(dirresult);
-    free(dirname);
 
     sys_register_loader(tclpd_do_load_lib);
 }
 
 void tclpd_interp_error(int result) {
-    post("tclpd error: %s", Tcl_GetStringResult(tcl_for_pd));
+    error("tclpd error: %s", Tcl_GetStringResult(tcl_for_pd));
     post("  (see stderr for details)");
 
     fprintf(stderr, "------------------- Tcl error: -------------------\n");

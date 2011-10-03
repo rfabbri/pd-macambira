@@ -37,7 +37,7 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl pkgIndex.tcl $(TCLPD_SOURCES) ChangeLo
 
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
 INCLUDES = -I"$(PD_INCLUDE)/pd"
-CFLAGS = $(INCLUDES) -Wall -W -g -DPDSUF=\".$(EXTENSION)\" -std=c99
+CFLAGS = $(INCLUDES) -Wall -W -g
 LDFLAGS = 
 LIBS =
 LIBS_linux = -ltcl8.5
@@ -53,7 +53,7 @@ LIBS_windows = -ltcl85
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
+CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"' -std=c99
 
 PD_INCLUDE = $(PD_PATH)/include
 # where to install the library, overridden below depending on platform
