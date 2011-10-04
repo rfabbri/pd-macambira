@@ -1350,7 +1350,10 @@ static int pdlua_loader
 }
 
 /** Start the Lua runtime and register our loader hook. */
-EXTERN void pdlua_setup(void)
+#ifdef _WIN32
+__declspec(dllexport)
+#endif 
+void pdlua_setup(void)
 {
     char                pd_lua_path[MAXPDSTRING];
     t_pdlua_readerdata  reader;
