@@ -1,7 +1,7 @@
-#N canvas 177 122 716 557 10;
+#N canvas 1 53 716 557 10;
 #X msg 73 84 fall;
 #X obj 198 182 metro 1000;
-#X obj 199 154 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 199 154 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 199 214 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
@@ -81,11 +81,20 @@
 #X text 56 2 Tags: Patch Fun;
 #X text 57 -17 Description: Animates the object boxes inside a patch.
 ;
-#X msg 54 56 bang;
-#X text 87 56 Launches the "explosion" animation;
+#X msg 52 56 bang;
+#X text 85 56 Launches the "explosion" animation;
 #X text 108 81 Lanches the "falling" animation;
 #X text 56 22 Version: 0.1;
 #X obj 52 124 tof/animate;
+#N canvas 435 278 494 344 META 0;
+#X text 12 105 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 45 LICENSE GPL v2;
+#X text 12 5 KEYWORDS control abstraction patch_op;
+#X text 12 65 INLET_0 bang fall;
+#X text 12 85 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 25 DESCRIPTION animate the object boxes inside a patch;
+#X restore 642 4 pd META;
 #X connect 0 0 48 0;
 #X connect 1 0 3 0;
 #X connect 2 0 1 0;

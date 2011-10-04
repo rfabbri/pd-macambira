@@ -1,4 +1,4 @@
-#N canvas 425 210 412 446 10;
+#N canvas 1 53 412 446 10;
 #X floatatom 82 146 5 0 0 0 - - -;
 #X obj 199 195 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
@@ -21,6 +21,18 @@ a stream of numbers.;
 #X msg 168 144 43 90;
 #X obj 9 95 tof/streamMinMax 45 100;
 #X obj 118 267 tof/streamMinMax;
+#N canvas 259 140 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 55 LICENSE GPL v2;
+#X text 12 135 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 5 KEYWORDS control conversion;
+#X text 12 25 DESCRIPTION output the minimum and maximum float of a
+stream of numbers;
+#X text 12 75 INLET_0 float list bang;
+#X text 12 95 OUTLET_0 float;
+#X text 12 115 OUTLET_1 float;
+#X restore 352 348 pd META;
 #X connect 0 0 16 0;
 #X connect 1 0 16 0;
 #X connect 14 0 16 0;

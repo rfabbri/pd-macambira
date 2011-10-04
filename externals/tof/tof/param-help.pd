@@ -1,11 +1,11 @@
-#N canvas 279 400 403 396 10;
+#N canvas 1 53 403 396 10;
 #N canvas 429 334 525 231 /id 0;
 #X text 26 42 Abstraction /id:;
 #X text 63 67 If an abstraction's arguments contains the "/id" keyword
 \, the symbol following the "/id" keyword \, instead of the abstraction's
 name \, will be used to build the path.;
 #X restore 327 340 pd /id;
-#N canvas 1318 214 933 657 /name 0;
+#N canvas 90 56 933 657 /name 0;
 #X floatatom 459 165 5 0 0 0 - - -;
 #X floatatom 459 215 5 0 0 0 - - -;
 #X obj 503 168 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
@@ -91,7 +91,7 @@ following abstraction is: /test-param/carrier;
 #X connect 23 0 8 0;
 #X connect 24 0 1 0;
 #X restore -16 187 pd /name;
-#N canvas 122 440 837 442 custom 0;
+#N canvas 141 64 837 442 custom 0;
 #X obj 17 211 cnv 15 300 20 empty empty empty 20 12 0 14 -4034 -66577
 0;
 #X text 19 212 arguments;
@@ -312,7 +312,7 @@ of this abstraction.;
 #X connect 21 0 20 0;
 #X connect 22 0 19 0;
 #X restore -16 292 pd route;
-#N canvas 324 321 986 455 gui 0;
+#N canvas 18 136 986 455 gui 0;
 #X obj 431 21 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 506 75 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
@@ -642,7 +642,7 @@ by the value of the first argument.;
 #X connect 21 0 19 1;
 #X connect 22 0 19 2;
 #X restore 325 80 pd anim;
-#X obj -23 2 cnv 15 400 100 empty \$0c empty 20 12 0 14 -89821 -262144
+#X obj -23 2 cnv 15 400 100 empty \$0c empty 20 12 0 14 -104978 -262144
 0;
 #X text -18 54 author: mrtoftrash@gmail.com;
 #X text -19 33 tags: state routing;
@@ -651,3 +651,11 @@ system.;
 #X text -19 75 version: 2009-10-27 (de localized release);
 #X text -20 341 Keyword for defining the param path inside abstractions:
 ;
+#N canvas 276 205 494 344 META 0;
+#X text 12 85 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 45 LICENSE GPL v2;
+#X text 12 65 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 25 DESCRIPTION state saving and message routing system;
+#X text 12 5 KEYWORDS control needs_work (xlets);
+#X restore 320 370 pd META;

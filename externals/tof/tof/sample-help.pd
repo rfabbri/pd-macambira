@@ -1,4 +1,4 @@
-#N canvas 519 275 683 625 10;
+#N canvas 1 53 683 625 10;
 #X obj 47 141 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 44 17 Description: Loads a sound file (wav) as a sample;
@@ -37,6 +37,15 @@ with a table size of 441000 (10 seconds at 44100hz);
 #X obj 80 410 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 45 201 Click on [tof/sample] to view info;
+#N canvas 339 248 494 344 META 0;
+#X text 12 105 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 85 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 45 DESCRIPTION load a sound file (wav) as a sample;
+#X text 12 5 KEYWORDS control abstraction array soundfile;
+#X text 12 65 INLET_0 bang read;
+#X restore 629 571 pd META;
 #X connect 0 0 20 0;
 #X connect 19 0 20 0;
 #X connect 27 0 26 0;

@@ -1,4 +1,4 @@
-#N canvas 56 497 880 406 10;
+#N canvas 1 53 880 406 10;
 #X obj 506 84 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 506 333 ./test-arguments-all a bear 3 34;
@@ -33,6 +33,17 @@ set \, the default mode is ALL.;
 #X text 608 132 TOKEN MODE;
 #X obj 593 158 tof/arguments @;
 #X obj 596 290 tof/arguments;
+#N canvas 450 281 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 65 INLET_0 bang;
+#X text 12 85 OUTLET_0 anything;
+#X text 12 5 KEYWORDS control abstraction_op;
+#X text 12 45 DESCRIPTION parse and output the patch's creation arguments.
+;
+#X restore 822 377 pd META;
 #X connect 0 0 5 0;
 #X connect 2 0 1 0;
 #X connect 3 0 4 0;

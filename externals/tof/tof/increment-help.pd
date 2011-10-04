@@ -1,4 +1,4 @@
-#N canvas 1174 80 640 574 10;
+#N canvas 1 53 640 515 10;
 #X obj 22 -23 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text 26 15 author: mrtoftrash@gmail.com;
@@ -30,6 +30,16 @@ value;
 #X text 160 402 Argument 2: incrementation amount (defaults to 1);
 #X msg 51 139 2;
 #X msg 78 367 1;
+#N canvas 219 217 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 INLET_0 bang float;
+#X text 12 65 INLET_1 bang float;
+#X text 12 85 OUTLET_0 float;
+#X restore 580 436 pd META;
 #X connect 2 0 14 1;
 #X connect 3 0 14 1;
 #X connect 6 0 14 0;

@@ -1,4 +1,4 @@
-#N canvas 59 319 922 529 10;
+#N canvas 1 53 922 529 10;
 #X obj 496 461 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj -11 19 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
@@ -47,6 +47,17 @@ type as the default value \, the default value will be outputed instead.
 #X text 1 126 see also:;
 #X obj 73 129 tof/arguments;
 #X obj 496 485 ./test-argument a b;
+#N canvas 450 281 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 115 AUTHOR Thomas Ouellet Fredericks;
+#X text 12 75 INLET_0 bang;
+#X text 12 95 OUTLET_0 anything;
+#X text 12 5 KEYWORDS control abstraction abstraction_op;
+#X text 12 45 DESCRIPTION outputs the patch's creation arguments individually.
+;
+#X restore 854 484 pd META;
 #X connect 0 0 29 0;
 #X connect 4 0 11 0;
 #X connect 5 0 12 0;
