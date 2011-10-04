@@ -30,13 +30,15 @@
 #include <string.h>
 #include <sys/types.h> // for open
 #include <sys/stat.h> // for open
-#include <sys/fcntl.h> // for open
 #ifdef _MSC_VER
 #include <io.h>
+#include <fcntl.h> // for open
 #define read _read
 #define close _close
 #define ssize_t int
+#define snprintf _snprintf
 #else
+#include <sys/fcntl.h> // for open
 #include <unistd.h>
 #endif
 /* we use Lua */
@@ -48,9 +50,6 @@
 #include "m_pd.h"
 #include "s_stuff.h" // for sys_register_loader()
 #include "m_imp.h" // for struct _class
-#ifdef _MSC_VER
-#include <s_stuff.h>
-#endif
 /* BAD: support for Pd < 0.41 */
 
 #if PD_MAJOR_VERSION == 0
@@ -80,25 +79,6 @@
 #endif
 
 /* BAD: end of bad section */
-
-/* EVIL: TODO: File requests/patches to Pd so that this becomes unnecessary. */
-
-/** Pd loader type, defined in pd/src/s_loader.c but not exported. */
-//typedef int (*loader_t)(t_canvas *, char *);
-
-/** Pd loader registration, defined in pd/src/s_loader.c but not exported. */
-//void sys_register_loader(loader_t loader);
-
-/** Pd extern dir declaration (for help finding), defined in pd/src/m_class.c but not exported. */
-//void class_set_extern_dir(t_symbol *s);
-
-/** Pd [value] getter, defined in pd/src/x_connective.c but not exported. */
-//int value_getfloat(t_symbol *s, t_float *f);
-
-/** Pd [value] setter, defined in pd/src/x_connective.c but not exported. */
-//int value_setfloat(t_symbol *s, t_float f);
-
-/* EVIL: end of evil section. */
 
 /* If defined, PDLUA_DEBUG lets pdlua post a lot of text */
 //#define PDLUA_DEBUG
