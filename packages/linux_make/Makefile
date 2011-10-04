@@ -28,20 +28,19 @@ else
   prefix = /usr/local
 endif
 
+OPT_CFLAGS = -g
+
 TARGET_PLATFORM := $(shell uname -m)
 ifeq ($(TARGET_PLATFORM),i686)
 # Generic x86 (tune for Pentium III, since that's more common these days)
-OPT_CFLAGS += -mtune=i686 -march=i386
-#OPT_CFLAGS += -march=pentium3 -msse -mfpmath=sse
-#OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
+  OPT_CFLAGS += -mtune=i686 -march=i386
+endif
+ifeq ($(TARGET_PLATFORM),amd64)
+  OPT_CFLAGS += -march=k8 -msse -msse2 -mfpmath=sse
+  OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=1
 endif
 ifeq ($(TARGET_PLATFORM),ppc)
-    OPT_CFLAGS += -pipe -fsigned-char -mpowerpc
-endif
-
-GCC_VERSION := $(shell gcc -dumpversion)
-ifeq ($(GCC_VERSION),4.1.2)
-  OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=3
+  OPT_CFLAGS += -pipe -fsigned-char -mpowerpc
 endif
 
 # lots more here: http://www.gentoo.se/docs/doc-cflags.php
@@ -80,7 +79,8 @@ package: $(PACKAGE_TYPE)
 tarbz2: installer_makefile installer_readme
 	install -p $(packages_src)/linux_make/default.pdextended $(DESTDIR)$(libpddir)
 	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
-	ln -s -f $(bindir)/pd-extended $(DESTDIR)$(bindir)/pd
+	ln -s -f pd-extended $(DESTDIR)$(bindir)/pdextended
+	ln -s -f pd-extended $(DESTDIR)$(bindir)/pd
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)

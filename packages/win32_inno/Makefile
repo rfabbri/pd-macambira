@@ -13,9 +13,11 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
+OPT_CFLAGS = -g
 
 # compile for pentium4 so we can use SSE2
 OPT_CFLAGS += -march=pentium4 -msse2 -mfpmath=sse
+OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=1
 
 
 # these are sent to all of the various Makefiles so that they all copy their
@@ -57,7 +59,7 @@ zip:
 	@echo "win32_inno install succeeded!"
 
 build_pd:
-	cd $(pd_src)/src && $(MAKE) -f makefile.mingw
+	cd $(pd_src)/src && $(MAKE) -f makefile.mingw MORECFLAGS="-O2 -g"
 
 PD_NAME=Pd
 pd_install: build_pd

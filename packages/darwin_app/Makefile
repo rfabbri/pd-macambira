@@ -27,7 +27,7 @@ WISH_CONTENTS = "$(WISH)/Contents"
 # http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
 # http://hpc.sourceforge.net/
 
-OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=2
+OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=1 -g
 FAT_FLAGS = -mmacosx-version-min=10.4
 
 # which CPU to compile for

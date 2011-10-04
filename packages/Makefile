@@ -111,7 +111,7 @@ pd: set_version
 	cd $(pd_src) \
 		&& ./autogen.sh \
 		&& ./configure $(PD_CONFIGURE_FLAGS) \
-		&& make $(DEST_PATHS) $(PD_BUILD_FLAGS)
+		&& make $(DEST_PATHS) $(PD_BUILD_FLAGS) CFLAGS="-O2 -g"
 
 PD_NAME=Pd
 pd_install: pd
