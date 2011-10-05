@@ -130,9 +130,9 @@ struct pdlua_proxyclock;
 typedef struct pdlua 
 {
     t_object                pd; /**< We are a Pd object. */
-    unsigned int            inlets; /**< Number of inlets. */
+    int                     inlets; /**< Number of inlets. */
     struct pdlua_proxyinlet *in; /**< The inlets themselves. */
-    unsigned int            outlets; /**< Number of outlets. */
+    int                     outlets; /**< Number of outlets. */
     t_outlet                **out; /**< The outlets themselves. */
     t_canvas                *canvas; /**< The canvas that the object was created on. */
 } t_pdlua;
@@ -453,7 +453,7 @@ static int pdlua_object_createinlets(lua_State *L)
   * \li \c 2 Number of inlets.
   * */
 {
-    unsigned int i;
+    int i;
 
 #ifdef PDLUA_DEBUG
     post("pdlua_object_createinlets:");
@@ -483,7 +483,7 @@ static int pdlua_object_createoutlets(lua_State *L)
   * \li \c 2 Number of outlets.
   * */
 {
-    unsigned int i;
+    int i;
 
 #ifdef PDLUA_DEBUG
     post("pdlua_object_createoutlets:");
@@ -656,7 +656,7 @@ static int pdlua_object_free(lua_State *L)
   * \li \c 1 Pd object pointer.
   * */
 {
-    unsigned int i;
+    int i;
 
 #ifdef PDLUA_DEBUG
     post("pdlua_object_free:");
