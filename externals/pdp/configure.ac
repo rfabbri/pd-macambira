@@ -96,6 +96,12 @@ then
 elif test -f $PWD/../src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$PWD/../src"
+elif test -f /usr/local/include/pd/m_pd.h;
+then
+	PD_CPPFLAGS="-I/usr/local/include/pd"
+elif test -f /usr/include/pd/m_pd.h;
+then
+	PD_CPPFLAGS="-I/usr/include/pd"
 fi
 
 
