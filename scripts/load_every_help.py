@@ -93,7 +93,13 @@ def remove_ignorelines(list):
         'pique 0.1 for PD version 23\n',
         'this is pddplink 0.1, 3rd alpha build...\n',
         'beware! this is tot 0.1, 19th alpha build...\n',
-        'foo: you have opened the [loadbang] help document\n'
+        'foo: you have opened the [loadbang] help document\n',
+        'print: bang\n',
+        'print: 207\n',
+        'print: 2 1\n',
+        'obj3\n',
+        'obj4 34\n',
+        'initial_bang: bang\n',
         '\n'
         ]
     ignorepatterns = [
@@ -103,6 +109,7 @@ def remove_ignorelines(list):
         '[a-z]+ v0\.[0-9]',
         'IOhannes m zm',
         'part of zexy-',
+        'Pd: 0.43.1-extended',
         'based on sync from jMax'
         ]
     for ignore in ignorelines:
