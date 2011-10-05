@@ -217,41 +217,6 @@ flatspace_clean:
 #
 #==============================================================================#
 
-# this is the template for creating new entries:
-
-#------------------------------------------------------------------------------#
-# TEMPLATE
-TEMPLATE_NAME=template
-TEMPLATE_OBJECTS := $(wildcard $(externals_src)/template/*.c)
-template: $(TEMPLATE_OBJECTS:.c=.$(EXTENSION))
-
-template_install: template
-	install -d $(DESTDIR)$(objectsdir)/$(TEMPLATE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(TEMPLATE_NAME) \
-		--author "" \
-		--description "" \
-		--license "" \
-		--version ""
-	install -p $(TEMPLATE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TEMPLATE_NAME)
-#	install -d $(manualsdir)/$(TEMPLATE_NAME)
-#	install -p $(externals_src)/template/manual.txt \
-#		$(manualsdir)/$(TEMPLATE_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/template/README \
-		$(readmesdir)/$(TEMPLATE_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(TEMPLATE_NAME)
-	install -p $(externals_src)/template/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(TEMPLATE_NAME)
-
-template_clean:
-	-rm -f -- $(TEMPLATE_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(TEMPLATE_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/template/*.bak
-	-rm -f -- $(externals_src)/template/*.*~
-
-
-
-
 #------------------------------------------------------------------------------#
 # AKA.WIIREMOTE
 # this is installed into the "io" library
@@ -1368,23 +1333,37 @@ loaders-pdlua:
 loaders-pdlua_install: loaders-pdlua
 	install -d $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
 	echo "installing $(LOADERS-PDLUA_NAME) to $(DESTDIR)"
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(LOADERS-PDLUA_NAME) \
-		--author "Claude Heiland-Allen Frank Barknecht Martin Peach" \
-		--license "GNU GPL" \
-		--description "lua loader for pd" \
-		--version "$(LOADERS-PDLUA_VERSION)"
-	install -p $(LOADERS-PDLUA_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/src/*.pd  $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/src/*.pd_lua  $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/src/*.pd_luax  $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/src/pd.lua  $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/loaders/pdlua/README $(DESTDIR)$(readmesdir)/$(LOADERS-PDLUA_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/examples/*.pd $(DESTDIR)$(examplesdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/examples/*.pd_lua $(DESTDIR)$(examplesdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/examples/*.pd_luax $(DESTDIR)$(examplesdir)/$(LOADERS-PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/doc/*.txt $(DESTDIR)$(examplesdir)/$(LOADERS-PDLUA_NAME)
+	install -p $(LOADERS-PDLUA_OBJECTS:.c=.$(EXTENSION)) \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/src/*.pd  \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/src/*.pd_lua \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/src/*.pd_luax \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/src/pd.lua \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/README \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/README.txt
+	install -p $(externals_src)/loaders/pdlua/COPYING \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/LICENSE.txt
+	install -p $(externals_src)/loaders/pdlua/examples/*.pd \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/examples
+	install -p $(externals_src)/loaders/pdlua/examples/*.pd_lua \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/examples
+	install -p $(externals_src)/loaders/pdlua/examples/*.pd_luax \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/examples
+	install -d $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/manual
+	install -p $(externals_src)/loaders/pdlua/doc/*.txt \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/manual
+	install -p $(externals_src)/loaders/pdlua/AUTHORS \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/manual/AUTHORS.txt
+	install -p $(externals_src)/loaders/pdlua/CHANGES \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/manual/CHANGES.txt
+	install -p $(externals_src)/loaders/pdlua/TODO \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/manual/TODO.txt
+
 loaders-pdlua_clean:
 	-rm -f -- $(LOADERS-PDLUA_OBJECTS:.c=.$(EXTENSION))
 	-rm -f -- $(externals_src)/loaders/pdlua/src/*.o
@@ -1603,9 +1582,6 @@ postlude_install: postlude
 		$(DESTDIR)$(readmesdir)/$(POSTLUDE_NAME)-dssi.txt
 	install -p $(externals_src)/postlude/psql/README \
 		$(DESTDIR)$(readmesdir)/$(POSTLUDE_NAME)-psql.txt
-	install -d $(DESTDIR)$(examplesdir)/$(POSTLUDE_NAME)
-#	install -p $(externals_src)/postlude/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(POSTLUDE_NAME)
 
 postlude_clean:
 	-rm -f -- $(POSTLUDE_OBJECTS:.c=.$(EXTENSION))
