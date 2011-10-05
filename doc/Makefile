@@ -161,6 +161,7 @@ pd_fileformat_clean:
 pddp_install: $(helpdir)
 	install -p $(doc_src)/pddp/*.pd $(DESTDIR)$(helpdir)
 # this file is used in key-help.pd
+	install -p $(doc_src)/pddp/glossary.txt $(DESTDIR)$(helpdir)
 	install -p $(doc_src)/pddp/keyboard_fun.txt $(DESTDIR)$(helpdir)
 
 pddp_clean:
