@@ -13,6 +13,10 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
+# to control whether the debug symbols are kept
+#STRIP = strip --strip-unneeded -R .note -R .comment
+STRIP = echo
+
 OPT_CFLAGS = -g
 
 # compile for pentium4 so we can use SSE2
@@ -27,7 +31,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
 				OPT_CFLAGS="$(OPT_CFLAGS)" \
-				UNAME=$(UNAME)
+				UNAME=$(UNAME) \
+				STRIP="$(STRIP)"
 
 PD_INNO_SETUP = pd-inno.iss
 

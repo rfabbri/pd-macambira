@@ -293,7 +293,8 @@ apple:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 apple_install:
-	make -C $(externals_src)/apple DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/apple STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 apple_clean:
 	make -C $(externals_src)/apple clean
@@ -306,7 +307,8 @@ arraysize:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 arraysize_install:
-	make -C $(externals_src)/arraysize DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/arraysize STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 arraysize_clean:
 	make -C $(externals_src)/arraysize clean
@@ -318,7 +320,8 @@ bassemu:
 	make -C $(externals_src)/bassemu~ PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 bassemu_install:
-	make -C $(externals_src)/bassemu~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/bassemu~ STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 bassemu_clean:
 	make -C $(externals_src)/bassemu~ clean
@@ -406,7 +409,8 @@ cw_binaural:
 	make -C $(externals_src)/ddoukhan/cw_binaural~ PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 cw_binaural_install:
-	make -C $(externals_src)/ddoukhan/cw_binaural~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/ddoukhan/cw_binaural~ STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 cw_binaural_clean:
 	make -C $(externals_src)/ddoukhan/cw_binaural~ clean
@@ -419,7 +423,8 @@ cxc:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 cxc_install:
-	make -C $(externals_src)/cxc DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/cxc STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 cxc_clean:
 	make -C $(externals_src)/cxc clean
@@ -448,7 +453,8 @@ ekext:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 ekext_install:
-	make -C $(externals_src)/ekext DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/ekext STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 ekext_clean:
 	make -C $(externals_src)/ekext clean
@@ -461,7 +467,8 @@ ext13:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 ext13_install:
-	make -C $(externals_src)/ext13 DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/ext13 STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 ext13_clean:
 	make -C $(externals_src)/ext13 clean
@@ -474,7 +481,8 @@ extra:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 extra_install:
-	make -C $(externals_src)/extra DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/extra STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 extra_clean:
 	make -C $(externals_src)/extra clean
@@ -551,7 +559,8 @@ freeverb:
 	make -C $(externals_src)/freeverb~ PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 freeverb_install:
-	make -C $(externals_src)/freeverb~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/freeverb~ STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 freeverb_clean:
 	make -C $(externals_src)/freeverb~ clean
@@ -663,7 +672,8 @@ ggee:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 ggee_install:
-	make -C $(externals_src)/ggee DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/ggee STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 ggee_clean:
 	make -C $(externals_src)/ggee clean
@@ -676,7 +686,8 @@ hcs:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 hcs_install:
-	make -C $(externals_src)/hcs DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/hcs STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 hcs_clean:
 	make -C $(externals_src)/hcs clean
@@ -689,7 +700,8 @@ hid:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 hid_install:
-	make -C $(externals_src)/hid DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/hid STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 hid_clean:
 	make -C $(externals_src)/hid clean
@@ -1032,7 +1044,8 @@ loaders-libdir:
 	make -C $(externals_src)/loaders/libdir PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 loaders-libdir_install:
-	make -C $(externals_src)/loaders/libdir DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/loaders/libdir STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 loaders-libdir_clean:
 	make -C $(externals_src)/loaders/libdir clean
@@ -1046,8 +1059,8 @@ loaders-tclpd:
 				PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 loaders-tclpd_install: loaders-tclpd
-	make -C $(externals_src)/loaders/tclpd DESTDIR="$(DESTDIR)" \
-		objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/loaders/tclpd STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 loaders-tclpd_clean:
 	make -C $(externals_src)/loaders/tclpd clean
@@ -1060,7 +1073,7 @@ log:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 log_install:
-	make -C $(externals_src)/log \
+	make -C $(externals_src)/log STRIP="$(STRIP)" \
 		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 log_clean:
@@ -1073,7 +1086,8 @@ mapping:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 mapping_install:
-	make -C $(externals_src)/mapping DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/mapping STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 mapping_clean:
 	make -C $(externals_src)/mapping clean
@@ -1085,7 +1099,8 @@ markex:
 		CFLAGS="$(CFLAGS) -DHAVE_SYS_CLOSE_AUDIO -DHAVE_SYS_CLOSE_MIDI"
 
 markex_install:
-	make -C $(externals_src)/markex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/markex STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 markex_clean:
 	make -C $(externals_src)/markex clean
@@ -1097,7 +1112,8 @@ maxlib:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 maxlib_install:
-	make -C $(externals_src)/maxlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/maxlib STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 maxlib_clean:
 	make -C $(externals_src)/maxlib clean
@@ -1109,7 +1125,8 @@ mediasettings:
 	make -C $(externals_src)/iem/mediasettings PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 mediasettings_install:
-	make -C $(externals_src)/iem/mediasettings DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/iem/mediasettings STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 mediasettings_clean:
 	make -C $(externals_src)/iem/mediasettings clean
@@ -1122,7 +1139,8 @@ mjlib:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 mjlib_install:
-	make -C $(externals_src)/mjlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/mjlib STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 mjlib_clean:
 	make -C $(externals_src)/mjlib clean
@@ -1192,7 +1210,8 @@ moonlib:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 moonlib_install:
-	make -C $(externals_src)/moonlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/moonlib STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 moonlib_clean:
 	make -C $(externals_src)/moonlib clean
@@ -1206,7 +1225,8 @@ motex:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 motex_install:
-	make -C $(externals_src)/motex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/motex STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 motex_clean:
 	make -C $(externals_src)/motex clean
@@ -1256,7 +1276,8 @@ osc:
 	make -C $(externals_src)/mrpeach/osc PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 osc_install:
-	make -C $(externals_src)/mrpeach/osc DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/mrpeach/osc STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 osc_clean:
 	make -C $(externals_src)/mrpeach/osc clean
@@ -1313,7 +1334,8 @@ pan:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 pan_install:
-	make -C $(externals_src)/pan DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/pan STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pan_clean:
 	make -C $(externals_src)/pan clean
@@ -1326,7 +1348,8 @@ pddp:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 pddp_install:
-	make -C $(externals_src)/pddp DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/pddp STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pddp_clean:
 	make -C $(externals_src)/pddp clean
@@ -1375,7 +1398,8 @@ pdogg:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 pdogg_install:
-	make -C $(externals_src)/pdogg DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/pdogg STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pdogg_clean:
 	make -C $(externals_src)/pdogg clean
@@ -1534,7 +1558,8 @@ plugin:
 	make -C $(externals_src)/plugin~ PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 plugin_install:
-	make -C $(externals_src)/plugin~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/plugin~ STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 plugin_clean:
 	make -C $(externals_src)/plugin~ clean
@@ -1547,7 +1572,8 @@ pmpd:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 pmpd_install:
-	make -C $(externals_src)/pmpd DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/pmpd STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pmpd_clean:
 	make -C $(externals_src)/pmpd clean
@@ -1596,7 +1622,8 @@ sigpack:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 sigpack_install:
-	make -C $(externals_src)/sigpack DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/sigpack STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 sigpack_clean:
 	make -C $(externals_src)/sigpack clean
@@ -1610,7 +1637,8 @@ smlib:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 smlib_install:
-	make -C $(externals_src)/smlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/smlib STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 smlib_clean:
 	make -C $(externals_src)/smlib clean
@@ -1704,7 +1732,8 @@ vbap:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 vbap_install:
-	make -C $(externals_src)/vbap DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/vbap STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 vbap_clean:
 	make -C $(externals_src)/vbap clean
@@ -1717,7 +1746,8 @@ vanilla:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 vanilla_install:
-	make -C $(externals_src)/vanilla DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/vanilla STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 vanilla_clean:
 	make -C $(externals_src)/vanilla clean
@@ -1730,7 +1760,8 @@ windowing:
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 windowing_install:
-	make -C $(externals_src)/windowing DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/windowing STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 windowing_clean:
 	make -C $(externals_src)/windowing clean
@@ -2194,7 +2225,8 @@ earplug:
 	make -C $(externals_src)/earplug~ PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
 earplug_install:
-	make -C $(externals_src)/earplug~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/earplug~ STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 earplug_clean:
 	make -C $(externals_src)/earplug~ clean

@@ -23,6 +23,10 @@ WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
 
+# to control whether the debug symbols are kept
+#STRIP = strip -x
+STRIP = echo
+
 # CPU-specific gleaned from:
 # http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
 # http://hpc.sourceforge.net/
@@ -54,7 +58,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				DESTDIR=$(DESTDIR) \
 				OPT_CFLAGS="$(OPT_CFLAGS)" \
 				FAT_FLAGS="$(FAT_FLAGS)" \
-				UNAME=$(UNAME)
+				UNAME=$(UNAME) \
+				STRIP="$(STRIP)"
 
 all:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS)

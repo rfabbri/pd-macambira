@@ -28,6 +28,10 @@ else
   prefix = /usr/local
 endif
 
+# to control whether the debug symbols are kept
+#STRIP = strip --strip-unneeded -R .note -R .comment
+STRIP = echo
+
 OPT_CFLAGS = -g
 
 TARGET_PLATFORM := $(shell uname -m)
@@ -52,7 +56,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
 				OPT_CFLAGS="$(OPT_CFLAGS)" \
-				UNAME=$(UNAME)
+				UNAME=$(UNAME) \
+				STRIP=$(STRIP)
 
 all: 	
 	$(MAKE) -C $(packages_src) $(DEST_PATHS)
