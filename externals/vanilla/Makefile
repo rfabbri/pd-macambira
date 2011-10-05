@@ -10,7 +10,7 @@ SOURCES = abs~.c adc~.c bang~.c bng.c clip~.c cnv.c cputime.c dac~.c dbtopow~.c 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = 
+PDOBJECTS = q8_sqrt~.pd q8_rsqrt~.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = 
