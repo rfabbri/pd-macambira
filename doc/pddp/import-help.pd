@@ -1,7 +1,7 @@
-#N canvas 0 0 555 619 10;
+#N canvas 579 22 555 619 10;
 #X declare;
 #X declare;
-#X declare -lib ext13 -lib memento -lib rradical;
+#X declare -lib cyclone -lib osc;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header import 3 12 0 18
@@ -44,7 +44,6 @@ to conform to the PDDP template for Pd version 0.42.;
 #X obj 455 20 pddp/pddplink http://wiki.puredata.info/en/import -text
 pdpedia: import;
 #X msg 91 114 bang;
-#X obj 91 162 import ext13 memento rradical;
 #X symbolatom 102 188 0 0 0 0 - - -;
 #X obj 91 214 print;
 #X text 138 113 get next item in list of loaded libs;
@@ -74,10 +73,12 @@ be sent out its right outlet.;
 #X text 80 471 n) symbol atom;
 #X text 167 471 - the arguments to [import] specify the libraries to
 load for patch.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 97 568 pddp/pddplink all_about_libraries.pd;
-#X connect 13 0 14 0;
-#X connect 14 0 15 0;
-#X connect 14 0 16 0;
-#X connect 14 1 25 0;
-#X connect 19 0 14 0;
+#X obj 91 162 import cyclone osc;
+#X connect 13 0 35 0;
+#X connect 18 0 35 0;
+#X connect 35 0 14 0;
+#X connect 35 0 15 0;
+#X connect 35 1 24 0;
