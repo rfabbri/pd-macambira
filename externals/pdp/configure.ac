@@ -139,12 +139,40 @@ then
 
 dnl if not darwin, assume target is linux
 else
-	AC_CHECK_HEADER(linux/videodev.h,
+  have_v4l="no"
+  have_libv4l="no"
+  AC_CHECK_HEADERS([libv4l1-videodev.h], have_v4l="yes")
+  AC_CHECK_HEADERS([linux/videodev.h], have_libv4l="yes")
+
+  if test "x$have_libv4l" = "xyes"
+  then
+    have_v4l="yes"
+  fi
+
+  if test "x$enable_v4l" = "xno"
+  then
+   have_v4l="no"
+  fi
+
+  if test "x$have_v4l" = "xyes"
+  then
 		PDP_OPTMOD="$PDP_OPTMOD pdp_v4l.o"
-		AC_DEFINE(HAVE_PDP_V4L, 1, build pdp_v4l),
-		echo "   linux/videodev.h not found: not building pdp_v4l")
+		AC_DEFINE(HAVE_PDP_V4L, 1, [build pdp_v4l])
 
-
+    if test "x$have_libv4l" = "xyes"
+    then
+  		AC_DEFINE(HAVE_PDP_LIBV4L, 1, [build pdp_v4l with libv4l])
+      PDP_V4L_CFLAGS="$(shell pkg-config --cflags libv4l)"
+      PDP_V4L_LIBS="$(shell pkg-config --libs libv4l)"
+    else
+      PDP_V4L_CFLAGS=""
+      PDP_V4L_LIBS=""
+    fi
+    PDP_CFLAGS="$PDP_CFLAGS $PDP_V4L_CFLAGS"
+    LIBS="$LIBS $PDP_V4L_LIBS"
+  else
+    AC_MSG_RESULT([not building pdp_v4l])
+  fi
 fi
 
 dnl optional gsl support
