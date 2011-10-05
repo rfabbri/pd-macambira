@@ -35,7 +35,15 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <linux/types.h>
-#include <linux/videodev.h>
+
+#ifdef HAVE_LIBV4L1_VIDEODEV_H
+# include <libv4l1-videodev.h>
+#elif defined  HAVE_LINUX_VIDEODEV_H
+# include <linux/videodev.h>
+#else
+# error cannot compile pdp_v4l without new kernel and without libv4l-dev
+#endif
+
 #include <sys/mman.h>
 #include <sched.h>
 #include <pthread.h>
