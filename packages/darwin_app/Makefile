@@ -32,7 +32,6 @@ STRIP = echo
 # http://hpc.sourceforge.net/
 
 OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=1 -g
-FAT_FLAGS = -mmacosx-version-min=10.4
 
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
@@ -40,7 +39,6 @@ ifeq ($(TARGET_PLATFORM),i386)
   # if on 10.6/Intel, then build as 64-bit with core2 as minimum CPU
   ifeq ($(shell uname -r | sed 's|\([0-9][0-9]*\)\.[0-9][0-9]*\.[0-9][0-9]*|\1|'), 10)
     OPT_CFLAGS += -march=core2 -msse3 -mssse3 -mfpmath=sse
-    FAT_FLAGS = -mmacosx-version-min=10.6
   else
     OPT_CFLAGS += -march=pentium4 -msse3 -mfpmath=sse
   endif
