@@ -95,7 +95,7 @@ void vbap_setup(void)
     class_addmethod(vbap_class, (t_method)def_ls_read_directions, gensym("ls-directions"), A_GIMME, 0);	
     class_addmethod(vbap_class, (t_method)def_ls_read_triplets, gensym("ls-triplets"), A_GIMME, 0);
 
-	post(VBAP_VERSION);
+	verbose(-1, VBAP_VERSION);
 }
 #else /* MAX */
 void main(void)
