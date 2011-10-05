@@ -411,7 +411,7 @@ the time \, state 2 10% \, and state 3 20%.;
 #N canvas 0 0 556 312 changementEchelles 0;
 #X text 11 3 But : passer un nombre qui va de 0 a 127 en un nombre
 entre 40 et 3000;
-#X obj 171 43 range 0 127 40 3000;
+#X obj 171 43 maxlib/scale 0 127 40 3000;
 #X text 13 43 Un objet fait ca :;
 #X text 9 92 Mais on peut faire tout aussi bien en utilisant les objets
 [expr] qui servent tres bien pour tout calcul.;
