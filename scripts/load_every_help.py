@@ -88,10 +88,12 @@ def remove_ignorelines(list):
     ignorelines = [
         'expr, expr~, fexpr~ version 0.4 under GNU General Public License \n',
         'fiddle version 1.1 TEST4\n',
-        'sigmund version 0.03\n',
+        'sigmund version 0.07\n',
+        'bonk version 1.5\n'
         'pique 0.1 for PD version 23\n',
         'this is pddplink 0.1, 3rd alpha build...\n',
         'beware! this is tot 0.1, 19th alpha build...\n',
+        'foo: you have opened the [loadbang] help document\n'
         '\n'
         ]
     ignorepatterns = [
