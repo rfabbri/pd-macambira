@@ -891,7 +891,8 @@ iemlib_install: iemlib
 
 
 iemlib_clean: 
-	-rm -f -- $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEMLIB_OBJECTS)
+	-rm -f -- $(IEMLIB_SRC:.c=.$(EXTENSION))
 	-rmdir -- $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
 	-rm -f -- $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)/*.*
 	-rmdir -- $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
