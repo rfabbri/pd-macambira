@@ -39,9 +39,8 @@ then, compile it :
 make clean
 make
 
-and copy the .pd_linux to your externals folder ::
-
-cp *.pd_linux /usr/local/lib/pd/extra/
+and put the *.pd_linux and *.pd files somewhere in Pd's path.  You can add the
+current directory to the pd search path through Media->Preferences->Path
 
 
 ===== MAC OSX (intel and powerPC) =====
