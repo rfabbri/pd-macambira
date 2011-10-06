@@ -170,6 +170,11 @@ static void pddplink_click(t_pddplink *x, t_floatarg xpos, t_floatarg ypos,
     x->x_ishit = 0;
 }
 
+static void pddplink_bang(t_pddplink *x)
+{
+  pddplink_click(x, 0, 0, 0, 0, 0);
+}
+
 static int pddplink_wbclick(t_gobj *z, t_glist *glist, int xpix, int ypix,
 			    int shift, int alt, int dbl, int doit)
 {
@@ -354,6 +359,7 @@ void pddplink_setup(void)
     pddplinkbox_class = class_new(gensym("pddplink"), 0,
 				  (t_method)pddplink_free,
 				  sizeof(t_pddplink), 0, A_GIMME, 0);
+    class_addbang(pddplinkbox_class, pddplink_bang);
     class_addanything(pddplinkbox_class, pddplink_anything);
     class_addmethod(pddplinkbox_class, (t_method)pddplink_click,
 		    gensym("click"),

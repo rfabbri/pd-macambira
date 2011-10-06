@@ -205,8 +205,9 @@ void helplink_setup(void)
 			       (t_newmethod)helplink_new,
 			       (t_method)helplink_free,
 			       sizeof(t_helplink),
-			       CLASS_NOINLET | CLASS_PATCHABLE,
+			       CLASS_PATCHABLE,
 			       A_DEFSYMBOL, 0);
 
+    class_addbang(helplink_class, helplink_doclick);
     class_setwidget(helplink_class, &helplink_widgetbehavior);
 }
