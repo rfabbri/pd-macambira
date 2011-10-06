@@ -415,7 +415,8 @@ static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
   		
   		final_gs[ls[0]-1] += g[0];
   		final_gs[ls[1]-1] += g[1];
-  		final_gs[ls[2]-1] += g[2];
+  		if (dim==3)
+  			final_gs[ls[2]-1] += g[2];
   	}
 }
 
