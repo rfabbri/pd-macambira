@@ -6,7 +6,7 @@ LIBRARY_NAME = hcs
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
-SOURCES = canvas_name.c ce_path.c classpath.c colorpanel.c cursor.c folder_list.c group.c helppath.c keyboard_layout.c passwd.c screensize.c setenv.c split_path.c sql_query.c stat.c sys_gui.c uname.c unsetenv.c version.c window_name.c
+SOURCES = canvas_name.c ce_path.c classpath.c colorpanel.c cursor.c folder_list.c group.c helppath.c passwd.c screensize.c setenv.c split_path.c sql_query.c stat.c sys_gui.c uname.c unsetenv.c version.c window_name.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
