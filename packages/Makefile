@@ -38,7 +38,7 @@ CYCLONE_BUILD := $(shell grep CYCLONE_BUILD \
 	cut -d '"' -f 2)
 CYCLONE_VERSION := $(CYCLONE_MAJOR_VERSION) $(CYCLONE_RELEASE) $(CYCLONE_BUILD)
 
-GEM_VERSION := $(shell sed -n 's|.*GEM_VERSION_MAJOR ||p' $(gem_src)/src/Base/GemVersion.h).$(shell sed -n 's|.*GEM_VERSION_MINOR ||p' $(gem_src)/src/Base/GemVersion.h)
+GEM_VERSION := $(shell sed -n 's|^AC_INIT.\[Gem\],\[\([0-9]\).*|\1|p' $(gem_src)/configure.ac).$(shell sed -n 's|^AC_INIT.\[Gem\],\[[0-9]\.\([0-9][0-9]*\).*|\1|p' $(gem_src)/configure.ac)
 
 MAXLIB_VERSION := $(shell grep "define VERSION" \
 	$(externals_src)/maxlib/maxlib.c | cut -d '"' -f 2)
