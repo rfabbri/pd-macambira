@@ -1,4 +1,4 @@
-#N canvas 574 199 637 279 10;
+#N canvas 576 203 637 279 10;
 #X declare -stdpath doc/examples/pdlua;
 #X declare -stdpath extra/pdlua/examples;
 #X msg 44 58;
@@ -14,7 +14,7 @@
 #X text 29 157 [pdlua] registers a loader that allows Pd classes written
 in Lua to be loaded.;
 #X obj 282 109 declare -stdpath doc/examples/pdlua;
-#N canvas 177 101 621 402 pdlua_HOWTO 0;
+#N canvas 128 92 621 356 pdlua_HOWTO 0;
 #X obj 13 3 cnv 15 500 140 empty empty pdlua_HOWTO 20 12 0 14 -135137
 -66577 0;
 #X obj 13 144 cnv 15 500 160 empty empty Class_Creation 20 12 0 14
@@ -78,7 +78,7 @@ them in a comment.;
 \, or weird things will happen.;
 #X obj 13 1823 cnv 15 500 120 empty empty Clocks 20 12 0 14 -203904
 -66577 0;
-#X obj 13 1944 cnv 15 500 120 empty empty Miscellaneous_Object_Methods
+#X obj 13 1944 cnv 15 500 140 empty empty Miscellaneous_Object_Methods
 20 12 0 14 -261234 -66577 0;
 #X text 32 1843 You can bind methods to clocks \, for timing based
 on Pd's logical clock.;
@@ -86,13 +86,12 @@ on Pd's logical clock.;
 \, or weird things will happen.;
 #X text 31 1964 Execute a Lua file using Pd's path to find it:;
 #X text 31 2001 Report an error to Pd's console:;
-#X obj 13 2065 cnv 15 500 120 empty empty Miscellaneous_Functions 20
+#X obj 13 2086 cnv 15 500 80 empty empty Miscellaneous_Functions 20
 12 0 14 -135137 -66577 0;
-#X text 31 2088 Print a string to Pd's console:;
-#X text 31 2124 Note that pd.post() should not really be used for errors.
+#X text 31 2109 Print a string to Pd's console:;
+#X text 31 2146 Note that pd.post() should not really be used for errors.
 ;
-#X text 31 2145 FIXME: add pd.error() for error messages;
-#X obj 9 2198 pdlua;
+#X obj 9 2176 pdlua;
 #X obj 9 30 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 31 1724 You can bind methods to receivers \, to get messages
@@ -118,7 +117,6 @@ from [send receiver] and " \; receiver message".;
 0;
 #X text 48 551 <"a" \, "b" \, 1 \, 2 \, 3 \, "c">;
 #X text 56 677 self.inlets = 1;
-#X text 56 693 self.outlets = atoms[1];
 #X text 55 843 function foo:postinitialize();
 #X text 55 857 -- code;
 #X text 56 872 end;
@@ -126,11 +124,11 @@ from [send receiver] and " \; receiver message".;
 0;
 #X obj 48 2025 cnv 15 400 20 empty empty empty 20 12 0 14 -204786 -66577
 0;
-#X obj 48 2105 cnv 15 400 20 empty empty empty 20 12 0 14 -204786 -66577
+#X obj 48 2126 cnv 15 400 20 empty empty empty 20 12 0 14 -204786 -66577
 0;
 #X text 56 1982 self:dofile("filename");
 #X text 56 2025 self:error("message");
-#X text 56 2105 pd.post("a string");
+#X text 56 2126 pd.post("a string");
 #X obj 479 1663 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -257985
 -1;
 #X floatatom 602 1789 5 0 0 0 - - -;
@@ -143,8 +141,7 @@ from [send receiver] and " \; receiver message".;
 #X obj 514 1667 lsend splat-2;
 #X obj 479 1760 lreceive splat- 1 2 3;
 #X obj 479 1870 ldelay 1000;
-#X text 75 2183 modified from doc/examples/pdlua/lua.txt;
-#X text 75 2196 by mrpeach 2011/10/05;
+#X text 75 2173 modified from doc/examples/pdlua/lua.txt;
 #X text 31 994 Each inlet should have at least one method that will
 be called when an item it can handle arrives at that input.;
 #X obj 48 1080 cnv 15 400 50 empty empty empty 20 12 0 14 -204786 -66577
@@ -166,15 +163,15 @@ be called when an item it can handle arrives at that input.;
 0;
 #X text 55 1432 self:outlet(2 \, "bang" \, <>);
 #X text 29 1451 (as usual <> should be curly brackets);
-#X text 31 1403 This will cause the second outlet to emit a bang:;
+#X text 31 1407 This will cause the second outlet to emit a bang:;
 #X obj 48 1498 cnv 15 400 20 empty empty empty 20 12 0 14 -204786 -66577
 0;
-#X text 31 1473 This will cause the second outlet to emit a float:
+#X text 31 1477 This will cause the second outlet to emit a float:
 ;
 #X text 55 1502 self:outlet(2 \, "float" \, <123>);
 #X obj 48 1548 cnv 15 400 40 empty empty empty 20 12 0 14 -204786 -66577
 0;
-#X text 31 1523 This will cause the first outlet to emit a list:;
+#X text 31 1526 This will cause the first outlet to emit a list:;
 #X text 55 1569 self:outlet(1 \, "list" \, somelist);
 #X text 55 1552 self.somelist = <some items in a list>;
 #X text 32 1132 A "stop" method for inlet 2 of [foo]:;
@@ -196,13 +193,18 @@ is a float method for [foo] inlet 1:;
 #X text 31 786 If you need to do things after the Pd object is created
 \, but before control is returned to Pd \, (such as registering receivers
 or clocks) you can use the 'postinitialize' method:;
-#X connect 38 0 37 0;
-#X connect 65 0 72 0;
-#X connect 67 0 73 0;
-#X connect 68 0 73 0;
-#X connect 74 0 75 0;
-#X connect 74 1 66 0;
-#X connect 75 0 40 0;
+#X text 75 2186 by mrpeach 2011/10/06;
+#X text 31 2046 This will allow the object to be highlighted from Pd's
+menu using Find->Find Last Error.;
+#X text 56 693 self.outlets = 2;
+#X text 31 1389 Use self:outlet(outlet_number \, type \, table);
+#X connect 37 0 36 0;
+#X connect 63 0 70 0;
+#X connect 65 0 71 0;
+#X connect 66 0 71 0;
+#X connect 72 0 73 0;
+#X connect 72 1 64 0;
+#X connect 73 0 39 0;
 #X restore 282 90 pd pdlua_HOWTO;
 #X obj 282 129 declare -stdpath extra/pdlua/examples;
 #X connect 0 0 8 0;
