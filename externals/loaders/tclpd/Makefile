@@ -63,7 +63,7 @@ ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
 # pd include paths to search, from more specific to more general:
 PD_INCLUDE = \
-	-I"$(PD_PATH)/include/pdextended"
+	-I"$(PD_PATH)/include/pdextended" \
 	-I"$(PD_PATH)/include/pd" \
 	-I"$(PD_PATH)/include"
 
