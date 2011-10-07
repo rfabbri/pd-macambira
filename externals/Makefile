@@ -15,9 +15,6 @@ cvs_root_dir := $(shell cd $(CWD)/.. && pwd)
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
-# turn on weak linking and dlopen support
-export MACOSX_DEPLOYMENT_TARGET = 10.3
-
 # default target
 default: all
 
@@ -309,7 +306,7 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 bsaylor:
-	make -C $(externals_src)/bsaylor CFLAGS="$(CFLAGS)" \
+	make -C $(externals_src)/bsaylor CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 bsaylor_install:
@@ -442,7 +439,7 @@ ext13_clean:
 #------------------------------------------------------------------------------#
 # EXTRA
 extra:
-	make -C $(externals_src)/extra CFLAGS="$(CFLAGS)" \
+	make -C $(externals_src)/extra CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 extra_install:
@@ -861,7 +858,7 @@ IEMLIB_SRC := $(wildcard $(externals_src)/iemlib/iemlib1/src/*[^1].c) $(wildcard
 
 IEMLIB_OBJECTS := $(IEMLIB_SRC:.c=.o)
 $(IEMLIB_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
+	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -o "$*.o" -c "$*.c"
 
 iemlib: $(IEMLIB_SRC:.c=.$(EXTENSION))
 
@@ -1021,7 +1018,7 @@ loaders-libdir_clean:
 # LOADERS-TCLPD
 
 loaders-tclpd:
-	make -C $(externals_src)/loaders/tclpd CFLAGS="$(CFLAGS)" \
+	make -C $(externals_src)/loaders/tclpd CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
 				PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 loaders-tclpd_install: loaders-tclpd
@@ -1172,7 +1169,7 @@ moocow_clean:
 #------------------------------------------------------------------------------#
 # MOONLIB
 moonlib:
-	make -C $(externals_src)/moonlib CFLAGS="$(CFLAGS)" \
+	make -C $(externals_src)/moonlib CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 moonlib_install:
@@ -1595,7 +1592,7 @@ postlude_clean:
 #------------------------------------------------------------------------------#
 # SIGPACK
 sigpack:
-	make -C $(externals_src)/sigpack CFLAGS="$(CFLAGS)" \
+	make -C $(externals_src)/sigpack CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 sigpack_install:
@@ -1719,7 +1716,7 @@ vbap_clean:
 #------------------------------------------------------------------------------#
 # VANILLA
 vanilla:
-	make -C $(externals_src)/vanilla CFLAGS="$(CFLAGS)" \
+	make -C $(externals_src)/vanilla CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 vanilla_install:
