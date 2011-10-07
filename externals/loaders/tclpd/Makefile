@@ -35,7 +35,7 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 #
 #------------------------------------------------------------------------------#
 
-ALL_CFLAGS = -I"$(PD_INCLUDE)" -std=c99 -I/usr/include/tcl8.5
+ALL_CFLAGS = $(PD_INCLUDE) -std=c99 -I/usr/include/tcl8.5
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
 ALL_LIBS = 
@@ -51,7 +51,8 @@ LIBS_windows = -ltcl85 "$(LIBRARY_NAME).def"
 #------------------------------------------------------------------------------#
 
 # these can be set from outside without (usually) breaking the build
-CFLAGS = -Wall -W -g
+DEBUG = 0
+CFLAGS = -Wall -W
 LDFLAGS =
 LIBS =
 
@@ -60,7 +61,12 @@ LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(
 
 ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
-PD_INCLUDE = $(PD_PATH)/include/pd
+# pd include paths to search, from more specific to more general:
+PD_INCLUDE = \
+	-I"$(PD_PATH)/include/pdextended"
+	-I"$(PD_PATH)/include/pd" \
+	-I"$(PD_PATH)/include"
+
 # where to install the library, overridden below depending on platform
 prefix = /usr/local
 libdir = $(prefix)/lib
@@ -86,7 +92,7 @@ ifeq ($(UNAME),Darwin)
     EXTENSION = pd_darwin
     SHARED_EXTENSION = dylib
     OS = iphoneos
-    PD_PATH = /Applications/Pd-extended.app/Contents/Resources
+    PD_PATH ?= /Applications/Pd-extended.app/Contents/Resources
     IPHONE_BASE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
     CC=$(IPHONE_BASE)/gcc
     CPP=$(IPHONE_BASE)/cpp
@@ -105,7 +111,7 @@ ifeq ($(UNAME),Darwin)
     EXTENSION = pd_darwin
     SHARED_EXTENSION = dylib
     OS = macosx
-    PD_PATH = /Applications/Pd-extended.app/Contents/Resources
+    PD_PATH ?= /Applications/Pd-extended.app/Contents/Resources
     OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
 # build universal 32-bit on 10.4 and 32/64 on newer
     ifeq ($(shell uname -r | sed 's|\([0-9][0-9]*\)\.[0-9][0-9]*\.[0-9][0-9]*|\1|'), 8)
@@ -133,7 +139,7 @@ ifeq ($(UNAME),ANDROID)
   EXTENSION = pd_linux
   SHARED_EXTENSION = so
   OS = android
-  PD_PATH = /usr
+  PD_PATH ?= /usr
   NDK_BASE := /usr/local/android-ndk
   NDK_PLATFORM_VERSION := 5
   NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_VERSION)/arch-arm
@@ -155,7 +161,7 @@ ifeq ($(UNAME),Linux)
   EXTENSION = pd_linux
   SHARED_EXTENSION = so
   OS = linux
-  PD_PATH = /usr
+  PD_PATH ?= /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
   ALL_LDFLAGS += -rdynamic -shared -fPIC
@@ -171,7 +177,7 @@ ifeq ($(UNAME),GNU)
   EXTENSION = pd_linux
   SHARED_EXTENSION = so
   OS = linux
-  PD_PATH = /usr
+  PD_PATH ?= /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
   ALL_LDFLAGS += -rdynamic -shared -fPIC
@@ -187,7 +193,7 @@ ifeq ($(UNAME),GNU/kFreeBSD)
   EXTENSION = pd_linux
   SHARED_EXTENSION = so
   OS = linux
-  PD_PATH = /usr
+  PD_PATH ?= /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
   ALL_LDFLAGS += -rdynamic -shared -fPIC
@@ -202,7 +208,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   EXTENSION = dll
   SHARED_EXTENSION = dll
   OS = cygwin
-  PD_PATH = $(shell cygpath $$PROGRAMFILES)/pd
+  PD_PATH ?= $(shell cygpath $$PROGRAMFILES)/pd
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += 
   ALL_LDFLAGS += -rdynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
@@ -217,12 +223,12 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   SHARED_EXTENSION = dll
   OS = windows
-  PD_PATH = $(shell cd "$$PROGRAMFILES/pd" && pwd)
+  PD_PATH ?= $(shell cd "$$PROGRAMFILES/pd" && pwd)
   # MinGW doesn't seem to include cc so force gcc
   CC=gcc
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -mms-bitfields
-  ALL_LDFLAGS += -s -shared -Wl,--enable-auto-import
+  ALL_LDFLAGS += -shared -Wl,--enable-auto-import -fPIC
   SHARED_LDFLAGS += -shared
   ALL_LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
   STRIP = strip --strip-unneeded -R .note -R .comment
@@ -232,7 +238,15 @@ endif
 # in case somebody manually set the HELPPATCHES above
 HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 
-ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS) $(OPT_CFLAGS)
+ifeq ($(DEBUG),1)
+	ALL_CFLAGS += -O0 -g -ggdb
+	STRIP = echo
+else
+	ALL_CFLAGS += $(OPT_CFLAGS)
+	ALL_LDFLAGS += -s
+endif
+
+ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS)
 ALL_LDFLAGS := $(LDFLAGS) $(ALL_LDFLAGS)
 ALL_LIBS := $(LIBS) $(ALL_LIBS)
 
@@ -253,12 +267,14 @@ all: $(LIBRARY_NAME)
 	chmod a-x "$*.$(EXTENSION)"
 
 tcl_wrap.c: tcl.i tcl_extras.h Makefile
-	swig -v -tcl -o tcl_wrap.c -I"$(PD_INCLUDE)" tcl.i
+	swig -v -tcl -o tcl_wrap.c $(PD_INCLUDE) tcl.i
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.c=.o)
-	$(CC) $(ALL_LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) \
-		$(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.c=.o) $(ALL_LIBS)
+	$(CC) $(CFLAGS) $(ALL_LDFLAGS) \
+		-o $(LIBRARY_NAME).$(EXTENSION) \
+		$(SOURCES:.c=.o) $(LIBRARY_NAME).o tcl_wrap.o \
+		$(TCLPD_SOURCES:.c=.o) $(ALL_LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 
 $(SHARED_LIB): $(SHARED_SOURCE:.c=.o)
