@@ -186,7 +186,7 @@ mailoutput.append('To: ' + toaddr + '\n')
 mailoutput.append('Subject: load_every_help ' + datestamp + '\n\n\n')
 mailoutput.append('______________________________________________________________________\n\n')
 mailoutput.append('Complete log:\n')
-mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/'
+mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/logs/'
                   + outputfilename + '\n')
 
 
