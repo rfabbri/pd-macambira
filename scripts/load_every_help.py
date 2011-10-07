@@ -193,7 +193,7 @@ mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/logs/'
 # upload the log file to the autobuild website
 rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/logs/' + outputfilename
 try:
-    p = subprocess.Popen(['rsync', '-ax', outputfilename, rsyncfile],
+    p = subprocess.Popen(['rsync', '-ax', outputfile, rsyncfile],
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
 except:
     mailoutput.append('rsync upload of the log failed!\n')

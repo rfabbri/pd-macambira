@@ -21,7 +21,8 @@ for log in glob.glob('/var/www/auto-build/' + date + '/logs/20*.txt'):
 							 .replace('/Users/pd/auto-build/', ''))
 	f.close()
 
-lf = open('/tmp/'+outputfilename, 'w')
+outputfile = '/tmp/' + outputfilename
+lf = open(outputfile, 'w')
 for line in logoutput:
 	lf.write(line)
 lf.close()
@@ -42,7 +43,7 @@ mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/logs/'
 # upload the log file to the autobuild website
 rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/logs/' + outputfilename
 try:
-    p = subprocess.Popen(['rsync', '-ax', '/tmp/'+outputfilename, rsyncfile],
+    p = subprocess.Popen(['rsync', '-ax', outputfile, rsyncfile],
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
 except:
     mailoutput.append('rsync upload of the log failed!\n')
