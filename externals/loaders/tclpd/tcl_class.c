@@ -31,7 +31,7 @@ static inline list_node_t* list_add(list_node_t* head, const char* k, void* v)
 {
 	list_node_t* n = (list_node_t*)malloc(sizeof(list_node_t));
 	n->next = head;
-	n->k = k;
+	n->k = strdup(k);
 	n->v = v;
 	return n;
 }
@@ -45,6 +45,7 @@ static inline list_node_t* list_remove(list_node_t* head, const char* k)
 	{
 		tmp = head;
 		head = head->next;
+		free(tmp->k);
 		free(tmp);
 	}
 
@@ -71,28 +72,16 @@ static inline void* list_get(list_node_t* head, const char* k)
 	while(head)
 	{
 		if(strcmp(head->k, k) == 0)
+		{
 			return head->v;
+		}
 		head = head->next;
 	}
+#ifdef DEBUG
+	debug_print("list_get(%lx, %s) = NULL\n", head, k);
+#endif
 	return (void*)0;
 }
-
-static inline void list_print(list_node_t* head)
-{
-	if(!head)
-	{
-		printf("NULL\n");
-		return;
-	}
-	while(head)
-	{
-		printf("%s=x%8.8X", head->k, head->v);
-		if(head->next) printf(", ");
-		head = head->next;
-	}
-	printf("\n");
-}
-
 
 static list_node_t* class_tbl[CLASS_TABLE_SIZE];
 static list_node_t* object_tbl[OBJECT_TABLE_SIZE];
