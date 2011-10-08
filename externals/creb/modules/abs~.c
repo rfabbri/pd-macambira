@@ -16,12 +16,12 @@ typedef struct _abs
 static t_int *abs_perform(t_int *w)
 {
     t_abs *x = (t_abs *)(w[1]);
-    t_float *in = (t_float *)(w[2]);
-    t_float *out = (t_float *)(w[3]);
+    t_sample *in = (t_sample *)(w[2]);
+    t_sample *out = (t_sample *)(w[3]);
     int n = (int)(w[4]);
     while (n--)
     {
-    	float f = *in++;
+    	t_sample f = *in++;
     	if (f < 0) f = -f;
     	*out++ = f;
     }

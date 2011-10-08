@@ -63,7 +63,7 @@ static void ffpoly_compute(t_ffpoly *x, t_floatarg fcoef)
     }
     
 
-    outlet_float(x->x_outlet, (float)out);
+    outlet_float(x->x_outlet, (t_float)out);
 }
 
 

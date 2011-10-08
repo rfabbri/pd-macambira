@@ -32,8 +32,8 @@ typedef struct fwarp
 
 static void fwarp_float(t_fwarp *x, t_floatarg f)
 {
-    float twopi = 2.0f * M_PI;
-    float sr = sys_getsr();
+    t_float twopi = 2.0f * M_PI;
+    t_float sr = sys_getsr();
     f /= sr;
     f = tan(twopi * f) / twopi;
     outlet_float(x->x_out, f * sr);

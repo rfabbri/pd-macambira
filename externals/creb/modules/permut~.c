@@ -93,7 +93,7 @@ static void permut_random(t_permut *x, t_floatarg seed)
 static void permut_bang(t_permut *x)
 {
     unsigned int r = rand();
-    //permut_random(x, *((float *)(&r)));
+    //permut_random(x, *((t_float *)(&r)));
     permut_random(x, ((t_flint)r).f);
 }
 
@@ -120,8 +120,8 @@ static t_int *permut_perform(t_int *w)
 {
 
 
-  t_float *in    = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in    = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_permutctl *ctl  = (t_permutctl *)(w[1]);
   t_int i;
   t_int n = (t_int)(w[2]);

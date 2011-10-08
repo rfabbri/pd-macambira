@@ -65,8 +65,8 @@ static t_int *dist_perform(t_int *w)
 {
 
 
-  t_float *in    = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in    = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_distctl *ctl  = (t_distctl *)(w[1]);
   t_float gain  = ctl->c_gain;
   t_int i;

@@ -65,7 +65,7 @@ void ear_float(t_ear *x, t_floatarg f)
 
 static t_int *ear_perform(t_int *w)
 {
-    t_float *out   = (float *)(w[3]);
+    t_float *out   = (t_float *)(w[3]);
     t_earctl *ctl = (t_earctl *)(w[1]);
     t_float attack = ctl->c_attack;
     t_float release  = ctl->c_release;

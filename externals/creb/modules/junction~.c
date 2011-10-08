@@ -101,7 +101,7 @@ static t_int *junction_perform(t_int *w)
       mayer_realfft(c, buf);
       for (j=1; j<c/2; j++)
 	{
-	  float x,y,a,b;
+	  t_float x,y,a,b;
 	  x = buf[j];
 	  y = buf[c-j];
 	  a = coef[j];
@@ -132,7 +132,7 @@ static t_int *junction_perform(t_int *w)
 static void junction_dsp(t_junction *x, t_signal **sp)
 {
   int i, c = x->x_ctl.c_channels;
-  float norm;
+  t_float norm;
 
   for (i=0;i<c;i++)
     {
@@ -182,10 +182,10 @@ void *junction_new(t_floatarg channels)
   for (i=1;i<n;i++) inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("signal"), gensym("signal")); 
   for (i=0;i<n;i++) outlet_new(&x->x_obj, gensym("signal")); 
 
-  x->x_ctl.c_in = (float **)malloc(n*sizeof(float *));
-  x->x_ctl.c_out = (float **)malloc(n*sizeof(float *));
-  x->x_ctl.c_buffer = (float *)malloc(n*sizeof(float));
-  x->x_ctl.c_coef = (float *)malloc(n*sizeof(float));
+  x->x_ctl.c_in = (t_float **)malloc(n*sizeof(t_float *));
+  x->x_ctl.c_out = (t_float **)malloc(n*sizeof(t_float *));
+  x->x_ctl.c_buffer = (t_float *)malloc(n*sizeof(t_float));
+  x->x_ctl.c_coef = (t_float *)malloc(n*sizeof(t_float));
   x->x_ctl.c_channels = n;
 
   junction_bang(x);

@@ -52,7 +52,7 @@ static void matrix_load(t_matrix *x, t_symbol *s)
       if(matrix = fopen(s->s_name, "r"))
 	{
 	  int n = x->x_ctl.c_order;
-	  fread(x->x_ctl.c_A, sizeof(float), n*n, matrix);
+	  fread(x->x_ctl.c_A, sizeof(t_float), n*n, matrix);
 	}
       else post("matrix: error, cant open file.");
     }
@@ -63,8 +63,8 @@ static t_int *matrix_perform(t_int *w)
 {
 
 
-  t_float *in       = (float *)(w[3]);
-  t_float *out      = (float *)(w[4]);
+  t_float *in       = (t_float *)(w[3]);
+  t_float *out      = (t_float *)(w[4]);
   t_matrixctl *ctl  = (t_matrixctl *)(w[1]);
   t_int n           = (t_int)(w[2]);
 

@@ -102,11 +102,11 @@ static t_int *bfft_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_bfftctl *ctl  = (t_bfftctl *)(w[1]);
   t_int n = (t_int)(w[2]);
-  t_float scale = sqrt(1.0f / (float)(n));
+  t_float scale = sqrt(1.0f / (t_float)(n));
 
   mayer_fht(out, n);
   bfft_perform_permutation(out, n, ctl->c_unclutter);
@@ -123,11 +123,11 @@ static t_int *ibfft_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_bfftctl *ctl  = (t_bfftctl *)(w[1]);
   t_int n = (t_int)(w[2]);
-  t_float scale = sqrt(1.0f / (float)(n));
+  t_float scale = sqrt(1.0f / (t_float)(n));
 
 
   if (ctl->c_kill_DC) {out[0] = 0.0f;}
@@ -149,8 +149,8 @@ static t_int *fht_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_bfftctl *ctl  = (t_bfftctl *)(w[1]);
 
 

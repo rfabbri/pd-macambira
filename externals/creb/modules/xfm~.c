@@ -88,8 +88,8 @@ void xfm_type(t_xfm *x, t_float f)
 
 static inline t_float xfm_sat(t_float x)
 {
-  const float max =  1;
-  const float min = -1;
+  const t_float max =  1;
+  const t_float min = -1;
 
   x = (x > max) ? (max) : (x);
   x = (x < min) ? (min) : (x);
@@ -101,12 +101,12 @@ static t_int *xfm_perform(t_int *w)
 {
 
 
-  t_float *inA     = (float *)(w[3]);
-  t_float *inB     = (float *)(w[4]);
-  t_float *fbA     = (float *)(w[5]);
-  t_float *fbB     = (float *)(w[6]);
-  t_float *outA    = (float *)(w[7]);
-  t_float *outB    = (float *)(w[8]);
+  t_float *inA     = (t_float *)(w[3]);
+  t_float *inB     = (t_float *)(w[4]);
+  t_float *fbA     = (t_float *)(w[5]);
+  t_float *fbB     = (t_float *)(w[6]);
+  t_float *outA    = (t_float *)(w[7]);
+  t_float *outB    = (t_float *)(w[8]);
   t_xfmctl *ctl    = (t_xfmctl *)(w[1]);
   t_int n          = (t_int)(w[2]);
   //t_float *tab     = ctl->c_sintab;

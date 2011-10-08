@@ -81,7 +81,7 @@ void eadsr_float(t_eadsr *x, t_floatarg f)
 
 static t_int *eadsr_perform(t_int *w)
 {
-    t_float *out    = (float *)(w[3]);
+    t_float *out    = (t_float *)(w[3]);
     t_eadsrctl *ctl  = (t_eadsrctl *)(w[1]);
     t_float attack  = ctl->c_attack;
     t_float decay   = ctl->c_decay;

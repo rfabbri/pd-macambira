@@ -51,20 +51,20 @@ void ramp_bang(t_ramp *x)
 
 static t_int *ramp_perform(t_int *w)
 {
-    t_float *out    = (float *)(w[3]);
+    t_float *out    = (t_float *)(w[3]);
     t_rampctl *ctl  = (t_rampctl *)(w[1]);
     t_int i;
     t_int n = (t_int)(w[2]);
     t_float x;
 
-    t_float scale = ctl->c_blockscale ? 1.0f / (float)n : 1.0f;
+    t_float scale = ctl->c_blockscale ? 1.0f / (t_float)n : 1.0f;
 
 
     x = ctl->c_offset;
     
     for (i = 0; i < n; i++)
 	{
-	    *out++ = ((float)x++) * scale;
+	    *out++ = ((t_float)x++) * scale;
 	}
 
     ctl->c_offset = x; /* save state */

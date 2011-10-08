@@ -69,13 +69,13 @@ static t_int *resofilt_perform_fourpole(t_int *w)
 
   t_resofiltctl *ctl = (t_resofiltctl *)(w[1]);
   t_int n            = (t_int)(w[2]);
-  t_float *in        = (float *)(w[3]);
-  t_float *freq      = (float *)(w[4]);
-  t_float *reso      = (float *)(w[5]);
-  t_float *out       = (float *)(w[6]);
+  t_float *in        = (t_float *)(w[3]);
+  t_float *freq      = (t_float *)(w[4]);
+  t_float *reso      = (t_float *)(w[5]);
+  t_float *out       = (t_float *)(w[6]);
 
   int i;
-  t_float inv_n = 1.0f / ((float)n);
+  t_float inv_n = 1.0f / ((t_float)n);
   t_float inv_sr = 1.0f / sys_getsr();
 
   t_float phasor[2], phasor_rot[2];
@@ -212,13 +212,13 @@ static t_int *resofilt_perform_threepole(t_int *w)
 
   t_resofiltctl *ctl = (t_resofiltctl *)(w[1]);
   t_int n            = (t_int)(w[2]);
-  t_float *in        = (float *)(w[3]);
-  t_float *freq      = (float *)(w[4]);
-  t_float *reso      = (float *)(w[5]);
-  t_float *out       = (float *)(w[6]);
+  t_float *in        = (t_float *)(w[3]);
+  t_float *freq      = (t_float *)(w[4]);
+  t_float *reso      = (t_float *)(w[5]);
+  t_float *out       = (t_float *)(w[6]);
 
   int i;
-  t_float inv_n = 1.0f / ((float)n);
+  t_float inv_n = 1.0f / ((t_float)n);
   t_float inv_sr = 1.0f / sys_getsr();
 
   t_float phasor[2], phasor_rot[2];

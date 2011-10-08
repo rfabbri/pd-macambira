@@ -132,10 +132,10 @@ static void fdn_reset(t_fdn *x)
   int i;
   if (x->x_ctl.c_buf) 
       memset(x->x_ctl.c_buf, 0, x->x_ctl.c_bufsize 
-	     * sizeof(float));
+	     * sizeof(t_float));
   if (x->x_ctl.c_vectorbuffer) 
       memset(x->x_ctl.c_vectorbuffer,
-	     0, x->x_ctl.c_maxorder * 2 * sizeof(float));
+	     0, x->x_ctl.c_maxorder * 2 * sizeof(t_float));
 }
 
 
@@ -145,9 +145,9 @@ static t_int *fdn_perform(t_int *w)
 {
 
 
-  t_float *in      = (float *)(w[3]);
-  t_float *outr    = (float *)(w[4]);
-  t_float *outl    = (float *)(w[5]);
+  t_float *in      = (t_float *)(w[3]);
+  t_float *outr    = (t_float *)(w[4]);
+  t_float *outl    = (t_float *)(w[5]);
   t_fdnctl *ctl    = (t_fdnctl *)(w[1]);
   t_int n          = (t_int)(w[2]);
   t_float input    = ctl->c_input;
@@ -378,7 +378,7 @@ static void fdn_linear(t_fdn *x, t_float forder, t_float min, t_float max)
     if (min <= 0) return;
     if (max <= 0) return;
 
-    inc = (max - min) / (float)(order - 1);
+    inc = (max - min) / (t_float)(order - 1);
     length = min;
     
     for (i=0; i<order; i++){
@@ -404,7 +404,7 @@ static void fdn_exponential(t_fdn *x, t_float forder, t_float min, t_float max)
     if (min <= 0) return;
     if (max <= 0) return;
 
-    inc = pow (max / min, 1.0f / ((float)(order - 1)));
+    inc = pow (max / min, 1.0f / ((t_float)(order - 1)));
     length = min;
     
     for (i=0; i<order; i++){
@@ -448,19 +448,19 @@ static void *fdn_new(t_floatarg maxiorder, t_floatarg maxibufsize)
 
   post("fdn: maximum nb of delay lines %d, total buffer "
        "size %d samples (%f seconds)", 
-       order, bufsize, ((float)bufsize) / sys_getsr());
+       order, bufsize, ((t_float)bufsize) / sys_getsr());
   
   
   x->x_ctl.c_maxorder = order;
-  x->x_ctl.c_buf = (float *)malloc(sizeof(float) * bufsize);
+  x->x_ctl.c_buf = (t_float *)malloc(sizeof(t_float) * bufsize);
   x->x_ctl.c_bufsize = bufsize;
   x->x_ctl.c_fsample = sys_getsr();
   x->x_ctl.c_tap = (t_int *)malloc((order + 1) * sizeof(t_int)); 
   x->x_ctl.c_length = (t_float *)malloc(order * sizeof(t_int)); 
   x->x_ctl.c_gain_in = (t_float *)malloc(order * sizeof(t_float));
   x->x_ctl.c_gain_state = (t_float *)malloc(order * sizeof(t_float));
-  x->x_ctl.c_vectorbuffer = (t_float *)malloc(order * 2 * sizeof(float));
-  memset(x->x_ctl.c_vectorbuffer, 0, order * 2 * sizeof(float));
+  x->x_ctl.c_vectorbuffer = (t_float *)malloc(order * 2 * sizeof(t_float));
+  memset(x->x_ctl.c_vectorbuffer, 0, order * 2 * sizeof(t_float));
   x->x_ctl.c_curvector = 0;
   x->x_ctl.c_vector[0] = &x->x_ctl.c_vectorbuffer[0];
   x->x_ctl.c_vector[1] = &x->x_ctl.c_vectorbuffer[order];

@@ -47,9 +47,9 @@ static t_int *dynwav_perform(t_int *w)
 {
 
 
-  t_float *wave     = (float *)(w[3]);
-  t_float *freq     = (float *)(w[4]);
-  t_float *out      = (float *)(w[5]);
+  t_float *wave     = (t_float *)(w[3]);
+  t_float *freq     = (t_float *)(w[4]);
+  t_float *out      = (t_float *)(w[5]);
   t_dynwavctl *ctl  = (t_dynwavctl *)(w[1]);
   t_int n           = (t_int)(w[2]);
 
@@ -113,9 +113,9 @@ static t_int *dynwav_perform_8point(t_int *w)
 {
 
 
-  t_float *wave     = (float *)(w[3]);
-  t_float *freq     = (float *)(w[4]);
-  t_float *out      = (float *)(w[5]);
+  t_float *wave     = (t_float *)(w[3]);
+  t_float *freq     = (t_float *)(w[4]);
+  t_float *out      = (t_float *)(w[5]);
   t_dynwavctl *ctl  = (t_dynwavctl *)(w[1]);
   t_int n           = (t_int)(w[2]);
 

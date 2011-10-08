@@ -65,7 +65,7 @@ static t_int *blocknorm_perform(t_int *word)
 
     /* compute normalization */
     if (p == 0.0f) s = 1.0f;
-    else s =sqrt(((float)(c * n)) /  p);
+    else s =sqrt(((t_float)(c * n)) /  p);
 
     /* normalize */
     for (j=0;j<c;j++){
@@ -111,8 +111,8 @@ static void *blocknorm_new(t_floatarg channels)
     if (i<1) i = 1;
     if (i>MAXCHANNELS) i = MAXCHANNELS;
     x->x_ctl.c_channels = i;
-    x->x_ctl.c_input = malloc(sizeof(float)*i);
-    x->x_ctl.c_output = malloc(sizeof(float)*i);
+    x->x_ctl.c_input = malloc(sizeof(t_float)*i);
+    x->x_ctl.c_output = malloc(sizeof(t_float)*i);
 
     j = i;
     while (--j) inlet_new(&x->x_obj, &x->x_obj.ob_pd, 

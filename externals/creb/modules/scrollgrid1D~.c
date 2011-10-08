@@ -75,13 +75,13 @@ static t_int *scrollgrid1D_perform(t_int *w)
 {
 
 
-  t_float *freq    = (float *)(w[3]);
-  t_float *t1      = (float *)(w[4]);
-  t_float *t2      = (float *)(w[5]);
-  t_float *order   = (float *)(w[6]);
-  t_float *outx    = (float *)(w[7]);
-  t_float *outy    = (float *)(w[8]);
-  t_float *outz    = (float *)(w[9]);
+  t_float *freq    = (t_float *)(w[3]);
+  t_float *t1      = (t_float *)(w[4]);
+  t_float *t2      = (t_float *)(w[5]);
+  t_float *order   = (t_float *)(w[6]);
+  t_float *outx    = (t_float *)(w[7]);
+  t_float *outy    = (t_float *)(w[8]);
+  t_float *outz    = (t_float *)(w[9]);
   t_scrollgrid1Dctl *ctl    = (t_scrollgrid1Dctl *)(w[1]);
   t_int n          = (t_int)(w[2]);
   

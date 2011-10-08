@@ -68,7 +68,7 @@ static void diag_time(t_diag *x, t_floatarg index, t_floatarg time)
   time *= 0.001;
 
   if (time < 0.0f) time = 0.0f;
-  r = pow(0.001f, (float)x->x_ctl.c_order / (time * sys_getsr()));
+  r = pow(0.001f, (t_float)x->x_ctl.c_order / (time * sys_getsr()));
   if (r < 0.0f) r = 0.0f;
   if (r > 1.0f) r = 1.0f;
 
@@ -105,8 +105,8 @@ static t_int *diag_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_diagctl *ctl  = (t_diagctl *)(w[1]);
 
   t_float *eigen = ctl->c_eigen;

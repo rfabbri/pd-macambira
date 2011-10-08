@@ -65,9 +65,9 @@ typedef struct eblosc
 
 /* phase converters */
 static inline float _phase_to_float(u32 p){
-    return ((float)p) * (1.0f / 4294967296.0f);
+    return ((t_float)p) * (1.0f / 4294967296.0f);
 }
-static inline u32 _float_to_phase(float f){
+static inline u32 _float_to_phase(t_float f){
     return (u32)(f * 4294967296.0f);
 }
 
@@ -151,7 +151,7 @@ static void _bang_comparator(t_ebloscctl *ctl, float prev, float curr)
 	/* determine the location of the discontinuity (in oversampled
  	  coordiates using linear interpolation */
 
-	float f = (float)S * curr / (curr - prev);
+	float f = (t_float)S * curr / (curr - prev);
 
 	/* get the offset in the oversample table */
 
@@ -160,7 +160,7 @@ static void _bang_comparator(t_ebloscctl *ctl, float prev, float curr)
 	/* determine the fractional part (in oversampled coordinates)
 	   for linear interpolation */
 
-	float table_frac_index = f - (float)table_index;
+	float table_frac_index = f - (t_float)table_index;
 
 	/* set state (+ or -) */
 
@@ -226,7 +226,7 @@ static void _bang_phasor(t_ebloscctl *ctl, float freq)
 	 * fraction */
 	    
 	ctl->c_index[voice] = table_index;
-	ctl->c_frac[voice] = (float)table_phase / (float)phase_inc_decimated;
+	ctl->c_frac[voice] = (t_float)table_phase / (t_float)phase_inc_decimated;
 	ctl->c_vscale[voice] = scale;
 	scale = scale * ctl->c_scale_update;
 
@@ -319,12 +319,12 @@ static void _bang_hardsync_phasor(t_ebloscctl *ctl, float freq, float freq2)
 	   prevent overflow */
 
 	stepsize = _phase_to_float(((oldphase-phase) >> LOVERSAMPLE)
-				   + phase_inc_decimated) * (float)S;
+				   + phase_inc_decimated) * (t_float)S;
 	    
 	/* use it to initialize the new voice index and interpolation fraction */
 	    
 	ctl->c_index[voice] = table_index;
-	ctl->c_frac[voice] = (float)table_phase / (float)phase_inc_decimated;
+	ctl->c_frac[voice] = (t_float)table_phase / (t_float)phase_inc_decimated;
 	ctl->c_vscale[voice] = scale * stepsize;
 	scale = scale * ctl->c_scale_update;
 
@@ -339,9 +339,9 @@ static void _bang_hardsync_phasor(t_ebloscctl *ctl, float freq, float freq2)
 
 static t_int *eblosc_perform_hardsync_saw(t_int *w)
 {
-    t_float *freq     = (float *)(w[3]);
-    t_float *freq2     = (float *)(w[4]);
-    t_float *out      = (float *)(w[5]);
+    t_float *freq     = (t_float *)(w[3]);
+    t_float *freq2     = (t_float *)(w[4]);
+    t_float *out      = (t_float *)(w[5]);
     t_ebloscctl *ctl  = (t_ebloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
@@ -376,8 +376,8 @@ static t_int *eblosc_perform_hardsync_saw(t_int *w)
 
 static t_int *eblosc_perform_saw(t_int *w)
 {
-    t_float *freq     = (float *)(w[3]);
-    t_float *out      = (float *)(w[4]);
+    t_float *freq     = (t_float *)(w[3]);
+    t_float *out      = (t_float *)(w[4]);
     t_ebloscctl *ctl  = (t_ebloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
@@ -406,8 +406,8 @@ static t_int *eblosc_perform_saw(t_int *w)
 
 static t_int *eblosc_perform_pulse(t_int *w)
 {
-    t_float *freq     = (float *)(w[3]);
-    t_float *out      = (float *)(w[4]);
+    t_float *freq     = (t_float *)(w[3]);
+    t_float *out      = (t_float *)(w[4]);
     t_ebloscctl *ctl  = (t_ebloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
@@ -439,8 +439,8 @@ static t_int *eblosc_perform_pulse(t_int *w)
 
 static t_int *eblosc_perform_comparator(t_int *w)
 {
-    t_float *amp      = (float *)(w[3]);
-    t_float *out      = (float *)(w[4]);
+    t_float *amp      = (t_float *)(w[3]);
+    t_float *out      = (t_float *)(w[4]);
     t_ebloscctl *ctl  = (t_ebloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
@@ -494,7 +494,7 @@ static void eblosc_dsp(t_eblosc *x, t_signal **sp)
   int n = sp[0]->s_n;
 
   /* set sampling rate scaling for phasors */
-  x->x_ctl.c_phase_inc_scale = 4.0f * (float)(1<<(LPHASOR-2)) / sys_getsr();
+  x->x_ctl.c_phase_inc_scale = 4.0f * (t_float)(1<<(LPHASOR-2)) / sys_getsr();
 
 
   /* setup & register the correct process routine depending on the waveform */

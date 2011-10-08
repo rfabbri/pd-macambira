@@ -69,7 +69,7 @@ static t_int *ead_perform(t_int *w)
 {
 
   /* interprete arguments */
-    t_float *out    = (float *)(w[3]);
+    t_float *out    = (t_float *)(w[3]);
     t_eadctl *ctl  = (t_eadctl *)(w[1]);
     t_float attack  = ctl->c_attack;
     t_float decay   = ctl->c_decay;

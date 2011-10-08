@@ -51,9 +51,9 @@ static t_int *bitsplit_perform(t_int *word)
     t_int i,j;
 
     for (i=0;i<n;i++){
-	long word = (in[i] * (float)(0x7fffffff));
+	long word = (in[i] * (t_float)(0x7fffffff));
 	for (j=0; j<outputs; j++){
-	    out[j][i] = (float)((word >> 31) & 1);
+	    out[j][i] = (t_float)((word >> 31) & 1);
 	    word <<= 1;
 	}
     }
@@ -90,7 +90,7 @@ static void *bitsplit_new(t_floatarg channels)
     if (i<1) i = 1;
     if (i>MAXCHANNELS) i = MAXCHANNELS;
     x->x_ctl.c_outputs = i;
-    x->x_ctl.c_output = malloc(sizeof(float)*i);
+    x->x_ctl.c_output = malloc(sizeof(t_float)*i);
 
     while (i--) outlet_new(&x->x_obj, gensym("signal")); 
 

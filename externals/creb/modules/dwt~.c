@@ -298,7 +298,7 @@ static void dwt_filter(t_dwt *x,  t_symbol *s, int argc, t_atom *argv)
 
 
 
-static inline void dwtloop(float *vector, 
+static inline void dwtloop(t_float *vector, 
 			   int source,
 			   int dest,
 		     int increment,
@@ -331,7 +331,7 @@ static inline void dwtloop(float *vector,
 
 }
 
-static inline void dwtloop16(float *vector, 
+static inline void dwtloop16(t_float *vector, 
 		     int source,
 		     int dest,
 		     int increment,
@@ -430,8 +430,8 @@ static t_int *dwt_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_dwtctl *ctl  = (t_dwtctl *)(w[1]);
 
 
@@ -499,8 +499,8 @@ static t_int *idwt_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_dwtctl *ctl  = (t_dwtctl *)(w[1]);
 
 
@@ -567,8 +567,8 @@ static t_int *dwt16_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_dwtctl *ctl  = (t_dwtctl *)(w[1]);
 
 
@@ -636,8 +636,8 @@ static t_int *idwt16_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_dwtctl *ctl  = (t_dwtctl *)(w[1]);
 
 
