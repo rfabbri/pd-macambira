@@ -35,7 +35,7 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 #
 #------------------------------------------------------------------------------#
 
-ALL_CFLAGS = $(PD_INCLUDE) -std=c99 -I/usr/include/tcl8.5
+ALL_CFLAGS = $(PD_INCLUDES) -std=c99 -I/usr/include/tcl8.5
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
 ALL_LIBS = 
@@ -61,11 +61,16 @@ LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(
 
 ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
-# pd include paths to search, from more specific to more general:
-PD_INCLUDE = \
-	-I"$(PD_PATH)/include/pdextended" \
-	-I"$(PD_PATH)/include/pd" \
-	-I"$(PD_PATH)/include"
+ifeq ($(PD_INCLUDE),)
+	# pd default include paths to search for
+	PD_INCLUDES = \
+		-I"$(PD_PATH)/include/pdextended" \
+		-I"$(PD_PATH)/include/pd" \
+		-I"$(PD_PATH)/include" \
+		-I"$(PD_PATH)/src"
+else
+	PD_INCLUDES = -I"$(PD_INCLUDE)"
+endif
 
 # where to install the library, overridden below depending on platform
 prefix = /usr/local
@@ -267,7 +272,7 @@ all: $(LIBRARY_NAME)
 	chmod a-x "$*.$(EXTENSION)"
 
 tcl_wrap.c: tcl.i tcl_extras.h Makefile
-	swig -v -tcl -o tcl_wrap.c $(PD_INCLUDE) tcl.i
+	swig -v -tcl -o tcl_wrap.c $(PD_INCLUDES) tcl.i
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.c=.o)
@@ -419,6 +424,7 @@ showsetup:
 	@echo "ALL_LDFLAGS: $(ALL_LDFLAGS)"
 	@echo "ALL_LIBS: $(ALL_LIBS)"
 	@echo "PD_INCLUDE: $(PD_INCLUDE)"
+	@echo "PD_INCLUDES: $(PD_INCLUDES)"
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
