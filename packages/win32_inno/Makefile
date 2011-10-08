@@ -64,7 +64,7 @@ zip:
 	@echo "win32_inno install succeeded!"
 
 build_pd:
-	cd $(pd_src)/src && $(MAKE) -f makefile.mingw MORECFLAGS="-O2 -g"
+	$(MAKE) -C $(pd_src)/src -f makefile.mingw MORECFLAGS="-O2 -g -fno-tree-vectorize -fno-strict-aliasing"
 
 PD_NAME=Pd
 pd_install: build_pd

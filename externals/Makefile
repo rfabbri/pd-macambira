@@ -306,7 +306,7 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 bsaylor:
-	make -C $(externals_src)/bsaylor CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
+	make -C $(externals_src)/bsaylor CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 bsaylor_install:
@@ -439,7 +439,7 @@ ext13_clean:
 #------------------------------------------------------------------------------#
 # EXTRA
 extra:
-	make -C $(externals_src)/extra CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
+	make -C $(externals_src)/extra CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 extra_install:
@@ -858,7 +858,7 @@ IEMLIB_SRC := $(wildcard $(externals_src)/iemlib/iemlib1/src/*[^1].c) $(wildcard
 
 IEMLIB_OBJECTS := $(IEMLIB_SRC:.c=.o)
 $(IEMLIB_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -o "$*.o" -c "$*.c"
+	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -fno-tree-vectorize -fno-strict-aliasing -o "$*.o" -c "$*.c"
 
 iemlib: $(IEMLIB_SRC:.c=.$(EXTENSION))
 
@@ -1018,7 +1018,7 @@ loaders-libdir_clean:
 # LOADERS-TCLPD
 
 loaders-tclpd:
-	make -C $(externals_src)/loaders/tclpd CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
+	make -C $(externals_src)/loaders/tclpd CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
 				PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 loaders-tclpd_install: loaders-tclpd
@@ -1169,7 +1169,7 @@ moocow_clean:
 #------------------------------------------------------------------------------#
 # MOONLIB
 moonlib:
-	make -C $(externals_src)/moonlib CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
+	make -C $(externals_src)/moonlib CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 moonlib_install:
@@ -1592,7 +1592,7 @@ postlude_clean:
 #------------------------------------------------------------------------------#
 # SIGPACK
 sigpack:
-	make -C $(externals_src)/sigpack CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
+	make -C $(externals_src)/sigpack CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 sigpack_install:
@@ -1662,7 +1662,7 @@ TOXY_NAME=toxy
 # toxy is compiled straight into $(OUT_DIR)
 TOXY_OUT_DIR=$(DESTDIR)$(objectsdir)/$(TOXY_NAME)
 toxy: $(bindir)
-	$(MAKE) OPT_CFLAGS="-O2 -fno-strict-aliasing -fPIC" \
+	$(MAKE) OPT_CFLAGS="-O2 -fno-tree-vectorize -fno-strict-aliasing -fPIC" \
 		-C $(externals_src)/miXed/toxy
 
 
@@ -1716,7 +1716,7 @@ vbap_clean:
 #------------------------------------------------------------------------------#
 # VANILLA
 vanilla:
-	make -C $(externals_src)/vanilla CFLAGS="$(CFLAGS) -fno-strict-aliasing" \
+	make -C $(externals_src)/vanilla CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 vanilla_install:
