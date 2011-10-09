@@ -127,6 +127,8 @@ proc pdtk_canvas_saveas {name initialfile initialdir} {
     set basename [file tail $filename]
     pdsend "$name savetofile [enquote_path $basename] [enquote_path $dirname]"
     set ::filenewdir $dirname
+    # add to recentfiles
+    ::pd_guiprefs::update_recentfiles $filename
 }
 
 ##### ask user Save? Discard? Cancel?, and if so, send a message on to Pd ######
@@ -180,7 +182,15 @@ proc pdtk_canvas_rightclick {tkcanvas x y b} {
 proc pdtk_canvas_clickpaste {tkcanvas x y b} {
     pdtk_canvas_mouse $tkcanvas $x $y $b 0
     pdtk_canvas_mouseup $tkcanvas $x $y $b
-    pdtk_pastetext
+    if { [catch {set pdtk_pastebuffer [selection get]}] } {
+        # no selection... do nothing
+    } else {
+        for {set i 0} {$i < [string length $pdtk_pastebuffer]} {incr i 1} {
+            set cha [string index $pdtk_pastebuffer $i]
+            scan $cha %c keynum
+            pdsend "pd key 1 $keynum 0"
+        }
+    }
 }
 
 #------------------------------------------------------------------------------#
@@ -264,13 +274,6 @@ proc ::pdtk_canvas::pdtk_canvas_editmode {mytoplevel state} {
     set ::editmode_button $state
     set ::editmode($mytoplevel) $state
     event generate $mytoplevel <<EditMode>>
-    # can't change the menu background color on Aqua
-    if {$::windowingsystem eq "aqua"} {return}
-    if {$state == 0} {
-        $::pd_menus::menubar.edit entryconfigure [_ "Edit Mode"] -background {}
-    } else {
-        $::pd_menus::menubar.edit entryconfigure [_ "Edit Mode"] -background green
-    }
 }
 
 # message from Pd to update the currently available undo/redo action
