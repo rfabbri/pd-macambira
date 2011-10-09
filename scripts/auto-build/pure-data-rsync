@@ -1,5 +1,5 @@
 #!/bin/sh
-# rsync the CVS source files from SourceForge to make a local copy
+# rsync the SVN source files from SourceForge to make a local copy
 
 # the source dir where this script is
 SCRIPT_DIR=$(echo $0 | sed 's|\(.*\)/.*$|\1|')
@@ -21,7 +21,7 @@ echo "----------------------------------------------------------------------" >>
 
 echo "rsync pd-gem" >> $LOGFILE 2>&1
 echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
-(/usr/bin/rsync -ax $VERBOSE_FLAGS --delete  rsync://pd-gem.cvs.sourceforge.net/cvsroot/p/pd/pd-gem/ /home/pd/cvsroot/pd-gem  || /usr/bin/logger -i -p local6.warning -t "$0" "rsync pd-gem CVS FAILED") >> $LOGFILE 2>&1
+(/usr/bin/rsync -ax $VERBOSE_FLAGS --delete  pd-gem.svn.sourceforge.net::svn/pd-gem/ /home/pd/svnroot/pd-gem  || /usr/bin/logger -i -p local6.warning -t "$0" "rsync pd-gem SVN FAILED") >> $LOGFILE 2>&1
 
 echo "chown -R pd.pd /home/pd/cvsroot" >> $LOGFILE 2>&1
 echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
