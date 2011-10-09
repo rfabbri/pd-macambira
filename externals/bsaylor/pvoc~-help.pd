@@ -9,7 +9,7 @@
 #X array sample 62079 float 0;
 #X coords 0 1 62078 -1 560 100 1;
 #X restore 77 62 graph;
-#X msg 346 506 read -resize ../../sound/voice.wav sample;
+#X msg 346 506 read -resize ../../doc/sound/voice.wav sample;
 #X obj 346 526 soundfiler;
 #X obj 346 547 s length;
 #X obj 346 485 loadbang;
