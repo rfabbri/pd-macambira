@@ -26,6 +26,7 @@ def find_pdexe(rootdir):
 def make_netreceive_patch(filename):
     fd = open(filename, 'w')
     fd.write('#N canvas 222 130 454 304 10;')
+    fd.write('#X obj 201 13 import vanilla;')
     fd.write('#X obj 111 83 netreceive ' + str(PORT) + ' 0 old;')
     fd.write('#X obj 111 103 loadbang;')
     fd.write('#X obj 111 123 print netreceive_patch;')
@@ -33,7 +34,7 @@ def make_netreceive_patch(filename):
 #    fd.write('#X obj 211 160 tof/destroysend pd;')
 #    fd.write('#X obj 211 160 closebang;')
 #    fd.write('#X obj 211 180 print CLOSE;')
-    fd.write('#X connect 1 0 2 0;')
+    fd.write('#X connect 2 0 3 0;')
 #    fd.write('#X connect 3 0 4 0;')
     fd.close()
 
