@@ -1,6 +1,13 @@
+font courier not found?
+carriage returns after posting
+lose makesfx.bat, etc. from msw (and move out personal stuff?)
+control C control
+window titles wrong on Macintosh
 
 ---------------- dolist --------------------
 
+portaudio: put call to PA_Terminate back in where appropriate
+    (first test situation on windows)
 compile on various versions of linux
 windows:
   modal dialogs confuse watchdog

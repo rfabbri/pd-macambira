@@ -44,8 +44,8 @@ proc ::dialog_gatom::apply {mytoplevel} {
                  [$mytoplevel.limits.upper.entry get] \
                  [::dialog_gatom::escape [$mytoplevel.gatomlabel.name.entry get]] \
                  $gatomlabel_radio($mytoplevel) \
-                 [::dialog_gatom::escape [$mytoplevel.s_r.send.entry get]] \
-                 [::dialog_gatom::escape [$mytoplevel.s_r.receive.entry get]]"
+                 [::dialog_gatom::escape [$mytoplevel.s_r.receive.entry get]] \
+                 [::dialog_gatom::escape [$mytoplevel.s_r.send.entry get]]"
 }
 
 proc ::dialog_gatom::cancel {mytoplevel} {
@@ -60,7 +60,7 @@ proc ::dialog_gatom::ok {mytoplevel} {
 # set up the panel with the info from pd
 proc ::dialog_gatom::pdtk_gatom_dialog {mytoplevel initwidth initlower initupper \
                                      initgatomlabel_radio \
-                                     initgatomlabel initsend initreceive} {
+                                     initgatomlabel initreceive initsend} {
     global gatomlabel_radio
     set gatomlabel_radio($mytoplevel) $initgatomlabel_radio
 
@@ -91,7 +91,11 @@ proc ::dialog_gatom::create_dialog {mytoplevel} {
 
     toplevel $mytoplevel -class DialogWindow
     wm title $mytoplevel [_ "Atom Box Properties"]
-    if {$::windowingsystem eq "aqua"} {$mytoplevel configure -menu .menubar}
+    wm group $mytoplevel .
+    wm resizable $mytoplevel 0 0
+    wm transient $mytoplevel $::focused_window
+    $mytoplevel configure -menu $::dialog_menubar
+    $mytoplevel configure -padx 0 -pady 0
     ::pd_bindings::dialog_bindings $mytoplevel "gatom"
 
     frame $mytoplevel.width -height 7
@@ -149,16 +153,18 @@ proc ::dialog_gatom::create_dialog {mytoplevel} {
     pack $mytoplevel.s_r.receive.entry $mytoplevel.s_r.receive.label -side right
     
     frame $mytoplevel.buttonframe -pady 5
-    pack $mytoplevel.buttonframe -side top -fill x -pady 2m
+    pack $mytoplevel.buttonframe -side top -fill x -expand 1 -pady 2m
     button $mytoplevel.buttonframe.cancel -text [_ "Cancel"] \
         -command "::dialog_gatom::cancel $mytoplevel"
-    pack $mytoplevel.buttonframe.cancel -side left -expand 1
-    button $mytoplevel.buttonframe.apply -text [_ "Apply"] \
-        -command "::dialog_gatom::apply $mytoplevel"
-    pack $mytoplevel.buttonframe.apply -side left -expand 1
+    pack $mytoplevel.buttonframe.cancel -side left -expand 1 -fill x -padx 10
+    if {$::windowingsystem ne "aqua"} {
+        button $mytoplevel.buttonframe.apply -text [_ "Apply"] \
+            -command "::dialog_gatom::apply $mytoplevel"
+    pack $mytoplevel.buttonframe.apply -side left -expand 1 -fill x -padx 10
+    }
     button $mytoplevel.buttonframe.ok -text [_ "OK"] \
         -command "::dialog_gatom::ok $mytoplevel"
-    pack $mytoplevel.buttonframe.ok -side left -expand 1
+    pack $mytoplevel.buttonframe.ok -side left -expand 1 -fill x -padx 10
 
     $mytoplevel.width.entry select from 0
     $mytoplevel.width.entry select adjust end

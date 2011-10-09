@@ -20,6 +20,10 @@
 #endif
 #ifdef MSW
 #include <io.h>
+#include <windows.h>
+#endif
+#ifdef _WIN32
+#include <malloc.h>
 #endif
 
 #include <string.h>
@@ -39,6 +43,7 @@
 
 t_namelist *sys_externlist;
 t_namelist *sys_searchpath;
+t_namelist *sys_staticpath;
 t_namelist *sys_helppath;
 
     /* change '/' characters to the system's native file separator */
@@ -86,6 +91,39 @@ int sys_isabsolutepath(const char *dir)
     }
 }
 
+/* expand env vars and ~ at the beginning of a path and make a copy to return */
+static void sys_expandpath(const char *from, char *to, int bufsize)
+{
+    if ((strlen(from) == 1 && from[0] == '~') || (strncmp(from,"~/", 2) == 0))
+    {
+#ifdef _WIN32
+        const char *home = getenv("USERPROFILE");
+#else
+        const char *home = getenv("HOME");
+#endif
+        if (home) 
+        {
+            strncpy(to, home, bufsize);
+            to[bufsize-1] = 0;
+            strncpy(to + strlen(to), from + 1, bufsize - strlen(to));
+            to[bufsize-1] = 0;
+        }
+    }
+    else
+    {
+        strncpy(to, from, bufsize);
+        to[bufsize-1] = 0;
+    }
+#ifdef _WIN32
+    {
+        char *buf = alloca(bufsize);
+        ExpandEnvironmentStrings(to, buf, bufsize-1);
+        buf[bufsize-1] = 0;
+        strncpy(to, buf, bufsize);
+        to[bufsize-1] = 0;
+    }
+#endif    
+}
 
 /*******************  Utility functions used below ******************/
 
@@ -187,14 +225,33 @@ char *namelist_get(t_namelist *namelist, int n)
     return (nl ? nl->nl_string : 0);
 }
 
-static t_namelist *pd_extrapath;
-
 int sys_usestdpath = 1;
 
 void sys_setextrapath(const char *p)
 {
-    namelist_free(pd_extrapath);
-    pd_extrapath = namelist_append(0, p, 0);
+    char pathbuf[MAXPDSTRING];
+    namelist_free(sys_staticpath);
+    /* add standard place for users to install stuff first */
+#ifdef __gnu_linux__
+    sys_expandpath("~/pd-externals", pathbuf, MAXPDSTRING);
+    sys_staticpath = namelist_append(0, pathbuf, 0);
+    sys_staticpath = namelist_append(sys_staticpath, "/usr/local/lib/pd-externals", 0);
+#endif
+
+#ifdef __APPLE__
+    sys_expandpath("~/Library/Pd", pathbuf, MAXPDSTRING);
+    sys_staticpath = namelist_append(0, pathbuf, 0);
+    sys_staticpath = namelist_append(sys_staticpath, "/Library/Pd", 0);
+#endif
+
+#ifdef _WIN32
+    sys_expandpath("%ProgramFiles%/Common Files/Pd", pathbuf, MAXPDSTRING);
+    sys_staticpath = namelist_append(0, pathbuf, 0);
+    sys_expandpath("%UserProfile%/Application Data/Pd", pathbuf, MAXPDSTRING);
+    sys_staticpath = namelist_append(sys_staticpath, pathbuf, 0);
+#endif
+    /* add built-in "extra" path last so its checked last */
+    sys_staticpath = namelist_append(sys_staticpath, p, 0);
 }
 
 #ifdef MSW
@@ -214,9 +271,11 @@ int sys_trytoopenone(const char *dir, const char *name, const char* ext,
     char *dirresult, char **nameresult, unsigned int size, int bin)
 {
     int fd;
+    char buf[MAXPDSTRING];
     if (strlen(dir) + strlen(name) + strlen(ext) + 4 > size)
         return (-1);
-    strcpy(dirresult, dir);
+    sys_expandpath(dir, buf, MAXPDSTRING);
+    strcpy(dirresult, buf);
     if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
         strcat(dirresult, "/");
     strcat(dirresult, name);
@@ -319,11 +378,12 @@ static int do_open_via_path(const char *dir, const char *name,
             dirresult, nameresult, size, bin)) >= 0)
                 return (fd);
 
-        /* next look in "extra" */
-    if (sys_usestdpath &&
-        (fd = sys_trytoopenone(pd_extrapath->nl_string, name, ext,
-            dirresult, nameresult, size, bin)) >= 0)
-                return (fd);
+        /* next look in built-in paths like "extra" */
+    if (sys_usestdpath)
+        for (nl = sys_staticpath; nl; nl = nl->nl_next)
+            if ((fd = sys_trytoopenone(nl->nl_string, name, ext,
+                dirresult, nameresult, size, bin)) >= 0)
+                    return (fd);
 
     *dirresult = 0;
     *nameresult = dirresult;
@@ -337,6 +397,15 @@ int open_via_path(const char *dir, const char *name, const char *ext,
     return (do_open_via_path(dir, name, ext, dirresult, nameresult,
         size, bin, sys_searchpath));
 }
+
+   /* close a previsouly opened file
+   this is needed on platforms where you cannot open/close ressources 
+   across dll-boundaries */
+int sys_close(int fd)
+{
+    return close(fd);
+}
+
 
     /* Open a help file using the help search path.  We expect the ".pd"
     suffix here, even though we have to tear it back off for one of the
@@ -450,7 +519,7 @@ int sys_rcfile(void)
     }
     if (sys_argparse(rcargc-1, rcargv+1))
     {
-        post("error parsing RC arguments");
+        error("error parsing RC arguments");
         goto cleanup;
     }
 
@@ -472,7 +541,7 @@ void sys_doflags( void)
     char *rcargv[MAXPDSTRING];
     if (len > MAXPDSTRING)
     {
-        post("flags: %s: too long", sys_flags->s_name);
+        error("flags: %s: too long", sys_flags->s_name);
         return;
     }
     for (i = 0; i < len+1; i++)
@@ -504,7 +573,7 @@ void sys_doflags( void)
         }
     }
     if (sys_argparse(rcargc, rcargv))
-        post("error parsing startup arguments");
+        error("error parsing startup arguments");
 }
 
 /* undo pdtl_encodedialog.  This allows dialogs to send spaces, commas,
@@ -540,17 +609,36 @@ t_symbol *sys_decodedialog(t_symbol *s)
     return (gensym(buf));
 }
 
+    /* send the user-specified search path to pd-gui */
+void sys_set_searchpath( void)
+{
+    int i;
+    t_namelist *nl;
+
+    sys_gui("set ::tmp_path {}\n");
+    for (nl = sys_searchpath, i = 0; nl; nl = nl->nl_next, i++)
+        sys_vgui("lappend ::tmp_path {%s}\n", nl->nl_string);
+    sys_gui("set ::sys_searchpath $::tmp_path\n");
+}
+
+    /* send the hard-coded search path to pd-gui */
+void sys_set_extrapath( void)
+{
+    int i;
+    t_namelist *nl;
+
+    sys_gui("set ::tmp_path {}\n");
+    for (nl = sys_staticpath, i = 0; nl; nl = nl->nl_next, i++)
+        sys_vgui("lappend ::tmp_path {%s}\n", nl->nl_string);
+    sys_gui("set ::sys_staticpath $::tmp_path\n");
+}
 
     /* start a search path dialog window */
 void glob_start_path_dialog(t_pd *dummy)
 {
-    char buf[MAXPDSTRING];
-    int i;
-    t_namelist *nl;
+     char buf[MAXPDSTRING];
 
-    sys_gui("global pd_path; set pd_path {}\n");
-    for (nl = sys_searchpath, i = 0; nl; nl = nl->nl_next, i++)
-        sys_vgui("lappend pd_path {%s}\n", nl->nl_string);
+    sys_set_searchpath();
     sprintf(buf, "pdtk_path_dialog %%s %d %d\n", sys_usestdpath, sys_verbose);
     gfxstub_new(&glob_pdobject, (void *)glob_start_path_dialog, buf);
 }
@@ -571,16 +659,24 @@ void glob_path_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     }
 }
 
+    /* set the global list vars for startup libraries and flags */
+void sys_set_startup( void)
+{
+    int i;
+    t_namelist *nl;
+
+    sys_vgui("set ::startup_flags {%s}\n", sys_flags->s_name);
+    sys_gui("set ::startup_libraries {}\n");
+    for (nl = sys_externlist, i = 0; nl; nl = nl->nl_next, i++)
+        sys_vgui("lappend ::startup_libraries {%s}\n", nl->nl_string);
+}
+
     /* start a startup dialog window */
 void glob_start_startup_dialog(t_pd *dummy)
 {
     char buf[MAXPDSTRING];
-    int i;
-    t_namelist *nl;
 
-    sys_gui("global pd_startup; set pd_startup {}\n");
-    for (nl = sys_externlist, i = 0; nl; nl = nl->nl_next, i++)
-        sys_vgui("lappend pd_startup {%s}\n", nl->nl_string);
+    sys_set_startup();
     sprintf(buf, "pdtk_startup_dialog %%s %d \"%s\"\n", sys_defeatrt,
         sys_flags->s_name);
     gfxstub_new(&glob_pdobject, (void *)glob_start_startup_dialog, buf);

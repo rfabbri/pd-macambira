@@ -14,7 +14,7 @@
 #include <bstring.h>
 #endif
 #endif
-#ifdef MSW
+#ifdef _WIN32
 #include <winsock.h>
 #include <sys/types.h>
 #include <sys/timeb.h> 
@@ -761,4 +761,18 @@ void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
         sys_open_midi(nindev, newmidiindev, noutdev, newmidioutdev, 1);
       }
 
+}
+
+void sys_get_midi_devs(char *indevlist, int *nindevs,
+                       char *outdevlist, int *noutdevs, 
+                       int maxndevs, int devdescsize)
+{
+
+#ifdef USEAPI_ALSA
+  if (sys_midiapi == API_ALSA)
+    midi_alsa_getdevs(indevlist, nindevs, outdevlist, noutdevs, 
+                      maxndevs, devdescsize);
+  else
+#endif /* ALSA */
+  midi_getdevs(indevlist, nindevs, outdevlist, noutdevs, maxndevs, devdescsize);
 }

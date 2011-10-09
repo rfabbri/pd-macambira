@@ -385,6 +385,7 @@ void glist_arraydialog(t_glist *parent, t_symbol *name, t_floatarg size,
         gl = glist_addglist(parent, &s_, 0, 1,
             (size > 1 ? size-1 : size), -1, 0, 0, 0, 0);
     a = graph_array(gl, sharptodollar(name), &s_float, size, flags);
+    canvas_dirty(parent, 1);
 }
 
     /* this is called from the properties dialog window for an existing array */
@@ -403,7 +404,7 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
     }
     else
     {
-        int size;
+        long size;
         int styleonset, styletype;
         t_symbol *stylearraytype;
         t_symbol *argname = sharptodollar(name);
@@ -445,7 +446,7 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
         if (size < 1)
             size = 1;
         if (size != a->a_n)
-            garray_resize(x, size);
+            garray_resize_long(x, size);
         else if (style != stylewas)
             garray_fittograph(x, size, style);
         template_setfloat(scalartemplate, gensym("style"),
@@ -453,6 +454,7 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
 
         garray_setsaveit(x, (saveit != 0));
         garray_redraw(x);
+        canvas_dirty(x->x_glist, 1);
     }
 }
 
@@ -1136,12 +1138,12 @@ int garray_getfloatwords(t_garray *x, int *size, t_word **vec)
     t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!a)
     {
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
         return (0);
     }
     else if (elemsize != sizeof(t_word))
     {
-        error("%s: has more than one field", x->x_realname);
+        error("%s: has more than one field", x->x_realname->s_name);
         return (0);
     }
     *size = garray_npoints(x);
@@ -1178,7 +1180,7 @@ static void garray_const(t_garray *x, t_floatarg g)
     int yonset, i, elemsize;
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!array)
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
     else for (i = 0; i < array->a_n; i++)
         *((t_float *)((char *)array->a_vec
             + elemsize * i) + yonset) = g;
@@ -1186,7 +1188,7 @@ static void garray_const(t_garray *x, t_floatarg g)
 }
 
     /* sum of Fourier components; called from routines below */
-static void garray_dofo(t_garray *x, int npoints, t_float dcval,
+static void garray_dofo(t_garray *x, long npoints, t_float dcval,
     int nsin, t_float *vsin, int sineflag)
 {
     double phase, phaseincr, fj;
@@ -1194,7 +1196,7 @@ static void garray_dofo(t_garray *x, int npoints, t_float dcval,
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!array)
     {
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
         return;
     }
     if (npoints == 0)
@@ -1202,7 +1204,7 @@ static void garray_dofo(t_garray *x, int npoints, t_float dcval,
     if (npoints != (1 << ilog2(npoints)))
         post("%s: rounnding to %d points", array->a_templatesym->s_name,
             (npoints = (1<<ilog2(npoints))));
-    garray_resize(x, npoints + 3);
+    garray_resize_long(x, npoints + 3);
     phaseincr = 2. * 3.14159 / npoints;
     for (i = 0, phase = -phaseincr; i < array->a_n; i++, phase += phaseincr)
     {
@@ -1221,8 +1223,9 @@ static void garray_dofo(t_garray *x, int npoints, t_float dcval,
 
 static void garray_sinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 {    
-    t_float *svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
-    int npoints, i;
+    t_float *svec;
+    long npoints;
+    int i;
     if (argc < 2)
     {
         error("sinesum: %s: need number of points and partial strengths",
@@ -1244,8 +1247,9 @@ static void garray_sinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 
 static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 {
-    t_float *svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
-    int npoints, i;
+    t_float *svec;
+    long npoints;
+    int i;
     if (argc < 2)
     {
         error("sinesum: %s: need number of points and partial strengths",
@@ -1267,13 +1271,13 @@ static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 
 static void garray_normalize(t_garray *x, t_float f)
 {
-    int type, npoints, i;
+    int type, i;
     double maxv, renormer;
     int yonset, elemsize;
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!array)
     {
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
         return;
     }
 
@@ -1308,7 +1312,7 @@ static void garray_list(t_garray *x, t_symbol *s, int argc, t_atom *argv)
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!array)
     {
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
         return;
     }
     if (argc < 2) return;
@@ -1389,7 +1393,7 @@ static void garray_read(t_garray *x, t_symbol *filename)
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!array)
     {
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
         return;
     }
     nelem = array->a_n;
@@ -1402,8 +1406,8 @@ static void garray_read(t_garray *x, t_symbol *filename)
     }
     for (i = 0; i < nelem; i++)
     {
-        float f;
-        if (!fscanf(fd, "%f", &f))
+        double f;
+        if (!fscanf(fd, "%lf", &f))
         {
             post("%s: read %d elements into table of size %d",
                 filename->s_name, i, nelem);
@@ -1426,7 +1430,7 @@ static void garray_write(t_garray *x, t_symbol *filename)
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!array)
     {
-        error("%s: needs floating-point 'y' field", x->x_realname);
+        error("%s: needs floating-point 'y' field", x->x_realname->s_name);
         return;
     }
     canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,
@@ -1458,17 +1462,24 @@ int garray_ambigendian(void)
     return (c==0);
 }
 
-void garray_resize(t_garray *x, t_floatarg f)
+void garray_resize_long(t_garray *x, long n)
 {
     t_array *array = garray_getarray(x);
     t_glist *gl = x->x_glist;
-    int n = (f < 1 ? 1 : f);
+    if (n < 1)
+        n = 1;
     garray_fittograph(x, n, template_getfloat(
         template_findbyname(x->x_scalar->sc_template),
             gensym("style"), x->x_scalar->sc_vec, 1));
     array_resize_and_redraw(array, x->x_glist, n);
     if (x->x_usedindsp)
         canvas_update_dsp();
+}
+
+    /* float version to use as Pd method */
+void garray_resize(t_garray *x, t_floatarg f)
+{
+    garray_resize_long(x, f);
 }
 
 static void garray_print(t_garray *x)

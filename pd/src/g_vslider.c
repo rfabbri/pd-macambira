@@ -59,19 +59,19 @@ static void vslider_draw_new(t_vslider *x, t_glist *glist)
              canvas, xpos+1, r,
              xpos + x->x_gui.x_w, r, x->x_gui.x_fcol, x);
     sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
-             -font {{%s} -%d %s} -fill #%6.6x -tags %lxLABEL\n",
+             -font {{%s} -%d %s} -fill #%6.6x -tags [list %lxLABEL label text]\n",
              canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
              strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
              x->x_gui.x_font, x->x_gui.x_fontsize, sys_fontweight, 
              x->x_gui.x_lcol, x);
     if(!x->x_gui.x_fsf.x_snd_able)
-        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags [list %lxOUT%d outlet]\n",
              canvas,
              xpos, ypos + x->x_gui.x_h+2,
              xpos+7, ypos + x->x_gui.x_h+3,
              x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
-        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxIN%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags [list %lxIN%d inlet]\n",
              canvas,
              xpos, ypos-2,
              xpos+7, ypos-1,
@@ -336,7 +336,7 @@ static void vslider_dialog(t_vslider *x, t_symbol *s, int argc, t_atom *argv)
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_CONFIG);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_IO + sr_flags);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-    canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+    canvas_fixlinesfor(x->x_gui.x_glist, (t_text*)x);
 }
 
 static void vslider_motion(t_vslider *x, t_floatarg dx, t_floatarg dy)

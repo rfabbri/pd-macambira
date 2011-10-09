@@ -16,6 +16,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "s_utf8.h"
+
 t_class *text_class;
 static t_class *message_class;
 static t_class *gatom_class;
@@ -97,13 +99,13 @@ static void canvas_objtext(t_glist *gl, int xpix, int ypix, int selected,
         if (!newest)
         {
             binbuf_print(b);
-            post("... couldn't create");
+            error("... couldn't create");
             x = 0;
         }
         else if (!(x = pd_checkobject(newest)))
         {
             binbuf_print(b);
-            post("... didn't return a patchable object");
+            error("... didn't return a patchable object");
         }
     }
     else x = 0;
@@ -675,7 +677,6 @@ static void gatom_key(void *z, t_floatarg f)
             gatom_retext(x, 1);
         return;
     }
-    else if (c == ' ') return;
     else if (c == '\b')
     {
         if (len > 0)
@@ -700,8 +701,22 @@ static void gatom_key(void *z, t_floatarg f)
             (c >= '0' && c <= '9' || c == '.' || c == '-'
                 || c == 'e' || c == 'E'))
         {
-            x->a_buf[len] = c;
-            x->a_buf[len+1] = 0;
+            /* the wchar could expand to up to 4 bytes, which
+             * which might overrun our a_buf;
+             * therefore we first expand into a temporary buffer, 
+             * and only if the resulting utf8 string fits into a_buf
+             * we apply it
+             */
+            char utf8[UTF8_MAXBYTES];
+            int utf8len = u8_wc_toutf8(utf8, c);
+            if((len+utf8len) < (ATOMBUFSIZE-1))
+            {
+                int j=0;
+                for(j=0; j<utf8len; j++)
+                    x->a_buf[len+j] = utf8[j];
+                 
+                x->a_buf[len+utf8len] = 0;
+            }
             goto redraw;
         }
     }
@@ -793,6 +808,7 @@ static void gatom_param(t_gatom *x, t_symbol *sel, int argc, t_atom *argv)
     x->a_symto = symto;
     x->a_expanded_to = canvas_realizedollar(x->a_glist, x->a_symto);
     gobj_vis(&x->a_text.te_g, x->a_glist, 1);
+    canvas_dirty(x->a_glist, 1);
 
     /* glist_retext(x->a_glist, &x->a_text); */
 }
@@ -847,7 +863,7 @@ static void gatom_vis(t_gobj *z, t_glist *glist, int vis)
         {
             int x1, y1;
             gatom_getwherelabel(x, glist, &x1, &y1);
-            sys_vgui("pdtk_text_new .x%lx.c %lx.l %f %f {%s} %d %s\n",
+            sys_vgui("pdtk_text_new .x%lx.c {%lx.l label text} %f %f {%s} %d %s\n",
                 glist_getcanvas(glist), x,
                 (double)x1, (double)y1,
                 canvas_realizedollar(x->a_glist, x->a_label)->s_name,
@@ -1026,7 +1042,7 @@ static void text_displace(t_gobj *z, t_glist *glist,
         rtext_displace(y, dx, dy);
         text_drawborder(x, glist, rtext_gettag(y),
             rtext_width(y), rtext_height(y), 0);
-        canvas_fixlinesfor(glist_getcanvas(glist), x);
+        canvas_fixlinesfor(glist, x);
     }
 }
 
@@ -1210,7 +1226,8 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     {
         int onset = x1 + (width - IOWIDTH) * i / nplus;
         if (firsttime)
-            sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %so%d\n",
+            sys_vgui(".x%lx.c create rectangle %d %d %d %d \
+-tags [list %so%d outlet]\n",
                 glist_getcanvas(glist),
                 onset, y2 - 1,
                 onset + IOWIDTH, y2,
@@ -1227,7 +1244,8 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     {
         int onset = x1 + (width - IOWIDTH) * i / nplus;
         if (firsttime)
-            sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %si%d\n",
+            sys_vgui(".x%lx.c create rectangle %d %d %d %d \
+-tags [list %si%d inlet]\n",
                 glist_getcanvas(glist),
                 onset, y1,
                 onset + IOWIDTH, y1 + EXTRAPIX,
@@ -1253,7 +1271,7 @@ void text_drawborder(t_text *x, t_glist *glist,
         char *pattern = ((pd_class(&x->te_pd) == text_class) ? "-" : "\"\"");
         if (firsttime)
             sys_vgui(".x%lx.c create line\
- %d %d %d %d %d %d %d %d %d %d -dash %s -tags %sR\n",
+ %d %d %d %d %d %d %d %d %d %d -dash %s -tags [list %sR obj]\n",
                 glist_getcanvas(glist),
                     x1, y1,  x2, y1,  x2, y2,  x1, y2,  x1, y1,  pattern, tag);
         else
@@ -1270,7 +1288,7 @@ void text_drawborder(t_text *x, t_glist *glist,
     {
         if (firsttime)
             sys_vgui(".x%lx.c create line\
- %d %d %d %d %d %d %d %d %d %d %d %d %d %d -tags %sR\n",
+ %d %d %d %d %d %d %d %d %d %d %d %d %d %d -tags [list %sR msg]\n",
                 glist_getcanvas(glist),
                 x1, y1,  x2+4, y1,  x2, y1+4,  x2, y2-4,  x2+4, y2,
                 x1, y2,  x1, y1,
@@ -1286,7 +1304,7 @@ void text_drawborder(t_text *x, t_glist *glist,
     {
         if (firsttime)
             sys_vgui(".x%lx.c create line\
- %d %d %d %d %d %d %d %d %d %d %d %d -tags %sR\n",
+ %d %d %d %d %d %d %d %d %d %d %d %d -tags [list %sR atom]\n",
                 glist_getcanvas(glist),
                 x1, y1,  x2-4, y1,  x2, y1+4,  x2, y2,  x1, y2,  x1, y1,
                     tag);

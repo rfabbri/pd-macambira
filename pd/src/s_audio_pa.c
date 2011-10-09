@@ -6,18 +6,29 @@
     the main way in for Mac OS and, with Michael Casey's help, also into
     ASIO in Windows. */
 
+/* dolist...  
+    put in a real FIFO (compare to Zmoelnig and keep FIFO if OK)
+    switch to usleep in s_inter.c
+    try blocking and nonblocking calls here
+    for blocking, offer pthreads or usleep method
+        (see if pthreads is still inefficient with FIFO?)
+*/
 
 #include "m_pd.h"
 #include "s_stuff.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 #include <portaudio.h>
-#include "s_audio_pablio.h"
 #ifdef MSW
 #include <malloc.h>
+#include <windows.h>
 #else
 #include <alloca.h>
+#include <unistd.h>
 #endif
+#include "s_audio_paring.h"
 
     /* LATER try to figure out how to handle default devices in portaudio;
     the way s_audio.c handles them isn't going to work here. */
@@ -25,16 +36,24 @@
     /* public interface declared in m_imp.h */
 
     /* implementation */
-static PABLIO_Stream  *pa_stream;
+static PaStream *pa_stream;
 static int pa_inchans, pa_outchans;
 static float *pa_soundin, *pa_soundout;
 static t_audiocallback pa_callback;
 
-int pa_foo;
+static float *pa_outbuf;
+static sys_ringbuf pa_outring;
+static float *pa_inbuf;
+static sys_ringbuf pa_inring;
+static int pa_started = 0;
+static int pa_dio_error;
 
-#ifndef MSW
-#include <unistd.h>
-#endif
+pthread_mutex_t pa_mutex;
+pthread_cond_t pa_sem;
+
+/* define this to enable thread signaling instead of polling */
+/* #define THREADSIGNAL */
+
 static void pa_init(void)
 {
     static int initialized;
@@ -68,54 +87,117 @@ static void pa_init(void)
 }
 
 static int pa_lowlevel_callback(const void *inputBuffer,
-    void *outputBuffer, unsigned long framesPerBuffer,
+    void *outputBuffer, unsigned long nframes,
     const PaStreamCallbackTimeInfo *outTime, PaStreamCallbackFlags myflags, 
     void *userData)
 {
     int i; 
-    unsigned int j;
+    unsigned int n, j;
     float *fbuf, *fp2, *fp3, *soundiop;
-    if (pa_foo)
-       fprintf(stderr, "pa_lowlevel_callback\n");
-    if (framesPerBuffer != DEFDACBLKSIZE)
+    if (nframes % DEFDACBLKSIZE)
     {
-        fprintf(stderr, "ignoring buffer size %d\n", (int)framesPerBuffer);
-        return 0;
+        fprintf(stderr, "portaudio: nframes %ld not a multiple of blocksize %d\n",
+            nframes, (int)DEFDACBLKSIZE);
+        nframes -= (nframes % DEFDACBLKSIZE);
     }
+    for (n = 0; n < nframes; n += DEFDACBLKSIZE)
+    {
         if (inputBuffer != NULL)
-    {
-        fbuf = (float *)inputBuffer;
-        soundiop = pa_soundin;
-        for (i = 0, fp2 = fbuf; i < pa_inchans; i++, fp2++)
-            for (j = 0, fp3 = fp2; j < framesPerBuffer; j++, fp3 += pa_inchans)
-                *soundiop++ = *fp3;
+        {
+            fbuf = ((float *)inputBuffer) + n*pa_inchans;
+            soundiop = pa_soundin;
+            for (i = 0, fp2 = fbuf; i < pa_inchans; i++, fp2++)
+                    for (j = 0, fp3 = fp2; j < DEFDACBLKSIZE;
+                        j++, fp3 += pa_inchans)
+                            *soundiop++ = *fp3;
+        }
+        else memset((void *)pa_soundin, 0,
+            DEFDACBLKSIZE * pa_inchans * sizeof(float));
+        memset((void *)pa_soundout, 0,
+            DEFDACBLKSIZE * pa_outchans * sizeof(float));
+        (*pa_callback)();
+        if (outputBuffer != NULL)
+        {
+            fbuf = ((float *)outputBuffer) + n*pa_outchans;
+            soundiop = pa_soundout;
+            for (i = 0, fp2 = fbuf; i < pa_outchans; i++, fp2++)
+                for (j = 0, fp3 = fp2; j < DEFDACBLKSIZE;
+                    j++, fp3 += pa_outchans)
+                        *fp3 = *soundiop++;
+        }
     }
-    else memset((void *)pa_soundin, 0,
-        framesPerBuffer * pa_inchans * sizeof(float));
-    memset((void *)pa_soundout, 0,
-        framesPerBuffer * pa_outchans * sizeof(float));
-    (*pa_callback)();
-    if (outputBuffer != NULL)
+    return 0;
+}
+
+    /* callback for "non-callback" case where we communicate with the
+    main thread via FIFO.  Here we first read the sudio output FIFO (which
+    we sync on, not waiting for it but supplying zeros to the audio output if
+    there aren't enough samples in the FIFO when we are called), then write
+    to the audio input FIFO.  The main thread will wait for the input fifo.
+    We can either throw it a pthreads condition or just allow the main thread
+    to poll for us; so far polling seems to work better. */
+static int pa_fifo_callback(const void *inputBuffer,
+    void *outputBuffer, unsigned long nframes,
+    const PaStreamCallbackTimeInfo *outTime, PaStreamCallbackFlags myflags, 
+    void *userData)
+{
+    /* callback routine for non-callback client... throw samples into
+            and read them out of a FIFO */
+    int ch;
+    long fiforoom;
+    float *fbuf;
+
+#if CHECKFIFOS
+    if (pa_inchans * sys_ringbuf_GetReadAvailable(&pa_outring) !=   
+        pa_outchans * sys_ringbuf_GetWriteAvailable(&pa_inring))
+            fprintf(stderr, "warning: in and out rings unequal (%d, %d)\n",
+                sys_ringbuf_GetReadAvailable(&pa_outring),
+                 sys_ringbuf_GetWriteAvailable(&pa_inring));
+#endif
+    fiforoom = sys_ringbuf_GetReadAvailable(&pa_outring);
+    if ((unsigned)fiforoom >= nframes*pa_outchans*sizeof(float))
     {
-        fbuf = (float *)outputBuffer;
-        soundiop = pa_soundout;
-        for (i = 0, fp2 = fbuf; i < pa_outchans; i++, fp2++)
-            for (j = 0, fp3 = fp2; j < framesPerBuffer; j++, fp3 += pa_outchans)
-                *fp3 = *soundiop++;
+        if (outputBuffer)
+            sys_ringbuf_Read(&pa_outring, outputBuffer,
+                nframes*pa_outchans*sizeof(float));
+        else if (pa_outchans)
+            fprintf(stderr, "no outputBuffer but output channels\n");
+        if (inputBuffer)
+            sys_ringbuf_Write(&pa_inring, inputBuffer,
+                nframes*pa_inchans*sizeof(float));
+        else if (pa_inchans)
+            fprintf(stderr, "no inputBuffer but input channels\n");
     }
-    if (pa_foo)
-        fprintf(stderr, "done pa_lowlevel_callback\n"); 
+    else
+    {        /* PD could not keep up; generate zeros */
+        if (pa_started)
+            pa_dio_error = 1;
+        if (outputBuffer)
+        {
+            for (ch = 0; ch < pa_outchans; ch++)
+            {
+                unsigned long frame;
+                fbuf = ((float *)outputBuffer) + ch;
+                for (frame = 0; frame < nframes; frame++, fbuf += pa_outchans)
+                    *fbuf = 0;
+            }
+        }
+    }
+#ifdef THREADSIGNAL
+    pthread_mutex_lock(&pa_mutex);
+    pthread_cond_signal(&pa_sem);
+    pthread_mutex_unlock(&pa_mutex);
+#endif
     return 0;
 }
 
 PaError pa_open_callback(double sampleRate, int inchannels, int outchannels,
-    int framesperbuf, int nbuffers, int indeviceno, int outdeviceno)
+    int framesperbuf, int nbuffers, int indeviceno, int outdeviceno, PaStreamCallback *callbackfn)
 {
     long   bytesPerSample;
     PaError err;
-    PABLIO_Stream *pastream;
-    long   numFrames;
     PaStreamParameters instreamparams, outstreamparams;
+    PaStreamParameters*p_instreamparams=0, *p_outstreamparams=0;
 
     if (indeviceno < 0) 
     {
@@ -130,58 +212,84 @@ PaError pa_open_callback(double sampleRate, int inchannels, int outchannels,
     /* fprintf(stderr, "nchan %d, flags %d, bufs %d, framesperbuf %d\n",
             nchannels, flags, nbuffers, framesperbuf); */
 
-    /* Allocate PABLIO_Stream structure for caller. */
-    pastream = (PABLIO_Stream *)malloc( sizeof(PABLIO_Stream));
-    if (pastream == NULL)
-        return (1);
-    memset(pastream, 0, sizeof(PABLIO_Stream));
-
-    /* Determine size of a sample. */
-    bytesPerSample = Pa_GetSampleSize(paFloat32);
-    if (bytesPerSample < 0)
-    {
-        err = (PaError) bytesPerSample;
-        goto error;
-    }
-    pastream->insamplesPerFrame = inchannels;
-    pastream->inbytesPerFrame = bytesPerSample * pastream->insamplesPerFrame;
-    pastream->outsamplesPerFrame = outchannels;
-    pastream->outbytesPerFrame = bytesPerSample * pastream->outsamplesPerFrame;
-
-    numFrames = nbuffers * framesperbuf;
-
     instreamparams.device = indeviceno;
     instreamparams.channelCount = inchannels;
     instreamparams.sampleFormat = paFloat32;
-    instreamparams.suggestedLatency = nbuffers*framesperbuf/sampleRate;
+    instreamparams.suggestedLatency = 0;        /* was nbuffers*framesperbuf/sampleRate */
     instreamparams.hostApiSpecificStreamInfo = 0;
     
     outstreamparams.device = outdeviceno;
     outstreamparams.channelCount = outchannels;
     outstreamparams.sampleFormat = paFloat32;
-    outstreamparams.suggestedLatency = nbuffers*framesperbuf/sampleRate;
+    outstreamparams.suggestedLatency = 0;
     outstreamparams.hostApiSpecificStreamInfo = 0;
 
+    if(inchannels>0)
+        p_instreamparams=&instreamparams;
+    if(outchannels>0)
+        p_outstreamparams=&outstreamparams;
+
+    err=Pa_IsFormatSupported(p_instreamparams, p_outstreamparams, sampleRate);
+
+    if (paFormatIsSupported != err)
+    {
+        /* check whether we have to change the numbers of channel and/or samplerate */
+        const PaDeviceInfo* info = 0;
+        double inRate=0, outRate=0;
+
+        if (inchannels>0)
+        {
+            if (NULL != (info = Pa_GetDeviceInfo( instreamparams.device )))
+            {
+              inRate=info->defaultSampleRate;
+
+              if(info->maxInputChannels<inchannels)
+                instreamparams.channelCount=info->maxInputChannels;
+            }
+        }
+
+        if (outchannels>0)
+        {
+            if (NULL != (info = Pa_GetDeviceInfo( outstreamparams.device )))
+            {
+              outRate=info->defaultSampleRate;
+
+              if(info->maxOutputChannels<outchannels)
+                outstreamparams.channelCount=info->maxOutputChannels;
+            }
+        }
+
+        if (err == paInvalidSampleRate)
+        {
+            sampleRate=outRate;
+        }
+
+        err=Pa_IsFormatSupported(p_instreamparams, p_outstreamparams,
+            sampleRate);
+        if (paFormatIsSupported != err)
+        goto error;
+    }
+
     err = Pa_OpenStream(
-              &pastream->stream,
-              (inchannels ? &instreamparams : 0),
-              (outchannels ? &outstreamparams : 0),
+              &pa_stream,
+              p_instreamparams,
+              p_outstreamparams,
               sampleRate,
-              DEFDACBLKSIZE,
+              framesperbuf,
               paNoFlag,      /* portaudio will clip for us */
-              pa_lowlevel_callback,
-              pastream);
+              callbackfn,
+              0);
     if (err != paNoError)
         goto error;
 
-    err = Pa_StartStream(pastream->stream);
+    err = Pa_StartStream(pa_stream);
     if (err != paNoError)
     {
         fprintf(stderr, "Pa_StartStream failed; closing audio stream...\n");
-        CloseAudioStream( pastream );
+        pa_close_audio();
         goto error;
     }
-    pa_stream = pastream;
+    sys_dacsr=sampleRate;
     return paNoError;
 error:
     pa_stream = NULL;
@@ -200,6 +308,9 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
     pa_init();
     /* post("in %d out %d rate %d device %d", inchans, outchans, rate, deviceno); */
     
+    if (pa_stream)
+        pa_close_audio();
+
     if (inchans > 0)
     {
         for (j = 0, devno = 0; j < Pa_GetDeviceCount(); j++)
@@ -209,6 +320,9 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
             {
                 if (devno == indeviceno)
                 {
+                    if (inchans > info->maxInputChannels)
+                      inchans = info->maxInputChannels;
+
                     pa_indev = j;
                     break;
                 }
@@ -226,6 +340,9 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
             {
                 if (devno == outdeviceno)
                 {
+                    if (outchans > info->maxOutputChannels)
+                      outchans = info->maxOutputChannels;
+
                     pa_outdev = j;
                     break;
                 }
@@ -240,23 +357,42 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
         post("output device %d, channels %d", pa_outdev, outchans);
         post("framesperbuf %d, nbufs %d", framesperbuf, nbuffers);
     }
-    pa_inchans = inchans;
-    pa_outchans = outchans;
+    pa_inchans = sys_inchannels = inchans;
+    pa_outchans = sys_outchannels = outchans;
     pa_soundin = soundin;
     pa_soundout = soundout;
+
+    if (pa_inbuf)
+        free(pa_inbuf), pa_inbuf = 0;
+    if (pa_outbuf)
+        free(pa_outbuf), pa_outbuf = 0;
+    
     if (! inchans && !outchans)
-        return(0);
+        return (0);
+    
     if (callbackfn)
     {
         pa_callback = callbackfn;
         err = pa_open_callback(rate, inchans, outchans,
-            framesperbuf, nbuffers, pa_indev, pa_outdev);
+            framesperbuf, nbuffers, pa_indev, pa_outdev, pa_lowlevel_callback);
     }
     else
     {
-        err = OpenAudioStream( &pa_stream, rate, paFloat32,
-            inchans, outchans, framesperbuf, nbuffers,
-                pa_indev, pa_outdev);
+        if (pa_inchans)
+        {
+            pa_inbuf = malloc(nbuffers*framesperbuf*pa_inchans*sizeof(float));
+            sys_ringbuf_Init(&pa_inring,
+                nbuffers*framesperbuf*pa_inchans*sizeof(float), pa_inbuf,
+                    nbuffers*framesperbuf*pa_inchans*sizeof(float));
+        }
+        if (pa_outchans)
+        {
+            pa_outbuf = malloc(nbuffers*framesperbuf*pa_outchans*sizeof(float));
+            sys_ringbuf_Init(&pa_outring,
+                nbuffers*framesperbuf*pa_outchans*sizeof(float), pa_outbuf, 0);
+        }
+        err = pa_open_callback(rate, inchans, outchans,
+            framesperbuf, nbuffers, pa_indev, pa_outdev, pa_fifo_callback);
     }
     if ( err != paNoError ) 
     {
@@ -273,94 +409,116 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
 
 void pa_close_audio( void)
 {
-    /* fprintf(stderr, "close\n"); */
-    if (pa_inchans || pa_outchans)
-        CloseAudioStream( pa_stream );
-    pa_inchans = pa_outchans = 0;
+    if (pa_stream)
+    {
+        Pa_AbortStream(pa_stream);
+        Pa_CloseStream(pa_stream);
+    }
+    pa_stream = 0;
+    if (pa_inbuf)
+        free(pa_inbuf), pa_inbuf = 0;
+    if (pa_outbuf)
+        free(pa_outbuf), pa_outbuf = 0;
+    
 }
 
 int pa_send_dacs(void)
 {
-    unsigned int framesize = (sizeof(float) * DEFDACBLKSIZE) *
-        (pa_inchans > pa_outchans ? pa_inchans:pa_outchans);
-    float *samples, *fp1, *fp2;
-    int i, j;
-    double timebefore;
-    
-    
-    samples = alloca(framesize);
-    
-    timebefore = sys_getrealtime();
-    if ((pa_inchans && GetAudioStreamReadable(pa_stream) < DEFDACBLKSIZE) ||
-        (pa_outchans && GetAudioStreamWriteable(pa_stream) < DEFDACBLKSIZE))
-    {
-        if (pa_inchans && pa_outchans)
-        {
-            int synced = 0;
-            while (GetAudioStreamWriteable(pa_stream) > 2*DEFDACBLKSIZE)
-            {
-                for (j = 0; j < pa_outchans; j++)
-                    for (i = 0, fp2 = samples + j; i < DEFDACBLKSIZE; i++,
-                        fp2 += pa_outchans)
-                {
-                    *fp2 = 0;
-                }
-                synced = 1;
-                WriteAudioStream(pa_stream, samples, DEFDACBLKSIZE);
-            }
-            while (GetAudioStreamReadable(pa_stream) > 2*DEFDACBLKSIZE)
-            {
-                synced = 1;
-                ReadAudioStream(pa_stream, samples, DEFDACBLKSIZE);
-            }
-            /* if (synced)
-                post("sync"); */
-        }
-        return (SENDDACS_NO);
-    }
-    if (pa_inchans)
-    {
-        ReadAudioStream(pa_stream, samples, DEFDACBLKSIZE);
-        for (j = 0, fp1 = pa_soundin; j < pa_inchans; j++, fp1 += DEFDACBLKSIZE)
-            for (i = 0, fp2 = samples + j; i < DEFDACBLKSIZE; i++,
-                fp2 += pa_inchans)
-        {
-            fp1[i] = *fp2;
-        }
-    }
-#if 0 
-        {
-                static int nread;
-                if (nread == 0)
-                {
-                        post("it's %f %f %f %f",
-                        pa_soundin[0], pa_soundin[1], pa_soundin[2],                                    pa_soundin[3]);
-                        nread = 1000;
-                }
-                nread--;
-        }
+    t_sample *fp;
+    float *fp2, *fp3;
+    float *conversionbuf;
+    int j, k;
+    int rtnval =  SENDDACS_YES;
+    int timenow;
+    int timeref = sys_getrealtime();
+    if (!sys_inchannels && !sys_outchannels)
+        return (SENDDACS_NO); 
+#if CHECKFIFOS
+    if (sys_outchannels * sys_ringbuf_GetReadAvailable(&pa_inring) !=   
+        sys_inchannels * sys_ringbuf_GetWriteAvailable(&pa_outring))
+            fprintf(stderr, "warning (2): in and out rings unequal  (%d, %d)\n",
+                sys_ringbuf_GetReadAvailable(&pa_inring),
+                    sys_ringbuf_GetWriteAvailable(&pa_outring));
 #endif
-    if (pa_outchans)
+    conversionbuf = (float *)alloca((sys_inchannels > sys_outchannels?
+        sys_inchannels:sys_outchannels) * DEFDACBLKSIZE * sizeof(float));
+    if (pa_dio_error)
     {
-        for (j = 0, fp1 = pa_soundout; j < pa_outchans; j++,
-            fp1 += DEFDACBLKSIZE)
-                for (i = 0, fp2 = samples + j; i < DEFDACBLKSIZE; i++,
-                    fp2 += pa_outchans)
-        {
-            *fp2 = fp1[i];
-            fp1[i] = 0;
-        }
-        WriteAudioStream(pa_stream, samples, DEFDACBLKSIZE);
+        sys_log_error(ERR_RESYNC);
+        pa_dio_error = 0;
     }
 
-    if (sys_getrealtime() > timebefore + 0.002)
+    if (!sys_inchannels)    /* if no input channels sync on output */
     {
-        /* post("slept"); */
-        return (SENDDACS_SLEPT);
+#ifdef THREADSIGNAL
+        pthread_mutex_lock(&pa_mutex);
+#endif
+        while (sys_ringbuf_GetWriteAvailable(&pa_outring) <
+            (long)(sys_outchannels * DEFDACBLKSIZE * sizeof(float)))
+#ifdef THREADSIGNAL
+                pthread_cond_wait(&pa_sem, &pa_mutex);
+#else
+#ifdef MSW
+                Sleep(1);
+#else
+                usleep(1000);
+#endif /* MSW */
+#endif /* THREADSIGNAL */
+#ifdef THREADSIGNAL
+        pthread_mutex_unlock(&pa_mutex);
+#endif
     }
-    else return (SENDDACS_YES);
+        /* write output */
+    if (sys_outchannels)
+    {
+        for (j = 0, fp = sys_soundout, fp2 = conversionbuf;
+            j < sys_outchannels; j++, fp2++)
+                for (k = 0, fp3 = fp2; k < DEFDACBLKSIZE;
+                    k++, fp++, fp3 += sys_outchannels)
+                        *fp3 = *fp;
+        sys_ringbuf_Write(&pa_outring, conversionbuf,
+            sys_outchannels*(DEFDACBLKSIZE*sizeof(float)));
+    }
+    if (sys_inchannels)    /* if there is input sync on it */
+    {
+#ifdef THREADSIGNAL
+        pthread_mutex_lock(&pa_mutex);
+#endif
+        while (sys_ringbuf_GetReadAvailable(&pa_inring) <
+            (long)(sys_inchannels * DEFDACBLKSIZE * sizeof(float)))
+#ifdef THREADSIGNAL
+                pthread_cond_wait(&pa_sem, &pa_mutex);
+#else
+#ifdef MSW
+                Sleep(1);
+#else
+                usleep(1000);
+#endif /* MSW */
+#endif /* THREADSIGNAL */
+#ifdef THREADSIGNAL
+        pthread_mutex_unlock(&pa_mutex);
+#endif
+    }
+    pa_started = 1;
+
+    if (sys_inchannels)
+    {
+        sys_ringbuf_Read(&pa_inring, conversionbuf,
+            sys_inchannels*(DEFDACBLKSIZE*sizeof(float)));
+        for (j = 0, fp = sys_soundin, fp2 = conversionbuf;
+            j < sys_inchannels; j++, fp2++)
+                for (k = 0, fp3 = fp2; k < DEFDACBLKSIZE;
+                    k++, fp++, fp3 += sys_inchannels)
+                        *fp = *fp3;
+    }
+
+    if ((timenow = sys_getrealtime()) - timeref > 0.002)
+    {
+        rtnval = SENDDACS_SLEPT;
+    }
+    memset(sys_soundout, 0, DEFDACBLKSIZE*sizeof(t_sample)*sys_outchannels);
+    return rtnval;
 }
-
 
 void pa_listdevs(void)     /* lifted from pa_devs.c in portaudio */
 {

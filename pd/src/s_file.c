@@ -24,7 +24,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #endif
-#ifdef MSW
+#ifdef _WIN32
 #include <windows.h>
 #include <tchar.h>
 #endif
@@ -36,7 +36,7 @@ int sys_defeatrt;
 t_symbol *sys_flags = &s_;
 void sys_doflags( void);
 
-#ifdef UNIX
+#if defined(__linux__) || defined(__CYGWIN__) || defined(__FreeBSD_kernel__) || defined(__GNU__) || defined(ANDROID)
 
 static char *sys_prefbuf;
 static int sys_prefbufsize;
@@ -159,9 +159,9 @@ static void sys_donesavepreferences( void)
     }
 }
 
-#endif /* UNIX */
+#endif /* __linux__ || __CYGWIN__ || __FreeBSD_kernel__ || __GNU__ */
 
-#ifdef MSW
+#ifdef _WIN32
 
 static void sys_initloadpreferences( void)
 {
@@ -203,12 +203,12 @@ static void sys_putpreference(const char *key, const char *value)
         NULL, &hkey, NULL);
     if (err != ERROR_SUCCESS)
     {
-        post("unable to create registry entry: %s\n", key);
+        error("unable to create registry entry: %s\n", key);
         return;
     }
-    err = RegSetValueEx(hkey, key, 0, REG_SZ, value, strlen(value)+1);
+    err = RegSetValueEx(hkey, key, 0, REG_EXPAND_SZ, value, strlen(value)+1);
     if (err != ERROR_SUCCESS)
-        post("unable to set registry entry: %s\n", key);
+        error("unable to set registry entry: %s\n", key);
     RegCloseKey(hkey);
 }
 
@@ -216,7 +216,7 @@ static void sys_donesavepreferences( void)
 {
 }
 
-#endif /* MSW */
+#endif /* _WIN32 */
 
 #ifdef __APPLE__
 
@@ -291,7 +291,8 @@ void sys_loadpreferences( void)
     int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
     int nmidiindev, midiindev[MAXMIDIINDEV];
     int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
-    int i, rate = 0, advance = 0, callback = 0, api, nolib, maxi;
+    int i, rate = 0, advance = -1, callback = 0, blocksize = 0,
+        api, nolib, maxi;
     char prefbuf[MAXPDSTRING], keybuf[80];
 
     sys_initloadpreferences();
@@ -342,9 +343,11 @@ void sys_loadpreferences( void)
         sscanf(prefbuf, "%d", &advance);
     if (sys_getpreference("callback", prefbuf, MAXPDSTRING))
         sscanf(prefbuf, "%d", &callback);
+    if (sys_getpreference("blocksize", prefbuf, MAXPDSTRING))
+        sscanf(prefbuf, "%d", &blocksize);
     sys_set_audio_settings(naudioindev, audioindev, naudioindev, chindev,
         naudiooutdev, audiooutdev, naudiooutdev, choutdev, rate, advance,
-        callback);
+        callback, blocksize);
         
         /* load MIDI preferences */
         /* JMZ/MB: brackets for initializing */
@@ -414,10 +417,10 @@ void sys_loadpreferences( void)
     if (sys_defeatrt)
         sys_hipriority = 0;
     else
-#ifdef UNIX
-        sys_hipriority = !geteuid();
+#if defined(__linux__) || defined(__CYGWIN__)
+        sys_hipriority = 1;
 #else
-#ifdef MSW
+#if defined(_WIN32) || defined(ANDROID)
         sys_hipriority = 0;
 #else
         sys_hipriority = 1;
@@ -429,7 +432,7 @@ void glob_savepreferences(t_pd *dummy)
 {
     int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
     int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
-    int i, rate, advance, callback;
+    int i, rate, advance, callback, blocksize;
     char buf1[MAXPDSTRING], buf2[MAXPDSTRING];
     int nmidiindev, midiindev[MAXMIDIINDEV];
     int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
@@ -442,7 +445,8 @@ void glob_savepreferences(t_pd *dummy)
     sys_putpreference("audioapi", buf1);
 
     sys_get_audio_params(&naudioindev, audioindev, chindev,
-        &naudiooutdev, audiooutdev, choutdev, &rate, &advance, &callback);
+        &naudiooutdev, audiooutdev, choutdev, &rate, &advance, &callback,
+            &blocksize);
 
     sys_putpreference("noaudioin", (naudioindev <= 0 ? "True" : "False"));
     for (i = 0; i < naudioindev; i++)
@@ -467,6 +471,9 @@ void glob_savepreferences(t_pd *dummy)
 
     sprintf(buf1, "%d", callback);
     sys_putpreference("callback", buf1);
+
+    sprintf(buf1, "%d", blocksize);
+    sys_putpreference("blocksize", buf1);
 
         /* MIDI settings */
     sys_get_midi_params(&nmidiindev, midiindev, &nmidioutdev, midioutdev);

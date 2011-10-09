@@ -95,8 +95,8 @@ AC_CHECK_LIB(pthread, pthread_create,PDLIB="$PDLIB -lpthread",
 dnl Check for fftw package
 if test x$fftw = "xyes";
 then
-AC_CHECK_LIB(fftw, fftw_one,PDLIB="$PDLIB -lfftw",
-    echo "fftw package not found - using built-in FFT"; fftw=no)
+AC_CHECK_LIB(fftw3f, fftwf_version,PDLIB="$PDLIB -lfftw3f",
+    echo "fftw3 package not found - using built-in FFT"; fftw=no)
 fi
 
 dnl look for tcl 8.x... do I really have to go through all this!?
@@ -173,7 +173,7 @@ else
 GUISRC=
 fi
 
-if test `uname -s` = Linux;
+if test `uname -s` = Linux -o `uname -s` = "GNU/kFreeBSD" -o `uname -s` = "GNU";
 then
     dnl Ckecking for ALSA
     echo .................... alsa= $alsa
@@ -195,10 +195,19 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
       LDFLAGS="$LDFLAGS -static"
     fi 
     EXT=pd_linux
-    CPPFLAGS="-DHAVE_LIBDL -DPA_USE_OSS -DUNIX -DHAVE_UNISTD_H\
-        -DUSEAPI_OSS \
+    CPPFLAGS="-DHAVE_LIBDL -DUNIX -DHAVE_UNISTD_H\
+        -DPDGUIDIR=\\\"tcl/\\\" \
         -fno-strict-aliasing"
-    SYSSRC="s_midi_oss.c s_audio_oss.c"
+dnl No OSS on hurd
+    if test `uname -s` = "GNU";
+    then
+        SYSSRC="s_midi_dummy.c"
+    else
+        SYSSRC="s_midi_oss.c s_audio_oss.c"
+        CPPFLAGS=$CPPFLAGS" -DPA_USE_OSS -DUSEAPI_OSS"
+    fi
+	
+	
     if test x$alsa = "xyes";
     then
         SYSSRC=$SYSSRC" s_audio_alsa.c s_audio_alsamm.c s_midi_alsa.c"
@@ -215,7 +224,6 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
         -I../portmidi/pm_common \
         -I../portmidi/pm_linux"
         SYSSRC="s_audio_pa.c \
-        s_audio_pablio.c     \
         s_audio_paring.c     \
         ../portaudio/src/common/pa_allocation.c  \
         ../portaudio/src/common/pa_converters.c  \
@@ -295,7 +303,6 @@ then
         EXTERNTARGET=d_ppc
     fi
     SYSSRC="s_midi_pm.c s_audio_pa.c \
-        s_audio_pablio.c     \
         s_audio_paring.c     \
         ../portaudio/src/common/pa_allocation.c  \
         ../portaudio/src/common/pa_converters.c  \
@@ -347,11 +354,11 @@ then
     OSNUMBER=2
     if test x$jack = "xyes";
     then
-        LDFLAGS=$LDFLAGS" -weak_framework Jack"
+        LDFLAGS=$LDFLAGS" -weak_framework Jackmp"
     fi
     if test x$jack = "xrun";
     then
-        LDFLAGS=$LDFLAGS" -weak_framework Jack"
+        LDFLAGS=$LDFLAGS" -weak_framework Jackmp"
     fi
 fi
 
@@ -367,7 +374,7 @@ then
         -mwindows -mms-bitfields "$MORECFLAGS
     PDLIB=$PDLIB" -lwsock32 -lwinmm -lole32 -lstdc++"
 
-    SYSSRC="s_audio_pa.c s_audio_pablio.c s_audio_paring.c \
+    SYSSRC="s_audio_pa.c s_audio_paring.c \
         s_audio_mmio.c s_midi_mmio.c \
         ../portaudio/src/common/pa_allocation.c  \
         ../portaudio/src/common/pa_converters.c  \
@@ -408,7 +415,7 @@ fi
 if test x$fftw = "xyes";
 then
     SYSSRC=$SYSSRC" d_fft_fftw.c d_fftroutine.c"
-    LDFLAGS=$LDFLAGS" -lfftw"
+    LDFLAGS=$LDFLAGS" -lfftw3"
 else
     SYSSRC=$SYSSRC" d_fft_mayer.c d_fftroutine.c"
 fi

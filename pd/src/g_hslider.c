@@ -33,12 +33,11 @@ static t_class *hslider_class;
 static void hslider_draw_update(t_gobj *client, t_glist *glist)
 {
     t_hslider *x = (t_hslider *)client;
-    t_canvas *canvas=glist_getcanvas(glist);
-    int ypos=text_ypix(&x->x_gui.x_obj, glist);
-
     if (glist_isvisible(glist))
     {
         int r = text_xpix(&x->x_gui.x_obj, glist) + (x->x_val + 50)/100;
+        int ypos=text_ypix(&x->x_gui.x_obj, glist);
+        t_canvas *canvas=glist_getcanvas(glist);
         sys_vgui(".x%lx.c coords %lxKNOB %d %d %d %d\n",
                  canvas, x, r, ypos+1,
                  r, ypos + x->x_gui.x_h);
@@ -76,18 +75,18 @@ static void hslider_draw_new(t_hslider *x, t_glist *glist)
              canvas, r, ypos+1, r,
              ypos + x->x_gui.x_h, x->x_gui.x_fcol, x);
     sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
-             -font {{%s} -%d %s} -fill #%6.6x -tags %lxLABEL\n",
+             -font {{%s} -%d %s} -fill #%6.6x -tags [list %lxLABEL label text]\n",
              canvas, xpos+x->x_gui.x_ldx,
              ypos+x->x_gui.x_ldy,
              strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
              x->x_gui.x_font, x->x_gui.x_fontsize, sys_fontweight,
              x->x_gui.x_lcol, x);
     if(!x->x_gui.x_fsf.x_snd_able)
-        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags [list %lxOUT%d outlet]\n",
              canvas, xpos-3, ypos + x->x_gui.x_h-1,
              xpos+4, ypos + x->x_gui.x_h, x, 0);
     if(!x->x_gui.x_fsf.x_rcv_able)
-        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxIN%d\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags [list %lxIN%d inlet]\n",
              canvas, xpos-3, ypos,
              xpos+4, ypos+1, x, 0);
 }
@@ -370,7 +369,7 @@ static void hslider_dialog(t_hslider *x, t_symbol *s, int argc, t_atom *argv)
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_CONFIG);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_IO + sr_flags);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-    canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+    canvas_fixlinesfor(x->x_gui.x_glist, (t_text*)x);
 }
 
 static void hslider_motion(t_hslider *x, t_floatarg dx, t_floatarg dy)

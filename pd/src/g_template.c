@@ -762,14 +762,20 @@ static void fielddesc_setfloat_var(t_fielddesc *fd, t_symbol *s)
     else
     {
         int cpy = s1 - s->s_name, got;
+        double v1, v2, screen1, screen2, quantum;
         if (cpy > MAXPDSTRING-5)
             cpy = MAXPDSTRING-5;
         strncpy(strbuf, s->s_name, cpy);
         strbuf[cpy] = 0;
         fd->fd_un.fd_varsym = gensym(strbuf);
-        got = sscanf(s1, "(%f:%f)(%f:%f)(%f)",
-            &fd->fd_v1, &fd->fd_v2, &fd->fd_screen1, &fd->fd_screen2,
-                &fd->fd_quantum);
+        got = sscanf(s1, "(%lf:%lf)(%lf:%lf)(%lf)",
+            &v1, &v2, &screen1, &screen2,
+                &quantum);
+        fd->fd_v1=v1;
+        fd->fd_v2=v2;
+        fd->fd_screen1=screen1;
+        fd->fd_screen2=screen2;
+        fd->fd_quantum=quantum;
         if (got < 2)
             goto fail;
         if (got == 3 || (got < 4 && strchr(s2, '(')))
@@ -1715,8 +1721,8 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                     minyval = yval;
                 if (i == nelem-1 || inextx != ixpix)
                 {
-                    sys_vgui(
-".x%lx.c create rectangle %d %d %d %d -fill black -width 0  -tags plot%lx\n",
+                    sys_vgui(".x%lx.c create rectangle %d %d %d %d \
+-fill black -width 0  -tags [list plot%lx array]\n",
                         glist_getcanvas(glist),
                         ixpix, (int)glist_ytopixels(glist, 
                             basey + fielddesc_cvttocoord(yfielddesc, minyval)),
@@ -1815,7 +1821,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                     outline, outline);
                 if (style == PLOTSTYLE_BEZ) sys_vgui("-smooth 1\\\n");
 
-                sys_vgui("-tags plot%lx\n", data);
+                sys_vgui("-tags [list plot%lx array]\n", data);
             }
             else if (linewidth > 0)
             {
@@ -1858,7 +1864,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                 sys_vgui("-fill %s\\\n", outline);
                 if (style == PLOTSTYLE_BEZ) sys_vgui("-smooth 1\\\n");
 
-                sys_vgui("-tags plot%lx\n", data);
+                sys_vgui("-tags [list plot%lx array]\n", data);
             }
         }
             /* We're done with the outline; now draw all the points.
@@ -2138,7 +2144,7 @@ static void drawnumber_vis(t_gobj *z, t_glist *glist,
                 glist_getcanvas(glist), xloc, yloc, colorstring, buf);
         sys_vgui(" -font {{%s} -%d %s}", sys_font,
                  sys_hostfontsize(glist_getfont(glist)), sys_fontweight);
-        sys_vgui(" -tags drawnumber%lx\n", data);
+        sys_vgui(" -tags [list drawnumber%lx label]\n", data);
     }
     else sys_vgui(".x%lx.c delete drawnumber%lx\n", glist_getcanvas(glist), data);
 }
@@ -2225,7 +2231,7 @@ static void drawnumber_key(void *z, t_floatarg fkey)
     else
     {
             /* key entry for a numeric field.  This is just a stopgap. */
-        float newf;
+        double newf;
         if (drawnumber_motion_firstkey)
             sbuf[0] = 0;
         else sprintf(sbuf, "%g", template_getfloat(drawnumber_motion_template,
@@ -2241,10 +2247,10 @@ static void drawnumber_key(void *z, t_floatarg fkey)
             sbuf[strlen(sbuf)+1] = 0;
             sbuf[strlen(sbuf)] = key;
         }
-        if (sscanf(sbuf, "%g", &newf) < 1)
+        if (sscanf(sbuf, "%lg", &newf) < 1)
             newf = 0;
         template_setfloat(drawnumber_motion_template,
-            f->fd_un.fd_varsym, drawnumber_motion_wp, newf, 1);
+            f->fd_un.fd_varsym, drawnumber_motion_wp, (t_float)newf, 1);
         if (drawnumber_motion_scalar)
             template_notifyforscalar(drawnumber_motion_template,
                 drawnumber_motion_glist, drawnumber_motion_scalar,
