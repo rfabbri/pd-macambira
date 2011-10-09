@@ -131,9 +131,21 @@ def remove_ignorelines(list):
 
 #---------- main()-like thing ----------#
 
-make_netreceive_patch(netreceive_patch)
+now = time.localtime(time.time())
+date = time.strftime('20%y-%m-%d', now)
+datestamp = time.strftime('20%y-%m-%d_%H.%M.%S', now)
+
+outputfilename = 'load_every_help_' + socket.gethostname() + '_' + datestamp + '.log'
+outputfile = '/tmp/' + outputfilename
+fd = open(outputfile, 'w')
+fd.write('load_every_help\n')
+fd.write('========================================================================\n')
+fd.flush()
 
 logoutput = []
+
+make_netreceive_patch(netreceive_patch)
+
 docdir = os.path.join(pdrootdir, 'doc')
 for root, dirs, files in os.walk(docdir):
     for name in files:
@@ -153,27 +165,22 @@ for root, dirs, files in os.walk(docdir):
                 line = p.stdout.readline()
                 m = re.search('EOF on socket', line)
                 if not m and line:
-                    patchoutput.append(line) 
+                    patchoutput.append(line)
+                    fd.write(line)
                 else:
                     break
             patchoutput = remove_ignorelines(patchoutput)
             if len(patchoutput) > 0:
-#                print 'found log messages: ' + patch
-                logoutput.append('\n\n__________________________________________________\n')
-                logoutput.append('loading: ' + patch + '\n')
-#                logoutput.append('--------------------------------------------------\n')
+                header = []
+                header.append('\n\n__________________________________________________\n')
+                header.append('loading: ' + patch + '\n')
+                logoutput += header
+                for line in header:
+                    fd.write(line)
                 logoutput += patchoutput
-#                for line in patchoutput:
-#                    print '--' + line + '--'
-
-now = time.localtime(time.time())
-date = time.strftime('20%y-%m-%d', now)
-datestamp = time.strftime('20%y-%m-%d_%H.%M.%S', now)
-
-outputfilename = 'load_every_help_' + socket.gethostname() + '_' + datestamp + '.log'
-outputfile = '/tmp/' + outputfilename
-fd = open(outputfile, 'w')
-fd.writelines(logoutput)
+                for line in patchoutput:
+                    fd.write(line)
+                fd.flush()
 fd.close()
 
 
