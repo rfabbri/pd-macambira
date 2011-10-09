@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import subprocess, sys, socket, time, os, re, time, smtplib, signal
 import random
@@ -145,7 +146,6 @@ class PdTest():
             m = re.search('EOF on socket', line)
             if not m and line:
                 patchoutput.append(line)
-                log.write(line)
             else:
                 break
         patchoutput = self.remove_ignorelines(patchoutput)
@@ -182,7 +182,6 @@ for root, dirs, files in os.walk(extradir):
     for name in files:
         m = re.search(".*-help\.pd$", name)
         if m:
-            print('runtest: ' + name)
             test.runtest(fd, root, name)
 
 docdir = os.path.join(pdrootdir, 'doc')
