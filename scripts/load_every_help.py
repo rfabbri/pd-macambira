@@ -1,15 +1,13 @@
 #!/usr/bin/python
 
 import subprocess, sys, socket, time, os, re, time, smtplib, signal
+import random
 
 try:
     pdrootdir = sys.argv[1]
 except IndexError:
     print 'only one arg: root dir of pd'
     sys.exit(2)
-
-PORT = 55555
-netreceive_patch = '/tmp/.____pd_netreceive____.pd'
 
 def find_pdexe(rootdir):
     # start with the Windows/Mac OS X location
@@ -136,6 +134,8 @@ now = time.localtime(time.time())
 date = time.strftime('20%y-%m-%d', now)
 datestamp = time.strftime('20%y-%m-%d_%H.%M.%S', now)
 
+rand = random.SystemRandom()
+
 outputfilename = 'load_every_help_' + socket.gethostname() + '_' + datestamp + '.log'
 outputfile = '/tmp/' + outputfilename
 fd = open(outputfile, 'w')
@@ -145,8 +145,6 @@ fd.flush()
 
 logoutput = []
 
-make_netreceive_patch(netreceive_patch)
-
 docdir = os.path.join(pdrootdir, 'doc')
 for root, dirs, files in os.walk(docdir):
     for name in files:
@@ -154,6 +152,9 @@ for root, dirs, files in os.walk(docdir):
         if m:
             patchoutput = []
             patch = os.path.join(root, m.string)
+            PORT = int(rand.random() * 10000) + int(rand.random() * 10000) + 40000
+            netreceive_patch = '/tmp/.____pd_netreceive_'+str(PORT)+'____.pd'
+            make_netreceive_patch(netreceive_patch)
             p = launch_pd()
             try:
                 open_patch(patch)
