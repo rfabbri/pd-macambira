@@ -215,6 +215,13 @@ try:
 except:
     mailoutput.append('rsync upload of the log failed!\n')
 
+# try to output the rsync log
+try:
+    mailoutput.append(''.join(p.stdout.readlines()))
+except:
+    pass
+
+
 mailoutput.append('______________________________________________________________________\n\n')
 server = smtplib.SMTP('in1.smtp.messagingengine.com')
 logoutput = []
