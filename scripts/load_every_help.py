@@ -214,8 +214,6 @@ try:
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
 except:
     mailoutput.append('rsync upload of the log failed!\n')
-    mailoutput.append(''.join(p.stdout.readlines()))
-
 
 mailoutput.append('______________________________________________________________________\n\n')
 server = smtplib.SMTP('in1.smtp.messagingengine.com')
