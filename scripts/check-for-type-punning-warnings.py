@@ -3,6 +3,7 @@
 import smtplib
 import glob
 import datetime
+import subprocess
 
 date = datetime.datetime.now().strftime("%Y-%m-%d")
 outputfilename = 'type-punning.log'
@@ -42,14 +43,15 @@ mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/logs/'
 
 # upload the log file to the autobuild website
 rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/logs/' + outputfilename
-try:
-    p = subprocess.Popen(['rsync', '-ax', outputfile, rsyncfile],
-                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
-except:
-    mailoutput.append('rsync upload of the log failed!\n')
-#    mailoutput.append(''.join(p.stdout.readlines()))
-
-
+cmd = ['rsync', '-axv', outputfile, rsyncfile]
+mailoutput.append(str(cmd))
+p = subprocess.Popen(cmd,
+					 shell=False,
+					 stdout=subprocess.PIPE,
+					 stderr=subprocess.PIPE)
+p.wait()
+mailoutput.append(''.join(p.stdout.readlines()))
+mailoutput.append(''.join(p.stderr.readlines()))
 
 mailoutput.append('______________________________________________________________________\n\n')
 server = smtplib.SMTP('in1.smtp.messagingengine.com')
