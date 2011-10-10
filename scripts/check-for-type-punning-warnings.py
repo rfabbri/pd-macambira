@@ -44,7 +44,7 @@ mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/logs/'
 # upload the log file to the autobuild website
 rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/logs/' + outputfilename
 cmd = ['rsync', '-axv', outputfile, rsyncfile]
-mailoutput.append(str(cmd))
+mailoutput.append(' '.join(cmd) + '\n')
 p = subprocess.Popen(cmd,
 					 shell=False,
 					 stdout=subprocess.PIPE,
