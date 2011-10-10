@@ -142,13 +142,32 @@ FOUND_SENSOR:
 	memset(&inputStructure, 0, sizeof(inputStructure));
 	memset(&outputStructure, 0, sizeof(outputStructure));
 
-	kern_return = IOConnectMethodStructureIStructureO(
-				io_connect,
-				kernel_function,	/* index to kernel function */
-				structureInputSize,
-				&structureOutputSize,
-				&inputStructure,
-				&outputStructure);
+#if !defined(__LP64__)
+	// Check if Mac OS X 10.5 API is available...
+	if (IOConnectCallStructMethod != NULL) {
+		// ...and use it if it is.
+#endif
+		kern_return = IOConnectCallStructMethod(
+            io_connect,         // an io_connect_t returned from IOServiceOpen().
+            kernel_function,	// selector of the function to be called via the user client.
+            &inputStructure,	    // pointer to the input struct parameter.
+            structureInputSize, // the size of the input structure parameter.
+            &outputStructure,    // pointer to the output struct parameter.
+            &structureOutputSize// pointer to the size of the output structure parameter.
+            );
+#if !defined(__LP64__)
+	}
+	else {
+		// Otherwise fall back to older API.
+        kern_return = IOConnectMethodStructureIStructureO(
+            io_connect,          // an io_connect_t returned from IOServiceOpen().
+            kernel_function,	 // an index to the function to be called via the user client.
+            structureInputSize,  // the size of the input struct paramter.
+            &structureOutputSize,// a pointer to the size of the output struct paramter.
+            &inputStructure,     // a pointer to the input struct parameter.
+            &outputStructure);   // a pointer to the output struct parameter.
+	}
+#endif
 
     if( kern_return == KERN_SUCCESS)
     {

@@ -165,15 +165,33 @@ kern_return_t SMCCall(int index, SMCKeyData_t *inputStructure, SMCKeyData_t *out
 
     structureInputSize = sizeof(SMCKeyData_t);
     structureOutputSize = sizeof(SMCKeyData_t);
-
-    return IOConnectMethodStructureIStructureO(
-        conn,
-        index,
-        structureInputSize,
-        &structureOutputSize,
-        inputStructure,
-        outputStructure
-        );
+#if !defined(__LP64__)
+	// Check if Mac OS X 10.5 API is available...
+	if (IOConnectCallStructMethod != NULL) {
+		// ...and use it if it is.
+#endif
+		return IOConnectCallStructMethod(
+            conn,               // an io_connect_t returned from IOServiceOpen().
+            index,	            // selector of the function to be called via the user client.
+            inputStructure,	    // pointer to the input struct parameter.
+            structureInputSize, // the size of the input structure parameter.
+            outputStructure,    // pointer to the output struct parameter.
+            &structureOutputSize// pointer to the size of the output structure parameter.
+            );
+#if !defined(__LP64__)
+	}
+	else {
+		// Otherwise fall back to older API.
+        return IOConnectMethodStructureIStructureO(
+            conn,                 // an io_connect_t returned from IOServiceOpen().
+            index,                // an index to the function to be called via the user client.
+            structureInputSize,   // the size of the input struct paramter.
+            &structureOutputSize, // a pointer to the size of the output struct paramter.
+            inputStructure,       // a pointer to the input struct parameter.
+            outputStructure       // a pointer to the output struct parameter.
+            );
+	}
+#endif
 }
 
 kern_return_t SMCReadKey(UInt32Char_t key, SMCVal_t *val)
