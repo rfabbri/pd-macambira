@@ -168,8 +168,8 @@ else
     if test "x$have_libv4l" = "xyes"
     then
   		AC_DEFINE(HAVE_PDP_LIBV4L, 1, [build pdp_v4l with libv4l])
-      PDP_V4L_CFLAGS="$(shell pkg-config --cflags libv4l)"
-      PDP_V4L_LIBS="$(shell pkg-config --libs libv4l)"
+      PDP_V4L_CFLAGS="`pkg-config --cflags libv4l`"
+      PDP_V4L_LIBS="`pkg-config --libs libv4l`"
     else
       PDP_V4L_CFLAGS=""
       PDP_V4L_LIBS=""
