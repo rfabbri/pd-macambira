@@ -26,19 +26,19 @@ fd.write('load_every_help\n')
 fd.write('========================================================================\n')
 fd.flush()
 
-extradir = os.path.join(pdrootdir, 'extra', 'earplug~')
+extradir = os.path.join(pdrootdir, 'extra')
 for root, dirs, files in os.walk(extradir):
     for name in files:
         m = re.search(".*-help\.pd$", name)
         if m:
             test.runtest(fd, root, name)
 
-# docdir = os.path.join(pdrootdir, 'doc')
-# for root, dirs, files in os.walk(docdir):
-#     for name in files:
-#         m = re.search(".*\.pd$", name)
-#         if m:
-#             test.runtest(fd, root, name)
+docdir = os.path.join(pdrootdir, 'doc')
+for root, dirs, files in os.walk(docdir):
+    for name in files:
+        m = re.search(".*\.pd$", name)
+        if m:
+            test.runtest(fd, root, name)
 
 fd.close()
 
