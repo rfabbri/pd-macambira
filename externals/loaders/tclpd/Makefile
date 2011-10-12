@@ -251,7 +251,6 @@ ifeq ($(DEBUG),1)
 	STRIP = echo
 else
 	ALL_CFLAGS += $(OPT_CFLAGS)
-	ALL_LDFLAGS += -s
 endif
 
 ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS)
