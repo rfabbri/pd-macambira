@@ -127,7 +127,7 @@ ifeq ($(UNAME),Darwin)
       FAT_FLAGS = -arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4
       SOURCES += $(SOURCES_iphoneos)
     endif
-    ALL_CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
+    ALL_CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include -I/Library/Frameworks/Tcl.framework/Headers
     # if the 'pd' binary exists, check the linking against it to aid with stripping
     BUNDLE_LOADER = $(shell test ! -e $(PD_PATH)/bin/pd || echo -bundle_loader $(PD_PATH)/bin/pd)
     ALL_LDFLAGS += $(FAT_FLAGS) -bundle $(BUNDLE_LOADER) -undefined dynamic_lookup -L/sw/lib
@@ -314,6 +314,13 @@ single_install: $(LIBRARY_NAME) install-doc install-examples install-manual
 	$(INSTALL_PROGRAM) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 	$(INSTALL_DATA) pdlib.tcl  $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+ifeq ($(UNAME),Darwin)
+# force tclpd to use the Tcl.framework built into Pd-extended
+	install_name_tool -change \
+		/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl \
+		@executable_path/../Frameworks/Tcl.framework/Versions/8.5/Tcl \
+		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
+endif
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
