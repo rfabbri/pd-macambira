@@ -37,7 +37,6 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 
 ALL_CFLAGS = $(PD_INCLUDES) -std=c99 -I/usr/include/tcl8.5 \
 	-I/Library/Frameworks/Tcl.framework/Headers \
-	-fno-tree-vectorize -fno-strict-aliasing \
 	-Wall -W -Wno-unused-parameter
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
@@ -55,7 +54,7 @@ LIBS_windows = -ltcl85 "$(LIBRARY_NAME).def"
 
 # these can be set from outside without (usually) breaking the build
 DEBUG = 0
-CFLAGS = 
+CFLAGS = -fno-tree-vectorize -fno-strict-aliasing -Wno-strict-aliasing
 LDFLAGS =
 LIBS =
 
