@@ -69,30 +69,55 @@ static void ambient_light_sensor_output(t_ambient_light_sensor* x)
 {
 	DEBUG(post("ambient_light_sensor_output"););
     kern_return_t kernResult;  
-    IOItemCount scalarInputCount = 0;  
-	IOItemCount scalarOutputCount = 2;  
-	SInt32 left = 0, right = 0;
+	t_float left = 0, right = 0;
     t_atom output_atoms[2];
 
-    if(x->io_connect)
-    {
+    if(! x->io_connect) return;
+
+#if !defined(__LP64__)
+	// Check if Mac OS X 10.5 API is available...
+	if (IOConnectCallScalarMethod != NULL) {
+		// ...and use it if it is.
+#endif
+        uint64_t inputValues[0];
+        uint32_t inputCount = 0;
+        uint64_t outputValues[2];
+        uint32_t outputCount = 2;
+        kernResult = IOConnectCallScalarMethod(x->io_connect,
+                                               kGetSensorReadingID,
+                                               inputValues,
+                                               inputCount,
+                                               outputValues,
+                                               &outputCount);
+        left = (t_float) (outputValues[0] / 2000.0);
+        right = (t_float) (outputValues[1] / 2000.0);
+#if !defined(__LP64__)
+	}
+	else {
+		// Otherwise fall back to older API.
+        IOItemCount scalarInputCount = 0;  
+        IOItemCount scalarOutputCount = 2;  
+        SInt32 out0, out1;
         kernResult = IOConnectMethodScalarIScalarO(x->io_connect, 
                                                    kGetSensorReadingID,  
                                                    scalarInputCount, 
                                                    scalarOutputCount, 
-                                                   &left, 
-                                                   &right);
-        if( kernResult == KERN_SUCCESS)
-        {
-            SETFLOAT(output_atoms, left);
-            SETFLOAT(output_atoms + 1, right);
-            outlet_list(x->data_outlet, &s_list, 2, output_atoms);
-        }
-        else if(kernResult == kIOReturnBusy)
-            pd_error(x,"[ambient_light_sensor]: device busy");
-        else
-            pd_error(x,"[ambient_light_sensor]: could not read device");
+                                                   &out0, 
+                                                   &out1);
+        left = (t_float) (out0 / 2000.0);
+        right = (t_float) (out1 / 2000.0);
+	}    
+#endif
+    if( kernResult == KERN_SUCCESS)
+    {
+        SETFLOAT(output_atoms, left);
+        SETFLOAT(output_atoms + 1, right);
+        outlet_list(x->data_outlet, &s_list, 2, output_atoms);
     }
+    else if(kernResult == kIOReturnBusy)
+            pd_error(x,"[ambient_light_sensor]: device busy");
+    else
+        pd_error(x,"[ambient_light_sensor]: could not read device");
 }
 
 
@@ -120,7 +145,7 @@ static void *ambient_light_sensor_new(void)
                                                 IOServiceMatching("AppleLMUController"));
     if(x->io_service)
     {
-        post("[ambient_light_sensor]: found AppleLMUController");
+        logpost(x, 4, "[ambient_light_sensor]: found AppleLMUController");
         x->sensor_name = gensym("AppleLMUController");
     }
     else
@@ -131,7 +156,7 @@ static void *ambient_light_sensor_new(void)
         if(x->io_service)
         {
             x->sensor_name = gensym("IOI2CDeviceLMU");
-            post("[ambient_light_sensor]: found IOI2CDeviceLMU");
+            logpost(x, 4, "[ambient_light_sensor]: found IOI2CDeviceLMU");
         }
         else
             pd_error(x,"[ambient_light_sensor]: no sensor found");

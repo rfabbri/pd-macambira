@@ -69,25 +69,45 @@ static void keyboard_light_output(t_keyboard_light* x)
 {
 	DEBUG(post("keyboard_light_output"););
     kern_return_t kernResult;  
-    IOItemCount scalarInputCount = 1;  
-	IOItemCount scalarOutputCount = 1;  
-	SInt32 in_unknown = 0, out_brightness;
+    uint32_t out_brightness;
+        
+    if(! x->io_connect) return;
 
-    if(x->io_connect)
-    {
+#if !defined(__LP64__)
+	// Check if Mac OS X 10.5 API is available...
+	if (IOConnectCallScalarMethod != NULL) {
+		// ...and use it if it is.
+#endif
+        uint64_t inputCount = 1;
+        uint64_t inputValues[1] = {0};
+        uint32_t outputCount = 1;
+		kernResult = IOConnectCallScalarMethod(x->io_connect,
+                                               kGetLEDBrightnessID,  
+                                               inputValues,
+                                               inputCount,
+                                               &out_brightness,
+                                               &outputCount);
+#if !defined(__LP64__)
+	}
+	else {
+		// Otherwise fall back to older API.
+        IOItemCount scalarInputCount = 1;  
+        IOItemCount scalarOutputCount = 1;  
+        uint32_t in_brightness;
         kernResult = IOConnectMethodScalarIScalarO(x->io_connect, 
                                                    kGetLEDBrightnessID,  
                                                    scalarInputCount, 
                                                    scalarOutputCount, 
-                                                   in_unknown,
+                                                   in_brightness, 
                                                    &out_brightness);
-        if( kernResult == KERN_SUCCESS)
-            outlet_float(x->x_obj.ob_outlet, (t_float)out_brightness / BRIGHTNESS_MAX);
-        else if(kernResult == kIOReturnBusy)
-            pd_error(x,"[keyboard_light]: device busy");
-        else
-            pd_error(x,"[keyboard_light]: could not read device");
-    }
+	}    
+#endif
+    if( kernResult == KERN_SUCCESS)
+        outlet_float(x->x_obj.ob_outlet, (t_float)out_brightness / BRIGHTNESS_MAX);
+    else if(kernResult == kIOReturnBusy)
+        pd_error(x,"[keyboard_light]: device busy");
+    else
+        pd_error(x,"[keyboard_light]: could not read device");
 }
 
 
@@ -96,18 +116,42 @@ static void keyboard_light_float(t_keyboard_light* x, t_float f)
 	DEBUG(post("keyboard_light_float"););
 
     kern_return_t kernResult;  
-    IOItemCount scalarInputCount = 3;  
-	IOItemCount scalarOutputCount = 1;  
-	SInt32 in_unknown = 0, in_brightness, out_brightness;
+    t_float brightness;
 
-    if(x->io_connect)
-    {
-        in_brightness = (SInt32) (f * BRIGHTNESS_MAX);
-        if(in_brightness < 0)
-            in_brightness = 0;
-        else if(in_brightness > BRIGHTNESS_MAX)
-            in_brightness = BRIGHTNESS_MAX;
-            
+    if(!x->io_connect) return;
+    
+    brightness = f * BRIGHTNESS_MAX;
+    if(brightness < 0)
+        brightness = 0;
+    else if(brightness > BRIGHTNESS_MAX)
+        brightness = BRIGHTNESS_MAX;
+    
+#if !defined(__LP64__)
+	// Check if Mac OS X 10.5 API is available...
+	if (IOConnectCallScalarMethod != NULL) {
+		// ...and use it if it is.
+#endif
+        uint64_t inputValues[3];
+        uint32_t inputCount = 3;
+        uint64_t outputValues[1];
+        uint32_t outputCount = 1;
+        inputValues[0] = 0;
+        inputValues[1] = brightness;
+        inputValues[2] = x->fade_time;
+        kernResult = IOConnectCallScalarMethod(x->io_connect,
+                                               kSetLEDFadeID,
+                                               inputValues,
+                                               inputCount,
+                                               outputValues,
+                                               &outputCount);
+#if !defined(__LP64__)
+	}
+	else {
+		// Otherwise fall back to older API.
+        IOItemCount scalarInputCount = 3;
+        IOItemCount scalarOutputCount = 1;
+        SInt32 in_unknown = 0, in_brightness, out_brightness;
+        in_brightness = brightness;
         kernResult = IOConnectMethodScalarIScalarO(x->io_connect, 
                                                    kSetLEDFadeID,  
                                                    scalarInputCount, 
@@ -116,13 +160,15 @@ static void keyboard_light_float(t_keyboard_light* x, t_float f)
                                                    in_brightness,
                                                    (SInt32) x->fade_time,
                                                    &out_brightness);
-        if( kernResult != KERN_SUCCESS)
-        {
-            if(kernResult == kIOReturnBusy)
-                pd_error(x,"[keyboard_light]: device busy");
-            else
-                pd_error(x,"[keyboard_light]: could not write to device");
-        }
+	}    
+#endif
+
+    if( kernResult != KERN_SUCCESS)
+    {
+        if(kernResult == kIOReturnBusy)
+            pd_error(x,"[keyboard_light]: device busy");
+        else
+            pd_error(x,"[keyboard_light]: could not write to device");
     }
 }
 
@@ -143,7 +189,7 @@ static void *keyboard_light_new(t_float level, t_float fade_time)
                                                 IOServiceMatching("AppleLMUController"));
     if(x->io_service)
     {
-        post("[keyboard_light]: found AppleLMUController");
+        logpost(x, 4, "[keyboard_light]: found AppleLMUController");
     }
     else
     {
@@ -152,7 +198,7 @@ static void *keyboard_light_new(t_float level, t_float fade_time)
                                                     IOServiceMatching("IOI2CDeviceLMU"));
         if(x->io_service)
         {
-            post("[keyboard_light]: found IOI2CDeviceLMU");
+            logpost(x, 4, "[keyboard_light]: found IOI2CDeviceLMU");
         }
         else
             pd_error(x,"[keyboard_light]: no sensor found");
