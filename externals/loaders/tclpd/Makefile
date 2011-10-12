@@ -35,7 +35,9 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 #
 #------------------------------------------------------------------------------#
 
-ALL_CFLAGS = $(PD_INCLUDES) -std=c99 -I/usr/include/tcl8.5
+ALL_CFLAGS = $(PD_INCLUDES) -std=c99 -I/usr/include/tcl8.5 \
+	-fno-strict-aliasing \
+	-Wall -W -Wno-unused-parameter
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
 ALL_LIBS = 
@@ -52,7 +54,7 @@ LIBS_windows = -ltcl85 "$(LIBRARY_NAME).def"
 
 # these can be set from outside without (usually) breaking the build
 DEBUG = 0
-CFLAGS = -Wall -W
+CFLAGS = 
 LDFLAGS =
 LIBS =
 

@@ -16,7 +16,7 @@ void tclpd_guiclass_motion(t_tcl* x, t_floatarg dx, t_floatarg dy) {
     Tcl_IncrRefCount(av[4]);
     int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     goto cleanup;
@@ -72,7 +72,7 @@ int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shif
     goto cleanup;
 
 error:
-    tclpd_interp_error(result);
+    tclpd_interp_error(x, result);
 
 cleanup:
     if(o) Tcl_DecrRefCount(o);
@@ -108,7 +108,7 @@ void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* 
     Tcl_IncrRefCount(av[4]);
     int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     theList = Tcl_GetObjResult(tcl_for_pd);
@@ -117,7 +117,7 @@ void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* 
     //result = Tcl_ListObjGetElements(tcl_for_pd, theList, @, @);
     result = Tcl_ListObjLength(tcl_for_pd, theList, &length);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     if(length != 4) {
@@ -128,12 +128,12 @@ void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* 
     for(i = 0; i < 4; i++) {
         result = Tcl_ListObjIndex(tcl_for_pd, theList, i, &o);
         if(result != TCL_OK) {
-            tclpd_interp_error(result);
+            tclpd_interp_error(x, result);
             goto error;
         }
         result = Tcl_GetIntFromObj(tcl_for_pd, o, &tmp[i]);
         if(result != TCL_OK) {
-            tclpd_interp_error(result);
+            tclpd_interp_error(x, result);
             goto error;
         }
     }
@@ -167,7 +167,7 @@ void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
     Tcl_IncrRefCount(av[4]);
     int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     theList = Tcl_GetObjResult(tcl_for_pd);
@@ -176,7 +176,7 @@ void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
     //result = Tcl_ListObjGetElements(tcl_for_pd, theList, @, @);
     result = Tcl_ListObjLength(tcl_for_pd, theList, &length);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     if(length != 2) {
@@ -187,12 +187,12 @@ void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
     for(i = 0; i < 2; i++) {
         result = Tcl_ListObjIndex(tcl_for_pd, theList, i, &o);
         if(result != TCL_OK) {
-            tclpd_interp_error(result);
+            tclpd_interp_error(x, result);
             goto error;
         }
         result = Tcl_GetIntFromObj(tcl_for_pd, o, &tmp[i]);
         if(result != TCL_OK) {
-            tclpd_interp_error(result);
+            tclpd_interp_error(x, result);
             goto error;
         }
     }
@@ -223,7 +223,7 @@ void tclpd_guiclass_select(t_gobj* z, t_glist* glist, int selected) {
     Tcl_IncrRefCount(av[3]);
     int result = Tcl_EvalObjv(tcl_for_pd, 4, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     goto cleanup;
@@ -248,7 +248,7 @@ void tclpd_guiclass_activate(t_gobj* z, t_glist* glist, int state) {
     Tcl_IncrRefCount(av[3]);
     int result = Tcl_EvalObjv(tcl_for_pd, 4, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     goto cleanup;
@@ -286,7 +286,7 @@ void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis) {
     Tcl_IncrRefCount(av[6]);
     int result = Tcl_EvalObjv(tcl_for_pd, 7, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
         goto error;
     }
     goto cleanup;

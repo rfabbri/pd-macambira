@@ -53,7 +53,7 @@ gotone:
         post("Tcl loader: loaded %s", filename);
     } else {
         post("Tcl loader: error trying to load %s", filename);
-        tclpd_interp_error(result);
+        tclpd_interp_error(NULL, result);
         return 0;
     }
 

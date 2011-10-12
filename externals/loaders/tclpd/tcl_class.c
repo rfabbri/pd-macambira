@@ -233,7 +233,7 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     return x;
 
 error:
-    tclpd_interp_error(TCL_ERROR);
+    tclpd_interp_error(NULL, TCL_ERROR);
     for(int i = 0; i < (ac+2); i++) {
         if(!av[i]) break;
         Tcl_DecrRefCount(av[i]);
@@ -302,7 +302,7 @@ void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) 
     return;
 
 error:
-    tclpd_interp_error(TCL_ERROR);
+    tclpd_interp_error(x, TCL_ERROR);
     for(int i=0; i < (ac+3); i++) {
         if(!av[i]) break;
         Tcl_DecrRefCount(av[i]);
@@ -399,12 +399,12 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
             }
         } else {
             pd_error(x, "Tcl: object save: failed");
-            tclpd_interp_error(result);
+            tclpd_interp_error(x, result);
         }
         Tcl_DecrRefCount(res);
     } else {
         pd_error(x, "Tcl: object save: failed");
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
     }
     Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);
@@ -427,7 +427,7 @@ void tclpd_properties(t_gobj* z, t_glist* owner) {
     if(result != TCL_OK) {
         //res = Tcl_GetObjResult(tcl_for_pd);
         pd_error(x, "Tcl: object properties: failed");
-        tclpd_interp_error(result);
+        tclpd_interp_error(x, result);
     }
     Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);

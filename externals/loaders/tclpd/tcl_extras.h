@@ -51,7 +51,7 @@ int tcl_to_pd(Tcl_Obj* input, t_atom* output);
 /* tcl_setup.cxx */
 extern Tcl_Interp* tcl_for_pd;
 extern void tclpd_setup(void);
-void tclpd_interp_error(int result);
+void tclpd_interp_error(t_tcl* x, int result);
 
 /* tcl_class.cxx */
 t_class* tclpd_class_new(const char* name, int flags);

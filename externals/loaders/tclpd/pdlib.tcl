@@ -84,7 +84,10 @@ namespace eval ::pd {
         if {[llength [info commands $m_any]] > 0} {
             return [$m_any $self [list symbol $sel] {*}$args]
         }
-        post "Tcl class $classname: inlet $inlet: no such method: $sel"
+	# don't notify if a loadbang method does not exists
+	if {$sel != "loadbang"} {
+		post "Tcl class $classname: inlet $inlet: no such method: $sel"
+	}
     }
 
     proc read_class_definition {classname def} {
