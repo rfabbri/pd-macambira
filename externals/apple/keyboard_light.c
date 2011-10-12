@@ -69,41 +69,46 @@ static void keyboard_light_output(t_keyboard_light* x)
 {
 	DEBUG(post("keyboard_light_output"););
     kern_return_t kernResult;  
-    uint32_t out_brightness;
-        
+    t_float brightness;
+
     if(! x->io_connect) return;
 
 #if !defined(__LP64__)
 	// Check if Mac OS X 10.5 API is available...
-	if (IOConnectCallScalarMethod != NULL) {
+//	if (IOConnectCallScalarMethod != NULL) {
+    if(0) {
 		// ...and use it if it is.
 #endif
-        uint64_t inputCount = 1;
         uint64_t inputValues[1] = {0};
+        uint64_t inputCount = 1;
+        uint64_t outputValues[1] = {0};
         uint32_t outputCount = 1;
-		kernResult = IOConnectCallScalarMethod(x->io_connect,
+        kernResult = IOConnectCallScalarMethod(x->io_connect,
                                                kGetLEDBrightnessID,  
                                                inputValues,
                                                inputCount,
-                                               &out_brightness,
+                                               outputValues,
                                                &outputCount);
+        brightness = (t_float)outputValues[0] / BRIGHTNESS_MAX;
 #if !defined(__LP64__)
 	}
 	else {
 		// Otherwise fall back to older API.
         IOItemCount scalarInputCount = 1;  
         IOItemCount scalarOutputCount = 1;  
-        uint32_t in_brightness;
+        uint32_t in_brightness = 0;
+        uint32_t out_brightness;
         kernResult = IOConnectMethodScalarIScalarO(x->io_connect, 
                                                    kGetLEDBrightnessID,  
                                                    scalarInputCount, 
                                                    scalarOutputCount, 
                                                    in_brightness, 
                                                    &out_brightness);
+        brightness = (t_float)out_brightness / BRIGHTNESS_MAX;
 	}    
 #endif
     if( kernResult == KERN_SUCCESS)
-        outlet_float(x->x_obj.ob_outlet, (t_float)out_brightness / BRIGHTNESS_MAX);
+        outlet_float(x->x_obj.ob_outlet, brightness);
     else if(kernResult == kIOReturnBusy)
         pd_error(x,"[keyboard_light]: device busy");
     else
