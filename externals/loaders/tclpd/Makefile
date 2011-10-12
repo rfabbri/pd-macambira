@@ -36,7 +36,8 @@ EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 #------------------------------------------------------------------------------#
 
 ALL_CFLAGS = $(PD_INCLUDES) -std=c99 -I/usr/include/tcl8.5 \
-	-fno-strict-aliasing \
+	-I/Library/Frameworks/Tcl.framework/Headers \
+	-fno-tree-vectorize -fno-strict-aliasing \
 	-Wall -W -Wno-unused-parameter
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
@@ -127,7 +128,7 @@ ifeq ($(UNAME),Darwin)
       FAT_FLAGS = -arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4
       SOURCES += $(SOURCES_iphoneos)
     endif
-    ALL_CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include -I/Library/Frameworks/Tcl.framework/Headers
+    ALL_CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
     # if the 'pd' binary exists, check the linking against it to aid with stripping
     BUNDLE_LOADER = $(shell test ! -e $(PD_PATH)/bin/pd || echo -bundle_loader $(PD_PATH)/bin/pd)
     ALL_LDFLAGS += $(FAT_FLAGS) -bundle $(BUNDLE_LOADER) -undefined dynamic_lookup -L/sw/lib
