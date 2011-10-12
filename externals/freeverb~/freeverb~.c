@@ -77,7 +77,7 @@ static const int allpasstuningL[numallpasses]
 static const int allpasstuningR[numallpasses]
                      = { 556+stereospread, 441+stereospread, 341+stereospread, 225+stereospread };
 
-static char *version = "freeverb~ v1.2";
+static char *version = "freeverb~ v1.2.1";
 
 #ifdef PD
 static t_class *freeverb_class;
@@ -813,7 +813,7 @@ void freeverb_tilde_setup(void)
 	class_addmethod(freeverb_class, (t_method)freeverb_setbypass, gensym("bypass"), A_FLOAT, A_NULL);
 	class_addmethod(freeverb_class, (t_method)freeverb_mute, gensym("clear"), A_NULL);
     class_addmethod(freeverb_class, (t_method)freeverb_print, gensym("print"), A_NULL);
-	post(version);
+	logpost(NULL, 3, version);
 }
 
 #else
