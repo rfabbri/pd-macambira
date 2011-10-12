@@ -415,9 +415,9 @@ proc propertiespanel_apply {w} {
         lappend newconf $key $v
     }
     set newconf [string map {$ \\$} $newconf]
-    pd [linsert $newconf 0 $::id($w) config]\;
+    pdsend "$::id($w) config $newconf"
 }
 
 proc propertiespanel_close {w} {
-    pd [concat $::id($w) cancel \;]
+    pdsend "$::id($w) cancel"
 }
