@@ -193,16 +193,18 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
 
     t_tcl* x = (t_tcl*)pd_new(qlass);
     x->ninlets = 1 /* qlass->c_firstin ??? */;
+    x->x_glist = (t_glist*)canvas_getcurrent();
 
     x->classname = Tcl_NewStringObj(name, -1);
-    Tcl_IncrRefCount(x->classname);
-
     char s[64];
     snprintf(s, 64, "tclpd:%s:x%lx", name, objectSequentialId++);
     x->self = Tcl_NewStringObj(s, -1);
-    Tcl_IncrRefCount(x->self);
 
-    x->x_glist = (t_glist*)canvas_getcurrent();
+    // the lifetime of x->classname and x->self is greater than this
+    // function, hence they get an extra Tcl_IncrRefCount here:
+    //      (see tclpd_free())
+    Tcl_IncrRefCount(x->classname);
+    Tcl_IncrRefCount(x->self);
 
     // store in object table (for later lookup)
     if(!object_table_get(s))
@@ -215,18 +217,23 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
     for(int i=0; i<ac; i++) {
+        // NOTE: pd_to_tcl already calls Tcl_IncrRefCount
+        //       so there is no need to call it here:
+
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
 #ifdef DEBUG
-            post("pd_to_tcl: tclpd_new: failed during conversion. check memory leaks!");
+            post("tclpd_new: failed conversion (pd_to_tcl)");
 #endif
             goto error;
         }
     }
+
     // call constructor
     if(Tcl_EvalObjv(tcl_for_pd, ac+2, av, 0) != TCL_OK) {
         goto error;
     }
 
+    // decrement reference counter
     for(int i = 0; i < (ac+2); i++)
         Tcl_DecrRefCount(av[i]);
 
@@ -260,6 +267,7 @@ void tclpd_free(t_tcl* x) {
     Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);
 
+    // here ends the lifetime of x->classname and x->self
     Tcl_DecrRefCount(x->self);
     Tcl_DecrRefCount(x->classname);
 #ifdef DEBUG
