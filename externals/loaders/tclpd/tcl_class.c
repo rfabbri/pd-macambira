@@ -357,7 +357,7 @@ t_pd* tclpd_get_object_pd(const char* objectSequentialId) {
 
 t_binbuf* tclpd_get_object_binbuf(const char* objectSequentialId) {
     t_object* o = tclpd_get_object(objectSequentialId);
-    return &o->ob_binbuf;
+    return o->ob_binbuf;
 }
 
 t_glist* tclpd_get_glist(const char* objectSequentialId) {
