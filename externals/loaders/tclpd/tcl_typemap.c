@@ -30,14 +30,31 @@ int tcl_to_pd(Tcl_Obj *input, t_atom *output) {
 
 const char* atom_type_string(t_atom* a) {
     switch(a->a_type) {
-    case A_FLOAT: return "float";
-    case A_SYMBOL: return "symbol";
-    case A_POINTER: return "pointer";
-    default: return "???";
+    case A_FLOAT:
+    case A_DEFFLOAT:
+        return "float";
+    case A_SYMBOL:
+    case A_DEFSYM:
+    case A_DOLLAR:
+    case A_DOLLSYM:
+    case A_SEMI:
+    case A_COMMA:
+        return "symbol";
+    case A_POINTER:
+        return "pointer";
+    default:
+        post("atom_type_string: unsupported/unknown selector: %d", a->a_type);
+        return "???";
     }
 }
 
 const char* atom_symbol_value(t_atom* a) {
+    if(a->a_type == A_DOLLAR) {
+        char buf[6];
+        snprintf(buf, 6, "$%d", a->a_w.w_index);
+        t_symbol* s = gensym(buf);
+        return s->s_name;
+    }
     return a->a_w.w_symbol->s_name;
 }
 
