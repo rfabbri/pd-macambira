@@ -9,7 +9,7 @@ SOURCES = bp.c decimator.c deltas.c hip.c hist.c itov.c lavg.c lhist.c lhisti.c 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = 
+PDOBJECTS = SMlib.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = beattracker.pd normalizer.pd resonate-beat.pd
@@ -21,7 +21,7 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = SMLib.c SMLib-help.pd SMLib.dsp SMLib.dsw SMLib.opt SMLib.plg defines.h
+EXTRA_DIST = SMLib.c SMLib.dsp SMLib.dsw SMLib.opt SMLib.plg defines.h
 
 
 
