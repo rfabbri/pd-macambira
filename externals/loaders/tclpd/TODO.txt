@@ -1,4 +1,5 @@
 TODO-list for tclpd (most important things first)
 =================================================
+- missing handling of binbuf in savefn (objects that wants to update their creation arguments, end up saving expanded dollar-args)
 - add (or check) GOP
 - signal externals? (really?)
