@@ -3,6 +3,7 @@ Version 0.2.2:
 	- Fixed "tclpd_get_instance_text cmd not found" bug
 	- Makefile for all platforms
 	- Replaced std::map with a minimal hashtable implementation
+	- Added support for te_binbuf retrieval (for savefn)
 
 Version 0.2.1:
 	- Added support for properties function.
