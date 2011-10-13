@@ -211,6 +211,7 @@ pd_startup_install:
 		$(LN_S) -f ../extra/vanilla/list.$(EXTENSION) 1.list.$(EXTENSION) && \
 		$(LN_S) -f ../extra/vanilla/ vanilla && \
 		$(LN_S) -f ../extra/extra/ extra && \
+		$(LN_S) -f ../extra/tclpd/ tclpd && \
 		$(LN_S) -f ../extra/pdlua/ pdlua
 
 
