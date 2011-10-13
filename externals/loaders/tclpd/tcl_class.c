@@ -104,7 +104,7 @@ static inline t_class* class_table_get(const char* name)
 	return (t_class*)list_get(class_tbl[h], name);
 }
 
-static inline void object_table_add(const char* name, t_pd* o)
+static inline void object_table_add(const char* name, t_tcl* o)
 {
 	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
 	object_tbl[h] = list_add(object_tbl[h], name, (void*)o);
@@ -116,7 +116,7 @@ static inline void object_table_remove(const char* name)
 	object_tbl[h] = list_remove(object_tbl[h], name);
 }
 
-static inline t_pd* object_table_get(const char* name)
+static inline t_tcl* object_table_get(const char* name)
 {
 	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
 	return (t_pd*)list_get(object_tbl[h], name);
@@ -331,6 +331,10 @@ t_tcl* tclpd_get_instance(const char* objectSequentialId) {
 
 t_pd* tclpd_get_instance_pd(const char* objectSequentialId) {
     return (t_pd*)object_table_get(objectSequentialId);
+}
+
+t_text* tclpd_get_instance_text(const char* objectSequentialId) {
+    return (t_text*)object_table_get(objectSequentialId);
 }
 
 t_object* tclpd_get_object(const char* objectSequentialId) {

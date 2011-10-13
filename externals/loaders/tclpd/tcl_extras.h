@@ -64,6 +64,7 @@ void tclpd_loadbang(t_tcl* x);
 t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x);
 t_tcl* tclpd_get_instance(const char* objectSequentialId);
 t_pd* tclpd_get_instance_pd(const char* objectSequentialId);
+t_text* tclpd_get_instance_text(const char* objectSequentialId);
 t_object* tclpd_get_object(const char* objectSequentialId);
 t_pd* tclpd_get_object_pd(const char* objectSequentialId);
 t_glist* tclpd_get_glist(const char* objectSequentialId);

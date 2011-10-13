@@ -1,4 +1,4 @@
-#N canvas 1022 530 786 430 10;
+#N canvas 342 108 616 430 10;
 #X obj 93 268 dynroute 4;
 #X msg 41 147 apple red \, banana yellow \, pear green \, apple yellow
 \, strawberry red;
