@@ -28,6 +28,23 @@ int tcl_to_pd(Tcl_Obj *input, t_atom *output) {
     return TCL_OK;
 }
 
+const char* atom_type_string(t_atom* a) {
+    switch(a->a_type) {
+    case A_FLOAT: return "float";
+    case A_SYMBOL: return "symbol";
+    case A_POINTER: return "pointer";
+    default: return "???";
+    }
+}
+
+const char* atom_symbol_value(t_atom* a) {
+    return a->a_w.w_symbol->s_name;
+}
+
+float atom_float_value(t_atom* a) {
+    return a->a_w.w_float;
+}
+
 int pd_to_tcl(t_atom *input, Tcl_Obj **output) {
     Tcl_Obj* tcl_t_atom[2];
 #ifdef DEBUG

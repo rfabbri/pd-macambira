@@ -256,5 +256,23 @@ namespace eval ::pd {
         # upload proc
         sys_gui "guiproc $name $argz $body\n"
     }
+
+    proc get_binbuf {self} {
+        set binbuf [tclpd_get_object_binbuf $self]
+        set len [binbuf_getnatom $binbuf]
+        set result {}
+        for {set i 0} {$i < $len} {incr i} {
+            set atom [tclpd_binbuf_get_atom $binbuf $i]
+            set selector [atom_type_string $atom]
+            set value {?}
+            if {$selector == "float"} {
+                set value [atom_float_value $atom]
+            } elseif {$selector == "symbol"} {
+                set value [atom_symbol_value $atom]
+            }
+            lappend result [list $selector $value]
+        }
+        return $result
+    }
 }
 

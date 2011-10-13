@@ -47,6 +47,9 @@ extern int Tclpd_SafeInit(Tcl_Interp *interp);
 /* tcl_typemap.cxx */
 int pd_to_tcl(t_atom* input, Tcl_Obj** output);
 int tcl_to_pd(Tcl_Obj* input, t_atom* output);
+const char* atom_type_string(t_atom* a);
+const char* atom_symbol_value(t_atom* a);
+float atom_float_value(t_atom* a);
 
 /* tcl_setup.cxx */
 extern Tcl_Interp* tcl_for_pd;
