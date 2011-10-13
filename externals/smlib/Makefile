@@ -9,7 +9,7 @@ SOURCES = bp.c decimator.c deltas.c hip.c hist.c itov.c lavg.c lhist.c lhisti.c 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = SMlib.pd
+PDOBJECTS = SMLib.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = beattracker.pd normalizer.pd resonate-beat.pd
