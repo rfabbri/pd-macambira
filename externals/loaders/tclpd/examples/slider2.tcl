@@ -1,4 +1,4 @@
-package require Tclpd 0.2.1
+package require Tclpd 0.2.2
 package require TclpdLib 0.17
 
 set ::script_path [file dirname [info script]]
