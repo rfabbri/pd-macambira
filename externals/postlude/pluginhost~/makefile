@@ -5,7 +5,7 @@ LIBDIR=/usr/local/lib
 PDDIR=$(LIBDIR)/pd
 INSTALLPATH=$(PDDIR)/extra/
 ARCHITECTURE=i386
-DEBUG=1
+DEBUG=0
 
 current: pd_linux
 
@@ -18,7 +18,7 @@ pd_linux: src/$(NAME).pd_linux
 
 # Debug
 LINUXCFLAGS = -ggdb -g -DPD -O0 -fPIC -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
+    -Wall -W -Wshadow -Wstrict-prototypes  \
     -Wno-unused -Wno-parentheses -Wno-switch -DDEBUG=$(DEBUG)
 
 LINUXINCLUDE =  -I/usr/include -I./include
@@ -41,7 +41,7 @@ pd_darwin: src/$(NAME).pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -arch $(ARCHITECTURE) -O3 -Wall -Werror -L/usr/local/lib/ -DDEBUG=$(DEBUG)
+DARWINCFLAGS = -g -ggdb -DPD -arch $(ARCHITECTURE) -O0 -Wall -L/usr/local/lib/ -m32 -DDEBUG=$(DEBUG)
 
 DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/include/pluginhost/
 
@@ -52,8 +52,8 @@ DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/handlers_osc.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/handlers_pd.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/ph_common.c
-	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace  -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o handlers_osc.o handlers_pd.o ph_common.o
-	rm -f *.o
+	$(CC) -m32 -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace  -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o handlers_osc.o handlers_pd.o ph_common.o
+	#rm -f *.o
 
 # ----------------------- Generic -----------------------
 

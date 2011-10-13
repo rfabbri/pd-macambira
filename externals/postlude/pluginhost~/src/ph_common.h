@@ -34,7 +34,7 @@
 #include "dssi.h"
 
 #define PH_NAME           "pluginhost~"
-#define PH_VERSION        0.99
+#define PH_VERSION        0.997
 #define EVENT_BUFSIZE     1024
 #define OSC_PORT          9998
 #define UI_TARGET_ELEMS   2

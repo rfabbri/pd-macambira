@@ -931,8 +931,18 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
                 char *p = encode_7in6(x->instances[instance].perf_buffer,
                         DX7_PERFORMANCE_SIZE);
                 debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "mod_wheel_assign"))  {
+                x->instances[instance].perf_buffer[10] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
             } else if (!strcmp(key, "foot_sensitivity")) {
                 x->instances[instance].perf_buffer[11] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "foot_assign")) {
+                x->instances[instance].perf_buffer[12] = atoi(value);
                 char *p = encode_7in6(x->instances[instance].perf_buffer,
                         DX7_PERFORMANCE_SIZE);
                 debug = ph_send_configure(x, "performance", p, instance);
@@ -941,8 +951,18 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
                 char *p = encode_7in6(x->instances[instance].perf_buffer,
                         DX7_PERFORMANCE_SIZE);
                 debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "pressure_assign")) {
+                x->instances[instance].perf_buffer[14] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
             } else if (!strcmp(key, "breath_sensitivity")) {
-                x->instances[instance].perf_buffer[4] = atoi(value);
+                x->instances[instance].perf_buffer[15] = atoi(value);
+                char *p = encode_7in6(x->instances[instance].perf_buffer,
+                        DX7_PERFORMANCE_SIZE);
+                debug = ph_send_configure(x, "performance", p, instance);
+            } else if (!strcmp(key, "breath_assign")) {
+                x->instances[instance].perf_buffer[16] = atoi(value);
                 char *p = encode_7in6(x->instances[instance].perf_buffer,
                         DX7_PERFORMANCE_SIZE);
                 debug = ph_send_configure(x, "performance", p, instance);
