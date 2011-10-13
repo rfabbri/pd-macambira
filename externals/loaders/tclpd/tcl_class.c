@@ -355,9 +355,20 @@ t_pd* tclpd_get_object_pd(const char* objectSequentialId) {
     return &o->ob_pd;
 }
 
+t_binbuf* tclpd_get_object_binbuf(const char* objectSequentialId) {
+    t_object* o = tclpd_get_object(objectSequentialId);
+    return &o->ob_binbuf;
+}
+
 t_glist* tclpd_get_glist(const char* objectSequentialId) {
     t_tcl* x = tclpd_get_instance(objectSequentialId);
     return x->x_glist;
+}
+
+t_atom* tclpd_binbuf_get_atom(t_binbuf* b, int n) {
+    if(binbuf_getnatom(b) <= n || n < 0)
+        return NULL;
+    return binbuf_getvec(b) + n;
 }
 
 t_symbol* null_symbol() {
