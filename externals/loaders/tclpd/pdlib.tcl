@@ -1,9 +1,10 @@
 # TCL objectized library for PD api
 # by Federico Ferri <mescalinum@gmail.com> - (C) 2007-2009
 
-package provide TclpdLib 0.17
+package provide TclpdLib 0.18
 
 package require Tcl 8.5
+package require Tclpd 0.2.2
 
 set verbose 0
 

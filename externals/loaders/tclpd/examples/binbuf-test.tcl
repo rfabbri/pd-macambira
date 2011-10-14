@@ -1,5 +1,5 @@
 package require Tclpd 0.2.2
-package require TclpdLib 0.17
+package require TclpdLib 0.18
 
 pd::class binbuf-test {
     constructor {
