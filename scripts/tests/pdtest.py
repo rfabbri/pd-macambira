@@ -117,6 +117,8 @@ class PdTest():
             'IOhannes m zm',
             'part of zexy-',
             'Pd: 0.43.1-extended',
+            'pdstring version 0.10-2 by Bryan Jurish',
+            'verbose(3): libdir_loader: added .* to the canvas-local objectclass path',
             'based on sync from jMax'
             ]
         for ignore in ignorelines:
@@ -156,11 +158,11 @@ class PdTest():
                 patchoutput.append(line)
             else:
                 break
-        patchoutput = self.remove_ignorelines(patchoutput)
-        if len(patchoutput) > 0:
+        toprint = self.remove_ignorelines(patchoutput)
+        if len(toprint) > 0:
             log.write('\n\n__________________________________________________\n')
             log.write('loading: ' + patch + '\n')
-            for line in patchoutput:
+            for line in toprint:
                 log.write(line)
             log.flush()
 
