@@ -129,8 +129,6 @@ namespace eval ::pd {
         "
 
 	# some dummy function to suppress eventual errors if they are not deifned:
-	proc ::${classname}::constructor {self args} {}
-	proc ::${classname}::destructor {self} {}
 	proc ::${classname}::0_loadbang {self} {}
         proc ::${classname}::save {self args} {return ""}
 
