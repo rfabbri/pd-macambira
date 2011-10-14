@@ -156,6 +156,8 @@ deb: $(bindir)
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
+	echo -n "Installed-Size: " >> $(DESTDIR)/DEBIAN/control
+	du -sk $(DESTDIR) | sed 's|\(^[0-9][0-9]*\).*|\1|' >>  $(DESTDIR)/DEBIAN/control
 	install -p -m0755  $(packages_src)/linux_make/debian/pd-extended.prerm \
 		$(packages_src)/linux_make/debian/pd-extended.postrm \
 	 	$(packages_src)/linux_make/debian/pd-extended.postinst \
