@@ -1346,9 +1346,9 @@ loaders-pdlua_install: loaders-pdlua
 		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/README.txt
 	install -p $(externals_src)/loaders/pdlua/COPYING \
 		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/LICENSE.txt
-	install -p $(externals_src)/loaders/pdlua/examples/*.pd \
-		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/examples
+	install -p $(externals_src)/loaders/pdlua/examples/*.pd \
+		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/examples
 	install -p $(externals_src)/loaders/pdlua/examples/*.pd_lua \
 		$(DESTDIR)$(objectsdir)/$(LOADERS-PDLUA_NAME)/examples
 	install -p $(externals_src)/loaders/pdlua/examples/*.pd_luax \
