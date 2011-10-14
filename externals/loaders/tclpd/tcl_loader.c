@@ -47,8 +47,13 @@ gotone:
     strncat(filename, nameptr, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING-1] = 0;
 
+    int result;
+
+    // create the required tcl namespace for the class
+    tclpd_class_namespace_init(classname);
+
     // load tcl external:
-    int result = Tcl_EvalFile(tcl_for_pd, filename);
+    result = Tcl_EvalFile(tcl_for_pd, filename);
     if(result == TCL_OK) {
         post("Tcl loader: loaded %s", filename);
     } else {
@@ -56,6 +61,19 @@ gotone:
         tclpd_interp_error(NULL, result);
         return 0;
     }
+
+#ifdef TCLPD_CALL_SETUP
+    // call the setup method:
+    char cmd[64];
+    snprintf(cmd, 64, "::%s::setup", classname);
+    result = Tcl_Eval(tcl_for_pd, cmd);
+    if(result == TCL_OK) {
+    } else {
+        post("Tcl loader: error in %s %s::setup", filename, classname);
+        tclpd_interp_error(NULL, result);
+        return 0;
+    }
+#endif // TCLPD_CALL_SETUP
 
     class_set_extern_dir(&s_);
     sys_putonloadlist(objectname);

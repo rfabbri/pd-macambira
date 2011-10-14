@@ -1,12 +1,19 @@
 # TCL objectized library for PD api
-# by Federico Ferri <mescalinum@gmail.com> - (C) 2007-2009
+# by Federico Ferri <mescalinum@gmail.com> - (C) 2007-2011
 
-package provide TclpdLib 0.18
+package provide TclpdLib 0.19
 
 package require Tcl 8.5
-package require Tclpd 0.2.2
+package require Tclpd 0.2.3
 
 set verbose 0
+
+namespace eval :: {
+    proc proc+ {name arglist body} {
+        set body2 [concat "global _;" [regsub -all @(\\\$?\[\\w\\?\]+) $body _(\$self:\\1)]]
+        uplevel #0 [list proc $name $arglist $body2]
+    }
+}
 
 namespace eval ::pd {
     proc error_msg {m} {
@@ -74,61 +81,58 @@ namespace eval ::pd {
         }
     }
 
-    # used internally (from dispatcher) to call a class method
-    proc call_classmethod {classname self inlet sel args} {
-        if $::verbose {post [info level 0]}
-        set m_sel "::${classname}_${inlet}_${sel}"
-        if {[llength [info commands $m_sel]] > 0} {
-            return [$m_sel $self {*}$args]
-        }
-        set m_any "::${classname}_${inlet}_anything"
-        if {[llength [info commands $m_any]] > 0} {
-            return [$m_any $self [list symbol $sel] {*}$args]
-        }
-	# don't notify if a loadbang method does not exists
-	if {$sel != "loadbang"} {
-		post "Tcl class $classname: inlet $inlet: no such method: $sel"
-	}
-    }
-
-    proc read_class_definition {classname def} {
+    proc read_class_options {classname options} {
         set patchable_flag 1
         set noinlet_flag 0
 
-        proc ::${classname}_object_save {self args} {return ""}
-
-        foreach {id arg} $def {
-            switch -- $id {
-                patchable {
-                    if {$arg != 0 && $arg != 1} {
-                        return -code error [error_msg "patchable must be 0/1"]
+        foreach {k v} $options {
+            switch -- $k {
+                -patchable {
+                    if {$v != 0 && $v != 1} {
+                        return -code error [error_msg "-patchable must be 0/1"]
                     }
-                    set patchable_flag $arg
+                    set patchable_flag $v
                 }
-                noinlet {
-                    if {$arg != 0 && $arg != 1} {
-                        return -code error [error_msg "noinlet must be 0/1"]
+                -noinlet {
+                    if {$v != 0 && $v != 1} {
+                        return -code error [error_msg "-noinlet must be 0/1"]
                     }
-                    set noinlet_flag $arg
+                    set noinlet_flag $v
                 }
                 default {
-                    proc ::${classname}_${id} {self args} [concat "global _;" [regsub -all @(\\\$?\[\\w\\?\]+) $arg _(\$self:\\1)]]
+                    return -code error [error_msg "unknown option: $k"]
                 }
             }
         }
 
-        # class level dispatcher (sort of class constructor)
-        proc ::$classname {self args} "
-            if \$::verbose {::pd::post \[info level 0\]}
-            # define object dispatcher:
-            proc ::\$self {inlet selector args} \"
-             if \\\$::verbose {::pd::post \\\[info level 0\\\]}
-             ::pd::call_classmethod $classname \$self \\\$inlet \\\$selector {*}\\\$args
-            \"
-            # call constructor:
-            ::${classname}_constructor \$self {*}\$args
-            return \$self
+        proc ::${classname}::dispatcher {self function args} "
+            if {\$function == \"method\"} {
+                set inlet \[lindex \$args 0\]
+                set selector \[lindex \$args 1\]
+                set argsr \[lrange \$args 2 end\]
+                set i_s ::${classname}::\${inlet}_\${selector}
+                set i_a ::${classname}::\${inlet}_anything
+                if {\[info procs \$i_s\] != {}} {
+                    uplevel \[linsert \$argsr 0 \$i_s \$self\]
+                } elseif {\[info procs \$i_s\] == {} && \[info procs \$i_a\] != {}} {
+                    uplevel \[linsert \$argsr 0 \$i_a \$self \[pd::add_selector \$selector\]\]
+                } else {
+                    return -code error \"${classname}: no such method: \$i_s\"
+                }
+            } elseif {\$function == \"widgetbehavior\"} {
+                set subfunction \[lindex \$args 0\]
+                set argsr \[lrange \$args 1 end\]
+                uplevel \[linsert \$argsr 0 ::${classname}::\${function}_\${subfunction} \$self]
+            } else {
+                uplevel \[linsert \$args 0 ::${classname}::\$function \$self\]
+            }
         "
+
+	# some dummy function to suppress eventual errors if they are not deifned:
+	proc ::${classname}::constructor {self args} {}
+	proc ::${classname}::destructor {self} {}
+	proc ::${classname}::0_loadbang {self} {}
+        proc ::${classname}::save {self args} {return ""}
 
         # TODO: c->c_gobj = (typeflag >= CLASS_GOBJ)
         set flag [expr {
@@ -140,19 +144,19 @@ namespace eval ::pd {
     }
 
     # this handles the pd::class definition
-    proc class {classname def} {
+    proc class {classname args} {
         if $::verbose {post [lrange [info level 0] 0 end-1]}
 
-        set flag [read_class_definition $classname $def]
+        set flag [read_class_options $classname $args]
 
         # this wraps the call to class_new()
         tclpd_class_new $classname $flag
     }
 
-    proc guiclass {classname def} {
+    proc guiclass {classname args} {
         if $::verbose {post [lrange [info level 0] 0 end-1]}
 
-        set flag [read_class_definition $classname $def]
+        set flag [read_class_options $classname $args]
 
         # this wraps the call to class_new()
         tclpd_guiclass_new $classname $flag
@@ -217,10 +221,14 @@ namespace eval ::pd {
         return $r
     }
 
+    proc add_selector {s} {
+        return [list [lindex {float symbol} [catch {expr $s}]] $s]
+    }
+
     proc add_selectors {tcllist} {
         set r {}
         foreach i $tcllist {
-            lappend r [list [lindex {float symbol} [catch {expr $i}]] $i]
+            lappend r [add_selector $i]
         }
         return $r
     }

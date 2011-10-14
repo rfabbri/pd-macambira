@@ -136,6 +136,8 @@ t_class* tclpd_class_new(const char* name, int flags) {
 	    class_table_add(name, c);
 
     class_addanything(c, tclpd_anything);
+
+    // is this really necessary given that there is already a 'anything' handler?
     class_addmethod(c, (t_method)tclpd_loadbang, gensym("loadbang"), A_NULL);
     
     // always set save function. it will call the default if
@@ -145,7 +147,7 @@ t_class* tclpd_class_new(const char* name, int flags) {
     // check if properties function exists in tcl space.
     char buf[80];
     int res_i;
-    snprintf(buf, 80, "llength [info procs ::%s_object_properties]", name);
+    snprintf(buf, 80, "llength [info procs ::%s::properties]", name);
     if(Tcl_Eval(tcl_for_pd, buf) == TCL_OK) {
         Tcl_Obj* res = Tcl_GetObjResult(tcl_for_pd);
         if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK) {
@@ -196,31 +198,37 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     x->x_glist = (t_glist*)canvas_getcurrent();
 
     x->classname = Tcl_NewStringObj(name, -1);
-    char s[64];
-    snprintf(s, 64, "tclpd:%s:x%lx", name, objectSequentialId++);
-    x->self = Tcl_NewStringObj(s, -1);
+    char so[64];
+    snprintf(so, 64, "tclpd.%s.x%lx", name, objectSequentialId++);
+    x->self = Tcl_NewStringObj(so, -1);
+    char sd[64];
+    snprintf(sd, 64, "::%s::dispatcher", name);
+    x->dispatcher = Tcl_NewStringObj(sd, -1);
 
-    // the lifetime of x->classname and x->self is greater than this
+    // the lifetime of x->{classname,self,dispatcher} is greater than this
     // function, hence they get an extra Tcl_IncrRefCount here:
     //      (see tclpd_free())
     Tcl_IncrRefCount(x->classname);
     Tcl_IncrRefCount(x->self);
+    Tcl_IncrRefCount(x->dispatcher);
 
     // store in object table (for later lookup)
-    if(!object_table_get(s))
-	    object_table_add(s, x);
+    if(!object_table_get(so))
+	    object_table_add(so, x);
 
     // build constructor command
-    Tcl_Obj *av[ac+2]; InitArray(av, ac+2, NULL);
-    av[0] = x->classname;
+    Tcl_Obj *av[ac+3]; InitArray(av, ac+3, NULL);
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
     av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
+    av[2] = Tcl_NewStringObj("constructor", -1);
+    Tcl_IncrRefCount(av[2]);
     for(int i=0; i<ac; i++) {
         // NOTE: pd_to_tcl already calls Tcl_IncrRefCount
         //       so there is no need to call it here:
 
-        if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
+        if(pd_to_tcl(&at[i], &av[3+i]) == TCL_ERROR) {
 #ifdef DEBUG
             post("tclpd_new: failed conversion (pd_to_tcl)");
 #endif
@@ -229,20 +237,20 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     }
 
     // call constructor
-    if(Tcl_EvalObjv(tcl_for_pd, ac+2, av, 0) != TCL_OK) {
+    if(Tcl_EvalObjv(tcl_for_pd, ac+3, av, 0) != TCL_OK) {
         goto error;
     }
 
     // decrement reference counter
-    for(int i = 0; i < (ac+2); i++)
+    for(int i = 0; i < (ac+3); i++)
         Tcl_DecrRefCount(av[i]);
 
     return x;
 
 error:
     tclpd_interp_error(NULL, TCL_ERROR);
-    for(int i = 0; i < (ac+2); i++) {
-        if(!av[i]) break;
+    for(int i = 0; i < (ac+3); i++) {
+        if(!av[i]) break; // XXX: I don't remind why I add this
         Tcl_DecrRefCount(av[i]);
     }
     pd_free((t_pd*)x);
@@ -251,25 +259,30 @@ error:
 
 void tclpd_free(t_tcl* x) {
     // build destructor command
-    Tcl_Obj *sym = Tcl_NewStringObj(Tcl_GetStringFromObj(x->classname, NULL), -1);
-    Tcl_AppendToObj(sym, "_destructor", -1);
-    Tcl_Obj *av[2]; InitArray(av, 2, NULL);
-    av[0] = sym;
+    Tcl_Obj *av[3]; InitArray(av, 3, NULL);
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
     av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
+    av[2] = Tcl_NewStringObj("destructor", -1);
+    Tcl_IncrRefCount(av[2]);
+
     // call destructor
-    if(Tcl_EvalObjv(tcl_for_pd, 2, av, 0) != TCL_OK) {
+    if(Tcl_EvalObjv(tcl_for_pd, 3, av, 0) != TCL_OK) {
 #ifdef DEBUG
-        post("tclpd_free: failed");
+        post("tclpd_free: failed to call destructor");
 #endif
     }
+
+    // decrement reference counter
     Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);
+    Tcl_DecrRefCount(av[2]);
 
     // here ends the lifetime of x->classname and x->self
     Tcl_DecrRefCount(x->self);
     Tcl_DecrRefCount(x->classname);
+    Tcl_DecrRefCount(x->dispatcher);
 #ifdef DEBUG
     post("tclpd_free called");
 #endif
@@ -280,30 +293,34 @@ void tclpd_anything(t_tcl* x, t_symbol* s, int ac, t_atom* at) {
 }
 
 void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) {
-    // proxy method - format: <self> <inlet#> <selector> ...
-    Tcl_Obj* av[ac+3]; InitArray(av, ac+3, NULL);
+    // proxy method - format: <classname> <self> method <inlet#> <selector> args...
+    Tcl_Obj* av[ac+5]; InitArray(av, ac+5, NULL);
     int result;
 
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewIntObj(inlet);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj(s->s_name, -1);
+    av[2] = Tcl_NewStringObj("method", -1);
     Tcl_IncrRefCount(av[2]);
+    av[3] = Tcl_NewIntObj(inlet);
+    Tcl_IncrRefCount(av[3]);
+    av[4] = Tcl_NewStringObj(s->s_name, -1);
+    Tcl_IncrRefCount(av[4]);
     for(int i=0; i<ac; i++) {
-        if(pd_to_tcl(&at[i], &av[3+i]) == TCL_ERROR) {
+        if(pd_to_tcl(&at[i], &av[5+i]) == TCL_ERROR) {
 #ifdef DEBUG
             post("pd_to_tcl: tclpd_inlet_anything: failed during conversion. check memory leaks!");
 #endif
             goto error;
         }
     }
-    result = Tcl_EvalObjv(tcl_for_pd, ac+3, av, 0);
+    result = Tcl_EvalObjv(tcl_for_pd, ac+5, av, 0);
     if(result != TCL_OK) {
         goto error;
     }
 
-    for(int i=0; i < (ac+3); i++)
+    for(int i=0; i < (ac+5); i++)
         Tcl_DecrRefCount(av[i]);
 
     // OK
@@ -311,7 +328,7 @@ void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) 
 
 error:
     tclpd_interp_error(x, TCL_ERROR);
-    for(int i=0; i < (ac+3); i++) {
+    for(int i=0; i < (ac+5); i++) {
         if(!av[i]) break;
         Tcl_DecrRefCount(av[i]);
     }
@@ -385,12 +402,13 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
 
     t_tcl* x = (t_tcl*)z;
 
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("object", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
     av[2] = Tcl_NewStringObj("save", -1);
     Tcl_IncrRefCount(av[2]);
+
     int result = Tcl_EvalObjv(tcl_for_pd, 3, av, 0);
     if(result == TCL_OK) {
         res = Tcl_GetObjResult(tcl_for_pd);
@@ -429,6 +447,7 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
         pd_error(x, "Tcl: object save: failed");
         tclpd_interp_error(x, result);
     }
+
     Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
@@ -436,23 +455,33 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
 
 void tclpd_properties(t_gobj* z, t_glist* owner) {
     Tcl_Obj* av[3]; InitArray(av, 3, NULL);
-    Tcl_Obj* res;
 
     t_tcl* x = (t_tcl*)z;
 
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("object", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
     av[2] = Tcl_NewStringObj("properties", -1);
     Tcl_IncrRefCount(av[2]);
+
     int result = Tcl_EvalObjv(tcl_for_pd, 3, av, 0);
     if(result != TCL_OK) {
         //res = Tcl_GetObjResult(tcl_for_pd);
         pd_error(x, "Tcl: object properties: failed");
         tclpd_interp_error(x, result);
     }
+
     Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
+}
+
+void tclpd_class_namespace_init(const char* classname) {
+    char cmd[256];
+    snprintf(cmd, 256, "if [namespace exists ::%s] "
+        "{namespace delete ::%s}; "
+        "namespace eval ::%s {}",
+        classname, classname, classname);
+    Tcl_Eval(tcl_for_pd, cmd);
 }

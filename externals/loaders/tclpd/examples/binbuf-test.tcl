@@ -1,15 +1,12 @@
-package require Tclpd 0.2.2
-package require TclpdLib 0.18
+package require Tclpd 0.2.3
+package require TclpdLib 0.19
 
-pd::class binbuf-test {
-    constructor {
-        pd::add_outlet $self list
-    }
-
-    destructor {
-    }
-
-    0_bang {
-        pd::outlet $self 0 list [pd::get_binbuf $self]
-    }
+proc binbuf-test::constructor {self args} {
+    pd::add_outlet $self list
 }
+
+proc binbuf-test::0_bang {self} {
+    pd::outlet $self 0 list [pd::get_binbuf $self]
+}
+
+pd::class binbuf-test

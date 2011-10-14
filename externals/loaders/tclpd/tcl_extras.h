@@ -10,7 +10,7 @@
 #define PATH_MAX 4096
 #endif
 
-#define TCLPD_VERSION "0.2.2"
+#define TCLPD_VERSION "0.2.3"
 
 #define InitArray(name, size, value) for(int zz=0; zz<(size); zz++) name[zz]=value
 
@@ -19,6 +19,7 @@ typedef struct _t_tcl {
     t_glist* x_glist;
     Tcl_Obj* self;
     Tcl_Obj* classname;
+    Tcl_Obj* dispatcher;
     int ninlets;
 } t_tcl;
 
@@ -31,7 +32,7 @@ typedef struct _t_proxyinlet {
     t_atom* argv;
 } t_proxyinlet;
 
-/* tcl_proxyinlet.cxx */
+/* tcl_proxyinlet.c */
 extern t_class* proxyinlet_class;
 void proxyinlet_init(t_proxyinlet* x);
 void proxyinlet_clear(t_proxyinlet* x);
@@ -41,22 +42,22 @@ t_atom* proxyinlet_get_atoms(t_proxyinlet* x);
 void proxyinlet_clone(t_proxyinlet* x, t_proxyinlet* y);
 void proxyinlet_setup(void);
 
-/* tcl_wrap.cxx */
+/* tcl_wrap.c */
 extern int Tclpd_SafeInit(Tcl_Interp *interp);
 
-/* tcl_typemap.cxx */
+/* tcl_typemap.c */
 int pd_to_tcl(t_atom* input, Tcl_Obj** output);
 int tcl_to_pd(Tcl_Obj* input, t_atom* output);
 const char* atom_type_string(t_atom* a);
 const char* atom_symbol_value(t_atom* a);
 float atom_float_value(t_atom* a);
 
-/* tcl_setup.cxx */
+/* tclpd.c */
 extern Tcl_Interp* tcl_for_pd;
 extern void tclpd_setup(void);
 void tclpd_interp_error(t_tcl* x, int result);
 
-/* tcl_class.cxx */
+/* tcl_class.c */
 t_class* tclpd_class_new(const char* name, int flags);
 t_class* tclpd_guiclass_new(const char* name, int flags);
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at);
@@ -78,8 +79,9 @@ void poststring2(const char* s);
 extern void text_save(t_gobj *z, t_binbuf *b);
 void tclpd_save(t_gobj* z, t_binbuf* b);
 void tclpd_properties(t_gobj* z, t_glist* owner);
+void tclpd_class_namespace_init(const char* classname);
 
-/* tcl_widgetbehavior.cxx */
+/* tcl_widgetbehavior.c */
 void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2);
 void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy);
 void tclpd_guiclass_select(t_gobj* z, t_glist* glist, int selected);
@@ -90,7 +92,7 @@ int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shif
 void tclpd_guiclass_motion(t_tcl* x, t_floatarg dx, t_floatarg dy);
 void tclpd_guiclass_grab(t_tcl* x, t_glist* glist, int xpix, int ypix);
 
-/* tcl_loader.cxx */
+/* tcl_loader.c */
 extern int tclpd_do_load_lib(t_canvas* canvas, char* objectname);
 /* pd loader private stuff: */
 typedef int (*loader_t)(t_canvas *canvas, char* classname);

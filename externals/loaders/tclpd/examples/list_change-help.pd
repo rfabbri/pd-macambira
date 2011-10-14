@@ -1,4 +1,4 @@
-#N canvas 617 384 635 406 10;
+#N canvas 294 76 635 406 10;
 #X obj 54 240 list_change;
 #X text 144 236 right inlet sets internal value without output anything
 ;

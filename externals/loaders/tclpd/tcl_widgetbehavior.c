@@ -2,19 +2,20 @@
 #include <string.h>
 
 void tclpd_guiclass_motion(t_tcl* x, t_floatarg dx, t_floatarg dy) {
-    Tcl_Obj* av[5]; InitArray(av, 5, NULL);
-    int tmp[4], i, length;
-    av[0] = x->self;
+    Tcl_Obj* av[6]; InitArray(av, 6, NULL);
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("motion", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
-    av[3] = Tcl_NewDoubleObj(dx);
+    av[3] = Tcl_NewStringObj("motion", -1);
     Tcl_IncrRefCount(av[3]);
-    av[4] = Tcl_NewDoubleObj(dy);
+    av[4] = Tcl_NewDoubleObj(dx);
     Tcl_IncrRefCount(av[4]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
+    av[5] = Tcl_NewDoubleObj(dy);
+    Tcl_IncrRefCount(av[5]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 6, av, 0);
     if(result != TCL_OK) {
         tclpd_interp_error(x, result);
         goto error;
@@ -27,6 +28,7 @@ cleanup:
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
     Tcl_DecrRefCount(av[4]);
+    Tcl_DecrRefCount(av[5]);
 }
 
 void tclpd_guiclass_grab(t_tcl* x, t_glist* glist, int xpix, int ypix) {
@@ -35,29 +37,31 @@ void tclpd_guiclass_grab(t_tcl* x, t_glist* glist, int xpix, int ypix) {
 }
 
 int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
-    Tcl_Obj* av[9]; InitArray(av, 9, NULL);
+    Tcl_Obj* av[10]; InitArray(av, 10, NULL);
     Tcl_Obj* o = NULL;
     int i = 0;
     t_tcl* x = (t_tcl*)z;
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("click", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
-    av[3] = Tcl_NewIntObj(xpix);
+    av[3] = Tcl_NewStringObj("click", -1);
     Tcl_IncrRefCount(av[3]);
-    av[4] = Tcl_NewIntObj(ypix);
+    av[4] = Tcl_NewIntObj(xpix);
     Tcl_IncrRefCount(av[4]);
-    av[5] = Tcl_NewIntObj(shift);
+    av[5] = Tcl_NewIntObj(ypix);
     Tcl_IncrRefCount(av[5]);
-    av[6] = Tcl_NewIntObj(alt);
+    av[6] = Tcl_NewIntObj(shift);
     Tcl_IncrRefCount(av[6]);
-    av[7] = Tcl_NewIntObj(dbl);
+    av[7] = Tcl_NewIntObj(alt);
     Tcl_IncrRefCount(av[7]);
-    av[8] = Tcl_NewIntObj(doit);
+    av[8] = Tcl_NewIntObj(dbl);
     Tcl_IncrRefCount(av[8]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 9, av, 0);
+    av[9] = Tcl_NewIntObj(doit);
+    Tcl_IncrRefCount(av[9]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 10, av, 0);
     if(result != TCL_OK) {
         goto error;
     }
@@ -85,28 +89,31 @@ cleanup:
     Tcl_DecrRefCount(av[6]);
     Tcl_DecrRefCount(av[7]);
     Tcl_DecrRefCount(av[8]);
+    Tcl_DecrRefCount(av[9]);
 
     // return value (BOOL) means 'object wants to be clicked' (g_editor.c:1270)
     return i;
 }
 
 void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2) {
-    Tcl_Obj* av[5]; InitArray(av, 5, NULL);
+    Tcl_Obj* av[6]; InitArray(av, 6, NULL);
     Tcl_Obj* o;
     Tcl_Obj* theList = NULL;
     int tmp[4], i, length;
     t_tcl* x = (t_tcl*)z;
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("getrect", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
-    av[3] = Tcl_NewIntObj(text_xpix(&x->o, owner));
+    av[3] = Tcl_NewStringObj("getrect", -1);
     Tcl_IncrRefCount(av[3]);
-    av[4] = Tcl_NewIntObj(text_ypix(&x->o, owner));
+    av[4] = Tcl_NewIntObj(text_xpix(&x->o, owner));
     Tcl_IncrRefCount(av[4]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
+    av[5] = Tcl_NewIntObj(text_ypix(&x->o, owner));
+    Tcl_IncrRefCount(av[5]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 6, av, 0);
     if(result != TCL_OK) {
         tclpd_interp_error(x, result);
         goto error;
@@ -147,25 +154,28 @@ cleanup:
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
     Tcl_DecrRefCount(av[4]);
+    Tcl_DecrRefCount(av[5]);
 }
 
 void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
-    Tcl_Obj* av[5]; InitArray(av, 5, NULL);
+    Tcl_Obj* av[6]; InitArray(av, 6, NULL);
     Tcl_Obj* theList = NULL;
     Tcl_Obj* o;
     int length, i, tmp[2];
     t_tcl* x = (t_tcl*)z;
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("displace", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
-    av[3] = Tcl_NewIntObj(dx);
+    av[3] = Tcl_NewStringObj("displace", -1);
     Tcl_IncrRefCount(av[3]);
-    av[4] = Tcl_NewIntObj(dy);
+    av[4] = Tcl_NewIntObj(dx);
     Tcl_IncrRefCount(av[4]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
+    av[5] = Tcl_NewIntObj(dy);
+    Tcl_IncrRefCount(av[5]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 6, av, 0);
     if(result != TCL_OK) {
         tclpd_interp_error(x, result);
         goto error;
@@ -208,20 +218,23 @@ cleanup:
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
     Tcl_DecrRefCount(av[4]);
+    Tcl_DecrRefCount(av[5]);
 }
 
 void tclpd_guiclass_select(t_gobj* z, t_glist* glist, int selected) {
-    Tcl_Obj* av[4]; InitArray(av, 4, NULL);
+    Tcl_Obj* av[5]; InitArray(av, 5, NULL);
     t_tcl* x = (t_tcl*)z;
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("select", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
-    av[3] = Tcl_NewIntObj(selected);
+    av[3] = Tcl_NewStringObj("select", -1);
     Tcl_IncrRefCount(av[3]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 4, av, 0);
+    av[4] = Tcl_NewIntObj(selected);
+    Tcl_IncrRefCount(av[4]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
     if(result != TCL_OK) {
         tclpd_interp_error(x, result);
         goto error;
@@ -233,20 +246,23 @@ cleanup:
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
+    Tcl_DecrRefCount(av[4]);
 }
 
 void tclpd_guiclass_activate(t_gobj* z, t_glist* glist, int state) {
-    Tcl_Obj* av[4]; InitArray(av, 4, NULL);
+    Tcl_Obj* av[5]; InitArray(av, 5, NULL);
     t_tcl* x = (t_tcl*)z;
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("activate", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
-    av[3] = Tcl_NewIntObj(state);
+    av[3] = Tcl_NewStringObj("activate", -1);
     Tcl_IncrRefCount(av[3]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 4, av, 0);
+    av[4] = Tcl_NewIntObj(state);
+    Tcl_IncrRefCount(av[4]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
     if(result != TCL_OK) {
         tclpd_interp_error(x, result);
         goto error;
@@ -258,6 +274,7 @@ cleanup:
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
+    Tcl_DecrRefCount(av[4]);
 }
 
 void tclpd_guiclass_delete(t_gobj* z, t_glist* glist) {
@@ -266,25 +283,27 @@ void tclpd_guiclass_delete(t_gobj* z, t_glist* glist) {
 }
 
 void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis) {
-    Tcl_Obj* av[7]; InitArray(av, 7, NULL);
+    Tcl_Obj* av[8]; InitArray(av, 8, NULL);
     t_tcl* x = (t_tcl*)z;
-    av[0] = x->self;
+    av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
-    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
-    av[2] = Tcl_NewStringObj("vis", -1);
+    av[2] = Tcl_NewStringObj("widgetbehavior", -1);
     Tcl_IncrRefCount(av[2]);
+    av[3] = Tcl_NewStringObj("vis", -1);
+    Tcl_IncrRefCount(av[3]);
     char buf[32];
     snprintf(buf, 32, ".x%lx.c", glist_getcanvas(glist));
-    av[3] = Tcl_NewStringObj(buf, -1);
-    Tcl_IncrRefCount(av[3]);
-    av[4] = Tcl_NewIntObj(text_xpix(&x->o, glist));
+    av[4] = Tcl_NewStringObj(buf, -1);
     Tcl_IncrRefCount(av[4]);
-    av[5] = Tcl_NewIntObj(text_ypix(&x->o, glist));
+    av[5] = Tcl_NewIntObj(text_xpix(&x->o, glist));
     Tcl_IncrRefCount(av[5]);
-    av[6] = Tcl_NewIntObj(vis);
+    av[6] = Tcl_NewIntObj(text_ypix(&x->o, glist));
     Tcl_IncrRefCount(av[6]);
-    int result = Tcl_EvalObjv(tcl_for_pd, 7, av, 0);
+    av[7] = Tcl_NewIntObj(vis);
+    Tcl_IncrRefCount(av[7]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 8, av, 0);
     if(result != TCL_OK) {
         tclpd_interp_error(x, result);
         goto error;
@@ -299,4 +318,5 @@ cleanup:
     Tcl_DecrRefCount(av[4]);
     Tcl_DecrRefCount(av[5]);
     Tcl_DecrRefCount(av[6]);
+    Tcl_DecrRefCount(av[7]);
 }
