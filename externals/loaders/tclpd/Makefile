@@ -19,7 +19,7 @@ EXAMPLES = bitmap-help.pd bitmap-madness.pd bitmap.tcl colorpicker.tcl dynreceiv
 MANUAL = 
 
 # tclpd-specific source files
-TCLPD_SOURCES = tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_typemap.c tcl_widgetbehavior.c
+TCLPD_SOURCES = hashtable.c tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_typemap.c tcl_widgetbehavior.c
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, test patches,

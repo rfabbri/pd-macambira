@@ -1,139 +1,31 @@
 #include "tcl_extras.h"
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "hashtable.h"
 
-#define CLASS_TABLE_SIZE (1 << 7)
-#define OBJECT_TABLE_SIZE (1 << 8)
+static hash_table_t* class_table = NULL;
+static hash_table_t* object_table = NULL;
 
-static inline uint32_t hash_str(const char *s)
-{
-	const unsigned char *p = (const unsigned char *)s;
-	uint32_t h = 5381;
+#define class_table_add(n, c) hashtable_add(class_table, n, (void*)c)
+#define class_table_remove(n) hashtable_remove(class_table, n)
+#define class_table_get(n) ((t_class*)hashtable_get(class_table, n))
 
-	while (*p) {
-		h *= 33;
-		h ^= *p++;
-	}
-
-	return h ^ (h >> 16);
-}
-
-typedef struct list_node
-{
-	const char* k;
-	void* v;
-	struct list_node* next;
-} list_node_t;
-
-static inline list_node_t* list_add(list_node_t* head, const char* k, void* v)
-{
-	list_node_t* n = (list_node_t*)malloc(sizeof(list_node_t));
-	n->next = head;
-	n->k = strdup(k);
-	n->v = v;
-	return n;
-}
-
-static inline list_node_t* list_remove(list_node_t* head, const char* k)
-{
-	list_node_t* tmp;
-
-	// head remove
-	while(head && strcmp(head->k, k) == 0)
-	{
-		tmp = head;
-		head = head->next;
-		free(tmp->k);
-		free(tmp);
-	}
-
-	list_node_t* p = head;
-
-	// normal (non-head) remove
-	while(p->next)
-	{
-		if(strcmp(p->next->k, k) == 0)
-		{
-			tmp = p->next;
-			p->next = p->next->next;
-			free(tmp);
-			continue;
-		}
-		p = p->next;
-	}
-
-	return head;
-}
-
-static inline void* list_get(list_node_t* head, const char* k)
-{
-	while(head)
-	{
-		if(strcmp(head->k, k) == 0)
-		{
-			return head->v;
-		}
-		head = head->next;
-	}
-#ifdef DEBUG
-	debug_print("list_get(%lx, %s) = NULL\n", head, k);
-#endif
-	return (void*)0;
-}
-
-static list_node_t* class_tbl[CLASS_TABLE_SIZE];
-static list_node_t* object_tbl[OBJECT_TABLE_SIZE];
-
-static inline void class_table_add(const char* name, t_class* c)
-{
-	uint32_t h = hash_str(name) % CLASS_TABLE_SIZE;
-	class_tbl[h] = list_add(class_tbl[h], name, (void*)c);
-}
-
-static inline void class_table_remove(const char* name)
-{
-	uint32_t h = hash_str(name) % CLASS_TABLE_SIZE;
-	class_tbl[h] = list_remove(class_tbl[h], name);
-}
-
-static inline t_class* class_table_get(const char* name)
-{
-	uint32_t h = hash_str(name) % CLASS_TABLE_SIZE;
-	return (t_class*)list_get(class_tbl[h], name);
-}
-
-static inline void object_table_add(const char* name, t_tcl* o)
-{
-	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
-	object_tbl[h] = list_add(object_tbl[h], name, (void*)o);
-}
-
-static inline void object_table_remove(const char* name)
-{
-	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
-	object_tbl[h] = list_remove(object_tbl[h], name);
-}
-
-static inline t_tcl* object_table_get(const char* name)
-{
-	uint32_t h = hash_str(name) % OBJECT_TABLE_SIZE;
-	return (t_pd*)list_get(object_tbl[h], name);
-}
+#define object_table_add(n, c) hashtable_add(object_table, n, (void*)c)
+#define object_table_remove(n) hashtable_remove(object_table, n)
+#define object_table_get(n) ((t_tcl*)hashtable_get(object_table, n))
 
 static unsigned long objectSequentialId = 0;
-
-static list_node_t* class_tbl[CLASS_TABLE_SIZE];
-static list_node_t* object_tbl[OBJECT_TABLE_SIZE];
 
 /* set up the class that handles loading of tcl classes */
 t_class* tclpd_class_new(const char* name, int flags) {
     t_class* c = class_new(gensym(name), (t_newmethod)tclpd_new,
         (t_method)tclpd_free, sizeof(t_tcl), flags, A_GIMME, A_NULL);
 
+    if(!class_table)
+        class_table = hashtable_new(1 << 7);
     if(!class_table_get(name))
-	    class_table_add(name, c);
+        class_table_add(name, c);
 
     class_addanything(c, tclpd_anything);
 
@@ -213,8 +105,10 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     Tcl_IncrRefCount(x->dispatcher);
 
     // store in object table (for later lookup)
+    if(!object_table)
+        object_table = hashtable_new(1 << 10);
     if(!object_table_get(so))
-	    object_table_add(so, x);
+        object_table_add(so, x);
 
     // build constructor command
     Tcl_Obj *av[ac+3]; InitArray(av, ac+3, NULL);
