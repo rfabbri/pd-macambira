@@ -58,12 +58,22 @@ void* list_get(list_node_t* head, const char* k) {
     return (void*)0;
 }
 
+size_t list_length(list_node_t* head) {
+    size_t length = 0;
+    while(head) {
+        length++;
+        head = head->next;
+    }
+    return length;
+}
+
 hash_table_t* hashtable_new(size_t size) {
     hash_table_t* ht = NULL;
     if(size > 0) {
         ht = (hash_table_t*)malloc(sizeof(hash_table_t));
         ht->sz = size;
         ht->t = (list_node_t**)malloc(sizeof(list_node_t*) * size);
+	for(int i = 0; i < size; i++) ht->t[i] = NULL;
     }
     return ht;
 }

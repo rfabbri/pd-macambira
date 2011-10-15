@@ -20,6 +20,7 @@ uint32_t hash_str(const char *s);
 list_node_t* list_add(list_node_t* head, const char* k, void* v);
 list_node_t* list_remove(list_node_t* head, const char* k);
 void* list_get(list_node_t* head, const char* k);
+size_t list_length(list_node_t* head);
 
 hash_table_t* hashtable_new(size_t size);
 void hash_table_free(hash_table_t* ht);
