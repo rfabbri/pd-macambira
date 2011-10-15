@@ -32,37 +32,28 @@ t_class* tclpd_class_new(const char* name, int flags) {
     // is this really necessary given that there is already a 'anything' handler?
     class_addmethod(c, (t_method)tclpd_loadbang, gensym("loadbang"), A_NULL);
     
-    // always set save function. it will call the default if
-    // none exists in tcl space.
-    class_setsavefn(c, tclpd_save);
-
-    // check if properties function exists in tcl space.
     char buf[80];
+    Tcl_Obj* res;
     int res_i;
+
+    // use properties function if exists in tcl space.
     snprintf(buf, 80, "llength [info procs ::%s::properties]", name);
     if(Tcl_Eval(tcl_for_pd, buf) == TCL_OK) {
-        Tcl_Obj* res = Tcl_GetObjResult(tcl_for_pd);
-        if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK) {
-            if(res_i) {
-                class_setpropertiesfn(c, tclpd_properties);
-            }
-#ifdef DEBUG
-            else {
-                post("tclpd_class_new: propertiesfn does not exist", buf);
-            }
-#endif
+        res = Tcl_GetObjResult(tcl_for_pd);
+        if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK && res_i > 0) {
+            class_setpropertiesfn(c, tclpd_properties);
         }
-#ifdef DEBUG
-        else {
-            post("tclpd_class_new: Tcl_GetIntFromObj returned an error");
+    }
+
+    // use save function if exists in tcl space.
+    snprintf(buf, 80, "llength [info procs ::%s::save]", name);
+    if(Tcl_Eval(tcl_for_pd, buf) == TCL_OK) {
+        res = Tcl_GetObjResult(tcl_for_pd);
+        if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK && res_i > 0) {
+            class_setsavefn(c, tclpd_save);
         }
-#endif
     }
-#ifdef DEBUG
-    else {
-        post("tclpd_class_new: [info procs] returned an error");
-    }
-#endif
+
     return c;
 }
 
