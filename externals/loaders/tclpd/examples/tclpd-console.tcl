@@ -13,26 +13,28 @@ proc tclpd-console::constructor {self} {
 
     sys_gui "set ::tclpd_console $self"
     sys_gui {
-        frame .pdwindow.tcl.tclpd -borderwidth 0
-        pack .pdwindow.tcl.tclpd -side bottom -fill x
-        label .pdwindow.tcl.tclpd.label -text [_ "TclPd:"] -anchor e
-        pack .pdwindow.tcl.tclpd.label -side left
-        entry .pdwindow.tcl.tclpd.entry -width 200 \
+        set w .pdwindow.tcl.tclpd
+        frame $w -borderwidth 0
+        pack $w -side bottom -fill x
+        label $w.label -text [_ "tclpd: "] -anchor e
+        pack $w.label -side left
+        entry $w.entry -width 200 \
             -exportselection 1 -insertwidth 2 -insertbackground blue \
-            -textvariable ::pdwindow::tclpdentry -font {$::font_family 12}
-        pack .pdwindow.tcl.tclpd.entry -side left -fill x
-        bind .pdwindow.tcl.tclpd.entry <$::modifier-Key-a> { %W selection range 0 end; break }
-        bind .pdwindow.tcl.tclpd.entry <Return> { ::pdsend "$::tclpd_console $::pdwindow::tclpdentry" }
-        bind .pdwindow.tcl.tclpd.entry <KeyRelease> { .pdwindow.tcl.tclpd.entry configure -background [lindex {#FFF0F0 #FFFFFF} [info complete $::pdwindow::tclpdentry]] }
-        bind .pdwindow.text <Key-Tab> { focus .pdwindow.tcl.tclpd.entry; break }
+            -textvariable ::tclpd_cmd -font {$::font_family 12}
+        pack $w.entry -side left -fill x
+        bind $w.entry <$::modifier-Key-a> "%W selection range 0 end; break"
+        bind $w.entry <Return> {::pdsend "$::tclpd_console $::tclpd_cmd"}
+        set bgrule {[lindex {#FFF0F0 #FFFFFF} [info complete $::tclpd_cmd]]}
+        bind $w.entry <KeyRelease> "$w.entry configure -background $bgrule"
+        bind .pdwindow.text <Key-Tab> "focus $w.entry; break"
     }
 }
 
 proc tclpd-console::destructor {self} {
     if {[set ::${self}_loaded]} {
-        pd_unbind [tclpd_get_instance_pd $self] [gensym $self]
+        sys_gui { destroy .pdwindow.tcl.tclpd ; unset ::tclpd_console }
 
-        sys_gui { destroy .pdwindow.tcl.tclpd }
+        pd_unbind [tclpd_get_instance_pd $self] [gensym $self]
     }
 
     unset ::tclpd_console_loaded
