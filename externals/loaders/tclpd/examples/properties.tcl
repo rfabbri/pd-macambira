@@ -9,6 +9,8 @@ proc propertieswindow {gfxstub_id {options {}} {title {}}} {
     set ::id($win.p) $gfxstub_id
     set ::optkeys($win.p) [list]
     foreach {k v} $options {
+        if {$v eq "empty"} {set v {}}
+        set v [string map {\\$ $} $v]
         set ::config($win.p:$k) $v
         lappend ::optkeys($win.p) $k
     }

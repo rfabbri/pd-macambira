@@ -86,7 +86,15 @@ proc+ slider2::0_loadbang {self} {
     if {[dict get $@config -init]} {0_bang $self}
 }
 
+proc+ slider2::0_printconfig {self args} {
+    if {[llength $args] == 0} {
+        pd::post $@config
+        return
+    }
+}
+
 proc+ slider2::0_config {self args} {
+    pd::post [info level 0]
     set newconf [list]
     set optlist [pd::strip_selectors $args]
     set optlist [pd::strip_empty $optlist]
@@ -192,11 +200,32 @@ proc+ slider2::0_float {self args} {
 }
 
 proc+ slider2::save {self} {
-    return [list #X obj $@x $@y slider2 {*}[pd::add_empty $@config] \;]
+    set c $@config
+
+    # use -sendsymbol and -receivesymbol from original binbuf, because of '$'
+    set c2 [pd::strip_selectors [lrange [pd::get_binbuf $self] 1 end]]
+    foreach opt {-sendsymbol -receivesymbol} {
+        dict set c $opt [dict get $c2 $opt]
+    }
+
+    set l [list #X obj $@x $@y slider2 {*}[pd::add_empty $c] \;]
+    return $l
 }
 
 proc+ slider2::properties {self} {
-    set c [string map {$ \\$} $@config]
+    set c $@config
+
+    # use -sendsymbol and -receivesymbol from original binbuf, because of '$'
+    set c2 [pd::strip_selectors [lrange [pd::get_binbuf $self] 1 end]]
+    foreach opt {-sendsymbol -receivesymbol} {
+        dict set c $opt [dict get $c2 $opt]
+    }
+
+    lappend c -foo
+    lappend c \$foo
+
+    pd::post gfxstub_new [tclpd_get_object_pd $self] [tclpd_get_instance $self] \
+        [list propertieswindow %s $c "\[slider2\] properties"]
     gfxstub_new [tclpd_get_object_pd $self] [tclpd_get_instance $self] \
         [list propertieswindow %s $c "\[slider2\] properties"]\n
 }
