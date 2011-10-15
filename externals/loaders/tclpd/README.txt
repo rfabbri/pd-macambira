@@ -3,14 +3,12 @@
  ==========
 
 This library allows to to write externals for Pd using the Tcl language.
-
-It is based on the standard API of PD (defined in m_pd.h, plus some other
-private header files, like g_canvas.h, s_stuff.h, ...).
+It wraps quite closely the pd API (m_pd.h, plus some private functions)
 
 Also a library of Tcl helper functions is provided. It is not mandatory to use
 it (moreover: it requires Tcl 8.5, while the tclpd external alone requires only
 Tcl 8.4), but it is a syntactic sugar and can simplify a lot the code.
-Using it is as simple as sourcing pdlib.tcl in your Tcl external.
+To use it simply add 'package require TclpdLib' in your Tcl external.
 
 Anyway, disregarding any approach chosen to develop Tcl externals, a general
 knowledge of Pd internals (atoms, symbols, symbol table, inlets, objects) is
@@ -37,40 +35,29 @@ pure-data).
  =====================
 
 Pd is split into two processes: pd (the core) and pd-gui.
-A simple pd external just runs in the core. A simple Tcl externals still runs
-in the core, because tclpd creates a Tcl interpreter for that.
+A pd external executes in the core. The same applies for a Tcl external loaded
+by tclpd, because tclpd creates a Tcl interpreter for that, running in the
+same process as pd.
 
-Instead, pd-gui has its own Tcl interpreter. In order to to GUI things (i.e.
-draw on the canvas, or react to mouse events), the core process needs to
-communicate with the pd-gui process (generally sending Tk commands, or calling
-procedures defined in the pd-gui interp.
-This is done with the sys_gui() function, if using the plain API.
-
-Also pdlib.tcl provide means to simplify this task, with the guiproc function,
-which defines procedures directly into the pd-gui interpreter.
-
-As a counterexample, I'd like to cite tot/toxy/widget externals, which you may
-be familiar with.
-Such externals run in the pd-gui process. That was fine for writing simple gui
-externals, that don't need to react to any message.
-But, for instance, you cannot do a metronome or anything which is timing
-accurate, or heavy IO, as that is not the purpose of the gui process.
-Tclpd instead, by running in the core process, allows that.
+On the gui side (pd-gui) there is another Tcl interpreter living in a separate
+process, which communicates with pd using a network socket.
+Communication happens in one way (pd to gui) with the sys_gui function, and in
+the other way using ::pdsend. (needs to set up a receiver using pdbind, check
+the examples).
 
 
  Data conversion between Tcl <=> Pd
  ==================================
 
-In pd exists 'atoms'. An atom is a float, a symbol, a list item, and such.
-Tcl does not have data types. In Tcl everything is a string, also numbers and
-lists. Just when something needs to be read as number, then evaluation comes
-in.
-This leads to loss of information about atom types. Imagine a
-symbol '456' comes into tclpd, you won't know anymore if "456"
-is a symbol or a float.
+In pd objects communicate using messages, and messages are made up of atoms.
+An atom could be a float, a symbol, a list, and so on.
+Tcl usually doesn't make distinction between strings and numbers. This means
+that simply translating a message text into a string could lose information
+about the atom type (to pd, symbol 456 is different from float 456, but if we
+just convert it as a string "456" the type information is lost).
 
-Here a little convention comes in: in tclpd an atom gets converted into a
-two-item list, where first item is atom type, and second item is its value.
+To maintain atom type infrmation, pd atoms are represented in Tcl as two
+element lists, where the first element indicates the atom type.
 
 Some examples of this conversion:
 
@@ -87,15 +74,7 @@ Some examples of this conversion:
  Examples
  ========
 
-I provided small examples.
-after loading pd with option '-lib tcl', just type the filename
-(minus the .tcl extension) to load the Tcl externals examples.
-
-actually there is one simple example: list_change (behaves like
-[change] object, but work with lists only)
-
-examples make use of pdlib.tcl. It's still possible to port the example to use
-only the plain Pd api. Contributions are welcome.
+Some examples externals are provided, including their helpfile.
 
 
  Authors

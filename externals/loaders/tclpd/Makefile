@@ -25,7 +25,7 @@ TCLPD_SOURCES = hashtable.c tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_typema
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = tcl.i tcl_extras.h pdlib.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS.txt TODO.txt
+EXTRA_DIST = tcl.i tcl_extras.h tclpd.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS.txt TODO.txt
 
 
 
@@ -312,7 +312,7 @@ single_install: $(LIBRARY_NAME) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_PROGRAM) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
-	$(INSTALL_DATA) pdlib.tcl  $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_DATA) tclpd.tcl  $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 ifeq ($(UNAME),Darwin)
 # force tclpd to use the Tcl.framework built into Pd-extended
 	install_name_tool -change \

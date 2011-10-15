@@ -122,7 +122,10 @@ namespace eval ::pd {
             } elseif {\$function == \"widgetbehavior\"} {
                 set subfunction \[lindex \$args 0\]
                 set argsr \[lrange \$args 1 end\]
-                uplevel \[linsert \$argsr 0 ::${classname}::\${function}_\${subfunction} \$self]
+                set f ::${classname}::\${function}_\${subfunction}
+                if {\[info procs \$f\] != {}} {
+                    uplevel \[linsert \$argsr 0 \$f \$self]
+                }
             } else {
                 uplevel \[linsert \$args 0 ::${classname}::\$function \$self\]
             }

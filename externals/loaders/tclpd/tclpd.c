@@ -25,7 +25,7 @@ void tclpd_setup(void) {
     t_class* foo_class = class_new(gensym("tclpd_init"), 0, 0, 0, 0, 0);
     char buf[PATH_MAX];
     
-    snprintf(buf, PATH_MAX, "%s/pdlib.tcl", foo_class->c_externdir->s_name);
+    snprintf(buf, PATH_MAX, "%s/tclpd.tcl", foo_class->c_externdir->s_name);
     if(Tcl_EvalFile(tcl_for_pd, buf) != TCL_OK) {
         error("tclpd loader: error loading %s", buf);
     }
