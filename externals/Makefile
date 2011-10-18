@@ -551,7 +551,7 @@ $(gem_src)/configure:
 
 $(gem_src)/Gem.dll: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
-		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		CXXFLAGS="-DHAVE_S_STUFF_H" \
 		--prefix=$(prefix) \
 		--libdir=$(objectsdir) \
 		--disable-rpath \
@@ -565,7 +565,7 @@ $(gem_src)/Gem.dll: $(gem_src)/configure
 
 $(gem_src)/Gem.pd_linux: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
-		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		CXXFLAGS="-DHAVE_S_STUFF_H" \
 		--prefix=$(prefix) \
 		--with-video=plugins \
 		--with-film=plugins \
@@ -574,7 +574,7 @@ $(gem_src)/Gem.pd_linux: $(gem_src)/configure
 
 $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
-		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		CXXFLAGS="-DHAVE_S_STUFF_H" \
 		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
 		--prefix=$(prefix) \
 		--libdir=$(objectsdir) \
