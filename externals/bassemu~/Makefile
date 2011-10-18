@@ -12,7 +12,7 @@ SOURCES = bassemu~.c
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = simple-sequencer.pd miniseq.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
