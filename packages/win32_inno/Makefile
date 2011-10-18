@@ -72,6 +72,9 @@ pd_install: build_pd
 #	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) bin
 #	-$(MAKE) -C $(pd_src)/src $(DEST_PATHS) install
 	$(MAKE) -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
+# make the Pd headers available in the standard locations
+	install -d $(DESTDIR)/include/pd
+	install -p $(DESTDIR)/include/pdextended/*.h $(DESTDIR)/include/pd
 # install notes.txt into the help browser
 	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
