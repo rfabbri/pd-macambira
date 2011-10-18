@@ -125,7 +125,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir loaders-pdlua loaders-tclpd log mapping markex maxlib mediasettings mjlib moocow moonlib motex mrpeach osc oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra flatgui freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir loaders-pdlua loaders-tclpd log mapping markex maxlib mediasettings mjlib moocow moonlib motex mrpeach osc oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -449,6 +449,20 @@ extra_install:
 
 extra_clean:
 	make -C $(externals_src)/extra clean
+
+
+#------------------------------------------------------------------------------#
+# FLATGUI
+flatgui:
+	make -C $(externals_src)/flatgui CFLAGS="$(CFLAGS)" \
+		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+
+flatgui_install:
+	make -C $(externals_src)/flatgui STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+flatgui_clean:
+	make -C $(externals_src)/flatgui clean
 
 
 #------------------------------------------------------------------------------#
