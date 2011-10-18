@@ -59,9 +59,11 @@
 	<key>loadlib26</key>
 	<string>ekext</string>
 	<key>loadlib27</key>
+	<string>flatgui</string>
+	<key>loadlib28</key>
 	<string>pdp</string>
 	<key>nloadlib</key>
-	<string>27</string>
+	<string>28</string>
 	<key>path1</key>
 	<string>/System/Library/Fonts</string>
 	<key>path2</key>

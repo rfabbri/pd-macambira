@@ -106,8 +106,8 @@ Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib2
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib24; ValueData: ggee; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib25; ValueData: iem_anything; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib26; ValueData: ekext; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: nloadlib; ValueData: 26; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib27; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib27; ValueData: flatgui; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: nloadlib; ValueData: 27; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib28; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib29; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib30; Flags: deletevalue; Tasks: libs

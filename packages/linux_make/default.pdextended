@@ -28,7 +28,8 @@ loadlib23: ext13
 loadlib24: ggee
 loadlib25: iem_anything
 loadlib26: ekext
-loadlib27: pdp
-nloadlib: 27
+loadlib27: flatgui
+loadlib28: pdp
+nloadlib: 28
 path1: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
 npath: 1
