@@ -1,16 +1,13 @@
-#N canvas 0 26 620 614 10;
-#X obj 78 223 sys_gui;
-#X msg 27 61 menu_doc_browser;
+#N canvas 196 22 620 614 10;
+#X obj 78 213 sys_gui;
 #X text 136 59 open the help browser;
 #X msg 51 93 set text_color #f0f;
 #X text 180 93 set variables;
-#X msg 81 120 bang;
+#X msg 91 140 bang;
 #X obj 304 115 colorpanel;
 #X obj 303 90 bng 17 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 333 89 choose a color;
-#X text 135 225 DANGER! You can mess up Pd big time with this!! :D
-;
 #N canvas 0 22 454 304 generate 0;
 #X obj 101 15 inlet;
 #X obj 103 275 outlet;
@@ -53,11 +50,11 @@
 #X text 24 257 You can find things to mess with by looking thru the
 Pd code \, look for things that have "sys_gui" and "sys_vgui". These
 are Tcl/Tk commands from the pd to the Pg GUI process.;
-#X obj 170 528 sys_gui;
-#X obj 317 425 loadbang;
-#X obj 317 447 canvas_name;
-#X msg 179 433 black;
-#X msg 136 433 green;
+#X obj 170 548 sys_gui;
+#X obj 257 405 loadbang;
+#X obj 317 467 canvas_name;
+#X msg 199 453 black;
+#X msg 156 453 green;
 #X obj 33 392 colorpanel;
 #N canvas 685 90 416 325 generate 0;
 #X obj 81 23 inlet;
@@ -93,12 +90,12 @@ are Tcl/Tk commands from the pd to the Pg GUI process.;
 #X obj 33 348 bng 35 250 50 0 empty empty empty 17 7 0 10 -204786 -1
 -1;
 #X text -29 325 change the highlight color:;
-#X msg 170 498 \$3 configure -highlightcolor \$1 -highlightthickness
+#X msg 170 518 \$3 configure -highlightcolor \$1 -highlightthickness
 \$2;
-#X obj 253 370 hsl 128 15 0 127 0 1 empty empty empty -2 -8 0 10 -262144
+#X obj 246 350 hsl 128 15 0 127 0 1 empty empty empty -2 -8 0 10 -262144
 -1 -1 500 1;
-#X obj 250 398 int;
-#X floatatom 282 398 5 0 0 0 - - -;
+#X obj 243 378 int;
+#X floatatom 275 378 5 0 0 0 - - -;
 #N canvas 1009 401 454 304 pak 0;
 #X obj 25 16 inlet;
 #X obj 167 15 inlet;
@@ -112,8 +109,7 @@ are Tcl/Tk commands from the pd to the Pg GUI process.;
 #X connect 4 0 3 0;
 #X connect 5 0 4 0;
 #X connect 5 1 4 1;
-#X restore 170 469 pd pak ------------------;
-#X obj 179 410 loadbang;
+#X restore 170 489 pd pak ------------------;
 #N canvas 280 175 494 344 META 0;
 #X text 12 65 PLATFORM windows macosx gnulinux;
 #X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
@@ -126,25 +122,37 @@ Wilkes for Pd version 0.42.;
 #X text 12 105 OUTLET_0;
 #X text 12 5 KEYWORDS control pd_op needs_work (outlet?);
 #X restore 512 562 pd META;
-#X text -24 17 This object gives you the ability to send raw Tcl directly
-to the Pd GUI process just like C objects do.;
-#X connect 1 0 0 0;
-#X connect 3 0 0 0;
-#X connect 5 0 0 0;
-#X connect 6 0 10 0;
-#X connect 7 0 6 0;
-#X connect 10 0 11 0;
-#X connect 11 0 0 0;
-#X connect 15 0 16 0;
-#X connect 16 0 27 2;
-#X connect 17 0 27 0;
-#X connect 18 0 27 0;
-#X connect 19 0 20 0;
-#X connect 20 0 27 0;
-#X connect 21 0 19 0;
-#X connect 23 0 14 0;
-#X connect 24 0 25 0;
-#X connect 24 0 26 0;
-#X connect 25 0 27 1;
-#X connect 27 0 23 0;
-#X connect 28 0 17 0;
+#X obj 78 236 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 257 427 trigger bang bang;
+#X text 99 236 <-- bang when command finished;
+#X text 135 215 DANGER! You can crash Pd with this!! :D;
+#X msg 27 61 menu_helpbrowser;
+#X text -24 17 This object gives you the ability to send raw Tcl commands
+directly to the 'pd-gui' process just like GUI objects do.;
+#X text 127 139 run previous command;
+#X obj 170 572 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X connect 0 0 27 0;
+#X connect 2 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 8 0;
+#X connect 6 0 5 0;
+#X connect 8 0 9 0;
+#X connect 9 0 0 0;
+#X connect 12 0 34 0;
+#X connect 13 0 28 0;
+#X connect 14 0 25 2;
+#X connect 15 0 25 0;
+#X connect 16 0 25 0;
+#X connect 17 0 18 0;
+#X connect 18 0 25 0;
+#X connect 19 0 17 0;
+#X connect 21 0 12 0;
+#X connect 22 0 23 0;
+#X connect 22 0 24 0;
+#X connect 23 0 25 1;
+#X connect 25 0 21 0;
+#X connect 28 0 15 0;
+#X connect 28 1 14 0;
+#X connect 31 0 0 0;
