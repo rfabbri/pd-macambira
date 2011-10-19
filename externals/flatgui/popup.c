@@ -55,6 +55,9 @@ typedef struct _popup
      t_symbol** x_options;
      int        x_maxoptions;
 
+    /* IDs for Tk widgets */
+    char *canvas_id;  
+
      int initialized; /* 1 when we are allowed to draw, 0 otherwise */
      int x_disabled; /* when disabled, graphical chosing is prohibited */
 } t_popup;
@@ -64,6 +67,40 @@ typedef struct _popup
 /* Append " x " to the following line to show debugging messages */
 #define DEBUG(x)
 
+
+/* widget helper functions */
+static void set_tk_widget_ids(t_popup *x, t_canvas *canvas)
+{
+    char buf[MAXPDSTRING];
+
+    /* Tk ID for the current canvas that this object is drawn in */
+    sprintf(buf,".x%lx.c", (long unsigned int) canvas);
+    x->canvas_id = getbytes(strlen(buf) + 1);
+    strcpy(x->canvas_id, buf);
+}
+
+static void bind_button_events(t_popup *x)
+{
+    /* mouse buttons */
+    sys_vgui("bind %s.s%lx <Button> {pdtk_canvas_mouse %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 0}\n",
+             x->canvas_id, x, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s.s%lx <ButtonRelease> {pdtk_canvas_mouseup %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->canvas_id, x, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s.s%lx <Shift-Button> {pdtk_canvas_mouse %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 1}\n",
+             x->canvas_id, x, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s.s%lx <Button-2> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->canvas_id, x, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s.s%lx <Button-3> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->canvas_id, x, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s.s%lx <$::modifier-Button> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->canvas_id, x, x->canvas_id, x->canvas_id, x->canvas_id);
+}
 
 static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int nout)
 {
@@ -166,7 +203,8 @@ static void create_widget(t_popup *x, t_glist *glist)
                    canvas, x, x->x_options[i]->s_name, canvas, x, x->x_options[i]->s_name, x, i);
         }
     }
-
+  set_tk_widget_ids(x, canvas);
+  bind_button_events(x);
   DEBUG(post("id: .x%lx.c.s%lx", canvas, x);)
   DEBUG(post("create_widget end");)
 }
