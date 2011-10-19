@@ -116,7 +116,7 @@ static void imagebang_drawme(t_imagebang *x, t_glist *glist, int firsttime) {
 			text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x->image_a,x->image_b,x);
 	  
 	  
-	   sys_vgui("pd [concat %s _imagesize [image width %x_imagebang] [image height %x_imagebang] \\;]\n",x->receive->s_name,x->image_a,x->image_a);
+	   sys_vgui("pdsend \"%s _imagesize [image width %x_imagebang] [image height %x_imagebang]\"\n",x->receive->s_name,x->image_a,x->image_a);
 	   
 	   
      } else {
@@ -239,14 +239,14 @@ static void imagebang_free(t_imagebang *x) {
 	
 	// check first if variable has been unset and image is unused
     // then delete image and unset variable
-     DEBUG(sys_vgui("pd [concat DEBUG b in use [image inuse %x_imagebang] \\;]\n",x->image_b);)
-     DEBUG(sys_vgui("pd [concat DEBUG a in use [image inuse %x_imagebang] \\;]\n",x->image_a);)
+     DEBUG(sys_vgui("pdsend \"DEBUG b in use [image inuse %x_imagebang]\"\n",x->image_b);)
+     DEBUG(sys_vgui("pdsend \"DEBUG a in use [image inuse %x_imagebang]\"\n",x->image_a);)
     
     sys_vgui("if { [info exists %x_imagebang] == 1 && [image inuse %x_imagebang] == 0} { image delete %x_imagebang \n unset %x_imagebang\n} \n",x->image_b,x->image_b,x->image_b,x->image_b);
     sys_vgui("if { [info exists %x_imagebang] == 1 && [image inuse %x_imagebang] == 0} { image delete %x_imagebang \n unset %x_imagebang\n} \n",x->image_a,x->image_a,x->image_a,x->image_a);
     
-    DEBUG(sys_vgui("pd [concat DEBUG b exists [info exists %x_imagebang] \\;]\n",x->image_b);)
-     DEBUG(sys_vgui("pd [concat DEBUG a exists [info exists %x_imagebang] \\;]\n",x->image_a);)
+    DEBUG(sys_vgui("pdsend \"DEBUG b exists [info exists %x_imagebang] \"\n",x->image_b);)
+     DEBUG(sys_vgui("pdsend \"DEBUG a exists [info exists %x_imagebang] \"\n",x->image_a);)
     
     if (x->receive) {
 		pd_unbind(&x->x_obj.ob_pd,x->receive);
@@ -290,7 +290,7 @@ static void *imagebang_new(t_symbol *s, int argc, t_atom *argv)
 			//sys_vgui("set %x_a \"%s\" \n",x,fname);
 			// Create the image only if the class has not already loaded the same image (with the same symbolic path name)
 			sys_vgui("if { [info exists %x_imagebang] == 0 } { image create photo %x_imagebang -file \"%s\"\n set %x_imagebang 1\n} \n",x->image_a,x->image_a,fname,x->image_a); 
-		    //sys_vgui("pd [concat test %x_imagebang \\;]\n",x->image_a);
+		    //sys_vgui("pdsend {test %x_imagebang}\n",x->image_a);
 		} else {
 			post("Oups... [imagebang] could not find \"%s\"",image_a->s_name);
 		}
@@ -305,7 +305,7 @@ static void *imagebang_new(t_symbol *s, int argc, t_atom *argv)
 			x->image_b = gensym(fname);
 			//sys_vgui("set %x_b \"%s\" \n",x,fname);
 			sys_vgui("if { [info exists %x_imagebang] == 0} { image create photo %x_imagebang -file \"%s\"\n set %x_imagebang 1\n} \n",x->image_b,x->image_b,fname,x->image_b);
-			//sys_vgui("pd [concat test %x_imagebang \\;]\n",x->image_b);
+			//sys_vgui("pdsend {test %x_imagebang}\n",x->image_b);
 		} else {
 			post("Oups... [imagebang] could not find \"%s\"",image_b->s_name);
 		}

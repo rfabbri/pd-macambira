@@ -325,8 +325,8 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
       pd_bind(&x->x_obj.ob_pd, x->callback);
 
       /* define proc in tcl/tk where "pmenu%p" is the receive, "callback" is the method, and "$index" is an argument. */
-    //sys_vgui("proc select%x {index} {\n pd [concat pmenu%p callback $index \\;]\n }\n",x,x); 
-    sys_vgui("proc select%x {index} {\n pd [concat %s callback $index \\;]\n }\n",x,pmenu_buffer); 
+    //sys_vgui("proc select%x {index} {\n pdsend \"pmenu%p callback $index \"\n }\n",x,x); 
+    sys_vgui("proc select%x {index} {\n pdsend \"%s callback $index \"\n }\n",x,pmenu_buffer); 
 
     x->outlet1 = outlet_new(&x->x_obj, &s_float);
 	x->outlet2 = outlet_new(&x->x_obj, &s_list);

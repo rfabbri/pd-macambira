@@ -78,7 +78,7 @@ void folderpanel_setup(void)
 	sys_gui("proc tof_folderpanel {target} {\n");
 	sys_gui("  set path [tk_chooseDirectory] \n");
 	sys_gui(" if {$path != \"\"} {\n");
-	sys_gui("  pd [concat $target callback [pdtk_enquote $path]] \\;\n");
+	sys_gui("  pdsend \"$target callback [pdtk_enquote $path]\"\n");
 	sys_gui(" }\n");
 	sys_gui("}\n");
 

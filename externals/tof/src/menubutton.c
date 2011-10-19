@@ -474,7 +474,7 @@ static void *menubutton_new(t_symbol *s, int argc, t_atom *argv)
       pd_bind(&x->x_obj.ob_pd, x->x_sym);
 
       /* define proc in tcl/tk where "menubutton%p" is the receive, "callback" is the method, and "$index" is an argument. */
-    sys_vgui("proc select%x {index} {\n pd [concat menubutton%p callback $index \\;]\n }\n",x,x); 
+    sys_vgui("proc select%x {index} {\n pdsend \"menubutton%p callback $index \"\n }\n",x,x); 
 
 
     outlet_new(&x->x_obj, &s_symbol);

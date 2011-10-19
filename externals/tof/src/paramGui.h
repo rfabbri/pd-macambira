@@ -351,7 +351,7 @@ static void paramGui_bang(t_paramGui *x) {
             // query for the mouse pointers position 
             // one it is received, build the canvas 
             x->waiting = 1;
-			sys_vgui("pd [concat %s motion [winfo pointerxy .] \\;]\n",x->receive->s_name);
+			sys_vgui("pdsend \"%s motion [winfo pointerxy .] \"\n",x->receive->s_name);
         } else {
 			// Show canvas
 			t_atom a;
