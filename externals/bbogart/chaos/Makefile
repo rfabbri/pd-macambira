@@ -6,7 +6,7 @@ LIBRARY_NAME = chaos
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
-SOURCES = attract1.c base3.c base.c chaos.c dejong.c gingerbreadman.c henon.c hopalong.c ikeda.c latoocarfian.c latoomutalpha.c latoomutbeta.c latoomutgamma.c logistic.c lorenz.c lotka_volterra.c martin.c mlogistic.c pickover.c popcorn.c quadruptwo.c rossler.c standardmap.c strange1.c tent.c three_d.c threeply.c tinkerbell.c unity.c
+SOURCES = attract1.c base3.c base.c dejong.c gingerbreadman.c henon.c hopalong.c ikeda.c latoocarfian.c latoomutalpha.c latoomutbeta.c latoomutgamma.c logistic.c lorenz.c lotkavolterra.c martin.c mlogistic.c pickover.c popcorn.c quadruptwo.c rossler.c standardmap.c strange1.c tent.c three_d.c threeply.c tinkerbell.c unity.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
