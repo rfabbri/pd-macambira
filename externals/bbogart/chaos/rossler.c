@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include "lyapunov.h"
+#include "chaos.h"
 
 #define M_h_lo -1000
 #define M_h_hi 1000

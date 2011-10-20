@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include "lyapunov.h"
+#include "chaos.h"
 
 #define M_a0_lo -2
 #define M_a0_hi 2

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include "lyapunov.h"
+#include "chaos.h"
 
 #define LY_ITERATIONS 50000
 

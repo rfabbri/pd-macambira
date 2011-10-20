@@ -1,5 +1,5 @@
 /*
- a test file for lyapunov.h
+ a test file for chaos.h
  */
 
 #ifndef PD_VERSION
