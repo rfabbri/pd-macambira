@@ -29,9 +29,9 @@ Windows Registry Editor Version 5.00
 "loadlib25"="iem_anything"
 "loadlib26"="ekext"
 "loadlib27"="flatgui"
-"nloadlib"=27
+"loadlib28"="chaos"
+"nloadlib"=28
 ; delete any previous loadlib flags
-"loadlib28"=-
 "loadlib29"=-
 "loadlib30"=-
 "loadlib31"=-
