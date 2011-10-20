@@ -12,7 +12,7 @@
 #X floatatom 408 399 10 0 0 0 Z - -;
 #X text 20 18 Pickover Attractor;
 #X text 19 33 Chaos PD Externals - Copyright Ben Bogart 2002;
-#X obj 20 62 readme-fractals;
+#X obj 20 62 examples/readme-fractals;
 #X obj 318 318 pickover 0.1 0 0 0.02 10 28 2.66667;
 #X text 550 194 Modify parameters;
 #X msg 363 162 reset;

@@ -1,4 +1,5 @@
 #N canvas 39 41 1031 669 10;
+#X declare -lib chaos;
 #X msg 471 344 show;
 #X msg 470 295 seed;
 #X msg 470 314 seed number;
@@ -60,7 +61,7 @@ for each param in the fractal equation.;
 #X text 32 238 This example creates a 'latoocarfian' fractal with the
 class defaults. When a search is performed \, the initial state for
 the variables are set to the class defaults.;
-#X obj 131 14 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144 -1
+#X obj 131 14 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X floatatom 166 211 10 0 0 0 X - -;
 #X floatatom 185 194 10 0 0 1 Y - -;
@@ -99,3 +100,4 @@ is returned when you use the 'show' message.;
 #X text 18 154 Search Outlet 0:;
 #X text 18 227 Search Outlet 1: list of current variables;
 #X text 18 243 Search Outlet 2: list of parameter set;
+#X obj 926 9 import chaos;

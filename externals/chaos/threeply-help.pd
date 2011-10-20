@@ -8,7 +8,7 @@
 #X obj 44 132 metro 50;
 #X obj 19 131 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 242 104 readme-fractals;
+#X obj 242 104 examples/readme-fractals;
 #X msg 87 245 search;
 #X text 138 246 Find a random attractor set;
 #X msg 98 266 show;

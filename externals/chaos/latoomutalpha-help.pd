@@ -16,7 +16,7 @@
 #X obj 43 151 metro 50;
 #X obj 18 150 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 25 83 readme-fractals;
+#X obj 25 83 examples/readme-fractals;
 #X obj 43 347 latoomutalpha 0.1 0.1 -2.90515 -2.03043 1.44055 0.70307
 ;
 #X obj 289 374 search-tools;

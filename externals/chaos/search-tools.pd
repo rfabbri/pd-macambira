@@ -144,8 +144,8 @@
 #X text 174 373 Param 1;
 #X text 174 393 Param 2;
 #X text 174 413 Param 3;
-#X obj 188 164 readme-lyapunov;
-#X obj 171 29 readme-searching;
+#X obj 188 164 examples/readme-lyapunov;
+#X obj 171 29 examples/readme-searching;
 #X obj -14 431 nbx 5 17 -1e+37 1e+37 0 0 empty \$0-v4 empty 0 -6 577
 10 -262144 -1 -1 0 256;
 #X obj -14 451 nbx 5 17 -1e+37 1e+37 0 0 empty \$0-v5 empty 0 -6 577

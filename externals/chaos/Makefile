@@ -10,10 +10,10 @@ SOURCES = attract1.c base3.c base.c dejong.c gingerbreadman.c henon.c hopalong.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = 
+PDOBJECTS = fractal-tools.pd search-tools.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = fractal-tools.pd loop.pd martin-test-help.pd popcorn-test-help.pd quaruptwo-test-help.pd readme-frac-format.pd readme-fractals.pd readme-gen-fractal.pd readme-lyapunov.pd readme-operation.pd readme-parameter-ranges.pd readme-searching.pd search-tools.pd
+EXAMPLES = loop.pd martin-test-help.pd popcorn-test-help.pd quaruptwo-test-help.pd readme-frac-format.pd readme-fractals.pd readme-gen-fractal.pd readme-lyapunov.pd readme-operation.pd readme-parameter-ranges.pd readme-searching.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 

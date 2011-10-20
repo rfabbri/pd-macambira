@@ -13,7 +13,7 @@
 #X obj 43 151 metro 50;
 #X obj 13 150 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 25 83 readme-fractals;
+#X obj 25 83 examples/readme-fractals;
 #X msg 95 226 param 2.35155;
 #X obj 43 347 quadruptwo 0.1 0 2.35155;
 #X text 98 441 This fractal seems to allow is sole parameter to range

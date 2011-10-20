@@ -8,7 +8,7 @@
 #X obj 44 132 metro 50;
 #X obj 19 131 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144 -1
 -1;
-#X obj 242 104 readme-fractals;
+#X obj 242 104 examples/readme-fractals;
 #X msg 113 272 show;
 #X msg 76 156 reset;
 #X text 120 156 Reset to initial state from creation arguments;
