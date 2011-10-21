@@ -10,7 +10,7 @@ SOURCES = httpreceive.c httpreq.c tcpclient.c tcpreceive.c tcpsend.c tcpserver.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = 
+PDOBJECTS = tcpsocket.FUDI.pd tcpsocket.OSC.pd tcpsocketserver.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = test.txt
