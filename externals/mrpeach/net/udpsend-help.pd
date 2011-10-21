@@ -8,7 +8,7 @@
 #X text 227 445 Used in conjunction with packOSC will send OSC over
 udp;
 #X obj 455 395 udpsend;
-#X msg 61 -19 send ../doc/5.reference/test.txt;
+#X msg 61 -19 send examples/test.txt;
 #X obj 131 27 openpanel;
 #X msg 131 51 send \$1;
 #X obj 131 8 bng 15 250 50 0 empty empty empty 17 7 0 10 -24198 -241291

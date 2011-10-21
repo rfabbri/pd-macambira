@@ -31,7 +31,7 @@ on;
 #X text 347 -55 tcpclient can connect to a server and send and receive
 messages as lists of bytes. Any integer value between 0 and 255 can
 be transmitted or received.;
-#X msg -63 105 send ../doc/5.reference/test.txt;
+#X msg -63 105 send examples/test.txt;
 #X obj -15 129 openpanel;
 #X msg -15 153 send \$1;
 #X obj -101 114 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -13381

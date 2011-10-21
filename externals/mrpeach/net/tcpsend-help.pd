@@ -9,7 +9,7 @@
 #X text 8 7 tcpsend sends bytes over a tcp connection.;
 #X text 8 30 Used in conjunction with packOSC will send OSC over tcp
 ;
-#X msg 50 106 send ../doc/5.reference/test.txt;
+#X msg 50 106 send examples/test.txt;
 #X obj 385 144 openpanel;
 #X msg 385 168 send \$1;
 #X obj 385 125 bng 15 250 50 0 empty empty empty 17 7 0 10 -24198 -241291
