@@ -303,6 +303,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
                 if (noPath)
                 { // just a list starting with a symbol
                   // The special symbol is s
+                  if (x->x_verbosity) post("routeOSC_doanything _1_(%p): (%d) noPath: s is \"%s\"", x, i, s->s_name);
                   outlet_anything(x->x_outlets[i], s, argc, argv);
                 }
                 else // normal OSC path
@@ -310,11 +311,13 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
                     // I hate stupid Max lists with a special first element
                     if (argc == 0)
                     {
+                        if (x->x_verbosity) post("routeOSC_doanything _2_(%p): (%d) no args", x, i);
                         outlet_bang(x->x_outlets[i]);
                     }
                     else if (argv[0].a_type == A_SYMBOL)
                     {
                         // Promote the symbol that was argv[0] to the special symbol
+                        if (x->x_verbosity) post("routeOSC_doanything _3_(%p): (%d) symbol: is \"%s\"", x, i, argv[0].a_w.w_symbol->s_name);
                         outlet_anything(x->x_outlets[i], argv[0].a_w.w_symbol, argc-1, argv+1);
                     }
                     else if (argc > 1)
@@ -322,6 +325,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
                         // Multiple arguments starting with a number, so naturally we have
                         // to use a special function to output this "list", since it's what
                         // Max originally meant by "list".
+                        if (x->x_verbosity) post("routeOSC_doanything _4_(%p): (%d) list:", x, i);
                         outlet_list(x->x_outlets[i], 0L, argc, argv);
                     }
                     else
@@ -330,6 +334,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
                         // not as a list
                         if (argv[0].a_type == A_FLOAT)
                         {
+                            if (x->x_verbosity) post("routeOSC_doanything _5_(%p): (%d) a single float", x, i);
                             outlet_float(x->x_outlets[i], argv[0].a_w.w_float);
                         }
                         else
@@ -357,17 +362,34 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
             {
                 StrCopyUntilNthSlash(patternBegin, pattern+1, x->x_prefix_depth[i]);
                 if (x->x_verbosity)
-                    post("routeOSC_doanything(%p): (%d) patternBegin is %s", x, i, patternBegin);
+                    post("routeOSC_doanything _6_(%p): (%d) patternBegin is %s", x, i, patternBegin);
                 if (MyPatternMatch(patternBegin, x->x_prefixes[i]+1))
                 {
                     if (x->x_verbosity)
-                        post("routeOSC_doanything(%p): (%d) matched %s depth %d", x, i, x->x_prefixes[i], x->x_prefix_depth[i]);
+                        post("routeOSC_doanything _7_(%p): (%d) matched %s depth %d", x, i, x->x_prefixes[i], x->x_prefix_depth[i]);
                     ++matchedAnything;
                     nextSlash = NthSlashOrNull(pattern+1, x->x_prefix_depth[i]);
                     if (x->x_verbosity)
-                        post("routeOSC_doanything(%p): (%d) nextSlash %s", x, i, nextSlash);
-                    if (restOfPattern == 0) restOfPattern = gensym(nextSlash);
-                    outlet_anything(x->x_outlets[i], restOfPattern, argc, argv);
+                        post("routeOSC_doanything _8_(%p): (%d) nextSlash %s [%d]", x, i, nextSlash, nextSlash[0]);
+                    if (*nextSlash != '\0')
+                    {
+                        if (x->x_verbosity) post("routeOSC_doanything _9_(%p): (%d) more pattern", x, i);
+                        restOfPattern = gensym(nextSlash);
+                        outlet_anything(x->x_outlets[i], restOfPattern, argc, argv);
+                    }
+                    else if (argc == 0)
+                    {
+                        if (x->x_verbosity) post("routeOSC_doanything _10_(%p): (%d) no more pattern, no args", x, i);
+                        outlet_bang(x->x_outlets[i]);
+                    }
+                    else
+                    {
+                        if (x->x_verbosity) post("routeOSC_doanything _11_(%p): (%d) no more pattern, %d args", x, i, argc);
+                        if (argv[0].a_type == A_SYMBOL) // Promote the symbol that was argv[0] to the special symbol
+                            outlet_anything(x->x_outlets[i], argv[0].a_w.w_symbol, argc-1, argv+1);
+                        else
+                            outlet_anything(x->x_outlets[i], gensym("list"), argc, argv);
+                    }
                 }
             }
         }
@@ -376,6 +398,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
     if (!matchedAnything)
     {
         // output unmatched data on rightmost outlet a la normal 'route' object, jdl 20020908
+        if (x->x_verbosity) post("routeOSC_doanything _13_(%p) unmatched %d, %d args", x, i, argc);
         outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
     }
 }
