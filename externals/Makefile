@@ -125,7 +125,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor chaos comport creb cw_binaural cxc cyclone earplug ekext ext13 extra flatgui freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir loaders-pdlua loaders-tclpd log mapping markex maxlib mediasettings mjlib moocow moonlib motex mrpeach osc oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor chaos comport creb cw_binaural cxc cyclone earplug ekext ext13 extra flatgui freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir loaders-pdlua loaders-tclpd log mapping markex maxlib mediasettings mjlib moocow moonlib motex mrpeach net osc oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1260,6 +1260,19 @@ mrpeach_clean:
 	-rm -f -- $(MRPEACH_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/mrpeach/*.bak
 	-rm -f -- $(externals_src)/mrpeach/*.*~
+
+
+#------------------------------------------------------------------------------#
+# NET
+net:
+	make -C $(externals_src)/mrpeach/net PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+
+net_install:
+	make -C $(externals_src)/mrpeach/net STRIP="$(STRIP)" \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+net_clean:
+	make -C $(externals_src)/mrpeach/net clean
 
 
 #------------------------------------------------------------------------------#
