@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <pthread.h>
-#if defined(UNIX) || defined(unix)
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
