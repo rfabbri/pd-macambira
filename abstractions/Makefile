@@ -36,7 +36,7 @@ all:
 final_setup:
 	chmod -R ugo-w $(pddocdir)
 
-install: all $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
+install: all $(objectsdir) \
 $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "abstractions install succeeded!"
@@ -110,9 +110,6 @@ la-kitchen_install:
 		--description "a collection of objects working with sensors"
 	install -p $(abstractions_src)/La-kitchen/*-help.pd \
 		 $(DESTDIR)$(objectsdir)/$(LA-KITCHEN_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(LA-KITCHEN_NAME)
-#	install -p $(abstractions_src)/La-kitchen/doc/*.* \
-#		 $(DESTDIR)$(manualsdir)/$(LA-KITCHEN_NAME)
 	install -p $(abstractions_src)/La-kitchen/readme.txt \
 		$(DESTDIR)$(objectsdir)/$(LA_KITCHEN_NAME)/README.txt
 
@@ -128,15 +125,9 @@ memento_install:
 		--author "Frank Barknecht" \
 		--license "GNU GPL" \
 		--description "a collection of objects for managing state saving"
-	install -d $(DESTDIR)$(manualsdir)/$(MEMENTO_NAME)
-	install -p $(abstractions_src)/rradical/memento/tutorial/*.* \
-		$(DESTDIR)$(manualsdir)/$(MEMENTO_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/manual
 	install -p $(abstractions_src)/rradical/memento/tutorial/*.* \
 		$(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/manual
-	install -d $(DESTDIR)$(examplesdir)/$(MEMENTO_NAME)
-	install -p $(abstractions_src)/rradical/memento/examples/*.* \
-		$(DESTDIR)$(examplesdir)/$(MEMENTO_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/examples
 	install -p $(abstractions_src)/rradical/memento/examples/*.* \
 		$(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/examples
@@ -185,22 +176,22 @@ mtl_install:
 		--description "(Pure Data) Montreal Abstractions"
 	install -p $(shell ls -1 $(abstractions_src)/$(MTL_NAME)/*.pd | \
 		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(MTL_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+		$(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/browser.pd \
-		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+		$(DESTDIR)$(objectsdir)/$(MTL_NAME)
 #	install -p $(abstractions_src)/$(MTL_NAME)/1.mtlBrowser.pd \
-#		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+#		$(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
 		$(DESTDIR)$(objectsdir)/$(MTL_NAME)		
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
-		$(DESTDIR)$(helpdir)/$(MTL_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(MTL_NAME)
+		$(DESTDIR)$(objectsdir)/$(MTL_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(MTL_NAME)/examples
 	install -p $(abstractions_src)/$(MTL_NAME)/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(MTL_NAME)
+		$(DESTDIR)$(objectsdir)/$(MTL_NAME)/examples
 
 
 #-------------------------------------------------------------------------------
@@ -214,9 +205,8 @@ pdsvn_install:
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "objects for interacting with Subversion from within Pd patches (experimental, but usable)"
-	install -d $(DESTDIR)$(helpdir)/$(PDSVN_NAME)
 	install -p $(abstractions_src)/sfruit/pdsvn/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(PDSVN_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDSVN_NAME)
 
 #-------------------------------------------------------------------------------
 # pixeltango
@@ -235,14 +225,9 @@ pixeltango_install:
 		--description "objects for creating visuals in a live performance setting"
 	install -p $(abstractions_src)/pixelTANGO/help/*.* \
 		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(PIXELTANGO_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/Example-Patches/*.* \
-		$(DESTDIR)$(examplesdir)/$(PIXELTANGO_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
-	install -p $(abstractions_src)/pixelTANGO/*.txt \
-		$(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
-	install -p $(abstractions_src)/pixelTANGO/dev-notes/*.txt \
-		$(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
+		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/manual
 	install -p $(abstractions_src)/pixelTANGO/*.txt \
 		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/manual
@@ -257,10 +242,6 @@ pixeltango_clean:
 	-rmdir -- $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/fx
 	-rm -f -- $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/*.*
 	-rmdir -- $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)
-	-rm -f -- $(DESTDIR)$(examplesdir)/$(PIXELTANGO_NAME)/*.*
-	-rmdir -- $(DESTDIR)$(examplesdir)/$(PIXELTANGO_NAME)
-	-rm -f -- $(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)/*.*
-	-rmdir -- $(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
 
 
 #------------------------------------------------------------------------------#
@@ -294,18 +275,18 @@ rradical_install:
 		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/*/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/usecases/*.* \
-		$(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)/showcase
+		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)/showcase
 	install -p $(abstractions_src)/rradical/usecases/showcase/*.* \
-		$(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)/showcase
-	install -d $(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)/showcase/impl
+		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)/showcase
+	install -d $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)/showcase/impl
 	install -p $(abstractions_src)/rradical/usecases/showcase/impl/*.* \
-		$(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)/showcase/impl
-	install -d $(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)/showcase/songs
+		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)/showcase/impl
+	install -d $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)/showcase/songs
 	install -p $(abstractions_src)/rradical/usecases/showcase/songs/*.* \
-		$(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)/showcase/songs
+		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)/showcase/songs
 
 #-------------------------------------------------------------------------------
 # rtc-lib
@@ -351,12 +332,6 @@ timestretch_install:
 		--description "" \
 		--license "" \
 		--version "" 
-#	install -d $(DESTDIR)$(manualsdir)/$(TIMESTRETCH_NAME)
-#	install -p $(abstractions_src)/timestretch/doc/*.txt \
-#		 $(DESTDIR)$(manualsdir)/$(TIMESTRETCH_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(abstractions_src)/timestretch/README \
-#		$(DESTDIR)$(readmesdir)/$(TIMESTRETCH_NAME).txt
 
 
 
@@ -376,9 +351,8 @@ pd-wavelet_install:
 		--description "manipulation of audio in the wavelet domain" \
 		--license "GNU GPL v2" \
 		--version "" 
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(abstractions_src)/pd-wavelet/README.txt \
-		$(DESTDIR)$(readmesdir)/$(PDWAVELET_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)/
 
 
 #==============================================================================#
@@ -434,6 +408,3 @@ test_locations:
 	@echo "PDDOCDIR  $(pddocdir)"
 	@echo "LIBPDDIR  $(libpddir)"
 	@echo "LIBPDBINDIR  $(libpdbindir)"
-	@echo "HELPDIR  $(helpdir)"
-	@echo "MANUALSDIR  $(manualsdir)"
-	@echo "EXAMPLESDIR  $(examplesdir)"
