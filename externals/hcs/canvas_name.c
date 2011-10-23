@@ -3,8 +3,6 @@
 #include <m_pd.h>
 #include "g_canvas.h"
 
-/* TODO make the query level settable by 2nd inlet */
-
 #define DEBUG(x)
 
 static t_class *canvas_name_class;
