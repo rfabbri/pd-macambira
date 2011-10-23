@@ -27,7 +27,7 @@ save and reopen.;
 #X msg 52 432 12;
 #X msg 20 431 9;
 #X msg 85 429 98;
-#X obj 148 31 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/text.htm
+#X obj 148 31 pddp/pddplink http://tcl.tk/man/tcl8.5/TkCmd/text.htm
 ;
 #X obj 395 132 entry 300 50 grey70 black;
 #X msg 571 101 option relief \$1;
@@ -49,7 +49,7 @@ save and reopen.;
 -1 -1 0 1;
 #X obj 263 509 entry 100 50 grey70 black;
 #X obj 262 464 symbol;
-#X obj 210 559 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
+#X obj 210 559 pddp/pddplink http://tcl.tk/man/tcl8.5/TkCmd/cursors.htm
 ;
 #X msg 260 429 boat;
 #X msg 263 485 option cursor \$1;
@@ -76,7 +76,7 @@ save and reopen.;
 #X text 561 393 type single chars:;
 #X msg 656 442 key a;
 #X msg 657 464 key 9;
-#X obj 500 559 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
+#X obj 500 559 pddp/pddplink http://tcl.tk/man/tcl8.5/TkCmd/cursors.htm
 ;
 #X text 367 538 for more cursors:;
 #X text 551 544 for more keynums:;
