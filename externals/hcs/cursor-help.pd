@@ -1,5 +1,5 @@
 #N canvas 0 31 659 523 10;
-#X obj 388 293 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
+#X obj 388 293 pddp/pddplink http://tcl.tk/man/tcl8.5/TkCmd/cursors.htm
 ;
 #X text 273 276 Here's a complete list of the available cursors:;
 #X msg 441 124 dot;
