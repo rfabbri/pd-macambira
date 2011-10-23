@@ -151,7 +151,7 @@ all: $(LIB_TARGETS)
 	@echo "Compiled externals for $(OS_NAME) aka $(UNAME)"
 
 
-install: $(examplesdir) $(manualsdir) $(objectsdir) $(readmesdir) \
+install: $(manualsdir) $(objectsdir) \
 all $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "externals install succeeded!"
@@ -362,13 +362,15 @@ creb_install: creb
 		--version "0.9.2"
 	install -p $(externals_src)/creb/abs/*.pd $(DESTDIR)$(objectsdir)/$(CREB_NAME)
 	install -p $(CREB_OBJECTS:.c=.$(EXTENSION)) \
-		$(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) 		$(DESTDIR)$(objectsdir)/$(CREB_NAME)
+		$(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) \
+		$(DESTDIR)$(objectsdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/doc/*.* $(DESTDIR)$(objectsdir)/$(CREB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
+	install -d $(DESTDIR)$(objectsdir)/$(CREB_NAME)/manual
 	install -p $(externals_src)/creb/doc/reference.txt \
-		$(DESTDIR)$(readmesdir)/$(CREB_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(CREB_NAME)
-	install -p $(externals_src)/creb/doc/examples/*.* $(DESTDIR)$(examplesdir)/$(CREB_NAME)
+		$(DESTDIR)$(objectsdir)/$(CREB_NAME)/manual
+	install -d $(DESTDIR)$(objectsdir)/$(CREB_NAME)/examples
+	install -p $(externals_src)/creb/doc/examples/*.* \
+		$(DESTDIR)$(objectsdir)/$(CREB_NAME)/examples
 
 creb_clean:
 	-rm -f -- $(CREB_OBJECTS:.c=.$(EXTENSION))
@@ -496,15 +498,9 @@ flib_install: flib
 	install -p $(FLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FLIB_NAME)
 	install -p $(externals_src)/postlude/flib/doc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(FLIB_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(FLIB_NAME)
-#	install -p $(externals_src)/postlude/flib/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(FLIB_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/postlude/flib/README \
 		$(DESTDIR)$(readmesdir)/$(FLIB_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(FLIB_NAME)
-#	install -p $(externals_src)/postlude/flib/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(FLIB_NAME)
 
 flib_clean:
 	-rm -f -- $(FLIB_OBJECTS:.c=.$(EXTENSION))
@@ -532,9 +528,9 @@ frankenstein_install: frankenstein
 	install -d $(DESTDIR)$(manualsdir)/$(FRANKENSTEIN_NAME)
 	install -p $(externals_src)/frankenstein/doc/*.* \
 		$(DESTDIR)$(manualsdir)/$(FRANKENSTEIN_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(FRANKENSTEIN_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(FRANKENSTEIN_NAME)/examples
 	install -p $(externals_src)/frankenstein/patches/*.* \
-		$(DESTDIR)$(examplesdir)/$(FRANKENSTEIN_NAME)
+		$(DESTDIR)$(objectsdir)/$(FRANKENSTEIN_NAME)/examples
 
 frankenstein_clean:
 	-rm -f -- $(externals_src)/frankenstein/*.$(EXTENSION)
@@ -640,9 +636,6 @@ gem2pdp_install: gem2pdp
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/gem2pdp/README \
 		$(DESTDIR)$(readmesdir)/$(GEM2PDP_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(GEM2PDP_NAME)
-#	install -p $(externals_src)/gem2pdp/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(GEM2PDP_NAME)
 
 gem2pdp_clean:
 	-rm -rf -- $(externals_src)/gem2pdp/autom4te.cache
@@ -723,9 +716,6 @@ hidin_install: hidin
 #	install -d $(DESTDIR)$(readmesdir)
 #	install -p $(externals_src)/olafmatt/hidin/README \
 #		$(DESTDIR)$(readmesdir)/$(HIDIN_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(HIDIN_NAME)
-#	install -p $(externals_src)/olafmatt/hidin/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(HIDIN_NAME)
 
 hidin_clean:
 	-rm -f -- $(HIDIN_DLL)
@@ -757,9 +747,6 @@ iem_ambi_install: iem_ambi
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_ambi/READ_ME.txt \
 		$(DESTDIR)$(readmesdir)/$(IEM_AMBI_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(IEM_AMBI_NAME)
-#	install -p $(externals_src)/iem/iem_ambi/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(IEM_AMBI_NAME)
 
 iem_ambi_clean:
 	-rm -f -- $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION))
@@ -790,9 +777,6 @@ iem_bin_ambi_install: iem_bin_ambi
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
 		$(DESTDIR)$(readmesdir)/$(IEM_BIN_AMBI_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(IEM_BIN_AMBI_NAME)
-#	install -p $(externals_src)/iem/iem_bin_ambi/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(IEM_BIN_AMBI_NAME)
 
 iem_bin_ambi_clean:
 	-rm -f -- $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION))
@@ -856,20 +840,15 @@ iemguts: $(IEMGUTS_OBJECTS:.c=.$(EXTENSION))
 
 iemguts_install: iemguts
 	install -d $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(IEMGUTS_NAME) \
-		--author "IOhannes m zmoelnig" \
-		--description "IEMguts is a collection of objects that deal with the infrastructure to build better abstractions" \
-		--license "GNU GPL" \
-		--version ""
-	install -p $(IEMGUTS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
-	install -p $(externals_src)/iem/iemguts/help/*.pd \
+	install -p $(externals_src)/iem/iemguts/iemguts-meta.pd \
+		$(IEMGUTS_OBJECTS:.c=.$(EXTENSION)) \
+		$(externals_src)/iem/iemguts/help/*.pd \
+		$(externals_src)/iem/iemguts/README.txt \
+		$(externals_src)/iem/iemguts/LICENSE.txt \
 		$(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/iem/iemguts/README.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMGUTS_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(IEMGUTS_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)/examples
 	install -p $(externals_src)/iem/iemguts/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(IEMGUTS_NAME)
+		$(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)/examples
 
 iemguts_clean:
 	-rm -f -- $(IEMGUTS_OBJECTS:.c=.$(EXTENSION))
@@ -896,15 +875,11 @@ iemlib_install: iemlib
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(IEMLIB_NAME) \
 		--description "a collection of objects written at IEM/KUG" \
 		--license "GNU GPL"
-	install -p $(IEMLIB_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.pd $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/alias/*.pd $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*/*-help.pd $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*/*.mp3 $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*/*.wav $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/examples/*.* \
-		$(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
+	install -p $(IEMLIB_SRC:.c=.$(EXTENSION)) \
+		$(externals_src)/iemlib/*/*.pd \
+		$(externals_src)/iemlib/*/*.mp3 \
+		$(externals_src)/iemlib/*/*.wav \
+		$(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/examples
 	install -p $(externals_src)/iemlib/examples/*.* \
 		$(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/examples
@@ -920,8 +895,6 @@ iemlib_clean:
 	-rm -f -- $(IEMLIB_OBJECTS)
 	-rm -f -- $(IEMLIB_SRC:.c=.$(EXTENSION))
 	-rmdir -- $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	-rm -f -- $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)/*.*
-	-rmdir -- $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
 	-rm -f -- $(DESTDIR)$(manualsdir)/$(IEMLIB_NAME)/*.*
 	-rmdir -- $(DESTDIR)$(manualsdir)/$(IEMLIB_NAME)
 
@@ -997,9 +970,6 @@ jasch_lib_install: jasch_lib
 #	install -d $(DESTDIR)$(readmesdir)
 #	install -p $(externals_src)/jasch_lib/README \
 #		$(DESTDIR)$(readmesdir)/$(JASCH_LIB_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(JASCH_LIB_NAME)
-#	install -p $(externals_src)/jasch_lib/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(JASCH_LIB_NAME)
 
 jasch_lib_clean:
 	-rm -f -- $(JASCH_LIB_OBJECTS:.c=.$(EXTENSION))
@@ -1183,10 +1153,6 @@ moocow_install:
 	install -p $(MOOCOW_DIR)/README.txt \
 		$(DESTDIR)$(readmesdir)/$(MOOCOW_NAME).txt \
 	  || echo 'moocow_install: WARNING: no README to install!'
-#	install -d $(DESTDIR)$(examplesdir)/$(MOOCOW_NAME)
-#	install -p $(MOOCOW_BUILD)/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(MOOCOW_NAME) \
-#	  || echo "moocow_install: WARNING: no examples patches to install!"
 
 moocow_clean:
 	$(MAKE) -C $(externals_src)/moocow/extended distclean
@@ -1253,9 +1219,6 @@ mrpeach_install: mrpeach
 #	install -d $(DESTDIR)$(readmesdir)
 #	install -p $(externals_src)/mrpeach/README \
 #		$(DESTDIR)$(readmesdir)/$(MRPEACH_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(MRPEACH_NAME)
-#	install -p $(externals_src)/mrpeach/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(MRPEACH_NAME)
 
 mrpeach_clean:
 	-rm -f -- $(MRPEACH_OBJECTS:.c=.$(EXTENSION))
@@ -1719,10 +1682,6 @@ toxy_install: toxy
 	cd $(externals_src)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
 	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
 		$(DESTDIR)$(objectsdir)/$(TOXY_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(TOXY_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(TOXY_NAME)
-	install -p $(externals_src)/miXed/test/toxy/*.*  \
-		$(DESTDIR)$(examplesdir)/$(TOXY_NAME)
 
 
 toxy_clean:
@@ -1903,16 +1862,10 @@ adaptive_install: adaptive
 	install -p $(ADAPTIVE_TARGETS) $(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)
 	install -p $(externals_src)/grh/adaptive/doc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/grh/adaptive/readme \
-		$(DESTDIR)$(readmesdir)/$(ADAPTIVE_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(ADAPTIVE_NAME)
-	install -p $(externals_src)/grh/adaptive/examples/*.pd \
-		$(externals_src)/grh/adaptive/examples/*.dat \
-		$(DESTDIR)$(examplesdir)/$(ADAPTIVE_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/manual
-	install -p $(externals_src)/grh/adaptive/readme \
-		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/manual/README.txt
+		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/README.txt
+	install -p $(externals_src)/grh/adaptive/GnuGPL.txt \
+		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/LICENSE.txt
 	install -d $(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/examples
 	install -p $(externals_src)/grh/adaptive/examples/*.pd \
 		$(externals_src)/grh/adaptive/examples/*.dat \
@@ -2219,14 +2172,13 @@ iemxmlrpc_install: iemxmlrpc
 		--version ""
 	install -p $(IEMXMLRPC_TARGET) $(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)
 	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
+		$(externals_src)/iem/iemxmlrpc/LICENSE.txt \
+		$(externals_src)/iem/iemxmlrpc/README.txt \
 		$(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/iem/iemxmlrpc/README.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMXMLRPC_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(IEMXMLRPC_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)/examples
 	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
 		   $(externals_src)/iem/iemxmlrpc/*.py \
-		   $(DESTDIR)$(examplesdir)/$(IEMXMLRPC_NAME)
+		   $(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)/examples
 
 iemxmlrpc_clean:
 	-rm -f -- $(IEMXMLRPC_TARGET)
@@ -2310,7 +2262,6 @@ test_locations:
 	@echo "LIBPDDIR  $(libpddir)"
 	@echo "LIBPDBINDIR  $(libpdbindir)"
 	@echo "MANUALSDIR  $(manualsdir)"
-	@echo "EXAMPLESDIR  $(examplesdir)"
 	@echo " "
 	@echo "Compiling these libs:"
 	@echo "$(LIB_TARGETS)"
