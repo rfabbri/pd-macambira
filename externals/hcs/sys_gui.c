@@ -3,8 +3,6 @@
 #include <m_pd.h>
 #include "g_canvas.h"
 
-#define DEBUG(x)
-
 static t_class *sys_gui_class;
 
 typedef struct _sys_gui
@@ -15,45 +13,8 @@ typedef struct _sys_gui
     char *send_buffer;
 } t_sys_gui;
 
-static void sys_gui_send_finished(t_sys_gui *x)
+static void execute_buffer(t_sys_gui *x, int argc, t_atom *argv)
 {
-    char message[MAXPDSTRING];
-    sprintf(message,"pdsend \"%s  finished\";",  x->x_receive_symbol->s_name );
-    sys_gui(message); 
-}
-
-static void sys_gui_bang(t_sys_gui *x)
-{
-    sys_gui(x->send_buffer);
-    sys_gui_send_finished(x); 
-}
-
-static void sys_gui_finished(t_sys_gui *x)
-{
-    outlet_bang(x->x_outlet);
-}
-
-static void sys_gui_anything(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
-{
-    DEBUG(post("sys_gui_anything"););
-    int i = 0;
-    char buf[MAXPDSTRING];
-
-    snprintf(x->send_buffer, MAXPDSTRING, "%s ", s->s_name);
-    for(i=0;i<argc;++i)
-    {
-        atom_string(argv + i, buf, MAXPDSTRING);
-        strncat(x->send_buffer, buf, MAXPDSTRING - strlen(x->send_buffer));
-        strncat(x->send_buffer, " ", MAXPDSTRING - strlen(x->send_buffer));
-    }
-    strncat(x->send_buffer, " ;\n", 3);
-    sys_gui(x->send_buffer);
-    sys_gui_send_finished(x);  
-}
-
-static void sys_gui_list(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
-{
-    DEBUG(post("sys_gui_list"););
     int i = 0;
     char buf[MAXPDSTRING];
 
@@ -64,8 +25,32 @@ static void sys_gui_list(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
         strncat(x->send_buffer, " ", MAXPDSTRING - strlen(x->send_buffer));
     }
     strncat(x->send_buffer, " ;\n", MAXPDSTRING - strlen(x->send_buffer));
+    snprintf(buf, MAXPDSTRING - strlen(x->send_buffer),
+             "pdsend \"%s  finished\";\n",  x->x_receive_symbol->s_name );
+    strncat(x->send_buffer, buf, MAXPDSTRING - strlen(x->send_buffer));
     sys_gui(x->send_buffer);
-    sys_gui_send_finished(x); 
+}
+
+static void sys_gui_bang(t_sys_gui *x)
+{
+    sys_gui(x->send_buffer);
+}
+
+static void sys_gui_finished(t_sys_gui *x)
+{
+    outlet_bang(x->x_outlet);
+}
+
+static void sys_gui_anything(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
+{
+    snprintf(x->send_buffer, MAXPDSTRING, "%s ", s->s_name);
+    execute_buffer(x, argc, argv);
+}
+
+static void sys_gui_list(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
+{
+    x->send_buffer = '\0';
+    execute_buffer(x, argc, argv);
 }
 
 static void sys_gui_free(t_sys_gui *x)
