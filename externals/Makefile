@@ -498,9 +498,8 @@ flib_install: flib
 	install -p $(FLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FLIB_NAME)
 	install -p $(externals_src)/postlude/flib/doc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(FLIB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/postlude/flib/README \
-		$(DESTDIR)$(readmesdir)/$(FLIB_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(FLIB_NAME)/README.txt
 
 flib_clean:
 	-rm -f -- $(FLIB_OBJECTS:.c=.$(EXTENSION))
@@ -630,12 +629,8 @@ gem2pdp_install: gem2pdp
 #		--version "0.6"
 	install -p $(GEM2PDP_OBJECTS:.cpp=.$(EXTENSION)) $(DESTDIR)$(objectsdir)
 	install -p $(externals_src)/gem2pdp/*.pd  $(DESTDIR)$(objectsdir)
-#	install -d $(DESTDIR)$(manualsdir)/$(GEM2PDP_NAME)
-#	install -p $(externals_src)/gem2pdp/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(GEM2PDP_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/gem2pdp/README \
-		$(DESTDIR)$(readmesdir)/$(GEM2PDP_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(GEM2PDP_NAME)-README.txt
 
 gem2pdp_clean:
 	-rm -rf -- $(externals_src)/gem2pdp/autom4te.cache
@@ -712,10 +707,6 @@ hidin_install: hidin
 		--description "HID input for Windows HID" \
 		--license "GNU GPL"
 	install -p $(HIDIN_DLL) $(DESTDIR)$(objectsdir)/$(HIDIN_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(HIDIN_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/olafmatt/hidin/README \
-#		$(DESTDIR)$(readmesdir)/$(HIDIN_NAME).txt
 
 hidin_clean:
 	-rm -f -- $(HIDIN_DLL)
@@ -742,11 +733,10 @@ iem_ambi_install: iem_ambi
 	install -p $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION)) \
 		$(DESTDIR)$(objectsdir)/$(IEM_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_ambi/*.pd \
+		$(externals_src)/iem/iem_ambi/LICENSE.txt \
 		$(DESTDIR)$(objectsdir)/$(IEM_AMBI_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(IEM_AMBI_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_ambi/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEM_AMBI_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEM_AMBI_NAME)/README.txt
 
 iem_ambi_clean:
 	-rm -f -- $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION))
@@ -773,10 +763,8 @@ iem_bin_ambi_install: iem_bin_ambi
 	install -p $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEM_BIN_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_bin_ambi/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEM_BIN_AMBI_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(IEM_BIN_AMBI_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEM_BIN_AMBI_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEM_BIN_AMBI_NAME)/README.txt
 
 iem_bin_ambi_clean:
 	-rm -f -- $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION))
@@ -964,12 +952,6 @@ jasch_lib_install: jasch_lib
 		$(DESTDIR)$(objectsdir)/$(JASCH_LIB_NAME)
 	install -p $(externals_src)/jasch_lib/*/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(JASCH_LIB_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(JASCH_LIB_NAME)
-#	install -p $(externals_src)/jasch_lib/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(JASCH_LIB_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/jasch_lib/README \
-#		$(DESTDIR)$(readmesdir)/$(JASCH_LIB_NAME).txt
 
 jasch_lib_clean:
 	-rm -f -- $(JASCH_LIB_OBJECTS:.c=.$(EXTENSION))
@@ -1145,13 +1127,8 @@ moocow_install:
 	install -p $(MOOCOW_BUILD)/doc/5.reference/*.pd \
 		$(DESTDIR)$(objectsdir)/$(MOOCOW_NAME) \
 	  || echo 'moocow_install: WARNING: no help patches to install!'
-#	install -d $(DESTDIR)$(manualsdir)/$(MOOCOW_NAME)
-#	install -p $(externals_src)/moocow/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(MOOCOW_NAME) \
-#	  || echo 'moocow_install: WARNING: no manuals to install!'
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(MOOCOW_DIR)/README.txt \
-		$(DESTDIR)$(readmesdir)/$(MOOCOW_NAME).txt \
+		$(DESTDIR)$(objectsdir)/$(MOOCOW_NAME) \
 	  || echo 'moocow_install: WARNING: no README to install!'
 
 moocow_clean:
@@ -1213,12 +1190,6 @@ mrpeach_install: mrpeach
 	install -d $(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)/example
 	install -p $(externals_src)/mrpeach/net/examples/test.txt \
 		$(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)/examples
-#	install -d $(DESTDIR)$(manualsdir)/$(MRPEACH_NAME)
-#	install -p $(externals_src)/mrpeach/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(MRPEACH_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/mrpeach/README \
-#		$(DESTDIR)$(readmesdir)/$(MRPEACH_NAME).txt
 
 mrpeach_clean:
 	-rm -f -- $(MRPEACH_OBJECTS:.c=.$(EXTENSION))
@@ -1579,14 +1550,10 @@ postlude_install: postlude
 	install -p $(POSTLUDE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(POSTLUDE_NAME)
 	install -p $(externals_src)/postlude/dssi/doc/output~.pd \
 		$(DESTDIR)$(objectsdir)/$(POSTLUDE_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(POSTLUDE_NAME)
-#	install -p $(externals_src)/postlude/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(POSTLUDE_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/postlude/dssi/README \
-		$(DESTDIR)$(readmesdir)/$(POSTLUDE_NAME)-dssi.txt
+		$(DESTDIR)$(objectsdir)/$(POSTLUDE_NAME)/README-dssi.txt
 	install -p $(externals_src)/postlude/psql/README \
-		$(DESTDIR)$(readmesdir)/$(POSTLUDE_NAME)-psql.txt
+		$(DESTDIR)$(objectsdir)/$(POSTLUDE_NAME)README-psql.txt
 
 postlude_clean:
 	-rm -f -- $(POSTLUDE_OBJECTS:.c=.$(EXTENSION))
@@ -1817,9 +1784,8 @@ pdcontainer_install: pdcontainer
 	install -p $(PDCONTAINER_TARGETS) $(DESTDIR)$(objectsdir)/$(PDCONTAINER_NAME)
 	install -p $(externals_src)/grh/PDContainer/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(PDCONTAINER_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/grh/PDContainer/readme.txt \
-		$(DESTDIR)$(readmesdir)/$(PDCONTAINER_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(PDCONTAINER_NAME)/README.txt
 
 pdcontainer_clean:
 	-rm -f -- $(PDCONTAINER_TARGETS)
@@ -1925,9 +1891,8 @@ iem_delay_install: iem_delay
 	install -p $(IEMDELAY_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMDELAY_NAME)
 	install -p $(externals_src)/iem/iem_delay/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMDELAY_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_delay/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMDELAY_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEMDELAY_NAME)/README.txt
 
 iem_delay_clean:
 	-rm -f -- $(IEMDELAY_SRC:.c=.$(EXTENSION))
@@ -1954,9 +1919,8 @@ iem_roomsim_install: iem_roomsim
 	install -p $(IEMROOM_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMROOM_NAME)
 	install -p $(externals_src)/iem/iem_roomsim/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMROOM_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_roomsim/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMROOM_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEMROOM_NAME)/README.txt
 
 iem_roomsim_clean:
 	-rm -f -- $(IEMROOM_SRC:.c=.$(EXTENSION))
@@ -1983,9 +1947,8 @@ iem_spec2_install: iem_spec2
 	install -p $(IEMSPEC2_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMSPEC2_NAME)
 	install -p $(externals_src)/iem/iem_spec2/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMSPEC2_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_spec2/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMSPEC2_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEMSPEC2_NAME)/README.txt
 
 iem_spec2_clean:
 	-rm -f -- $(IEMSPEC2_SRC:.c=.$(EXTENSION))
@@ -2025,9 +1988,8 @@ iem_tab_install: iem_tab
 	install -p $(IEMTAB_TARGETS) $(DESTDIR)$(objectsdir)/$(IEMTAB_NAME)
 	install -p $(externals_src)/iem/iem_tab/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMTAB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMTAB_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEMTAB_NAME)/README.txt
 
 iem_tab_clean:
 	-rm -f -- $(IEMTAB_TARGETS)
@@ -2053,9 +2015,8 @@ flashserver_install: flashserver
 	install -p $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FLASHSERVER_NAME)
 	install -p $(externals_src)/olafmatt/flashserver/*.pd \
 		$(DESTDIR)$(objectsdir)/$(FLASHSERVER_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/olafmatt/flashserver/README \
-		$(DESTDIR)$(readmesdir)/$(FLASHSERVER_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(FLASHSERVER_NAME)/README.txt
 
 flashserver_clean:
 	-rm -f -- $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION))
@@ -2132,9 +2093,8 @@ iemgui_install: iemgui
 	install -p $(IEMGUI_TARGETS) $(DESTDIR)$(objectsdir)/$(IEMGUI_NAME)
 	install -p $(externals_src)/iem/iemgui/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMGUI_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iemgui/READ_ME.txt \
-		$(DESTDIR)$(readmesdir)/$(IEMGUI_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(IEMGUI_NAME)/README.txt
 
 iemgui_clean:
 	-rm -f -- $(IEMGUI_TARGETS)
