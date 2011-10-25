@@ -13,7 +13,7 @@ proc pdtk_folderpanel {target localdir} {
     	set filename [tk_getSaveFile -initialdir $localdir]
     }
     if {$filename != ""} {
-        pd [concat $target callback [pdtk_enquote $filename] \;]
+        pd [concat $target callback [enquote_path $filename] \;]
     }
 }
 
@@ -35,7 +35,7 @@ typedef struct _folderpanel
 static void folderpanel_symbol(t_folderpanel *x, t_symbol *s)
 {
     char *path = (s && s->s_name) ? s->s_name : "\"\"";
-    sys_vgui("tof_folderpanel %s \n", x->x_s->s_name);
+    sys_vgui("after idle [list after 100 tof_folderpanel %s]\n", x->x_s->s_name);
 }
 
 static void folderpanel_bang(t_folderpanel *x)
@@ -78,7 +78,7 @@ void folderpanel_setup(void)
 	sys_gui("proc tof_folderpanel {target} {\n");
 	sys_gui("  set path [tk_chooseDirectory] \n");
 	sys_gui(" if {$path != \"\"} {\n");
-	sys_gui("  pdsend \"$target callback [pdtk_enquote $path]\"\n");
+	sys_gui("  pdsend \"$target callback [enquote_path $path]\"\n");
 	sys_gui(" }\n");
 	sys_gui("}\n");
 
