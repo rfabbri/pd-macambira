@@ -4,7 +4,7 @@
 #X msg 69 191 symbol atom;
 #X msg 47 343 float 1.234;
 #X text 15 76 To send one piece of data to an object \, send an atomic
-message. There are atomic message to match each of the atom types.
+message. There are atomic messages to match each of the atom types.
 ;
 #X symbolatom 61 233 10 0 0 0 - - -;
 #X msg 54 165 atom;
