@@ -42,7 +42,7 @@
 #X text 18 65 Message processing is driven by events \, nothing happens
 if there are no events. There is nothing happening in the patches below
 until you click on the messages (the bang buttons at the bottom of
-each patch illustrates this):;
+each patch illustrate this):;
 #X text 18 265 Pd is always ready to process messages \, you don't
 need to tell it to run. You can keep events happening by sending a
 stream of messages:;
