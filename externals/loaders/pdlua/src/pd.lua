@@ -76,6 +76,13 @@ pd._clockdispatch = function (c)
   end
 end
 
+--whoami method dispatcher
+pd._whoami = function (object)
+  if nil ~= pd._objects[object] then
+    return pd._objects[object]:whoami()
+  end
+end
+
 -- prototypical OO system
 pd.Prototype = { }
 function pd.Prototype:new(o)
@@ -207,6 +214,11 @@ function pd.Class:register(name)
     self._class = pd._register(name)  -- register new class
     pd._classes[name] = self          -- record registration
     self._name = name
+    if name == "pdlua" then
+      self._scriptname = "pd.lua"
+    else
+      self._scriptname = name .. ".pd_lua"
+    end -- mrpeach 20111027
     return self                       -- return new
   end
 end
@@ -273,9 +285,11 @@ end
 function pd.Class:error(msg)
   pd._error(self._object, msg)
 end
+function pd.Class:whoami()
+  return self._scriptname or self._name
+end
 
-
-local lua = pd.Class:new():register("pdlua")  -- global controls
+local lua = pd.Class:new():register("pdlua")  -- global controls (the [pdlua] object only)
 function lua:initialize(sel, atoms)
   self.inlets = 1
   self.outlets = 0    -- FIXME: might be nice to have errors go here?
@@ -286,10 +300,11 @@ function lua:in_1_load(atoms)  -- execute a script
 end
 
 
-local luax = pd.Class:new():register("pdluax")  -- classless lua externals
+local luax = pd.Class:new():register("pdluax")  -- classless lua externals (like [pdluax foo])
 function luax:initialize(sel, atoms)          -- motivation: pd-list 2007-09-23
   local f = self:dofile(atoms[1] .. ".pd_luax")
   if nil ~= f then
+    self._scriptname = atoms[1] .. ".pd_luax" -- mrpeach 20111027
     local atomstail = { }          -- munge for better lua<->luax compatibility
     for i,_ in ipairs(atoms) do                  
       if i > 1 then

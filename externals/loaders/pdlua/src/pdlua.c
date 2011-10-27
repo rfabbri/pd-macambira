@@ -390,7 +390,32 @@ static void pdlua_free( t_pdlua *o /**< The object to destruct. */)
     return;
 }
 
-/** Lua class registration. */
+/** a handler for the open item in the right-click menu (mrpeach 20111025) */
+/** Here we find the lua code for the object and open it in an editor */
+static void pdlua_menu_open(t_pdlua *o)
+{
+    const char  *name;
+
+#ifdef PDLUA_DEBUG
+    post("pdlua_menu_open");
+#endif // PDLUA_DEBUG
+    /** Get the scriptname of the object */
+    lua_getglobal(L, "pd");
+    lua_getfield(L, -1, "_whoami");
+    lua_pushlightuserdata(L, o);
+    if (lua_pcall(L, 1, 1, 0))
+    {
+        error("lua: error in whoami:\n%s", lua_tostring(L, -1));
+        return;
+    }
+    name = luaL_checkstring(L, -1);
+#ifdef PDLUA_DEBUG
+    post("pdlua_menu_open: L is %p, name is %s", L, name);
+#endif // PDLUA_DEBUG
+    if (name) sys_vgui("::pd_menucommands::menu_openfile {%s}\n", name);
+}
+
+/** Lua class registration. This is equivalent to the "setup" method for an ordinary Pd class */
 static int pdlua_class_new(lua_State *L)
 /**< Lua interpreter state.
   * \par Inputs:
@@ -402,12 +427,17 @@ static int pdlua_class_new(lua_State *L)
     const char  *name;
     t_class     *c;
 
-#ifdef PDLUA_DEBUG
-    post("pdlua_class_new:");
-#endif // PDLUA_DEBUG
     name = luaL_checkstring(L, 1);
+#ifdef PDLUA_DEBUG
+    post("pdlua_class_new: L is %p, name is %s", L, name);
+#endif // PDLUA_DEBUG
     c = class_new(gensym((char *) name), (t_newmethod) pdlua_new,
         (t_method) pdlua_free, sizeof(t_pdlua), CLASS_NOINLET, A_GIMME, 0);
+
+/* a class with a "menu-open" method will have the "Open" item highlighted in the right-click menu */
+    class_addmethod(c, (t_method)pdlua_menu_open, gensym("menu-open"), A_NULL);/* (mrpeach 20111025) */
+/**/
+
     lua_pushlightuserdata(L, c);
     return 1;
 }
