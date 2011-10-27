@@ -34,7 +34,7 @@ static void colorpanel_list(t_colorpanel *x, t_symbol *s, int argc, t_atom *argv
     char color_string[MAXPDSTRING];
 
     strncpy(color_string,"#",MAXPDSTRING);
-    if(argc > 2) 
+    if(argc > 3) 
         logpost(x, 2, "[colorpanel] warning more than three elements in list");
     for(i=0; i<3; i++)
     {
@@ -47,7 +47,8 @@ static void colorpanel_list(t_colorpanel *x, t_symbol *s, int argc, t_atom *argv
         }
         else 
         {
-            pd_error(x,"[colorpanel] symbol atom in color list");
+            pd_error(x,"[colorpanel] symbols are not allowed in the color list");
+            return;
         }
     }
     memcpy(x->current_color, color_string, 7);
