@@ -4,7 +4,6 @@
 # current folder so that it becomes a libdir to be installed into /Library/Pd.
 # <hans@at.or.at>
 
-LIB_DIR=/Library/Pd/readanysf~
 PD_APP_LIB=$1
 
 echo " "
@@ -17,8 +16,8 @@ for pd_darwin in `find . -name '*.pd_darwin'`; do
 	    echo "    $lib"
 	    install -vp /sw/lib/$lib $PD_APP_LIB
 	    new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
-	    install_name_tool -id $LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
-	    install_name_tool -change /sw/lib/$lib $LIB_DIR/$new_lib $pd_darwin
+	    install_name_tool -id @loader_path/$new_lib $PD_APP_LIB/$new_lib
+	    install_name_tool -change /sw/lib/$lib @loader_path/$new_lib $pd_darwin
 	done
 	echo " "
     fi
@@ -36,8 +35,8 @@ for dylib in $PD_APP_LIB/*.dylib; do
 	    else
 		install -vp /sw/lib/$lib $PD_APP_LIB
 	    fi
-	    install_name_tool -id $LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
-	    install_name_tool -change /sw/lib/$lib $LIB_DIR/$new_lib $dylib
+	    install_name_tool -id @loader_path/$new_lib $PD_APP_LIB/$new_lib
+	    install_name_tool -change /sw/lib/$lib @loader_path/$new_lib $dylib
 	done
 	echo " "
     fi
@@ -56,8 +55,8 @@ for dylib in $PD_APP_LIB/*.dylib; do
 	    else
 		install -vp /sw/lib/$lib $PD_APP_LIB
 	    fi
-	    install_name_tool -id $LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
-	    install_name_tool -change /sw/lib/$lib $LIB_DIR/$new_lib $dylib
+	    install_name_tool -id @loader_path/$new_lib $PD_APP_LIB/$new_lib
+	    install_name_tool -change /sw/lib/$lib @loader_path/$new_lib $dylib
 	done
 	echo " "
     fi
@@ -76,8 +75,8 @@ for dylib in $PD_APP_LIB/*.dylib; do
 	    else
 		install -vp /sw/lib/$lib $PD_APP_LIB
 	    fi
-	    install_name_tool -id $LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
-	    install_name_tool -change /sw/lib/$lib $LIB_DIR/$new_lib $dylib
+	    install_name_tool -id @loader_path/$new_lib $PD_APP_LIB/$new_lib
+	    install_name_tool -change /sw/lib/$lib @loader_path/$new_lib $dylib
 	done
 	echo " "
     fi
