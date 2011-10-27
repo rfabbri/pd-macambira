@@ -1,4 +1,4 @@
-#N canvas 386 245 644 464 10;
+#N canvas 415 228 644 464 10;
 #X obj 541 21 pddp/dsp;
 #X obj 11 8 cnv 15 400 40 empty empty ramping_up_and_down 20 12 0 24
 -228992 -66577 0;
@@ -27,8 +27,8 @@
 are useful when you want to have a smooth transition from one thing
 to another.;
 #X text 334 378 More on ramping:;
-#X obj 330 402 pddp/open ../../3.audio.examples/A03.line;
-#X obj 330 425 pddp/open ../../3.audio.examples/A04.line2;
+#X obj 330 425 pddp/open ../../doc/3.audio.examples/A04.line2;
+#X obj 330 404 pddp/open ../../doc/3.audio.examples/A03.line;
 #X connect 6 0 7 0;
 #X connect 6 0 9 0;
 #X connect 8 0 7 0;
