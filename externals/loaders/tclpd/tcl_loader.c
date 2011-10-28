@@ -2,6 +2,10 @@
 #include <string.h>
 #include <unistd.h>
 
+/* from tcl_class.c: */
+//void source_table_remove(const char *object_name);
+void source_table_add(const char *object_name, const char *source_path);
+
 extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
 #ifdef DEBUG
     post("Tcl loader: registering tcl class loader mechanism");
@@ -20,12 +24,12 @@ extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
         return (1);
     }
 
-        /* try looking in the path for (objectname).(tcl) ... */
+    /* try looking in the path for (objectname).(tcl) ... */
     if ((fd = canvas_open(canvas, objectname, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
 
-        /* next try (objectname)/(classname).(tcl) ... */
+    /* next try (objectname)/(classname).(tcl) ... */
     strncpy(filename, objectname, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
@@ -40,7 +44,7 @@ extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
 gotone:
     close(fd);
     class_set_extern_dir(gensym(dirbuf));
-        /* rebuild the absolute pathname */
+    /* rebuild the absolute pathname */
     strncpy(filename, dirbuf, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
@@ -55,6 +59,7 @@ gotone:
     // load tcl external:
     result = Tcl_EvalFile(tcl_for_pd, filename);
     if(result == TCL_OK) {
+        source_table_add(objectname, filename);
         post("Tcl loader: loaded %s", filename);
     } else {
         post("Tcl loader: error trying to load %s", filename);

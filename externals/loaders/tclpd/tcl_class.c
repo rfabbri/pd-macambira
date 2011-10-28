@@ -6,6 +6,7 @@
 
 static hash_table_t* class_table = NULL;
 static hash_table_t* object_table = NULL;
+static hash_table_t* source_table = NULL;
 
 #define class_table_add(n, c) hashtable_add(class_table, n, (void*)c)
 #define class_table_remove(n) hashtable_remove(class_table, n)
@@ -32,6 +33,8 @@ t_class* tclpd_class_new(const char* name, int flags) {
     // is this really necessary given that there is already a 'anything' handler?
     class_addmethod(c, (t_method)tclpd_loadbang, gensym("loadbang"), A_NULL);
     
+    class_addmethod(c, (t_method)tclpd_open, gensym("menu-open"), A_NULL);
+
     char buf[80];
     Tcl_Obj* res;
     int res_i;
@@ -79,6 +82,11 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     t_tcl* x = (t_tcl*)pd_new(qlass);
     x->ninlets = 1 /* qlass->c_firstin ??? */;
     x->x_glist = (t_glist*)canvas_getcurrent();
+
+    x->source_file = (char *)hashtable_get(source_table, name);
+    if(!x->source_file) {
+        post("tclpd: missing source file information. open command will not work.");
+    }
 
     x->classname = Tcl_NewStringObj(name, -1);
     char so[64];
@@ -222,6 +230,13 @@ error:
 
 void tclpd_loadbang(t_tcl* x) {
     tclpd_inlet_anything(x, 0, gensym("loadbang"), 0, NULL);
+}
+
+void tclpd_open(t_tcl *x) {
+    if(!x->source_file)
+        return;
+
+    sys_vgui("::pd_menucommands::menu_openfile {%s}\n", x->source_file);
 }
 
 /* Tcl glue: */
@@ -369,4 +384,15 @@ void tclpd_class_namespace_init(const char* classname) {
         "namespace eval ::%s {}",
         classname, classname, classname);
     Tcl_Eval(tcl_for_pd, cmd);
+}
+
+void source_table_remove(const char *object_name) {
+    if(!source_table)
+        source_table = hashtable_new(1 << 7);
+    hashtable_remove(source_table, object_name);
+}
+
+void source_table_add(const char *object_name, const char *source_file) {
+    source_table_remove(object_name);
+    hashtable_add(source_table, object_name, strdup(source_file));
 }

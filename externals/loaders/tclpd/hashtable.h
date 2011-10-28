@@ -19,7 +19,7 @@ typedef struct hash_table {
 uint32_t hash_str(const char *s);
 list_node_t* list_add(list_node_t* head, const char* k, void* v);
 list_node_t* list_remove(list_node_t* head, const char* k);
-void* list_get(list_node_t* head, const char* k);
+list_node_t* list_get(list_node_t* head, const char* k);
 size_t list_length(list_node_t* head);
 
 hash_table_t* hashtable_new(size_t size);
@@ -37,7 +37,8 @@ static inline void hashtable_remove(hash_table_t* ht, const char* name) {
 
 static inline void* hashtable_get(hash_table_t* ht, const char* name) {
     uint32_t h = hash_str(name) % ht->sz;
-    return list_get(ht->t[h], name);
+    list_node_t* n = list_get(ht->t[h], name);
+    return n ? n->v : NULL;
 }
 
 #endif // HASHTABLE_H_INCLUDED

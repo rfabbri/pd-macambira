@@ -16,11 +16,15 @@
 
 typedef struct _t_tcl {
     t_object o;
+    int ninlets;
     t_glist* x_glist;
+
+    char *source_file;
+
+    // Tcl-interpreter related objects:
     Tcl_Obj* self;
     Tcl_Obj* classname;
     Tcl_Obj* dispatcher;
-    int ninlets;
 } t_tcl;
 
 typedef struct _t_proxyinlet {
@@ -65,6 +69,7 @@ void tclpd_free (t_tcl* self);
 void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at);
 void tclpd_inlet_anything(t_tcl *self, int inlet, t_symbol *s, int ac, t_atom *at);
 void tclpd_loadbang(t_tcl* x);
+void tclpd_open(t_tcl* x);
 t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x);
 t_tcl* tclpd_get_instance(const char* objectSequentialId);
 t_pd* tclpd_get_instance_pd(const char* objectSequentialId);

@@ -15,19 +15,27 @@ uint32_t hash_str(const char *s) {
 list_node_t* list_add(list_node_t* head, const char* k, void* v) {
     list_node_t* n = (list_node_t*)malloc(sizeof(list_node_t));
     n->next = head;
+#ifdef HASHTABLE_COPY_KEYS
     n->k = strdup(k);
+#else
+    n->k = k;
+#endif
     n->v = v;
     return n;
 }
 
 list_node_t* list_remove(list_node_t* head, const char* k) {
+    if(!head) return NULL;
+
     list_node_t* tmp;
 
     // head remove
     while(head && strcmp(head->k, k) == 0) {
         tmp = head;
         head = head->next;
+#ifdef HASHTABLE_COPY_KEYS
         free(tmp->k);
+#endif
         free(tmp);
     }
 
@@ -39,6 +47,9 @@ list_node_t* list_remove(list_node_t* head, const char* k) {
         {
             tmp = p->next;
             p->next = p->next->next;
+#ifdef HASHTABLE_COPY_KEYS
+            free(tmp->k);
+#endif
             free(tmp);
             continue;
         }
@@ -48,14 +59,14 @@ list_node_t* list_remove(list_node_t* head, const char* k) {
     return head;
 }
 
-void* list_get(list_node_t* head, const char* k) {
+list_node_t* list_get(list_node_t* head, const char* k) {
     while(head) {
         if(strcmp(head->k, k) == 0) {
-            return head->v;
+            return head;
         }
         head = head->next;
     }
-    return (void*)0;
+    return NULL;
 }
 
 size_t list_length(list_node_t* head) {

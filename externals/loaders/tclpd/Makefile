@@ -37,7 +37,8 @@ EXTRA_DIST = tcl.i tcl_extras.h tclpd.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS
 
 ALL_CFLAGS = $(PD_INCLUDES) -std=c99 -I/usr/include/tcl8.5 \
 	-I/Library/Frameworks/Tcl.framework/Headers \
-	-Wall -W -Wno-unused-parameter
+	-Wall -W -Wno-unused-parameter \
+	-DHASHTABLE_COPY_KEYS
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
 ALL_LIBS = 
