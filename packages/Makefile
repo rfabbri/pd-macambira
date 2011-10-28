@@ -199,7 +199,7 @@ noncvs_install:
 	install -d $(DESTDIR)$(objectsdir)
 	test ! -d $(packages_src)/noncvs/$(OS_NAME)/extra/ || \
 		(cd $(packages_src)/noncvs/$(OS_NAME)/extra/ && \
-		tar --exclude-vcs --create * | \
+		tar --exclude .svn --exclude .git --exclude CVS --create * | \
 		tar --extract --directory $(DESTDIR)$(objectsdir) )
 
 #------------------------------------------------------------------------------
