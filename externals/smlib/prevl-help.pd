@@ -12,7 +12,7 @@
 #X text 127 79 [deltas a b c];
 #X text 94 28 b;
 #X text 40 29 a;
-#X text 126 125 requires b<=c;
+#X text 126 125 requires a<b and b<=c;
 #X text 126 109 c = buffer size;
 #X text 9 -8 x(i);
 #X obj -14 107 print prevl;

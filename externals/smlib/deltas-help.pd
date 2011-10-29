@@ -20,7 +20,7 @@ input and past inputs;
 #X text 153 137 [deltas a b c];
 #X text 120 86 b;
 #X text 66 87 a;
-#X text 152 183 requires b<=c;
+#X text 152 183 requires a<b and b<=c;
 #X text 152 167 c = buffer size;
 #X text 35 50 x(i);
 #X msg 79 57 clear;

@@ -14,6 +14,7 @@ typedef struct _prevl
 	float *m_buffer;  // circular buffer
 } t_prevl;
 
+static void prevl_set(t_prevl *x, t_float lo, t_float hi, t_float size);
 
 static void prevl_perform_float(t_prevl *x, t_float f)
 {
@@ -30,6 +31,7 @@ static void prevl_bang(t_prevl *x)
 	t_atom *ap,*app;
 	float *buffer, *bp;
 
+    prevl_set(x, x->m_lo, x->m_hi, x->m_buffer_size);
 	lo=(int)x->m_lo;
 	hi=(int)x->m_hi;
 
@@ -94,37 +96,42 @@ static void prevl_set(t_prevl *x, t_float lo, t_float hi, t_float size)
 	if (size<1)
 	{
 		size=1;
-		post("prevl: size is minimum 1...");
+		logpost(x, 2, "[prevl] size is minimum 1");
 	}
 	if (hi>size)
 	{
-		post("prevl: higher bound cannot be higher than the buffer size...");	
+		logpost(x, 2, "[prevl] higher bound (%g) cannot be greater than the buffer size (%g)",
+                hi, size);	
 		hi=size;
 	}
 	if (lo<0)
 	{
-		post("prevl: lower bound cannot be negative...");	
+		logpost(x, 2, "[prevl] lower bound cannot be negative");	
 		lo=0;
 	}
 	if (hi<1)
 	{
-		post("prevl: higher bound cannot be smaller than one...");	
+		logpost(x, 2, "[prevl] higher bound (%g) cannot be smaller than 1", hi);
 		hi=1;
 	}
 	if (hi<=lo)
 	{
-		post("prevl: higher bound must be higher than lower bound...");	
+		logpost(x, 2, "[prevl] higher bound (%g) must be greater than lower bound (%g)",
+                hi, lo);	
 		lo=hi-1.0f;
 	}
 
-	freebytes(x->m_buffer, x->m_buffer_size);
 
 	x->m_hi=(float)((int)hi);
 	x->m_lo=(float)((int)lo);
-	x->m_buffer_size=(int)size;
-    x->m_buffer = (float*)getbytes(sizeof(float)*x->m_buffer_size);
-	prevl_clear(x);
-	x->m_buffer_index=0;
+    if (x->m_buffer_size != size)
+    {
+        x->m_buffer_size=(int)size;
+        freebytes(x->m_buffer, x->m_buffer_size);
+        x->m_buffer = (float*)getbytes(sizeof(float)*x->m_buffer_size);
+        prevl_clear(x);
+        x->m_buffer_index=0;
+    }
 }
 
 static void *prevl_new(t_float lo, t_float hi, t_float size)

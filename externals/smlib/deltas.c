@@ -14,6 +14,7 @@ typedef struct _deltas
 	float *m_buffer;  // circular buffer
 } t_deltas;
 
+static void deltas_set(t_deltas *x, t_float lo, t_float hi, t_float size);
 
 static void deltas_perform_float(t_deltas *x, t_float f)
 {
@@ -31,11 +32,12 @@ static void deltas_bang(t_deltas *x)
 	float last;
 	float *buffer, *bp;
 
+    deltas_set(x, x->m_lo, x->m_hi, x->m_buffer_size);
 	lo=(int)x->m_lo;
 	hi=(int)x->m_hi;
 
 	n=hi-lo;
-	size=x->m_buffer_size;
+ 	size=x->m_buffer_size;
 	index=x->m_buffer_index;
     ap = (t_atom *)getbytes(sizeof(t_atom)*n);
 	app=ap;
@@ -114,37 +116,40 @@ static void deltas_set(t_deltas *x, t_float lo, t_float hi, t_float size)
 	if (size<1)
 	{
 		size=1;
-		post("deltas: size is minimum 1...");
+		logpost(x, 2, "[deltas]: minimum size is 1");
 	}
 	if (hi>size)
 	{
-		post("deltas: higher bound cannot be higher than the buffer size...");	
+		logpost(x, 2, "[deltas]: higher bound (%g) cannot be greater than the buffer size (%g)",
+                hi, size);	
 		hi=size;
 	}
 	if (lo<0)
 	{
-		post("deltas: lower bound cannot be negative...");	
+		logpost(x, 2, "[deltas]: lower bound cannot be negative");
 		lo=0;
 	}
 	if (hi<1)
 	{
-		post("deltas: higher bound cannot be smaller than one...");	
+		logpost(x, 2, "[deltas]: higher bound cannot be smaller than one");
 		hi=1;
 	}
 	if (hi<=lo)
 	{
-		post("deltas: higher bound must be higher than lower bound...");	
+		logpost(x, 2, "[deltas]: higher bound (%g) must be greater than lower bound (%g)", hi, lo);	
 		lo=hi-1.0f;
 	}
 
-	freebytes(x->m_buffer, x->m_buffer_size);
-
 	x->m_hi=(float)((int)hi);
 	x->m_lo=(float)((int)lo);
-	x->m_buffer_size=(int)size;
-    x->m_buffer = (float*)getbytes(sizeof(float)*x->m_buffer_size);
-	deltas_clear(x);
-	x->m_buffer_index=0;
+    if (x->m_buffer_size != size)
+    {
+        freebytes(x->m_buffer, x->m_buffer_size);
+        x->m_buffer_size = (int)size;
+        x->m_buffer = (float*)getbytes(sizeof(float)*x->m_buffer_size);
+        deltas_clear(x);
+        x->m_buffer_index=0;
+    }
 }
 
 static void *deltas_new(t_float lo, t_float hi, t_float size)
