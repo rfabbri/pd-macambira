@@ -119,11 +119,12 @@ static void lhist_set(t_lhist *x, t_float lo, t_float hi, t_float nbins)
 	if (nbins<1)
 	{
 		nbins=1;
-		post("lhist: number of bins is minimum 1...");
+		logpost(x, 2, "[lhist] minimum number of bins is 1");
 	}
 	if (hi<=lo)
 	{
-		post("lhist: higher bound must be higher than lower bound...");	
+		logpost(x, 2, "[lhist] higher bound (%g) must be greater than lower bound (%g)",
+                hi, lo);	
 		hi=lo+1.0f;
 	}
 	freebytes(x->m_lhist, x->m_nbins);

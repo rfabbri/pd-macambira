@@ -119,11 +119,12 @@ static void lhisti_set(t_lhisti *x, t_float lo, t_float hi, t_float nbins)
 	if (nbins<1)
 	{
 		nbins=1;
-		post("lhisti: number of bins is minimum 1...");
+		logpost(x, 2, "[lhisti] number of bins is minimum 1");
 	}
 	if (hi<=lo)
 	{
-		post("lhisti: higher bound must be higher than lower bound...");	
+		post("[lhisti] higher bound (%g) must be greater than lower bound (%g)",
+             hi, lo);	
 		hi=lo+1.0f;
 	}
 	freebytes(x->m_lhisti, x->m_nbins);
