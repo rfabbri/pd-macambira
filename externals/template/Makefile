@@ -1,4 +1,4 @@
-## Pd library template version 1.0.11
+## Pd library template version 1.0.12
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
@@ -232,10 +232,10 @@ ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS) $(OPT_CFLAGS)
 ALL_LDFLAGS := $(LDFLAGS) $(ALL_LDFLAGS)
 ALL_LIBS := $(LIBS) $(ALL_LIBS)
 
-SHARED_SOURCE ?= $(shell test ! -e lib$(LIBRARY_NAME).c || \
-	echo lib$(LIBRARY_NAME).c )
+SHARED_SOURCE ?= $(wildcard lib$(LIBRARY_NAME).c)
 SHARED_HEADER ?= $(shell test ! -e $(LIBRARY_NAME).h || echo $(LIBRARY_NAME).h)
 SHARED_LIB = $(SHARED_SOURCE:.c=.$(SHARED_EXTENSION))
+SHARED_TCL_LIB = $(wildcard lib$(LIBRARY_NAME).tcl)
 
 .PHONY = install libdir_install single_install install-doc install-examples install-manual clean distclean dist etags $(LIBRARY_NAME)
 
@@ -352,6 +352,8 @@ dist: $(DISTDIR)
 		$(INSTALL_DATA) $(SHARED_HEADER)  $(DISTDIR)
 	test -z "$(strip $(SHARED_SOURCE))" || \
 		$(INSTALL_DATA) $(SHARED_SOURCE)  $(DISTDIR)
+	test -z "$(strip $(SHARED_TCL))" || \
+		$(INSTALL_DATA) $(SHARED_TCL)  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
@@ -400,6 +402,7 @@ showsetup:
 	@echo "SHARED_HEADER: $(SHARED_HEADER)"
 	@echo "SHARED_SOURCE: $(SHARED_SOURCE)"
 	@echo "SHARED_LIB: $(SHARED_LIB)"
+	@echo "SHARED_TCL_LIB: $(SHARED_TCL_LIB)"
 	@echo "PDOBJECTS: $(PDOBJECTS)"
 	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "ALLSOURCES TCL: $(wildcard $(ALLSOURCES:.c=.tcl))"
