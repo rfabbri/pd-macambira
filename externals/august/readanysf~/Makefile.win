@@ -1,0 +1,47 @@
+GAVLPREFIX=/usr/local
+PD_INCLUDES=/usr/local/include
+GMERLIN_LIBS= -lgmerlin_avdec -lgavl.dll -lpng -lz -lintl -liconv -lws2_32 -lflac -lwsock32 -lregex -ldl \
+				-logg -lvorbis -lvorbisenc -la52 -ldca -lspeex -ltiff -ltheora -lfaad
+
+
+# SHOULDN'T REALLY NEED TO EDIT BELOW HERE
+
+VERSION=0.43
+
+PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
+GAVLPATH=$(GAVLPREFIX)/include
+
+STRIP=strip --strip-unneeded  -R .note -R .comment
+
+LDFLAGS =  -s -shared -Wl,--enable-auto-import
+LDFLAGS +=  -L$(GAVLPREFIX)/lib -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj"
+LDFLAGS += -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 -lpthreadGC2 $(GMERLIN_LIBS)
+
+
+CFLAGS =  -I./  -I$(GAVLPATH) -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PD_INCLUDES) \
+	-Wall -Wno-unused -Wunused-variable -Wno-trigraphs -g -I. -mms-bitfields -DNT -DPD -fPIC  
+
+
+all: pd_win 
+
+pd_win: src/readanysf~.cpp  objs/FifoVideoFrames.o objs/FifoAudioFrames.o objs/ReadMedia.o
+	g++   -o  readanysf~.dll \
+	src/readanysf~.cpp \
+	objs/FifoAudioFrames.o \
+	objs/FifoVideoFrames.o \
+	objs/ReadMedia.o $(CFLAGS) $(LDFLAGS) 
+	$(STRIP) readanysf~.dll
+
+objs/ReadMedia.o: src/ReadMedia.cpp src/ReadMedia.h objs/FifoAudioFrames.o objs/FifoVideoFrames.o
+	g++  -c -o objs/ReadMedia.o src/ReadMedia.cpp $(CFLAGS)
+
+objs/FifoAudioFrames.o: src/FifoAudioFrames.cpp src/FifoAudioFrames.h 
+	g++  -c -o objs/FifoAudioFrames.o src/FifoAudioFrames.cpp $(CFLAGS)
+
+objs/FifoVideoFrames.o: src/FifoVideoFrames.cpp src/FifoVideoFrames.h 
+	g++  -c -o objs/FifoVideoFrames.o src/FifoVideoFrames.cpp $(CFLAGS)
+
+clean:
+	if [ -d readanysf~$(VERSION)_MacOSX-Intel ]; then rm -rf readanysf~$(VERSION)_MacOSX-Intel; fi; 
+	if [ -f readanysf~$(VERSION)_MacOSX-Intel.tar.gz ]; then rm -rf readanysf~$(VERSION)_MacOSX-Intel.tar.gz; fi; 
+	rm

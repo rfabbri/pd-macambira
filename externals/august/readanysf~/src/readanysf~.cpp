@@ -36,6 +36,9 @@
 
 #define MAXSFCHANS 64	// got this from d_soundfile.c in pd/src
 
+#define OPENCB_READY 1
+#define OPENCB_BADFILE 2 
+
 
 static t_class *readanysf_class;
 
@@ -51,6 +54,7 @@ typedef struct readanysf {
 	unsigned int tick;  // how often to send outlet info
 	bool play;
 	bool is_opening;
+	unsigned int spit_out_info;
 	unsigned int count;
 	float src_factor;
 
@@ -182,7 +186,6 @@ void m_init_audio( t_readanysf *x) {
 
 
 void m_open_callback( void * data) {
-	t_atom lst;
 	t_readanysf * x = (t_readanysf *)data;
 
 	pthread_mutex_lock(&x->mut);
@@ -194,34 +197,15 @@ void m_open_callback( void * data) {
 		pthread_mutex_lock(&x->mut);
 		m_init_audio(x);
 		x->is_opening=false;
+		x->spit_out_info = OPENCB_READY; // set variable so that dsp cycle can send out the right info
 		pthread_mutex_unlock(&x->mut);
 
-		// FIXME:  is it safe to call these here?
-		SETFLOAT(&lst, (float)x->rm->getAudioSamplerate() );
-		outlet_anything(x->outinfo, gensym("samplerate"), 1, &lst);
-		
-		SETFLOAT(&lst, x->rm->getLengthInSeconds() );
-		outlet_anything(x->outinfo, gensym("length"), 1, &lst);
-
-		outlet_float(x->outinfo, 0.0);
-
-		// ready should be last	
-		SETFLOAT(&lst, 1.0 );
-		outlet_anything(x->outinfo, gensym("ready"), 1, &lst);
-		// set time to 0 again here just to be sure
+	// set time to 0 again here just to be sure
 	} else {
 		pthread_mutex_lock(&x->mut);
 		x->is_opening=false;
+		x->spit_out_info = OPENCB_BADFILE;
 		pthread_mutex_unlock(&x->mut);
-
-		SETFLOAT(&lst, 0.0 );
-		outlet_anything(x->outinfo, gensym("samplerate"), 1, &lst);
-		SETFLOAT(&lst, 0.0 );
-		outlet_anything(x->outinfo, gensym("length"), 1, &lst);
-		SETFLOAT(&lst, 0.0 );
-		outlet_anything(x->outinfo, gensym("ready"), 1, &lst);
-		outlet_float(x->outinfo, 0.0);
-		post("readanysf~: Invalid file or unsupported codec.");
 	}
 }
 
@@ -291,6 +275,7 @@ static void *readanysf_new(t_float f, t_float f2, t_float f3 ) {
   x->tick = 1000;
   x->play =false; 
 	x->is_opening=false;
+	x->spit_out_info =0;
   x->count = 0;
 	x->src_factor = 1.0;
 	x->do_t2o_audio_convert = false;
@@ -423,7 +408,6 @@ static t_int *readanysf_perform(t_int *w) {
 	int samples_returned = 0;
 	t_atom lst;
 
-
 	if (x->play ) { // play protects the memory accessed in m_decode_block
 		samples_returned = m_decode_block( x );	
 		if (samples_returned == 0 ) { // EOF
@@ -431,9 +415,8 @@ static t_int *readanysf_perform(t_int *w) {
 			outlet_bang(x->outinfo);
 		} else if (samples_returned == -1) {
 			// error in getting audio, normally from seeking
-			post("readanysf~: error on m_decode_block inside perform()");
 			samples_returned=0;
-		}
+		} 
 	} 
 	
 	for (i = 0; i < x->num_channels; i++) {
@@ -442,6 +425,29 @@ static t_int *readanysf_perform(t_int *w) {
 		}
 	}
 
+	if (x->spit_out_info == OPENCB_READY) {
+		SETFLOAT(&lst, (float)x->rm->getAudioSamplerate() );
+		outlet_anything(x->outinfo, gensym("samplerate"), 1, &lst);
+		SETFLOAT(&lst, x->rm->getLengthInSeconds() );
+		outlet_anything(x->outinfo, gensym("length"), 1, &lst);
+		outlet_float(x->outinfo, 0.0);
+		// ready should be last	
+		SETFLOAT(&lst, 1.0 );
+		outlet_anything(x->outinfo, gensym("ready"), 1, &lst);
+		x->spit_out_info = 0;
+	}
+
+	if (x->spit_out_info == OPENCB_BADFILE) {
+		SETFLOAT(&lst, 0.0 );
+		outlet_anything(x->outinfo, gensym("samplerate"), 1, &lst);
+		SETFLOAT(&lst, 0.0 );
+		outlet_anything(x->outinfo, gensym("length"), 1, &lst);
+		SETFLOAT(&lst, 0.0 );
+		outlet_anything(x->outinfo, gensym("ready"), 1, &lst);
+		outlet_float(x->outinfo, 0.0);
+		post("readanysf~: Invalid file or unsupported codec.");
+		x->spit_out_info = 0;
+	}
 
 	// just set some variables
 	if ( ++x->count > x->tick ) {
