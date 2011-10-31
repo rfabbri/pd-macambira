@@ -276,6 +276,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) $(SHARED_LIB) install-doc install-ex
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(strip $(SHARED_TCL_LIB))" || \
+		$(INSTALL_DATA) $(SHARED_TCL_LIB) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-examples install-manual
@@ -352,8 +355,8 @@ dist: $(DISTDIR)
 		$(INSTALL_DATA) $(SHARED_HEADER)  $(DISTDIR)
 	test -z "$(strip $(SHARED_SOURCE))" || \
 		$(INSTALL_DATA) $(SHARED_SOURCE)  $(DISTDIR)
-	test -z "$(strip $(SHARED_TCL))" || \
-		$(INSTALL_DATA) $(SHARED_TCL)  $(DISTDIR)
+	test -z "$(strip $(SHARED_TCL_LIB))" || \
+		$(INSTALL_DATA) $(SHARED_TCL_LIB)  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
