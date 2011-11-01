@@ -175,9 +175,9 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
      count = MAX_COUNT;
      cvGoodFeaturesToTrack( gray, eig, temp, points[1], &count,
                                quality, min_distance, 0, 3, 0, 0.04 );
-     cvFindCornerSubPix( gray, points[1], count,
-          cvSize(win_size,win_size), cvSize(-1,-1),
-          cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
+     // cvFindCornerSubPix( gray, points[1], count,
+     //      cvSize(win_size,win_size), cvSize(-1,-1),
+     //      cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
      cvReleaseImage( &eig );
      cvReleaseImage( &temp );
 
@@ -453,9 +453,9 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
      count = MAX_COUNT;
      cvGoodFeaturesToTrack( gray, eig, temp, points[1], &count,
                                quality, min_distance, 0, 3, 0, 0.04 );
-     cvFindCornerSubPix( gray, points[1], count,
-          cvSize(win_size,win_size), cvSize(-1,-1),
-          cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
+     // cvFindCornerSubPix( gray, points[1], count,
+     //      cvSize(win_size,win_size), cvSize(-1,-1),
+     //      cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
      cvReleaseImage( &eig );
      cvReleaseImage( &temp );
 
@@ -732,9 +732,9 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
      count = MAX_COUNT;
      cvGoodFeaturesToTrack( gray, eig, temp, points[1], &count,
                                quality, min_distance, 0, 3, 0, 0.04 );
-     cvFindCornerSubPix( gray, points[1], count,
-          cvSize(win_size,win_size), cvSize(-1,-1),
-          cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
+     // cvFindCornerSubPix( gray, points[1], count,
+     //      cvSize(win_size,win_size), cvSize(-1,-1),
+     //      cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
      cvReleaseImage( &eig );
      cvReleaseImage( &temp );
 
