@@ -191,10 +191,8 @@ then
 		PDP_IMAGE_BASIC="$PDP_IMAGE_BASIC pdp_cheby.o"
 		PDP_IMAGE_SPECIAL="$PDP_IMAGE_SPECIAL pdp_histo.o"
 		AC_DEFINE(HAVE_PDP_GSL, 1, gsl support)
-		LIBS="$LIBS -lgslcblas -lgsl",
+		LIBS="$LIBS `pkg-config --libs gsl`",
 		echo "   libgsl not found: not building matrix type support")
-
-
 fi
 
 
