@@ -184,15 +184,25 @@ fi
 dnl optional gsl support
 if test $enable_gsl == yes;
 then
-	AC_CHECK_LIB(gslcblas,main)
-	AC_CHECK_LIB(gsl,main,
-		PDP_OPTTYPES="$PDP_OPTTYPES pdp_matrix.o"
-		PDP_MATRIX_BASIC="$PDP_MATRIX_BASIC pdp_mat_mul.o pdp_mat_lu.o pdp_mat_vec.o"
-		PDP_IMAGE_BASIC="$PDP_IMAGE_BASIC pdp_cheby.o"
-		PDP_IMAGE_SPECIAL="$PDP_IMAGE_SPECIAL pdp_histo.o"
-		AC_DEFINE(HAVE_PDP_GSL, 1, gsl support)
-		LIBS="$LIBS `pkg-config --libs gsl`",
-		echo "   libgsl not found: not building matrix type support")
+  AC_CHECK_LIB(gslcblas,main)
+  AC_CHECK_LIB(gsl,main,
+    PDP_OPTTYPES="$PDP_OPTTYPES pdp_matrix.o"
+    PDP_MATRIX_BASIC="$PDP_MATRIX_BASIC pdp_mat_mul.o pdp_mat_lu.o pdp_mat_vec.o"
+    PDP_IMAGE_BASIC="$PDP_IMAGE_BASIC pdp_cheby.o"
+    PDP_IMAGE_SPECIAL="$PDP_IMAGE_SPECIAL pdp_histo.o"
+    AC_DEFINE(HAVE_PDP_GSL, 1, gsl support)
+    PDP_GSL_FOUND=1,
+    echo "   libgsl not found: not building matrix type support")
+
+  if test -n "$PDP_GSL_FOUND"; then
+    if test $ARCH == Darwin
+    then
+      LIBS="$LIBS -lgslcblas -lgsl"
+    else
+      dnl if not darwin, assume target is linux
+      LIBS="$LIBS `pkg-config --libs gsl`"
+    fi
+  fi
 fi
 
 
