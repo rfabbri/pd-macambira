@@ -26,6 +26,7 @@
 #include <mach/mach.h> 
 #include <IOKit/IOKitLib.h> 
 #include <CoreFoundation/CoreFoundation.h> 
+#include <CoreServices/CoreServices.h>
 #include <m_pd.h>
 
 #define DEBUG(x)
@@ -144,9 +145,11 @@ FOUND_SENSOR:
 
 #if !defined(__LP64__)
 	// Check if Mac OS X 10.5 API is available...
-	if (IOConnectCallStructMethod != NULL) {
+    SInt32 MacVersion;
+    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1050)) {
 		// ...and use it if it is.
 #endif
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 		kern_return = IOConnectCallStructMethod(
             io_connect,         // an io_connect_t returned from IOServiceOpen().
             kernel_function,	// selector of the function to be called via the user client.
@@ -155,6 +158,7 @@ FOUND_SENSOR:
             &outputStructure,    // pointer to the output struct parameter.
             &structureOutputSize// pointer to the size of the output structure parameter.
             );
+#endif
 #if !defined(__LP64__)
 	}
 	else {

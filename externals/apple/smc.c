@@ -31,6 +31,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <IOKit/IOKitLib.h> 
+#include <CoreServices/CoreServices.h>
 
 #include "m_pd.h"
 #include "smc.h"
@@ -167,9 +168,11 @@ kern_return_t SMCCall(int index, SMCKeyData_t *inputStructure, SMCKeyData_t *out
     structureOutputSize = sizeof(SMCKeyData_t);
 #if !defined(__LP64__)
 	// Check if Mac OS X 10.5 API is available...
-	if (IOConnectCallStructMethod != NULL) {
+    SInt32 MacVersion;
+    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1050)) {
 		// ...and use it if it is.
 #endif
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 		return IOConnectCallStructMethod(
             conn,               // an io_connect_t returned from IOServiceOpen().
             index,	            // selector of the function to be called via the user client.
@@ -178,6 +181,7 @@ kern_return_t SMCCall(int index, SMCKeyData_t *inputStructure, SMCKeyData_t *out
             outputStructure,    // pointer to the output struct parameter.
             &structureOutputSize// pointer to the size of the output structure parameter.
             );
+#endif
 #if !defined(__LP64__)
 	}
 	else {

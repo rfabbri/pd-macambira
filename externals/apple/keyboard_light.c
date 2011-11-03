@@ -26,6 +26,7 @@
 #include <mach/mach.h> 
 #include <IOKit/IOKitLib.h> 
 #include <CoreFoundation/CoreFoundation.h> 
+#include <CoreServices/CoreServices.h>
 #include <m_pd.h>
 
 #define DEBUG(x)
@@ -133,9 +134,11 @@ static void keyboard_light_float(t_keyboard_light* x, t_float f)
     
 #if !defined(__LP64__)
 	// Check if Mac OS X 10.5 API is available...
-	if (IOConnectCallScalarMethod != NULL) {
+    SInt32 MacVersion;
+    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1050)) {
 		// ...and use it if it is.
 #endif
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
         uint64_t inputValues[3];
         uint32_t inputCount = 3;
         uint64_t outputValues[1];
@@ -149,6 +152,7 @@ static void keyboard_light_float(t_keyboard_light* x, t_float f)
                                                inputCount,
                                                outputValues,
                                                &outputCount);
+#endif
 #if !defined(__LP64__)
 	}
 	else {

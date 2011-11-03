@@ -26,6 +26,7 @@
 #include <mach/mach.h> 
 #include <IOKit/IOKitLib.h> 
 #include <CoreFoundation/CoreFoundation.h> 
+#include <CoreServices/CoreServices.h>
 #include <m_pd.h>
 
 #define DEBUG(x)
@@ -76,9 +77,11 @@ static void ambient_light_sensor_output(t_ambient_light_sensor* x)
 
 #if !defined(__LP64__)
 	// Check if Mac OS X 10.5 API is available...
-	if (IOConnectCallScalarMethod != NULL) {
+    SInt32 MacVersion;
+    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1050)) {
 		// ...and use it if it is.
 #endif
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
         uint64_t inputValues[0];
         uint32_t inputCount = 0;
         uint64_t outputValues[2];
@@ -91,6 +94,7 @@ static void ambient_light_sensor_output(t_ambient_light_sensor* x)
                                                &outputCount);
         left = (t_float) (outputValues[0] / 2000.0);
         right = (t_float) (outputValues[1] / 2000.0);
+#endif
 #if !defined(__LP64__)
 	}
 	else {
