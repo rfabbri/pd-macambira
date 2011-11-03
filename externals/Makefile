@@ -1014,7 +1014,7 @@ loaders-libdir_clean:
 
 loaders-tclpd:
 	make -C $(externals_src)/loaders/tclpd CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
-				PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+				FAT_FLAGS="-mmacosx-version-min=10.4" PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 loaders-tclpd_install: loaders-tclpd
 	make -C $(externals_src)/loaders/tclpd STRIP="$(STRIP)" \
