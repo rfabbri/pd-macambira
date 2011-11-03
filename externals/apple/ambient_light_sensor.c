@@ -76,9 +76,9 @@ static void ambient_light_sensor_output(t_ambient_light_sensor* x)
     if(! x->io_connect) return;
 
 #if !defined(__LP64__)
-	// Check if Mac OS X 10.5 API is available...
+	// Check if Mac OS X 10.5/10.6 API is available...
     SInt32 MacVersion;
-    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1050)) {
+    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1060)) {
 		// ...and use it if it is.
 #endif
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER

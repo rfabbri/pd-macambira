@@ -167,9 +167,9 @@ kern_return_t SMCCall(int index, SMCKeyData_t *inputStructure, SMCKeyData_t *out
     structureInputSize = sizeof(SMCKeyData_t);
     structureOutputSize = sizeof(SMCKeyData_t);
 #if !defined(__LP64__)
-	// Check if Mac OS X 10.5 API is available...
+	// Check if Mac OS X 10.5/10.6 API is available...
     SInt32 MacVersion;
-    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1050)) {
+    if ((Gestalt(gestaltSystemVersion, &MacVersion) == noErr) && (MacVersion >= 0x1060)) {
 		// ...and use it if it is.
 #endif
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
