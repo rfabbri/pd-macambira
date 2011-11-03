@@ -1120,6 +1120,7 @@ static int pdlua_error(lua_State *L)
   * */
 {
     t_pdlua     *o;
+
     const char  *s;
 
     if (lua_islightuserdata(L, 1))
@@ -1243,11 +1244,11 @@ static void pdlua_init(lua_State *L)
     lua_setglobal(L, "pd");
     lua_getglobal(L, "pd");
     lua_pushstring(L, "_iswindows");
-#ifdef MSW
+#ifdef _WIN32
     lua_pushboolean(L, 1);
 #else
     lua_pushboolean(L, 0);
-#endif
+#endif // _WIN32
     lua_settable(L, -3);
     lua_pushstring(L, "_register");
     lua_pushcfunction(L, pdlua_class_new);
