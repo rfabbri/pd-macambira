@@ -66,6 +66,7 @@ typedef struct _tcpclient_sender_params
     int                 x_buf_len;
     int                 x_sendresult;
     pthread_t           sendthreadid;
+    int                 threadisvalid; /*  non-zero if sendthreadid is an active thread */
     struct _tcpclient   *x_x;
 } t_tcpclient_sender_params;
 #define MAX_TCPCLIENT_THREADS 32
@@ -249,7 +250,7 @@ static void tcpclient_disconnect(t_tcpclient *x)
     {
         for (i = 0; i < MAX_TCPCLIENT_THREADS;++i)
         { /* wait for any sender threads to finish */
-            while (x->x_tsp[i].sendthreadid != 0);
+            while (x->x_tsp[i].threadisvalid != 0);
         }
         sys_closesocket(x->x_fd);
         x->x_fd = -1;
@@ -349,6 +350,7 @@ static int tcpclient_send_buf(t_tcpclient *x, char *buf, int buf_len)
         return 0;
     }
     max = (buf_len > MAX_TCPCLIENT_SEND_BUF)? MAX_TCPCLIENT_SEND_BUF: buf_len;
+    while(0 != tsp->threadisvalid); /* wait for thread to clear */
     for (i = 0; i < max; ++i)
     {
         tsp->x_sendbuf[i] = buf[i];
@@ -356,9 +358,10 @@ static int tcpclient_send_buf(t_tcpclient *x, char *buf, int buf_len)
     tsp->x_buf_len = i;
     x->x_sendbuf_len += i;
     tsp->x_x = x;
-
+    tsp->threadisvalid = 1;
     if((tsp->x_sendresult = pthread_create(&tsp->sendthreadid, &x->x_sendthreadattr, tcpclient_child_send, tsp)) < 0)
     {
+        tsp->threadisvalid = 0;
         post("%s_send_buf: could not create new thread (%d)", objName);
         clock_delay(x->x_sendclock, 0); // calls tcpclient_sent
         return 0;
@@ -375,7 +378,7 @@ static void *tcpclient_child_send(void *w)
 
     tsp->x_sendresult = send(tsp->x_x->x_fd, tsp->x_sendbuf, tsp->x_buf_len, 0);
     clock_delay(tsp->x_x->x_sendclock, 0); // calls tcpclient_sent when it's safe to do so
-    tsp->sendthreadid = 0;
+    tsp->threadisvalid = 0; /* this thread is over */
     return(tsp);
 }
 
