@@ -7,7 +7,8 @@ do
   (test -e "$dir/Makefile" && echo "Building $dir") || continue
   make -C $dir dist
   make -C $dir distclean
-  make -C $dir 
-  mkdir destdir
-  make -C $dir DESTDIR=destdir objectsdir="" install
+  make -C $dir
+  rm -rf -- $dir/destdir
+  mkdir $dir/destdir
+  make -C $dir DESTDIR=$dir/destdir objectsdir="" install
 done
