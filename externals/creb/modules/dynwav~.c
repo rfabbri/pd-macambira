@@ -74,9 +74,9 @@ static t_int *dynwav_perform(t_int *w)
       
       for (i = 0; i < n; i++)
 	{
-	  float findex = *freq++ * (t_float)n;
+	  t_float findex = *freq++ * (t_float)n;
 	  int index = findex;
-	  float frac,  a,  b,  c,  d, cminusb, q, r;
+	  t_float frac,  a,  b,  c,  d, cminusb, q, r;
 	  int ia, ib, ic, id;
 	  
 	  frac = findex - index; 
@@ -134,16 +134,16 @@ static t_int *dynwav_perform_8point(t_int *w)
   if (buf && dbuf)
     {
 
-/* const float N1 = 1 / (   2      * (1-(1/9))  * (1-(1/25))  * (1-(1/49))  );
-** const float N2 = 1 / ( (1-(9))  *      2     * (1-(9/25))  * (1-(9/49))  );
-** const float N3 = 1 / ( (1-(25)) * (1-(25/9)) *      2      * (1-(25/49)) );
-** const float N4 = 1 / ( (1-(49)) * (1-(49/9)) * (1-(49/25)) *    2        );
+/* const t_float N1 = 1 / (   2      * (1-(1/9))  * (1-(1/25))  * (1-(1/49))  );
+** const t_float N2 = 1 / ( (1-(9))  *      2     * (1-(9/25))  * (1-(9/49))  );
+** const t_float N3 = 1 / ( (1-(25)) * (1-(25/9)) *      2      * (1-(25/49)) );
+** const t_float N4 = 1 / ( (1-(49)) * (1-(49/9)) * (1-(49/25)) *    2        );
 */
 
-      const float N1 =   0.59814453125;
-      const float N2 =  -0.11962890625;
-      const float N3 =   0.02392578125;
-      const float N4 =  -0.00244140625;
+      const t_float N1 =   0.59814453125;
+      const t_float N2 =  -0.11962890625;
+      const t_float N3 =   0.02392578125;
+      const t_float N4 =  -0.00244140625;
 
 
       /* store input wavetable in buffer */
@@ -152,13 +152,13 @@ static t_int *dynwav_perform_8point(t_int *w)
       
       for (i = 0; i < n; i++)
 	{
-	  float findex = *freq++ * (t_float)n;
+	  t_float findex = *freq++ * (t_float)n;
 	  int index = findex;
-	  float frac, q, r, fm, fp, fe, fo;
-	  float x1, x2, x3, x4;
-	  float g1, g2, g3, g4;
-	  float gg, g2g3g4, g1g3g4, g1g2g4, g1g2g3;
-	  float acc;
+	  t_float frac, q, r, fm, fp, fe, fo;
+	  t_float x1, x2, x3, x4;
+	  t_float g1, g2, g3, g4;
+	  t_float gg, g2g3g4, g1g3g4, g1g2g4, g1g2g3;
+	  t_float acc;
 	  int im, ip;
 	  
 	  frac = 2 *(findex - index) - 1; 

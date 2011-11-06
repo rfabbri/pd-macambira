@@ -53,7 +53,7 @@ static void window_size(t_window *x, t_int n)
 {
     if (x->x_size != n){
 	if (x->x_window) free(x->x_window);
-	x->x_window = malloc(sizeof(float)*n);
+	x->x_window = malloc(sizeof(t_float)*n);
 	x->x_size = n;
     }
 }
@@ -62,26 +62,26 @@ static void window_size(t_window *x, t_int n)
 static void window_type(t_window *x, t_symbol *s, t_float f)
 {
     int i;
-    float a = 0;
-    float a_inc = 2 * M_PI / (float)(x->x_size);
+    t_float a = 0;
+    t_float a_inc = 2 * M_PI / (t_float)(x->x_size);
     if (!s) s = gensym("hamming");
     if (s == gensym("hamming")){
 	for (i=0; i<x->x_size; i++){
-	    float c = cos(a);
+	    t_float c = cos(a);
 	    x->x_window[i] = (0.54 - 0.46 * c);
 	    a += a_inc;
 	}
     }
     else if (s == gensym("hann")){
 	for (i=0; i<x->x_size; i++){
-	    float c = cos(a);
+	    t_float c = cos(a);
 	    x->x_window[i] = (0.5 - 0.5 * c);
 	    a += a_inc;
 	}
     }
     else if (s == gensym("hann/hamming")){
 	for (i=0; i<x->x_size; i++) {
-	    float c = cos(a);
+	    t_float c = cos(a);
 	    x->x_window[i] = (0.5 - 0.5 * c) / (0.54 - 0.46 * c);
 	    a += a_inc;
 	}
@@ -91,7 +91,7 @@ static void window_type(t_window *x, t_symbol *s, t_float f)
 	x->x_window[1] = 1.0f / sqrt((double)(x->x_size>>1)); //NY
 	for (i=2; i<x->x_size; i+=2) {
 	    double freq = (double)(i>>1);
-	    float amp = sqrt(1.0 / freq);
+	    t_float amp = sqrt(1.0 / freq);
 	    x->x_window[i] = amp;
 	    x->x_window[i+1] = amp;
 	}
@@ -101,18 +101,18 @@ static void window_type(t_window *x, t_symbol *s, t_float f)
 	x->x_window[1] = sqrt((double)(x->x_size>>1)); //NY
 	for (i=2; i<x->x_size; i+=2) {
 	    double freq = (double)(i>>1);
-	    float amp = sqrt(freq);
+	    t_float amp = sqrt(freq);
 	    x->x_window[i] = amp;
 	    x->x_window[i+1] = amp;
 	}
     }   
     else if (s == gensym("bfft_db/octave")){
-	float power = f/6.0;
+	t_float power = f/6.0;
 	x->x_window[0] = 1.0f; //DC
 	x->x_window[1] = pow((double)(x->x_size>>1), power); //NY
 	for (i=2; i<x->x_size; i+=2) {
 	    double freq = (double)(i>>1);
-	    float amp = pow(freq, power);
+	    t_float amp = pow(freq, power);
 	    x->x_window[i] = amp;
 	    x->x_window[i+1] = amp;
 	}

@@ -26,28 +26,31 @@
 /* envelope stuff */
 
 /* exponential range for envelopes is 60dB */
-#define ENVELOPE_RANGE 0.001f
-#define ENVELOPE_MAX   (1.0f - ENVELOPE_RANGE)
+#define ENVELOPE_RANGE 0.001
+#define ENVELOPE_MAX   (1.0 - ENVELOPE_RANGE)
 #define ENVELOPE_MIN   ENVELOPE_RANGE
 
 /* convert milliseconds to 1-p, with p a real pole */
-static inline float milliseconds_2_one_minus_realpole(float time)
+static inline t_float milliseconds_2_one_minus_realpole(t_float time)
 {
-  float r;
+  t_float r;
 
-  if (time < 0.0f) time = 0.0f;
-  r = -expm1(1000.0f * log(ENVELOPE_RANGE) / (sys_getsr() * time));
-  if (!(r < 1.0f)) r = 1.0f;
+  if (time < 0.0) time = 0.0;
+  r = -expm1(1000.0 * log(ENVELOPE_RANGE) / (sys_getsr() * time));
+  if (!(r < 1.0)) r = 1.0;
 
   //post("%f",r);
   return r;
 }
 
+#if defined(__i386__) || defined(__x86_64__) // type punning code:
+
+#if PD_FLOAT_PRECISION == 32
 
 typedef union
 {
     unsigned int i;
-    float f;
+    t_float f;
 } t_flint;
 
 /* check if floating point number is denormal */
@@ -56,6 +59,20 @@ typedef union
 
 #define IS_DENORMAL(f) (((((t_flint)(f)).i) & 0x7f800000) == 0)
 
+#elif PD_FLOAT_PRECISION == 64
+
+typedef union
+{
+    unsigned int i[2];
+    t_float f;
+} t_flint;
+
+#define IS_DENORMAL(f) (((((t_flint)(f)).i[1]) & 0x7ff00000) == 0)
+
+#endif // endif PD_FLOAT_PRECISION
+#else   // if not defined(__i386__) || defined(__x86_64__)
+#define IS_DENORMAL(f) 0
+#endif // end if defined(__i386__) || defined(__x86_64__)
 
 #endif /* CREB_EXTLIB_UTIL_H */
 

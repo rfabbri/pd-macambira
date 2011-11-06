@@ -58,9 +58,9 @@ static void dwt_even(t_dwt *x, t_floatarg f)
 {
   int k = (int)f;
   int i, j;
-  float *p = x->x_ctl.c_predict;
-  float *u = x->x_ctl.c_update;
-  float  l, xi, xj;
+  t_float *p = x->x_ctl.c_predict;
+  t_float *u = x->x_ctl.c_update;
+  t_float  l, xi, xj;
 
   if ((k>0) && (k<MAXORDER/2))
     {
@@ -230,12 +230,12 @@ static void dwt_filter(t_dwt *x,  t_symbol *s, int argc, t_atom *argv)
   
   char *name = x->x_ctl.c_name;
 
-  float *pfilter = x->x_ctl.c_predict; 
-  float *ufilter = x->x_ctl.c_update; 
-  float *mask = NULL;
+  t_float *pfilter = x->x_ctl.c_predict; 
+  t_float *ufilter = x->x_ctl.c_update; 
+  t_float *mask = NULL;
 
   t_int *length = NULL;
-  float sum = 0;
+  t_float sum = 0;
 
   if (s == gensym("predict"))
     {
@@ -305,13 +305,13 @@ static inline void dwtloop(t_float *vector,
 		     int backup,
 		     int numcoef, 
 		     int mask,
-		     float *filter,
+		     t_float *filter,
 		     int filtlength,
-		     float sign)
+		     t_float sign)
 {
 
   int k,m;
-  float acc;
+  t_float acc;
 
   for (k = 0; k < numcoef; k++)
     {
@@ -338,13 +338,13 @@ static inline void dwtloop16(t_float *vector,
 		     int backup,
 		     int numcoef, 
 		     int mask,
-		     float *filter,
+		     t_float *filter,
 		     int filtlength, /* ignored, set to 16 */
-		     float sign)
+		     t_float sign)
 {
 
   int k,m;
-  float acc;
+  t_float acc;
 
   for (k = 0; k < numcoef; k++)
     {
@@ -516,7 +516,7 @@ static t_int *idwt_perform(t_int *w)
   int backup_u = (ctl->c_nupdate-1)*n;
   int backup_p = (ctl->c_npredict-1)*n;
   int fake_in = ctl->c_fakein;
-  float fake_val = ctl->c_fakeval;
+  t_float fake_val = ctl->c_fakeval;
 
   /* copy input to output */
   if (in != out)
@@ -653,7 +653,7 @@ static t_int *idwt16_perform(t_int *w)
   int backup_u = (ctl->c_nupdate-1)*n;
   int backup_p = (ctl->c_npredict-1)*n;
   int fake_in = ctl->c_fakein;
-  float fake_val = ctl->c_fakeval;
+  t_float fake_val = ctl->c_fakeval;
 
   /* copy input to output */
   if (in != out)

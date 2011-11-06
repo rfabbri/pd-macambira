@@ -28,31 +28,31 @@ class DSPIcomplex
 {
     public:
         inline DSPIcomplex() {_r = _i = 0;}
-        inline DSPIcomplex(const float &a, const float &b) {setCart(a, b);}
-        inline DSPIcomplex(const float &phasor) {setAngle(phasor);}
+        inline DSPIcomplex(const t_float &a, const t_float &b) {setCart(a, b);}
+        inline DSPIcomplex(const t_float &phasor) {setAngle(phasor);}
         
-        inline void setAngle(const float &angle) {_r = cos(angle); _i = sin(angle);}
-        inline void setPolar(const float &phasor, const float &norm) 
+        inline void setAngle(const t_float &angle) {_r = cos(angle); _i = sin(angle);}
+        inline void setPolar(const t_float &phasor, const t_float &norm) 
         {_r = norm * cos(phasor); _i = norm * sin(phasor);}
-        inline void setCart(const float &a, const float &b) {_r = a; _i = b;}
+        inline void setCart(const t_float &a, const t_float &b) {_r = a; _i = b;}
         
-        inline const float& r() const {return _r;}
-        inline const float& i() const {return _i;}
+        inline const t_float& r() const {return _r;}
+        inline const t_float& i() const {return _i;}
         
-        inline float norm2() const {return _r*_r+_i*_i;}
-        inline float norm() const {return sqrt(norm2());}
-        inline void normalize() {float n = 1.0f / norm(); _r *= n; _i *= n;}
+        inline t_float norm2() const {return _r*_r+_i*_i;}
+        inline t_float norm() const {return sqrt(norm2());}
+        inline void normalize() {t_float n = 1.0f / norm(); _r *= n; _i *= n;}
         
         inline DSPIcomplex conj() const {return DSPIcomplex(_r, -_i);}
 
-        inline float angle() const {return atan2(_i, _r);}
+        inline t_float angle() const {return atan2(_i, _r);}
 
 
         inline DSPIcomplex operator+ (const DSPIcomplex &a) const
         {
             return DSPIcomplex(_r + a.r(), _i + a.i());
         }
-        inline DSPIcomplex operator+ (float f) const
+        inline DSPIcomplex operator+ (t_float f) const
         {
             return DSPIcomplex(_r + f, _i);
         }
@@ -60,7 +60,7 @@ class DSPIcomplex
         {
             return DSPIcomplex(_r - a.r(), _i - a.i());
         }
-        inline DSPIcomplex operator- (float f) const
+        inline DSPIcomplex operator- (t_float f) const
         {
             return DSPIcomplex(_r - f, _i);
         }
@@ -69,18 +69,18 @@ class DSPIcomplex
         {
             return DSPIcomplex(_r * a.r() - _i * a.i(), _i * a.r() + _r * a.i());
         }
-        inline DSPIcomplex operator* (float f) const
+        inline DSPIcomplex operator* (t_float f) const
         {
             return DSPIcomplex(_r * f, _i * f);
         }
         inline DSPIcomplex operator/ (const DSPIcomplex &a) const 
         {
-            float n_t = 1.0f / a.norm2();
+            t_float n_t = 1.0f / a.norm2();
             return DSPIcomplex(n_t * (_r * a.r() + _i * a.i()), n_t * (_i * a.r() - _r * a.i()));
         }
-        inline DSPIcomplex operator/ (float f) const 
+        inline DSPIcomplex operator/ (t_float f) const 
         {
-            float n_t = 1.0f / f;
+            t_float n_t = 1.0f / f;
             return DSPIcomplex(n_t * _r, n_t * _i);
         }
         
@@ -89,36 +89,36 @@ class DSPIcomplex
             return o << "(" << a.r() << "," << a.i() << ")";
         }
 
-        inline friend DSPIcomplex operator+ (float f, DSPIcomplex& a)
+        inline friend DSPIcomplex operator+ (t_float f, DSPIcomplex& a)
         {
             return(DSPIcomplex(a.r() + f, a.i()));
         }
         
-        inline friend DSPIcomplex operator- (float f, DSPIcomplex& a)
+        inline friend DSPIcomplex operator- (t_float f, DSPIcomplex& a)
         {
             return(DSPIcomplex(f - a.r(), - a.i()));
         }
         
-        inline friend DSPIcomplex operator/ (float f, DSPIcomplex& a)
+        inline friend DSPIcomplex operator/ (t_float f, DSPIcomplex& a)
         {
             return(DSPIcomplex(f,0) / a);
         }
         
         // ????
-        inline friend DSPIcomplex operator* (float f, DSPIcomplex& a)
+        inline friend DSPIcomplex operator* (t_float f, DSPIcomplex& a)
         {
             return(DSPIcomplex(f*a.r(), f*a.i()));
         }
         
         
-        inline DSPIcomplex& operator *= (float f)
+        inline DSPIcomplex& operator *= (t_float f)
         {
             _r *= f;
             _i *= f;
             return *this;
         }
 
-        inline DSPIcomplex& operator /= (float f)
+        inline DSPIcomplex& operator /= (t_float f)
         {
             _r /= f;
             _i /= f;
@@ -127,7 +127,7 @@ class DSPIcomplex
 
         inline DSPIcomplex& operator *= (DSPIcomplex& a)
         {
-            float r_t = _r * a.r() - _i * a.i();
+            t_float r_t = _r * a.r() - _i * a.i();
                    _i = _r * a.i() + _i * a.r();
                    _r = r_t;
                    
@@ -136,8 +136,8 @@ class DSPIcomplex
 
         inline DSPIcomplex& operator /= (DSPIcomplex& a)
         {
-            float n_t = a.norm2();
-            float r_t = n_t * (_r * a.r() + _i * a.i());
+            t_float n_t = a.norm2();
+            t_float r_t = n_t * (_r * a.r() + _i * a.i());
                    _i = n_t * (_i * a.r() - _r * a.i());
                    _r = r_t;
                    
@@ -145,8 +145,8 @@ class DSPIcomplex
         }
 
         
-        float _r;
-        float _i;
+        t_float _r;
+        t_float _i;
 };
 
 
@@ -154,8 +154,8 @@ class DSPIcomplex
 
 inline DSPIcomplex dspilog(DSPIcomplex a) /* complex log */
 {
-    float r_t = log(a.norm());
-    float i_t = a.angle();
+    t_float r_t = log(a.norm());
+    t_float i_t = a.angle();
     return DSPIcomplex(r_t, i_t);
 }
 
@@ -170,22 +170,22 @@ inline DSPIcomplex dspiexp(DSPIcomplex a) /* complex exp */
 
 inline DSPIcomplex bilin_stoz(DSPIcomplex a)
 {
-    DSPIcomplex a2 = a * 0.5f;
-    return((1.0f + a2)/(1.0f - a2));
+    DSPIcomplex a2 = a * 0.5;
+    return((1.0 + a2)/(1.0 - a2));
 }    
 
 // BILINEAR TRANSFORM digital -> analog
 
 inline DSPIcomplex bilin_ztos(DSPIcomplex a)
 {
-    return ((a - 1.0f) / (a + 1.0f))*2.0f;
+    return ((a - 1.0) / (a + 1.0))*2.0;
 }
 
 // not really a complex function but a nice complement to the bilinear routines
 
-inline float bilin_prewarp(float freq)
+inline t_float bilin_prewarp(t_float freq)
 {
-    return 2.0f * tan(M_PI * freq);
+    return 2.0 * tan(M_PI * freq);
 }    
 
 #endif //DSPIcomplex_h

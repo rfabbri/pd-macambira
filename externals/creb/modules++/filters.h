@@ -4,7 +4,7 @@
 
 /* the typedef */
 #ifndef T
-#define T float
+#define T t_float
 #endif
 
 
@@ -54,14 +54,14 @@ P vcmul2 (T A, T C)       { cmul2(a,a+1,c,c+1); }
 
 
 /* norm */
-static inline float vcnorm(T X) { return hypot(x[0], x[1]); }
+static inline t_float vcnorm(T X) { return hypot(x[0], x[1]); }
 
 
 
 /* swap */
 P vcswap(T Y, T X)
 {
-    float t[2] = {x[0], x[1]};
+    t_float t[2] = {x[0], x[1]};
     x[0] = y[0];
     x[1] = y[1];
     y[0] = t[0];
@@ -72,14 +72,14 @@ P vcswap(T Y, T X)
 /* inverse */
 P vcinv(T Y, T X)
 {
-    float scale = 1.0f / vcnorm(x);
+    t_float scale = 1.0 / vcnorm(x);
     y[0] = scale * x[0];
     y[1] = scale * x[1];
 }
 
 P vcinv1(T X)
 {
-    float scale = 1.0f / vcnorm(x);
+    t_float scale = 1.0 / vcnorm(x);
     x[0] *= scale;
     x[1] *= scale;
 }
@@ -162,24 +162,24 @@ P two_pole_complex_conj (T X, T Y, T S, T A, T C)
 
 /* evaluate pole and allzero TF in z^-1 given the complex zeros/poles:
    p(z) (or p(z)^-1) = \product (1-z_i z^-1) */
-PP eval_zero_poly(float *val, float *arg, float *zeros, int nb_zeros)
+PP eval_zero_poly(t_float *val, t_float *arg, t_float *zeros, int nb_zeros)
 {
     int i;
-    float a[2] = {arg[0], arg[1]};
+    t_float a[2] = {arg[0], arg[1]};
     vcinv1(a);
-    val[0] = 1.0f;
-    val[1] = 0.0f;
+    val[0] = 1.0;
+    val[1] = 0.0;
     a[0] *= -1;
     a[1] *= -1;
     for (i=0; i<nb_zeros; i++){
-	float t[2];
+	t_float t[2];
 	vcmul(t, a, zeros + 2*i);
-	t[0] += 1.0f;
+	t[0] += 1.0;
 	vcmul2(val, t);
     }
 }
 
-PP eval_pole_poly(float *val, float *arg, float *poles, int nb_poles)
+PP eval_pole_poly(t_float *val, t_float *arg, t_float *poles, int nb_poles)
 {
     eval_zero_poly(val, arg, poles, nb_poles);
     vcinv1(val);
@@ -189,10 +189,10 @@ PP eval_pole_poly(float *val, float *arg, float *poles, int nb_poles)
 /* since it's more efficient to store half of the poles for a real impulse
    response, these functions compute p(z) conj(p(conj(z)))  */
 
-PP eval_conj_zero_poly(float *val, float *arg, float *zeros, int nb_zeros)
+PP eval_conj_zero_poly(t_float *val, t_float *arg, t_float *zeros, int nb_zeros)
 {
-    float t[2];
-    float a[2] = {arg[0], arg[1]};
+    t_float t[2];
+    t_float a[2] = {arg[0], arg[1]};
     eval_zero_poly(t, a, zeros, nb_zeros);
     a[1] *= -1;
     eval_zero_poly(val, a, zeros, nb_zeros);
@@ -200,15 +200,15 @@ PP eval_conj_zero_poly(float *val, float *arg, float *zeros, int nb_zeros)
     vcmul2(val, t);
 }
 
-PP eval_conj_pole_poly(float *val, float *arg, float *poles, int nb_poles)
+PP eval_conj_pole_poly(t_float *val, t_float *arg, t_float *poles, int nb_poles)
 {
     eval_conj_zero_poly(val, arg, poles, nb_poles);
     vcinv1(val);
 }
 
-PP eval_conj_pole_zero_ratfunc(float *val, float *arg, float *poles, float *zeros, int nb_poles, int nb_zeros)
+PP eval_conj_pole_zero_ratfunc(t_float *val, t_float *arg, t_float *poles, t_float *zeros, int nb_poles, int nb_zeros)
 {
-    float t[2];
+    t_float t[2];
     eval_conj_zero_poly(t, arg, zeros, nb_zeros);
     eval_conj_pole_poly(val, arg, poles, nb_zeros);
     vcmul2(val, t);

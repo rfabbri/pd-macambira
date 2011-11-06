@@ -27,9 +27,9 @@ typedef struct _tabreadmix_tilde
 {
     t_object x_obj;
     int x_npoints;
-    float *x_vec;
+    t_float *x_vec;
     t_symbol *x_arrayname;
-    float x_f;
+    t_float x_f;
 
     /* file position vars */
     int x_currpos;
@@ -38,10 +38,10 @@ typedef struct _tabreadmix_tilde
     /* cross fader state vars */
     int x_xfade_size;
     int x_xfade_phase;
-    float x_xfade_cos;
-    float x_xfade_sin;
-    float x_xfade_state_c;
-    float x_xfade_state_s;
+    t_float x_xfade_cos;
+    t_float x_xfade_sin;
+    t_float x_xfade_state_c;
+    t_float x_xfade_state_s;
 
 } t_tabreadmix_tilde;
 
@@ -74,10 +74,10 @@ static t_int *tabreadmix_tilde_perform(t_int *w)
     t_float *out = (t_float *)(w[3]);
     int n = (int)(w[4]);    
     int maxxindex;
-    float *buf = x->x_vec;
+    t_float *buf = x->x_vec;
     int i;
-    float currgain, prevgain;
-    float c,s;
+    t_float currgain, prevgain;
+    t_float c,s;
     int chunk;
     int leftover;
     int newpos = (int)*pos;
@@ -95,8 +95,8 @@ static t_int *tabreadmix_tilde_perform(t_int *w)
 
 	for (i = 0; i < chunk; i++){
 	    /* compute crossfade gains from oscillator state */
-	    currgain = 0.5f - x->x_xfade_state_c;
-	    prevgain = 0.5f + x->x_xfade_state_c;
+	    currgain = 0.5 - x->x_xfade_state_c;
+	    prevgain = 0.5 + x->x_xfade_state_c;
 	    
 	    /* check indices & wrap */
 	    tabreadmix_tilde_wrapindices(x);
@@ -124,8 +124,8 @@ static t_int *tabreadmix_tilde_perform(t_int *w)
 	if (x->x_xfade_size == x->x_xfade_phase){
 	    x->x_prevpos = x->x_currpos;
 	    x->x_currpos = newpos;
-	    x->x_xfade_state_c = 0.5f;
-	    x->x_xfade_state_s = 0.0f;
+	    x->x_xfade_state_c = 0.5;
+	    x->x_xfade_state_s = 0.0;
 	    x->x_xfade_phase = 0;
 	}
 
@@ -145,7 +145,7 @@ static void tabreadmix_tilde_blocksize(t_tabreadmix_tilde *x, t_float size)
 {
     double prev_phase;
     int max;
-    float fmax = (float)x->x_npoints * 0.5f;
+    t_float fmax = (t_float)x->x_npoints * 0.5;
 
     if (size < 1.0) size = 1.0;
 
@@ -159,8 +159,8 @@ static void tabreadmix_tilde_blocksize(t_tabreadmix_tilde *x, t_float size)
     x->x_xfade_size = (int)size;
 
 
-    x->x_xfade_cos = cos(M_PI / (float)x->x_xfade_size);
-    x->x_xfade_sin = sin(M_PI / (float)x->x_xfade_size);
+    x->x_xfade_cos = cos(M_PI / (t_float)x->x_xfade_size);
+    x->x_xfade_sin = sin(M_PI / (t_float)x->x_xfade_size);
 
 
     /* make sure indices are inside array */
@@ -184,8 +184,8 @@ void tabreadmix_tilde_pitch(t_tabreadmix_tilde *x, t_float f)
 
 void tabreadmix_tilde_chunks(t_tabreadmix_tilde *x, t_float f)
 {
-    if (f < 1.0f) f = 1.0f;
-    tabreadmix_tilde_blocksize(x, (float)x->x_npoints / f);
+    if (f < 1.0) f = 1.0;
+    tabreadmix_tilde_blocksize(x, (t_float)x->x_npoints / f);
 }
 
 void tabreadmix_tilde_bang(t_tabreadmix_tilde *x, t_float f)
@@ -247,8 +247,8 @@ static void *tabreadmix_tilde_new(t_symbol *s)
     x->x_xfade_size = 1024;
     x->x_currpos = 0;
     x->x_prevpos = 0;
-    x->x_xfade_state_c = 0.5f;
-    x->x_xfade_state_s = 0.0f;
+    x->x_xfade_state_c = 0.5;
+    x->x_xfade_state_s = 0.0;
     tabreadmix_tilde_blocksize(x, 1024);
     return (x);
 }

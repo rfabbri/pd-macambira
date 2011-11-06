@@ -43,8 +43,8 @@ typedef struct bdiag
 } t_bdiag;
 
 
-static float randfloat(void){
-  float r = rand ();
+static t_float randfloat(void){
+  t_float r = rand ();
   r /= (RAND_MAX/2);
   r -= 1;
   return r;
@@ -94,22 +94,22 @@ static void bdiag_eigen(t_bdiag *x, t_floatarg index,
 static void bdiag_timefreq(t_bdiag *x, t_floatarg index, 
 			   t_floatarg time, t_floatarg freq)
 {
-  float r,a,b,n;
-  float sr = sys_getsr() / (float)x->x_ctl.c_order;
+  t_float r,a,b,n;
+  t_float sr = sys_getsr() / (t_float)x->x_ctl.c_order;
 
   /* time in ms */
   time *= 0.001;
 
-  if (time < 0.0f) time = 0.0f;
-  r = pow(0.001f, 1.0f / (time * sr));
-  if (r < 0.0f) r = 0.0f;
-  if (r > 1.0f) r = 1.0f;
+  if (time < 0.0) time = 0.0;
+  r = pow(0.001, 1.0 / (time * sr));
+  if (r < 0.0) r = 0.0;
+  if (r > 1.0) r = 1.0;
 
   a = cos(2*M_PI*freq/sr);
   b = sin(2*M_PI*freq/sr);
  
   /* normalize to be sure */
-  n = 1.0f / sqrt(a*a + b*b);
+  n = 1.0 / sqrt(a*a + b*b);
   a *= n;
   b *= n;
 
@@ -120,14 +120,14 @@ static void bdiag_preset(t_bdiag *x, t_floatarg preset)
 {
   int p = preset;
   int i;
-  float a, b, w, r;
+  t_float a, b, w, r;
 
   switch(p){
   case 0:
     post("preset 0");
     for (i=0; i<x->x_ctl.c_order/2; i++){
       w = randfloat() * .001;
-      r = 1. - (((float)i + 1.)/1000.);
+      r = 1. - (((t_float)i + 1.)/1000.);
       a = cos(w) * r;
       b = sin(w) * r;
       post("%f %f %f %f", w, r, a, b);
@@ -145,8 +145,8 @@ static t_int *bdiag_perform(t_int *w)
 {
 
 
-  t_float *in     = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in     = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   t_bdiagctl *ctl  = (t_bdiagctl *)(w[1]);
 
   t_float *eigen = ctl->c_eigen;

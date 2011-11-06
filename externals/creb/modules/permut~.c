@@ -25,6 +25,11 @@
 //#include "m_pd.h"
 #include "extlib_util.h"
                                
+typedef union
+{
+    float f;
+    unsigned int i;
+}t_permutflint;
 
 
 typedef struct permutctl
@@ -33,6 +38,7 @@ typedef struct permutctl
   t_int *c_permutationtable;
   int c_blocksize;
 } t_permutctl;
+
 
 typedef struct permut
 {
@@ -64,9 +70,10 @@ static void permut_random(t_permut *x, t_floatarg seed)
   int mask = N-1;
   t_int *p = x->x_ctl.c_permutationtable;
   int r, last = 0;
-
-  //srand(* ((unsigned int *)(&seed)));
-  srand (((t_flint)seed).i);
+  t_permutflint flintseed;
+  
+  flintseed.f = (float)seed;
+  srand(flintseed.i);
 
   if(p)
     {
@@ -92,9 +99,10 @@ static void permut_random(t_permut *x, t_floatarg seed)
 
 static void permut_bang(t_permut *x)
 {
-    unsigned int r = rand();
-    //permut_random(x, *((t_float *)(&r)));
-    permut_random(x, ((t_flint)r).f);
+    t_permutflint seed;
+    seed.i = rand();
+    t_float floatseed = (t_float)seed.f;
+    permut_random(x, floatseed);
 }
 
 static void permut_resize_table(t_permut *x, int size)

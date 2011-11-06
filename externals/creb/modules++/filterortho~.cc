@@ -43,8 +43,8 @@ static t_int *filterortho_perform(t_int *w)
 {
 
 
-  t_float *in    = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in    = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   DSPIfilterOrtho* filterortho  = (DSPIfilterOrtho *)(w[1]);
   t_int n = (t_int)(w[2]);
   t_int i;
@@ -52,7 +52,7 @@ static t_int *filterortho_perform(t_int *w)
 
 
   // dit kan beter 
-  float smooth = 1.0f - pow(.05f,1.0f/(float)(n));
+  t_float smooth = 1.0 - pow(.05,1.0/(t_float)(n));
 
   for (i = 0; i < n; i++)
   {

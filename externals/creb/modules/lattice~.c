@@ -23,7 +23,7 @@
 #include <math.h>
 
 #define MAXORDER 1024
-#define MAXREFCO 0.9999f
+#define MAXREFCO 0.9999
 
 typedef struct latticesegment
 {

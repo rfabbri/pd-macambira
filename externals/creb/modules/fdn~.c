@@ -32,7 +32,7 @@ check filtering code
 #include <stdio.h>
 #include <string.h>
 
-#define FDN_MIN_DECAY_TIME .01f
+#define FDN_MIN_DECAY_TIME .01
 
 /*
 
@@ -330,8 +330,8 @@ static void fdn_setupdelayline(t_fdn *x){
   int mask = x->x_ctl.c_bufsize - 1;
   int start =  x->x_ctl.c_tap[0];
   t_int *tap = x->x_ctl.c_tap;
-  float *length = x->x_ctl.c_length;
-  float scale = sys_getsr() * .001f;
+  t_float *length = x->x_ctl.c_length;
+  t_float scale = sys_getsr() * .001f;
 
   sum = 0;
   tap[0] = (start & mask);
@@ -350,7 +350,7 @@ static void fdn_setupdelayline(t_fdn *x){
 
 static void fdn_list (t_fdn *x,  t_symbol *s, int argc, t_atom *argv){
   int i;
-  float l;
+  t_float l;
   int sum=0;
 
   int order = argc & 0xfffffffc;

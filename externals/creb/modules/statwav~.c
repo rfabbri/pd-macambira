@@ -30,9 +30,9 @@ typedef struct _statwav_tilde
 {
     t_object x_obj;
     int x_npoints;
-    float *x_vec;
+    t_float *x_vec;
     t_symbol *x_arrayname;
-    float x_f;
+    t_float x_f;
 } t_statwav_tilde;
 
 static void *statwav_tilde_new(t_symbol *s)
@@ -51,9 +51,9 @@ static t_int *statwav_tilde_perform(t_int *w)
     t_float *in = (t_float *)(w[2]);
     t_float *out = (t_float *)(w[3]);
     int n = (int)(w[4]);
-    float maxindex;
+    t_float maxindex;
     int imaxindex;
-    float *buf = x->x_vec, *fp;
+    t_float *buf = x->x_vec, *fp;
     int i;
 
     maxindex = x->x_npoints;
@@ -64,15 +64,15 @@ static t_int *statwav_tilde_perform(t_int *w)
 
     for (i = 0; i < n; i++)
     {
-      float phase = *in++;
-      float modphase = phase - (int)phase;
-      float findex;
+      t_float phase = *in++;
+      t_float modphase = phase - (int)phase;
+      t_float findex;
       int index;
       int ia, ib, ic, id;
-      float frac,  a,  b,  c,  d, cminusb;
+      t_float frac,  a,  b,  c,  d, cminusb;
       static int count;
 
-      if (modphase < 0.0f) modphase += 1.0f;
+      if (modphase < 0.0) modphase += 1.0;
       findex = modphase * maxindex;
       index = findex;
     
@@ -92,8 +92,8 @@ static t_int *statwav_tilde_perform(t_int *w)
       cminusb = c-b;
 
       *out++ = b + frac * (
-            cminusb - 0.5f * (frac-1.) * (
-                (a - d + 3.0f * cminusb) * frac + (b - a - cminusb)
+            cminusb - 0.5 * (frac-1.) * (
+                (a - d + 3.0 * cminusb) * frac + (b - a - cminusb)
             )
         );                                                         
     }

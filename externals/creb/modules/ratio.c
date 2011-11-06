@@ -37,8 +37,8 @@ static void ratio_float(t_ratio *x, t_floatarg f)
   f = (f<0)?(-f):(f);
   if (f)
     {
-      while (f <  1.0f) f *= 2.0f;
-      while (f >= 2.0f) f *= 0.5f;
+      while (f <  1.0) f *= 2.0;
+      while (f >= 2.0) f *= 0.5;
     }
   outlet_float(x->x_out, f);
 

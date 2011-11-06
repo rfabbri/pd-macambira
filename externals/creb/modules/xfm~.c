@@ -53,7 +53,7 @@ some (possible) enhancements:
 #include <string.h>  
 
 #define SINSAMPLES 512
-#define MYPI 3.1415927
+#define MYPI 3.141592653589793
 
 
 #define DISTORTED   0

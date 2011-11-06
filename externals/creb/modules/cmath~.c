@@ -33,19 +33,19 @@ typedef struct cmath
 
 static t_int *cmath_perform_clog(t_int *w)
 {
-    t_float *inx    = (float *)(w[2]);
-    t_float *iny    = (float *)(w[3]);
-    t_float *outx    = (float *)(w[5]); // clockwize addressing
-    t_float *outy    = (float *)(w[4]);
+    t_float *inx    = (t_float *)(w[2]);
+    t_float *iny    = (t_float *)(w[3]);
+    t_float *outx    = (t_float *)(w[5]); // clockwize addressing
+    t_float *outy    = (t_float *)(w[4]);
     t_int i;
     t_int n = (t_int)(w[1]);
     t_float x;
 
     while (n--){
-	float x = *inx++;
-	float y = *iny++;
- 	float norm = sqrt(x*x + y*y);
-	float arg = atan2(y, x);
+	t_float x = *inx++;
+	t_float y = *iny++;
+ 	t_float norm = sqrt(x*x + y*y);
+	t_float arg = atan2(y, x);
 	if (norm < MINNORM){
 	    norm = MINNORM;
 	}
@@ -59,18 +59,18 @@ static t_int *cmath_perform_clog(t_int *w)
 
 static t_int *cmath_perform_cexp(t_int *w)
 {
-    t_float *inx    = (float *)(w[2]);
-    t_float *iny    = (float *)(w[3]);
-    t_float *outx    = (float *)(w[5]); // clockwize addressing
-    t_float *outy    = (float *)(w[4]);
+    t_float *inx    = (t_float *)(w[2]);
+    t_float *iny    = (t_float *)(w[3]);
+    t_float *outx    = (t_float *)(w[5]); // clockwize addressing
+    t_float *outy    = (t_float *)(w[4]);
     t_int i;
     t_int n = (t_int)(w[1]);
     t_float x;
 
     while (n--){
-	float x = *inx++;
-	float y = *iny++;
-	float norm = exp(x);
+	t_float x = *inx++;
+	t_float y = *iny++;
+	t_float norm = exp(x);
 	*outx++ = norm * cos(y);
 	*outy++ = norm * sin(y);
     }
@@ -80,20 +80,20 @@ static t_int *cmath_perform_cexp(t_int *w)
 
 static t_int *cmath_perform_nfft(t_int *w)
 {
-    t_float *inx    = (float *)(w[2]);
-    t_float *iny    = (float *)(w[3]);
-    t_float *outx    = (float *)(w[5]); // clockwize addressing
-    t_float *outy    = (float *)(w[4]);
+    t_float *inx    = (t_float *)(w[2]);
+    t_float *iny    = (t_float *)(w[3]);
+    t_float *outx    = (t_float *)(w[5]); // clockwize addressing
+    t_float *outy    = (t_float *)(w[4]);
     t_int i;
     t_int n = (t_int)(w[1]);
     t_float x;
-    t_float scale = 1.0f / (sqrt((float)n));
+    t_float scale = 1.0 / (sqrt((t_float)n));
 
     mayer_fft(n, inx, outx);
 
     while (n--){
-	float x = *inx++;
-	float y = *iny++;
+	t_float x = *inx++;
+	t_float y = *iny++;
 	*outx++ = scale * x;
 	*outy++ = scale * y;
     }
@@ -103,20 +103,20 @@ static t_int *cmath_perform_nfft(t_int *w)
 
 static t_int *cmath_perform_nifft(t_int *w)
 {
-    t_float *inx    = (float *)(w[2]);
-    t_float *iny    = (float *)(w[3]);
-    t_float *outx    = (float *)(w[5]); // clockwize addressing
-    t_float *outy    = (float *)(w[4]);
+    t_float *inx    = (t_float *)(w[2]);
+    t_float *iny    = (t_float *)(w[3]);
+    t_float *outx    = (t_float *)(w[5]); // clockwize addressing
+    t_float *outy    = (t_float *)(w[4]);
     t_int i;
     t_int n = (t_int)(w[1]);
     t_float x;
-    t_float scale = 1.0f / (sqrt((float)n));
+    t_float scale = 1.0 / (sqrt((t_float)n));
 
     mayer_ifft(n, inx, outx);
 
     while (n--){
-	float x = *inx++;
-	float y = *iny++;
+	t_float x = *inx++;
+	t_float y = *iny++;
 	*outx++ = scale * x;
 	*outy++ = scale * y;
     }

@@ -46,14 +46,14 @@ typedef unsigned long u32;
 #define L            (1<<LLENGTH)
 #define LMASK        (L-1)
 
-#define WALPHA       0.1f // windowing alpha (0 = cos -> 1 = rect)
-#define CUTOFF       0.8f // fraction of nyquist for impulse cutoff
-#define NBPERIODS    ((float)(L) * CUTOFF / 2.0f)
+#define WALPHA       0.1 // windowing alpha (0 = cos -> 1 = rect)
+#define CUTOFF       0.8 // fraction of nyquist for impulse cutoff
+#define NBPERIODS    ((t_float)(L) * CUTOFF / 2.0)
 
 /* sample buffers */
-static float bli[N]; // band limited impulse
-static float bls[N]; // band limited step
-static float blr[N]; // band limited ramp
+static t_float bli[N]; // band limited impulse
+static t_float bls[N]; // band limited step
+static t_float blr[N]; // band limited ramp
 
 
 typedef struct bloscctl
@@ -83,17 +83,17 @@ typedef struct blosc
 
 
 /* phase converters */
-static inline float _phase_to_float(u32 p){return ((float)p) * (1.0f / 4294967296.0f);}
-static inline u32 _float_to_phase(float f){return ((u32)(f * 4294967296.0f)) & ~(S-1);}
+static inline t_float _phase_to_float(u32 p){return ((t_float)p) * (1.0 / 4294967296.0);}
+static inline u32 _float_to_phase(t_float f){return ((u32)(f * 4294967296.0)) & ~(S-1);}
 
 
 /* flat table: better for linear interpolation */
-static inline float _play_voice_lint(float *table, t_int *index, float frac, float scale)
+static inline t_float _play_voice_lint(t_float *table, t_int *index, t_float frac, t_float scale)
 {
     int i = *index;
 
     /* perform linear interpolation */
-    float f = (((1.0f - frac) * table[i]) + (table[i+1] * frac)) * scale;
+    t_float f = (((1.0 - frac) * table[i]) + (table[i+1] * frac)) * scale;
 
     /* increment phase index if next 2 elements will still be inside table
        if not there's no increment and the voice will keep playing the same sample */
@@ -105,9 +105,9 @@ static inline float _play_voice_lint(float *table, t_int *index, float frac, flo
 }
 
 /* get one sample from the bandlimited discontinuity wavetable playback syth */
-static inline t_float _get_bandlimited_discontinuity(t_bloscctl *ctl, float *table)
+static inline t_float _get_bandlimited_discontinuity(t_bloscctl *ctl, t_float *table)
 {
-    float sum = 0.0f;
+    t_float sum = 0.0;
     int i;
     /* sum  all voices */
     for (i=0; i<VOICES; i++){
@@ -119,18 +119,18 @@ static inline t_float _get_bandlimited_discontinuity(t_bloscctl *ctl, float *tab
 
 
 /* update waveplayers on zero cross */
-static void _bang_comparator(t_bloscctl *ctl, float prev, float curr)
+static void _bang_comparator(t_bloscctl *ctl, t_float prev, t_float curr)
 {
 
     /* check for sign change */
-    if ((prev * curr) < 0.0f){
+    if ((prev * curr) < 0.0){
 
 	int voice;
 
 	/* determine the location of the discontinuity (in oversampled coordiates
  	  using linear interpolation */
 
-	float f = (float)S * curr / (curr - prev);
+	t_float f = (t_float)S * curr / (curr - prev);
 
 	/* get the offset in the oversample table */
 
@@ -139,11 +139,11 @@ static void _bang_comparator(t_bloscctl *ctl, float prev, float curr)
 	/* determine the fractional part (in oversampled coordinates)
 	   for linear interpolation */
 
-	float table_frac_index = f - (float)table_index;
+	t_float table_frac_index = f - (t_float)table_index;
 
 	/* set state (+ or -) */
 
-	ctl->c_state =  (curr > 0.0f) ? 0.5f : -0.5f;
+	ctl->c_state =  (curr > 0.0) ? 0.5 : -0.5;
 	
 	/* steal the oldest voice */
 
@@ -154,7 +154,7 @@ static void _bang_comparator(t_bloscctl *ctl, float prev, float curr)
 
 	ctl->c_index[voice] = table_index;
 	ctl->c_frac[voice] = table_frac_index;
-	ctl->c_vscale[voice] = -ctl->c_scale * 2.0f * ctl->c_state;
+	ctl->c_vscale[voice] = -ctl->c_scale * 2.0 * ctl->c_state;
 
     }
 
@@ -162,20 +162,20 @@ static void _bang_comparator(t_bloscctl *ctl, float prev, float curr)
 
 
 /* advance phasor and update waveplayers on phase wrap */
-static void _bang_phasor(t_bloscctl *ctl, float freq)
+static void _bang_phasor(t_bloscctl *ctl, t_float freq)
 {
     u32 phase = ctl->c_phase;
     u32 phase_inc; 
     u32 oldphase;
     int voice;
-    float scale = ctl->c_scale;
+    t_float scale = ctl->c_scale;
 
     /* get increment */
-    float inc = freq * ctl->c_phase_inc_scale;
+    t_float inc = freq * ctl->c_phase_inc_scale;
 
     /* calculate new phase
        the increment (and the phase) should be a multiple of S */
-    if (inc < 0.0f) inc = -inc;
+    if (inc < 0.0) inc = -inc;
     phase_inc = ((u32)inc) & ~(S-1);
     oldphase = phase;
     phase += phase_inc;
@@ -205,7 +205,7 @@ static void _bang_phasor(t_bloscctl *ctl, float freq)
 	/* use it to initialize the new voice index and interpolation fraction */
 	    
 	ctl->c_index[voice] = table_index;
-	ctl->c_frac[voice] = (float)table_phase / (float)phase_inc_decimated;
+	ctl->c_frac[voice] = (t_float)table_phase / (t_float)phase_inc_decimated;
 	ctl->c_vscale[voice] = scale;
 	scale = scale * ctl->c_scale_update;
 
@@ -221,7 +221,7 @@ static void _bang_phasor(t_bloscctl *ctl, float freq)
    the second osc can reset the first osc's phase (hence it determines the pitch)
    the first osc determines the waveform */
 
-static void _bang_hardsync_phasor(t_bloscctl *ctl, float freq, float freq2)
+static void _bang_hardsync_phasor(t_bloscctl *ctl, t_float freq, t_float freq2)
 {
     u32 phase = ctl->c_phase;
     u32 phase2 = ctl->c_phase2;
@@ -230,12 +230,12 @@ static void _bang_hardsync_phasor(t_bloscctl *ctl, float freq, float freq2)
     u32 oldphase;
     u32 oldphase2;
     int voice;
-    float scale = ctl->c_scale;
+    t_float scale = ctl->c_scale;
 
 
     /* get increment */
-    float inc = freq * ctl->c_phase_inc_scale;
-    float inc2 = freq2 * ctl->c_phase_inc_scale;
+    t_float inc = freq * ctl->c_phase_inc_scale;
+    t_float inc2 = freq2 * ctl->c_phase_inc_scale;
 
     /* calculate new phases
        the increment (and the phase) should be a multiple of S */
@@ -245,12 +245,12 @@ static void _bang_hardsync_phasor(t_bloscctl *ctl, float freq, float freq2)
     oldphase2 = phase2;
 
     /* update second osc */
-    if (inc2 < 0.0f) inc2 = -inc2;
+    if (inc2 < 0.0) inc2 = -inc2;
     phase_inc2 = ((u32)inc2) & ~(S-1);
     phase2 += phase_inc2;
     
     /* update first osc (freq should be >= freq of sync osc */
-    if (inc < 0.0f) inc = -inc;
+    if (inc < 0.0) inc = -inc;
     phase_inc = ((u32)inc) & ~(S-1);
     if (phase_inc < phase_inc2) phase_inc = phase_inc2;
     phase += phase_inc;
@@ -274,7 +274,7 @@ static void _bang_hardsync_phasor(t_bloscctl *ctl, float freq, float freq2)
 	u32 phase_inc_decimated = phase_inc >> LOVERSAMPLE;
 	u32 table_index;
 	u32 table_phase;
-	float stepsize;
+	t_float stepsize;
 	
 	/* steal the oldest voice if we have a phase wrap */
 	    
@@ -298,12 +298,12 @@ static void _bang_hardsync_phasor(t_bloscctl *ctl, float freq, float freq2)
 	   reduce the bit depth to prevent overflow */
 
 	stepsize = _phase_to_float(((oldphase-phase) >> LOVERSAMPLE)
-				   + phase_inc_decimated) * (float)S;
+				   + phase_inc_decimated) * (t_float)S;
 	    
 	/* use it to initialize the new voice index and interpolation fraction */
 	    
 	ctl->c_index[voice] = table_index;
-	ctl->c_frac[voice] = (float)table_phase / (float)phase_inc_decimated;
+	ctl->c_frac[voice] = (t_float)table_phase / (t_float)phase_inc_decimated;
 	ctl->c_vscale[voice] = scale * stepsize;
 	scale = scale * ctl->c_scale_update;
 
@@ -318,28 +318,28 @@ static void _bang_hardsync_phasor(t_bloscctl *ctl, float freq, float freq2)
 
 static t_int *blosc_perform_hardsync_saw(t_int *w)
 {
-    t_float *freq     = (float *)(w[3]);
-    t_float *freq2     = (float *)(w[4]);
-    t_float *out      = (float *)(w[5]);
+    t_float *freq     = (t_float *)(w[3]);
+    t_float *freq2     = (t_float *)(w[4]);
+    t_float *out      = (t_float *)(w[5]);
     t_bloscctl *ctl  = (t_bloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
 
     /* set postfilter cutoff */
-    ctl->c_butter->setButterHP(0.85f * (*freq / sys_getsr()));
+    ctl->c_butter->setButterHP(0.85 * (*freq / sys_getsr()));
     
     while (n--) {
-	float frequency = *freq++;
-	float frequency2 = *freq2++;
+	t_float frequency = *freq++;
+	t_float frequency2 = *freq2++;
 
 	/* get the bandlimited discontinuity */
-	float sample = _get_bandlimited_discontinuity(ctl, bls);
+	t_float sample = _get_bandlimited_discontinuity(ctl, bls);
 
 	/* add aliased sawtooth wave */
-	sample += _phase_to_float(ctl->c_phase) - 0.5f;
+	sample += _phase_to_float(ctl->c_phase) - 0.5;
 
 	/* highpass filter output to remove DC offset and low frequency aliasing */
-	ctl->c_butter->BangSmooth(sample, sample, 0.05f);
+	ctl->c_butter->BangSmooth(sample, sample, 0.05);
 
 	/* send to output */
 	*out++ = sample;
@@ -354,20 +354,20 @@ static t_int *blosc_perform_hardsync_saw(t_int *w)
 
 static t_int *blosc_perform_saw(t_int *w)
 {
-    t_float *freq     = (float *)(w[3]);
-    t_float *out      = (float *)(w[4]);
+    t_float *freq     = (t_float *)(w[3]);
+    t_float *out      = (t_float *)(w[4]);
     t_bloscctl *ctl  = (t_bloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
     
     while (n--) {
-	float frequency = *freq++;
+	t_float frequency = *freq++;
 
 	/* get the bandlimited discontinuity */
-	float sample = _get_bandlimited_discontinuity(ctl, bls);
+	t_float sample = _get_bandlimited_discontinuity(ctl, bls);
 
 	/* add aliased sawtooth wave */
-	sample += _phase_to_float(ctl->c_phase) - 0.5f;
+	sample += _phase_to_float(ctl->c_phase) - 0.5;
 
 	/* send to output */
 	*out++ = sample;
@@ -384,24 +384,24 @@ static t_int *blosc_perform_saw(t_int *w)
 
 static t_int *blosc_perform_pulse(t_int *w)
 {
-    t_float *freq     = (float *)(w[3]);
-    t_float *out      = (float *)(w[4]);
+    t_float *freq     = (t_float *)(w[3]);
+    t_float *out      = (t_float *)(w[4]);
     t_bloscctl *ctl  = (t_bloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
 
 
     /* set postfilter cutoff */
-    ctl->c_butter->setButterHP(0.85f * (*freq / sys_getsr()));
+    ctl->c_butter->setButterHP(0.85 * (*freq / sys_getsr()));
     
     while (n--) {
-	float frequency = *freq++;
+	t_float frequency = *freq++;
 
 	/* get the bandlimited discontinuity */
-	float sample = _get_bandlimited_discontinuity(ctl, bli);
+	t_float sample = _get_bandlimited_discontinuity(ctl, bli);
 
 	/* highpass filter output to remove DC offset and low frequency aliasing */
-	ctl->c_butter->BangSmooth(sample, sample, 0.05f);
+	ctl->c_butter->BangSmooth(sample, sample, 0.05);
 
 	/* send to output */
 	*out++ = sample;
@@ -416,21 +416,21 @@ static t_int *blosc_perform_pulse(t_int *w)
 
 static t_int *blosc_perform_comparator(t_int *w)
 {
-    t_float *amp      = (float *)(w[3]);
-    t_float *out      = (float *)(w[4]);
+    t_float *amp      = (t_float *)(w[3]);
+    t_float *out      = (t_float *)(w[4]);
     t_bloscctl *ctl  = (t_bloscctl *)(w[1]);
     t_int n           = (t_int)(w[2]);
     t_int i;
     t_float prev_amp = ctl->c_prev_amp;
     
     while (n--) {
-	float curr_amp = *amp++;
+	t_float curr_amp = *amp++;
 
 	/* exact zero won't work for zero detection (sic) */
-	if (curr_amp == 0.0f) curr_amp = 0.0000001f;
+	if (curr_amp == 0.0) curr_amp = 0.0000001;
 
 	/* get the bandlimited discontinuity */
-	float sample = _get_bandlimited_discontinuity(ctl, bls);
+	t_float sample = _get_bandlimited_discontinuity(ctl, bls);
 
 	/* add the block wave state */
 	sample += ctl->c_state;
@@ -471,38 +471,38 @@ static void blosc_dsp(t_blosc *x, t_signal **sp)
   int n = sp[0]->s_n;
 
   /* set sampling rate scaling for phasors */
-  x->x_ctl.c_phase_inc_scale = 4.0f * (float)(1<<(LPHASOR-2)) / sys_getsr();
+  x->x_ctl.c_phase_inc_scale = 4.0 * (t_float)(1<<(LPHASOR-2)) / sys_getsr();
 
 
   /* setup & register the correct process routine depending on the waveform */
 
   /* 2 osc */
   if (x->x_ctl.c_waveform == gensym("syncsaw")){
-      x->x_ctl.c_scale = 1.0f;
-      x->x_ctl.c_scale_update = 1.0f;
+      x->x_ctl.c_scale = 1.0;
+      x->x_ctl.c_scale_update = 1.0;
       dsp_add(blosc_perform_hardsync_saw, 5, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec);
   }
 
   /* 1 osc */
   else if (x->x_ctl.c_waveform == gensym("pulse")){
-      x->x_ctl.c_scale = 1.0f;
-      x->x_ctl.c_scale_update = 1.0f;
+      x->x_ctl.c_scale = 1.0;
+      x->x_ctl.c_scale_update = 1.0;
       dsp_add(blosc_perform_pulse, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
   }
   else if (x->x_ctl.c_waveform == gensym("pulse2")){
       x->x_ctl.c_phase_inc_scale *= 2;
-      x->x_ctl.c_scale = 1.0f;
-      x->x_ctl.c_scale_update = -1.0f;
+      x->x_ctl.c_scale = 1.0;
+      x->x_ctl.c_scale_update = -1.0;
       dsp_add(blosc_perform_pulse, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
   }
   else if (x->x_ctl.c_waveform == gensym("comparator")){
-      x->x_ctl.c_scale = 1.0f;
-      x->x_ctl.c_scale_update = 1.0f;
+      x->x_ctl.c_scale = 1.0;
+      x->x_ctl.c_scale_update = 1.0;
       dsp_add(blosc_perform_comparator, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
   }
   else{
-       x->x_ctl.c_scale = 1.0f;
-      x->x_ctl.c_scale_update = 1.0f;
+       x->x_ctl.c_scale = 1.0;
+      x->x_ctl.c_scale_update = 1.0;
       dsp_add(blosc_perform_saw, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
   }
 
@@ -540,7 +540,7 @@ static void *blosc_new(t_symbol *s)
     /* init oscillators */
     for (i=0; i<VOICES; i++) {
       x->x_ctl.c_index[i] = N-2;
-      x->x_ctl.c_frac[i] = 0.0f;
+      x->x_ctl.c_frac[i] = 0.0;
     }
 
     /* init rest of state data */
@@ -549,8 +549,8 @@ static void *blosc_new(t_symbol *s)
     x->x_ctl.c_state = 0.0;
     x->x_ctl.c_prev_amp = 0.0;
     x->x_ctl.c_next_voice = 0;
-    x->x_ctl.c_scale = 1.0f;
-    x->x_ctl.c_scale_update = 1.0f;
+    x->x_ctl.c_scale = 1.0;
+    x->x_ctl.c_scale_update = 1.0;
     x->x_ctl.c_waveform = s;
 
     return (void *)x;
@@ -568,31 +568,31 @@ static void *blosc_new(t_symbol *s)
 /* some vector ops */
 
 /* clear a buffer */
-static inline void _clear(float *array, int size)
+static inline void _clear(t_float *array, int size)
 {
-  memset(array, 0, sizeof(float)*size);
+  memset(array, 0, sizeof(t_float)*size);
 }
 
 /* compute complex log */
-static inline void _clog(float *real, float *imag, int size)
+static inline void _clog(t_float *real, t_float *imag, int size)
 {
     int k;
     for (k=0; k<size; k++){
-	float r = real[k];
-	float i = imag[k];
-	float radius = sqrt(r*r+i*i);
+	t_float r = real[k];
+	t_float i = imag[k];
+	t_float radius = sqrt(r*r+i*i);
 	real[k] = log(radius);
 	imag[k] = atan2(i,r);
     }
 }
 
 /* compute complex exp */
-static inline void _cexp(float *real, float *imag, int size)
+static inline void _cexp(t_float *real, t_float *imag, int size)
 {
     int k;
     for (k=0; k<size; k++){
-	float r = exp(real[k]);
-	float i = imag[k];
+	t_float r = exp(real[k]);
+	t_float i = imag[k];
 	real[k] = r * cos(i);
 	imag[k] = r * sin(i);
     }
@@ -600,10 +600,10 @@ static inline void _cexp(float *real, float *imag, int size)
 
 
 /* compute fft */
-static inline void _fft(float *real, float *imag, int size)
+static inline void _fft(t_float *real, t_float *imag, int size)
 {
     int i;
-    float scale = 1.0f / sqrt((float)size);
+    t_float scale = 1.0 / sqrt((t_float)size);
     for (i=0; i<size; i++){
 	real[i] *= scale;
 	imag[i] *= scale;
@@ -612,10 +612,10 @@ static inline void _fft(float *real, float *imag, int size)
     mayer_fft(size, real, imag);
 }
 /* compute ifft */
-static inline void _ifft(float *real, float *imag, int size)
+static inline void _ifft(t_float *real, t_float *imag, int size)
 {
     int i;
-    float scale = 1.0f / sqrt((float)size);
+    t_float scale = 1.0 / sqrt((t_float)size);
     for (i=0; i<size; i++){
 	real[i] *= scale;
 	imag[i] *= scale;
@@ -625,15 +625,15 @@ static inline void _ifft(float *real, float *imag, int size)
 }
 
 /* convert an integer index to a phase: [0 -> pi, -pi -> 0] */
-static inline float _i2theta(int i, int size){
-    float p = 2.0f * M_PI * (float)i / (float)size;
-    if (p >= M_PI) p -= 2.0f * M_PI;
+static inline t_float _i2theta(int i, int size){
+    t_float p = 2.0 * M_PI * (t_float)i / (t_float)size;
+    if (p >= M_PI) p -= 2.0 * M_PI;
     return p;
 }
 
 
 /* print matlab array */
-static void _printm(float *array, char *name, int size)
+static void _printm(t_float *array, char *name, int size)
 {
     int i;
     fprintf(stderr, "%s = [", name);
@@ -644,7 +644,7 @@ static void _printm(float *array, char *name, int size)
 }
 
 /* store oversampled waveform as decimated chunks */
-static void _store_decimated(float *dst, float *src, float scale, int size)
+static void _store_decimated(t_float *dst, t_float *src, t_float scale, int size)
 {
     int i;
     for (i=0; i<size; i++){
@@ -656,7 +656,7 @@ static void _store_decimated(float *dst, float *src, float scale, int size)
 }
 
 /* store waveform as one chunk */
-static void _store(float *dst, float *src, float scale, int size)
+static void _store(t_float *dst, t_float *src, t_float scale, int size)
 {
     int i;
     for (i=0; i<size; i++){
@@ -674,24 +674,24 @@ static void build_tables(void)
   /* we work in the complex domain to eliminate the need to avoid
      negative spectral components */
 
-    float real[M];
-    float imag[M];
-    float sum,scale;
+    t_float real[M];
+    t_float imag[M];
+    t_float sum,scale;
     int i,j;
 
 
     /* create windowed sinc */
     _clear(imag, M); 
-    real[0] = 1.0f;
+    real[0] = 1.0;
     for (i=1; i<M; i++){
-	float tw = _i2theta(i,M);
-	float ts = tw * NBPERIODS * (float)(M) / (float)(N);
+	t_float tw = _i2theta(i,M);
+	t_float ts = tw * NBPERIODS * (t_float)(M) / (t_float)(N);
 
 	/* sinc */
 	real[i] = sin(ts)/ts;
 
 	/* blackman window */
-	real[i] *= 0.42f + 0.5f * (cos(tw)) + 0.08f * (cos(2.0f*tw));
+	real[i] *= 0.42 + 0.5 * (cos(tw)) + 0.08 * (cos(2.0*tw));
 
 	//real[i] *= 0.5f * (1.0f + WALPHA) + 0.5f * (1.0f - WALPHA) * (cos(tw)); 
 
@@ -711,8 +711,8 @@ static void build_tables(void)
     /* kill anti-causal part (contribution of non minimum phase zeros) */
     /* should we kill nyquist too ?? */
     for (i=M/2+1; i<M; i++){
-	real[i] *= 0.0000f;
-	imag[i] *= 0.0000f;
+	real[i] *= 0.0000;
+	imag[i] *= 0.0000;
     }
 
 
@@ -727,27 +727,27 @@ static void build_tables(void)
        and work with the first N samples */
 
     /* normalize impulse (integral = 1) */
-    sum = 0.0f;
+    sum = 0.0;
     for (i=0; i<N; i++){sum += real[i];}
-    scale = 1.0f / sum;
+    scale = 1.0 / sum;
     for (i=0; i<N; i++){real[i] *= scale;}
 
 
     /* store bli table */
-    _store(bli, real, (float)S, N);
+    _store(bli, real, (t_float)S, N);
     //_printm(bli, "h", N);
 
 
     /* integrate impulse and invert to produce a step function
        from 1->0 */
-    sum = 0.0f;
+    sum = 0.0;
     for (i=0; i<N; i++){
 	sum += real[i];
-	real[i] = (1.0f - sum);
+	real[i] = (1.0 - sum);
     }
 
     /* store decimated bls tables */
-    _store(bls, real, 1.0f, N);
+    _store(bls, real, 1.0, N);
 
 
 }

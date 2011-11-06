@@ -54,15 +54,15 @@ static t_int *biquadseries_perform(t_int *w)
 {
 
 
-  t_float *in    = (float *)(w[3]);
-  t_float *out    = (float *)(w[4]);
+  t_float *in    = (t_float *)(w[3]);
+  t_float *out    = (t_float *)(w[4]);
   DSPIfilterSeries* biquadseries  = (DSPIfilterSeries *)(w[1]);
   t_int n = (t_int)(w[2]);
   t_int i;
   t_float x;
 
   // dit kan beter 
-  float smooth = .01;
+  t_float smooth = .01;
   //1.0f - pow(.9f,1.0f/(float)(n));
 
   for (i = 0; i < n; i++)

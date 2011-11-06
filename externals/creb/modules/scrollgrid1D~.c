@@ -55,17 +55,17 @@ typedef struct scrollgrid1D
 } t_scrollgrid1D;
 
 
-static inline float _fixedpoint(float x, int n)
+static inline t_float _fixedpoint(t_float x, int n)
 {
-  int ix = (x + 0.5f);
+  int ix = (x + 0.5);
   if (ix < 0) ix = 0;
   else if (ix >= n) ix = n-1;
-  return (float)ix;
+  return (t_float)ix;
 }
 
-static inline float _sat(float x, float upper)
+static inline t_float _sat(t_float x, t_float upper)
 {
-    float lower = -1.0f;
+    t_float lower = -1.0;
     if (x < lower) x = lower;
     else if (x > upper) x = upper;
     return x;
@@ -86,7 +86,7 @@ static t_int *scrollgrid1D_perform(t_int *w)
   t_int n          = (t_int)(w[2]);
   
   t_int i;
-  t_float inv_sr = 1.0f /sys_getsr();
+  t_float inv_sr = 1.0 /sys_getsr();
   t_float state[3] = {ctl->c_x, ctl->c_y, ctl->c_z};
   t_float c,f;
   t_float pole[2], r1, r2;
@@ -97,24 +97,24 @@ static t_int *scrollgrid1D_perform(t_int *w)
   for (i=0; i<n; i++){
 
       /* get params */
-      r1 = exp(1000.0f * inv_sr / (0.01f + fabs(*t1++)));
-      r2 = exp(-1000.0f * inv_sr / (0.01f + fabs(*t2++)));
+      r1 = exp(1000.0 * inv_sr / (0.01 + fabs(*t1++)));
+      r2 = exp(-1000.0 * inv_sr / (0.01 + fabs(*t2++)));
       f = *freq++;
       o = (int)(*order++);
       if (o < 2) o = 2;
-      pole[0] = r1 * cos(2.0f * M_PI * inv_sr * f);
-      pole[1] = r1 * sin(2.0f * M_PI * inv_sr * f);
+      pole[0] = r1 * cos(2.0 * M_PI * inv_sr * f);
+      pole[1] = r1 * sin(2.0 * M_PI * inv_sr * f);
 
       /* debug */
       //post("%f", r1);
 
       /* base transform + clipping to prevent blowup */
       /* projection onto axis containing fixed */
-      x = _sat(0.5f * (state[0] - state[2]), (float)o); 
+      x = _sat(0.5 * (state[0] - state[2]), (t_float)o); 
       /* the "pure" oscillation axis */
-      y = _sat(0.5f * state[1], 1.0f);
+      y = _sat(0.5 * state[1], 1.0);
       /* orthogonal complement of x */
-      z = _sat(0.5f * (state[0] + state[2]), 1.0f);
+      z = _sat(0.5 * (state[0] + state[2]), 1.0);
 
       /* output */
       *outx++ = x;
@@ -127,7 +127,7 @@ static t_int *scrollgrid1D_perform(t_int *w)
 
       /* inverse base transform */
       state[0] = x + z;
-      state[1] = 2.0f * y;
+      state[1] = 2.0 * y;
       state[2] = -x + z;
 
 

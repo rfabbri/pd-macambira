@@ -32,25 +32,25 @@
 
 #define SHIFTTABSIZE ((sizeof(unsigned int) * 8) - LOGTABSIZE)
 #define FRACTABSIZE (1<<SHIFTTABSIZE)
-#define INVFRACTABSIZE (1.0f / (float)(FRACTABSIZE))
+#define INVFRACTABSIZE (1.0 / (t_float)(FRACTABSIZE))
 #define MASKFRACTABSIZE (FRACTABSIZE-1)
 
-#define PITCHLIMIT 20.0f
+#define PITCHLIMIT 20.0
 
-static float costable[TABSIZE];
+static t_float costable[TABSIZE];
 
-static inline void _exp_j2pi(unsigned int t, float *real, float *imag)
+static inline void _exp_j2pi(unsigned int t, t_float *real, t_float *imag)
 {
     unsigned int i1 = t >> SHIFTTABSIZE;
-    float f2 = (t & MASKFRACTABSIZE) * INVFRACTABSIZE;
+    t_float f2 = (t & MASKFRACTABSIZE) * INVFRACTABSIZE;
     unsigned int i2 = (i1+1) & MASKTABSIZE;
     unsigned int i3 = (i1 - (TABSIZE>>2)) & MASKTABSIZE;
     unsigned int i4 = (i2 + 1 - (TABSIZE>>2)) & MASKTABSIZE;
-    float f1 = 1.0f - f2;
-    float a1 = f1 * costable[i1];
-    float a2 = f2 * costable[i2];
-    float b1 = f1 * costable[i3];
-    float b2 = f2 * costable[i4];
+    t_float f1 = 1.0 - f2;
+    t_float a1 = f1 * costable[i1];
+    t_float a2 = f2 * costable[i2];
+    t_float b1 = f1 * costable[i3];
+    t_float b2 = f2 * costable[i4];
     *real = a1 + a2;
     *imag = b1 + b2;
 }
@@ -60,13 +60,13 @@ static t_class *sbosc_tilde_class;
 typedef struct _sbosc_tilde
 {
     t_object x_obj;
-    float x_f;
+    t_float x_f;
 
     /* state vars */
     unsigned int x_phase;          // phase of main pitch osc
     unsigned int x_phase_inc;      // frequency of main pitch osc
     unsigned int x_harmonic;       // first harmonic
-    float x_frac;                  // fraction of first harmonic
+    t_float x_frac;                  // fraction of first harmonic
 
 
 } t_sbosc_tilde;
@@ -94,13 +94,13 @@ static t_int *sbosc_tilde_perform(t_int *w)
     int n = (int)(w[6]);
     int i;
 
-    t_float pitch_to_phase =  4294967295.0f / sys_getsr();
+    t_float pitch_to_phase =  4294967295.0 / sys_getsr();
 
     for (i = 0; i < n; i++)
     {
-	float p = *pitch++;
-	float c = *center++;
-      	float r1,r2,i1,i2;
+	t_float p = *pitch++;
+	t_float c = *center++;
+      	t_float r1,r2,i1,i2;
 
 	/* compute harmonic mixture */
 	unsigned int h1 = x->x_phase * x->x_harmonic;
@@ -109,8 +109,8 @@ static t_int *sbosc_tilde_perform(t_int *w)
 	_exp_j2pi(h2, &r2, &i2);
 	r1 *= x->x_frac;
 	i1 *= x->x_frac;
-	r2 *= 1.0f - x->x_frac;
-	i2 *= 1.0f - x->x_frac;
+	r2 *= 1.0 - x->x_frac;
+	i2 *= 1.0 - x->x_frac;
 
 	*out_real++ = r1 + r2;
 	*out_imag++ = i1 + i2;
@@ -121,13 +121,13 @@ static t_int *sbosc_tilde_perform(t_int *w)
 	/* check for phase wrap & update osc */
 	if ((x->x_phase <= x->x_phase_inc)) 
 	    {
-		float p_plus = (p < 0.0f) ? -p : p;
-		float p_limit = (p_plus < PITCHLIMIT) ? PITCHLIMIT : p_plus;
-		float c_plus = (c < 0.0f) ? -c : c;
-		float harmonic = c_plus/p_limit;
+		t_float p_plus = (p < 0.0) ? -p : p;
+		t_float p_limit = (p_plus < PITCHLIMIT) ? PITCHLIMIT : p_plus;
+		t_float c_plus = (c < 0.0) ? -c : c;
+		t_float harmonic = c_plus/p_limit;
 		x->x_phase_inc = pitch_to_phase * p_limit;
 		x->x_harmonic = harmonic;
-		x->x_frac = 1.0f - (harmonic - x->x_harmonic);
+		x->x_frac = 1.0 - (harmonic - x->x_harmonic);
 	    }
 	
 
@@ -149,7 +149,7 @@ static void sbosc_tilde_free(t_sbosc_tilde *x)
 
 static void sbosc_tilde_phase(t_sbosc_tilde *x, t_floatarg f)
 {
-    x->x_phase = f * (1.0f / 4294967295.0f);
+    x->x_phase = f * (1.0 / 4294967295.0);
 }
 
 void sbosc_tilde_setup(void)

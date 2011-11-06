@@ -57,7 +57,7 @@ static t_int *ramp_perform(t_int *w)
     t_int n = (t_int)(w[2]);
     t_float x;
 
-    t_float scale = ctl->c_blockscale ? 1.0f / (t_float)n : 1.0f;
+    t_float scale = ctl->c_blockscale ? 1.0 / (t_float)n : 1.0;
 
 
     x = ctl->c_offset;

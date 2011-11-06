@@ -51,11 +51,11 @@ typedef struct resofilt
 
 static inline void _sat_state(t_float *x)
 {
-    const float norm_squared_max = 1.0f;
-    float norm_squared = x[0] * x[0] + x[1] * x[1];
+    const t_float norm_squared_max = 1.0;
+    t_float norm_squared = x[0] * x[0] + x[1] * x[1];
 
     if (norm_squared > norm_squared_max){
-	float scale = 1.0f / sqrt(norm_squared);
+	t_float scale = 1.0 / sqrt(norm_squared);
 	x[0] *= scale;
 	x[1] *= scale;
     }
@@ -75,8 +75,8 @@ static t_int *resofilt_perform_fourpole(t_int *w)
   t_float *out       = (t_float *)(w[6]);
 
   int i;
-  t_float inv_n = 1.0f / ((t_float)n);
-  t_float inv_sr = 1.0f / sys_getsr();
+  t_float inv_n = 1.0 / ((t_float)n);
+  t_float inv_sr = 1.0 / sys_getsr();
 
   t_float phasor[2], phasor_rot[2];
   t_float radior[2], radior_rot[2];
@@ -92,7 +92,7 @@ static t_int *resofilt_perform_fourpole(t_int *w)
      interpolated linearly (that is, linearly in the "analog" domain,
      so exponentially in the z-domain)  */
 
-  reso_rms = freq_rms = 0.0f;
+  reso_rms = freq_rms = 0.0;
   for (i=0; i<n; i++){
       /* first input is the reso frequency (absolute) */
       t_float _freq = *freq++; 
@@ -104,7 +104,7 @@ static t_int *resofilt_perform_fourpole(t_int *w)
   }
   freq_rms = sqrt(freq_rms * inv_n) * inv_sr;
   reso_rms = sqrt(reso_rms * inv_n);
-  f = (freq_rms > 0.5f) ? 0.5f : freq_rms;
+  f = (freq_rms > 0.5) ? 0.5 : freq_rms;
   r = sqrt(sqrt(reso_rms));         
 
 
@@ -132,18 +132,18 @@ static t_int *resofilt_perform_fourpole(t_int *w)
 
   /* moog like scaling */
   if (1){
-      float r2 = r_prev * r_prev;
-      float r4 = r2 * r2;
-      scalor = 1.0f + (1.0f + 4.0f * r4);
+      t_float r2 = r_prev * r_prev;
+      t_float r4 = r2 * r2;
+      scalor = 1.0f + (1.0 + 4.0 * r4);
       r2 = r * r;
       r4 = r2 * r2;
-      scalor_inc = ((1.0f + (1.0f + 4.0f * r4)) - scalor) * inv_n;
+      scalor_inc = ((1.0 + (1.0 + 4.0 * r4)) - scalor) * inv_n;
   }
 
   /* no scaling */
   else{
-      scalor = 1.0f;
-      scalor_inc = 0.0f;
+      scalor = 1.0;
+      scalor_inc = 0.0;
   }
   
   ctl->c_f_prev = f;
@@ -155,11 +155,11 @@ static t_int *resofilt_perform_fourpole(t_int *w)
 
   /* perform filtering */
   for (i=0; i<n; i++){
-      float poleA[2], poleB[2];
-      float *stateA = ctl->c_state;
-      float *stateB = ctl->c_state+2;
+      t_float poleA[2], poleB[2];
+      t_float *stateA = ctl->c_state;
+      t_float *stateB = ctl->c_state+2;
 
-      float x;
+      t_float x;
 
       /* compute poles */
       poleA[0] = radior[0] * phasor[0];
@@ -232,7 +232,7 @@ static t_int *resofilt_perform_threepole(t_int *w)
   t_float sqrt5 = sqrt(5.0);
 
   /* use rms of input to drive freq and reso */
-  reso_rms = freq_rms = 0.0f;
+  reso_rms = freq_rms = 0.0;
   for (i=0; i<n; i++){
       /* first input is the reso frequency (absolute) */
       t_float _freq = *freq++;
@@ -243,7 +243,7 @@ static t_int *resofilt_perform_threepole(t_int *w)
   }
   freq_rms = sqrt(freq_rms * inv_n) * inv_sr;
   reso_rms = sqrt(reso_rms * inv_n);
-  f = (freq_rms > 0.5f) ? 0.25f : freq_rms * 0.5f;
+  f = (freq_rms > 0.5) ? 0.25 : freq_rms * 0.5;
   r = cbrt(reso_rms);         
 
 
@@ -269,42 +269,42 @@ static t_int *resofilt_perform_threepole(t_int *w)
   */
 
   /* compute phasor, radius and update eqs */
-  phasor[0] = cos(2.0 * M_PI * r_prev * f_prev * 2.0f);
-  phasor[1] = sin(2.0 * M_PI * r_prev * f_prev * 2.0f);
-  phasor_rot[0] = cos(2.0 * M_PI * (r*f - r_prev*f_prev) * 2.0f * inv_n);
-  phasor_rot[1] = sin(2.0 * M_PI * (r*f - r_prev*f_prev) * 2.0f * inv_n);
+  phasor[0] = cos(2.0 * M_PI * r_prev * f_prev * 2.0);
+  phasor[1] = sin(2.0 * M_PI * r_prev * f_prev * 2.0);
+  phasor_rot[0] = cos(2.0 * M_PI * (r*f - r_prev*f_prev) * 2.0 * inv_n);
+  phasor_rot[1] = sin(2.0 * M_PI * (r*f - r_prev*f_prev) * 2.0 * inv_n);
 
   radior[0] = exp(f_prev * (-1.0 + r_prev)); /* dominant radius */
   radior[1] = exp(f_prev * (-1.0 - sqrt5 * r_prev));
-  radior_rot[0] = exp((f*(-1.0f + r) - f_prev * (-1.0 + r_prev)) * inv_n);
-  radior_rot[1] = exp((f*(-1.0f - r) - f_prev * (-1.0 - sqrt5 * r_prev)) * inv_n);
+  radior_rot[0] = exp((f*(-1.0 + r) - f_prev * (-1.0 + r_prev)) * inv_n);
+  radior_rot[1] = exp((f*(-1.0 - r) - f_prev * (-1.0 - sqrt5 * r_prev)) * inv_n);
 
   /* 303 like scaling */
   if (1){
-      float r3 = r_prev * r_prev * r_prev;
-      scalor = 1.0f + (1.0f + 3.0f * r_prev);
+      t_float r3 = r_prev * r_prev * r_prev;
+      scalor = 1.0 + (1.0 + 3.0 * r_prev);
       r3 = r * r * r;
-      scalor_inc = ((1.0f + (1.0f + 3.0f * r3)) - scalor) * inv_n;
+      scalor_inc = ((1.0f + (1.0f + 3.0 * r3)) - scalor) * inv_n;
   }
 
   /* no scaling */
   else{
-      scalor = 1.0f;
-      scalor_inc = 0.0f;
+      scalor = 1.0;
+      scalor_inc = 0.0;
   }
   
   ctl->c_f_prev = f;
   ctl->c_r_prev = r;
 
 
-  ctl->c_state[3] = 0.0f;
+  ctl->c_state[3] = 0.0;
   /* perform filtering */
   for (i=0; i<n; i++){
-      float poleA[2], poleB[2];
-      float *stateA = ctl->c_state;
-      float *stateB = ctl->c_state+2;
+      t_float poleA[2], poleB[2];
+      t_float *stateA = ctl->c_state;
+      t_float *stateB = ctl->c_state+2;
 
-      float x;
+      t_float x;
 
       /* compute poles */
       poleA[0] = radior[0] * phasor[0];
@@ -385,7 +385,7 @@ static void *resofilt_new(t_floatarg algotype)
 
 
     /* set algo type */
-    if (algotype == 3.0f){
+    if (algotype == 3.0){
 	post("resofilt~: 3-pole lowpass ladder vcf");
 	x->x_dsp = resofilt_perform_threepole;
     }
