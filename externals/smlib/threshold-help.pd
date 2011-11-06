@@ -1,7 +1,7 @@
-#N canvas 114 43 708 422 10;
+#N canvas 1 53 708 422 10;
 #X text 221 309 Arguments:;
 #X text 310 310 1 trigger threshold;
-#X floatatom 20 235 5 0 0;
+#X floatatom 20 235 5 0 0 0 - - -;
 #X obj 42 363 print trigger;
 #X obj 183 363 print rest;
 #X text 310 341 3 rest threshold;
@@ -25,7 +25,7 @@ after the two event types before triggering again.;
 #X obj 20 170 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X obj 132 171 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 1200 1;
+-1 -1 0 1;
 #X msg 129 208 set 50 0 10 0;
 #X msg 130 231 set 50 15 10 15;
 #X text 12 393 see also threshold~;
@@ -34,8 +34,20 @@ after the two event types before triggering again.;
 #X obj 20 363 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 20 332 threshold 70 10 30 10;
-#X text 620 398 j#|@2002;
-#X obj 638 376 SMLib-help;
+#X text 615 345 j#|@2002;
+#X obj 633 323 SMLib-help;
+#N canvas 339 203 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 125 AUTHOR Johannes Taelman (johannes.taelman@rug.ac.be)
+;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION trigger float from stream;
+#X text 12 65 INLET_0 float set;
+#X text 12 85 OUTLET_0 bang;
+#X text 12 105 OUTLET_1 bang;
+#X restore 650 367 pd META;
 #X connect 2 0 25 0;
 #X connect 15 0 2 0;
 #X connect 16 0 15 0;

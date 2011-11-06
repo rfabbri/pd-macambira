@@ -1,10 +1,10 @@
-#N canvas 553 310 489 262 10;
+#N canvas 1 53 489 293 10;
 #X text 390 239 j#|@2002;
 #X obj 412 217 SMLib-help;
-#X floatatom 14 74 5 0 0;
+#X floatatom 14 74 5 0 0 0 - - -;
 #X obj 12 165 print deltas;
-#X floatatom 68 108 5 0 0;
-#X floatatom 120 107 5 0 0;
+#X floatatom 68 108 5 0 0 0 - - -;
+#X floatatom 120 107 5 0 0 0 - - -;
 #X obj 24 104 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 12 138 deltas 1 10 10;
@@ -24,6 +24,20 @@ input and past inputs;
 #X text 152 167 c = buffer size;
 #X text 35 50 x(i);
 #X msg 79 57 clear;
+#N canvas 101 197 494 344 META 0;
+#X text 12 175 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 155 AUTHOR Johannes Taelman (johannes.taelman@rug.ac.be)
+;
+#X text 12 75 INLET_0 float factor clear;
+#X text 12 45 DESCRIPTION generate vector with differences between
+last input and past inputs;
+#X text 12 115 INLET_2 float;
+#X text 12 95 INLET_1 float;
+#X text 12 135 OUTLET_0 list;
+#X text 12 5 KEYWORDS control list_op;
+#X restore 419 263 pd META;
 #X connect 2 0 6 0;
 #X connect 2 0 7 0;
 #X connect 4 0 7 1;

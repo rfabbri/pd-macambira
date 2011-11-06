@@ -1,4 +1,4 @@
-#N canvas 619 449 433 228 10;
+#N canvas 1 53 433 284 10;
 #X msg 5 30 1 1 1 1 1 1 1 1 1 1;
 #X msg 5 52 1 0 1 0 1 0 1 0 1 0;
 #X msg 5 74 0 1 0 1 0 1 0 1 0 1;
@@ -16,6 +16,17 @@
 #X msg 221 57 0 0 0;
 #X msg 221 79 1 2 3;
 #X msg 221 101 3 2 1;
+#N canvas 248 160 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Johannes Taelman (johannes.taelman@rug.ac.be)
+;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 65 INLET_0 list float;
+#X text 12 45 DESCRIPTION difference between consecutive vectors;
+#X text 12 85 OUTLET_0 list float;
+#X restore 374 228 pd META;
 #X connect 0 0 13 0;
 #X connect 1 0 13 0;
 #X connect 2 0 13 0;

@@ -1,6 +1,5 @@
-#N canvas 133 245 443 412 10;
-#X text 360 376 j#|@2002;
-#X text 380 357 SMLib-help;
+#N canvas 1 53 443 412 10;
+#X text 353 328 j#|@2002;
 #X obj 51 362 print;
 #X obj 11 193 random 10;
 #X obj 11 174 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -27,14 +26,26 @@
 #X msg 118 194 leak;
 #X text 118 172 perform leak;
 #X msg 10 246 -5;
-#X connect 3 0 23 0;
-#X connect 4 0 3 0;
-#X connect 5 0 23 0;
-#X connect 6 0 23 0;
-#X connect 7 0 23 0;
-#X connect 11 0 12 0;
-#X connect 13 0 23 0;
-#X connect 23 0 2 0;
-#X connect 23 0 11 0;
-#X connect 24 0 23 0;
-#X connect 26 0 23 0;
+#X obj 368 307 SMLib-help;
+#N canvas 300 200 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Johannes Taelman (johannes.taelman@rug.ac.be)
+;
+#X text 12 5 KEYWORDS control;
+#X text 12 85 OUTLET_0 list;
+#X text 12 45 DESCRIPTION "leaky" histograms;
+#X text 12 65 INLET_0 float list leak absolute relative clear;
+#X restore 378 352 pd META;
+#X connect 2 0 22 0;
+#X connect 3 0 2 0;
+#X connect 4 0 22 0;
+#X connect 5 0 22 0;
+#X connect 6 0 22 0;
+#X connect 10 0 11 0;
+#X connect 12 0 22 0;
+#X connect 22 0 1 0;
+#X connect 22 0 10 0;
+#X connect 23 0 22 0;
+#X connect 25 0 22 0;

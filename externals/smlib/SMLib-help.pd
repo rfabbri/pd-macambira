@@ -1,4 +1,4 @@
-#N canvas 103 71 525 422 10;
+#N canvas 1 53 525 422 10;
 #X obj 31 188 lmax;
 #X obj 31 211 lmin;
 #X obj 31 234 lrange;
