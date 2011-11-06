@@ -7,11 +7,11 @@ static t_class *prevl_class;
 typedef struct _prevl
 {
     t_object x_obj;
-	float m_lo;
-	float m_hi;
+	t_float m_lo;
+	t_float m_hi;
 	int m_buffer_size;
 	int m_buffer_index;
-	float *m_buffer;  // circular buffer
+	t_float *m_buffer;  // circular buffer
 } t_prevl;
 
 static void prevl_set(t_prevl *x, t_float lo, t_float hi, t_float size);
@@ -29,7 +29,7 @@ static void prevl_bang(t_prevl *x)
 {
 	int lo,hi,n,index,size;
 	t_atom *ap,*app;
-	float *buffer, *bp;
+	t_float *buffer, *bp;
 
     prevl_set(x, x->m_lo, x->m_hi, x->m_buffer_size);
 	lo=(int)x->m_lo;
@@ -84,11 +84,11 @@ static void prevl_bang(t_prevl *x)
 static void prevl_clear(t_prevl *x)
 {
 	int i,s;
-	float *f;
+	t_float *f;
 	f=x->m_buffer;
 	s=x->m_buffer_size;
 	for (i=0;i<s;i++)
-		*f++=0.0f;
+		*f++=0.0;
 }
 
 static void prevl_set(t_prevl *x, t_float lo, t_float hi, t_float size)
@@ -118,17 +118,18 @@ static void prevl_set(t_prevl *x, t_float lo, t_float hi, t_float size)
 	{
 		logpost(x, 2, "[prevl] higher bound (%g) must be greater than lower bound (%g)",
                 hi, lo);	
-		lo=hi-1.0f;
+		lo=hi-1.0;
 	}
 
 
-	x->m_hi=(float)((int)hi);
-	x->m_lo=(float)((int)lo);
+	x->m_hi=(t_float)((int)hi);
+	x->m_lo=(t_float)((int)lo);
+
     if (x->m_buffer_size != size)
     {
         x->m_buffer_size=(int)size;
         freebytes(x->m_buffer, x->m_buffer_size);
-        x->m_buffer = (float*)getbytes(sizeof(float)*x->m_buffer_size);
+        x->m_buffer = (t_float*)getbytes(sizeof(t_float)*x->m_buffer_size);
         prevl_clear(x);
         x->m_buffer_index=0;
     }

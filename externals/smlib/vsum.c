@@ -12,7 +12,7 @@ typedef struct _vsum
 
 static void vsum_perform(t_vsum *x, t_symbol *s, int argc, t_atom *argv)
 {
-	float sum=0.f;
+	t_float sum=0.;
 	int i;
 	for (i = 0; i < argc; i++)
 	{

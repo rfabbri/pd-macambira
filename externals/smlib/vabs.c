@@ -21,7 +21,7 @@ static void vabs_perform(t_vabs *x, t_symbol *s, int argc, t_atom *argv)
 
 	for (i = 0; i < argc; i++)
 	{
-		float f=atom_getfloat(argv++);
+		t_float f=atom_getfloat(argv++);
 		SETFLOAT(app, f>0?f:-f);
 		app++;
 	}

@@ -9,15 +9,15 @@ static t_class *vclip_class;
 typedef struct _vclip
 {
     t_object x_obj;
-	float m_lo;
-	float m_hi;
+	t_float m_lo;
+	t_float m_hi;
 } t_vclip;
 
 
 static void vclip_perform(t_vclip *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
-	float lo,hi;
+	t_float lo,hi;
 	t_atom *ap,*app;
     ap = (t_atom *)getbytes(sizeof(t_atom)*argc);
 	app=ap;
@@ -25,7 +25,7 @@ static void vclip_perform(t_vclip *x, t_symbol *s, int argc, t_atom *argv)
 	hi=x->m_hi;
 	for (i = 0; i < argc; i++)
 	{
-		float f=atom_getfloat(argv++);
+		t_float f=atom_getfloat(argv++);
 		SETFLOAT(app, (f<lo?lo:(f>hi?hi:f)));
 		app++;
 	}

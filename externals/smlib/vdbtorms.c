@@ -9,7 +9,7 @@ typedef struct _vdbtorms
     t_object x_obj;
 } t_vdbtorms;
 
-float dbtorms(float f)
+static t_float decibelbtorms(t_float f)
 {
     if (f <= 0)
     	return(0);
@@ -18,7 +18,7 @@ float dbtorms(float f)
     	if (f > 485)
 	    f = 485;
     }
-    return (float)(exp((LOGTEN * 0.05) * (f-100.)));
+    return (t_float)(exp((LOGTEN * 0.05) * (f-100.)));
 }
 
 static void vdbtorms_perform(t_vdbtorms *x, t_symbol *s, int argc, t_atom *argv)
@@ -30,7 +30,7 @@ static void vdbtorms_perform(t_vdbtorms *x, t_symbol *s, int argc, t_atom *argv)
 
 	for (i = 0; i < argc; i++)
 	{
-		SETFLOAT(app, dbtorms(atom_getfloat(argv++)));
+		SETFLOAT(app, decibelbtorms(atom_getfloat(argv++)));
 		app++;
 	}
 	outlet_list(x->x_obj.ob_outlet,gensym("list"),argc,ap);

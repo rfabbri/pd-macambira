@@ -7,26 +7,26 @@ static t_class *lstd_class;
 typedef struct _lstd
 {
     t_object x_obj;
-	float m_avg;
-	float m_sum_squares;
-	float m_std;
-	float m_c_leak;
-	float m_leak;
+	t_float m_avg;
+	t_float m_sum_squares;
+	t_float m_std;
+	t_float m_c_leak;
+	t_float m_leak;
 } t_lstd;
 
 
 static void lstd_perform(t_lstd *x, t_float in)
 {
-	float tmp=x->m_avg-in;
+	t_float tmp=x->m_avg-in;
 	x->m_avg= x->m_avg * x->m_c_leak + in * x->m_leak;
 	x->m_sum_squares=x->m_sum_squares * x->m_c_leak + x->m_leak*tmp*tmp;
-	x->m_std=(float)sqrtf(x->m_sum_squares);
+	x->m_std=(t_float)sqrtf(x->m_sum_squares);
     outlet_float(x->x_obj.ob_outlet, x->m_std);
 }
 
 static void lstd_setHalfDecay(t_lstd *x, t_float halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
+	x->m_c_leak=(t_float)powf(.5,(1.0f/halfDecayTime));
 	x->m_leak=1.0f-x->m_c_leak;
 }
 

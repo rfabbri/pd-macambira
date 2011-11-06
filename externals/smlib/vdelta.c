@@ -8,9 +8,9 @@ static t_class *vdelta_class;
 typedef struct _vdelta
 {
     t_object x_obj;
-	float m_c_leak;
-	float m_leak;
-	float *m_prev;
+	t_float m_c_leak;
+	t_float m_leak;
+	t_float *m_prev;
 	int m_n;
 } t_vdelta;
 
@@ -19,9 +19,9 @@ static void vdelta_perform(t_vdelta *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
 	t_atom *ap,*app;
-	float *fp;
-	float m_leak;
-	float m_c_leak;
+	t_float *fp;
+	t_float m_leak;
+	t_float m_c_leak;
 	m_leak=x->m_leak;
 	m_c_leak=x->m_c_leak;
 
@@ -30,7 +30,7 @@ static void vdelta_perform(t_vdelta *x, t_symbol *s, int argc, t_atom *argv)
 		int i;
 		if (x->m_prev)
 			freebytes(x->m_prev,x->m_n);
-		x->m_prev=(float*)getbytes(argc*sizeof(float));
+		x->m_prev=(t_float*)getbytes(argc*sizeof(t_float));
 		for(i=0;i<argc;i++)
 			x->m_prev[i]=0.0f;
 		x->m_n=argc;
@@ -41,7 +41,7 @@ static void vdelta_perform(t_vdelta *x, t_symbol *s, int argc, t_atom *argv)
 	app=ap;
 	for (i = 0; i < argc; i++)
 	{
-		float f=atom_getfloat(argv++);
+		t_float f=atom_getfloat(argv++);
 		SETFLOAT(app, f-*fp);
 		app++;
 		*fp++=f;

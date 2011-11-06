@@ -7,14 +7,14 @@ static t_class *vpow_class;
 typedef struct _vpow
 {
     t_object x_obj;
-	float m_y;
+	t_float m_y;
 } t_vpow;
 
 
 static void vpow_perform(t_vpow *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
-	float y;
+	t_float y;
 	t_atom *ap,*app;
     ap = (t_atom *)getbytes(sizeof(t_atom)*argc);
 	app=ap;
@@ -23,9 +23,9 @@ static void vpow_perform(t_vpow *x, t_symbol *s, int argc, t_atom *argv)
 		y=1.0f;
 	for (i = 0; i < argc; i++)
 	{
-		float x=atom_getfloat(argv++);
+		t_float x=atom_getfloat(argv++);
 		if (x>0) 
-			x=(float)powf(x,y);
+			x=(t_float)powf(x,y);
 		else
 			x=-1000.;
 		SETFLOAT(app, x);

@@ -12,10 +12,10 @@ typedef struct _vthreshold
     t_outlet *x_outlet2;    	/* bang out for low thresh */
     int *x_state;    			/* 1 = high, 0 = low */
 	int x_n;
-    float x_hithresh;	    	/* value of high vthreshold */
-    float x_lothresh;	    	/* value of low vthreshold */
-    float x_hideadtime;	    	/* hi dead */
-    float x_lodeadtime;	    	/* lo dead */
+    t_float x_hithresh;	    	/* value of high vthreshold */
+    t_float x_lothresh;	    	/* value of low vthreshold */
+    t_float x_hideadtime;	    	/* hi dead */
+    t_float x_lodeadtime;	    	/* lo dead */
 } t_vthreshold;
 
     /* "set" message to specify vthresholds and dead times */
@@ -62,14 +62,14 @@ static void vthreshold_perform(t_vthreshold *x, t_symbol *s, int argc, t_atom *a
 	if (argc>x->x_n) argc=x->x_n;
 	for (i=0;i<argc;i++)
 	{
-		float f;
+		t_float f;
 		f=atom_getfloat(argv++);
 
 		if (*state<0)
 		{
 			if (f>x->x_hithresh)
 			{
-				outlet_float(x->x_outlet1, (float)i); // on
+				outlet_float(x->x_outlet1, (t_float)i); // on
 				*state=1;
 			}
 		}
@@ -77,7 +77,7 @@ static void vthreshold_perform(t_vthreshold *x, t_symbol *s, int argc, t_atom *a
 		{
 			if (f<x->x_lothresh)
 			{
-				outlet_float(x->x_outlet2, (float)i); // off
+				outlet_float(x->x_outlet2, (t_float)i); // off
 				*state=-1;
 			}
 		}

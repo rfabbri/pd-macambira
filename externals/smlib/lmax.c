@@ -7,9 +7,9 @@ static t_class *lmax_class;
 typedef struct _lmax
 {
     t_object x_obj;
-	float m_max;
-	float m_leak;
-	float m_c_leak;
+	t_float m_max;
+	t_float m_leak;
+	t_float m_c_leak;
 } t_lmax;
 
 
@@ -21,8 +21,8 @@ static void lmax_perform(t_lmax *x, t_float in)
 
 static void lmax_setHalfDecay(t_lmax *x, t_float halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
-	x->m_leak=1.0f-x->m_c_leak;
+	x->m_c_leak=(t_float)powf(.5,(1.0/halfDecayTime));
+	x->m_leak=1.0-x->m_c_leak;
 }
 
 static void lmax_clear(t_lmax *x)

@@ -12,18 +12,18 @@ typedef struct _vstd
 
 static void vstd_perform(t_vstd *x, t_symbol *s, int argc, t_atom *argv)
 {
-	float sumsq=0.0f;
-	float sum=0.0f;
+	t_float sumsq=0.0f;
+	t_float sum=0.0f;
 	int i;
 	for (i = 0; i < argc; i++)
 	{
-		float tmp=atom_getfloat(&argv[i]);
+		t_float tmp=atom_getfloat(&argv[i]);
 		sumsq+= tmp*tmp;
 		sum+=tmp;
 	}
 	sumsq/=argc;
 	sum/=argc;
-	outlet_float(x->x_obj.ob_outlet, (float)sqrtf(sumsq-sum*sum));
+	outlet_float(x->x_obj.ob_outlet, (t_float)sqrtf(sumsq-sum*sum));
 }
 
 static void *vstd_new( t_float halfDecayTime)

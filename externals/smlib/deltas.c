@@ -7,11 +7,11 @@ static t_class *deltas_class;
 typedef struct _deltas
 {
     t_object x_obj;
-	float m_lo;
-	float m_hi;
+	t_float m_lo;
+	t_float m_hi;
 	int m_buffer_size;
 	int m_buffer_index;
-	float *m_buffer;  // circular buffer
+	t_float *m_buffer;  // circular buffer
 } t_deltas;
 
 static void deltas_set(t_deltas *x, t_float lo, t_float hi, t_float size);
@@ -29,8 +29,8 @@ static void deltas_bang(t_deltas *x)
 {
 	int lo,hi,n,index,size;
 	t_atom *ap,*app;
-	float last;
-	float *buffer, *bp;
+	t_float last;
+	t_float *buffer, *bp;
 
     deltas_set(x, x->m_lo, x->m_hi, x->m_buffer_size);
 	lo=(int)x->m_lo;
@@ -104,11 +104,11 @@ static void deltas_bang(t_deltas *x)
 static void deltas_clear(t_deltas *x)
 {
 	int i,s;
-	float *f;
+	t_float *f;
 	f=x->m_buffer;
 	s=x->m_buffer_size;
 	for (i=0;i<s;i++)
-		*f++=0.0f;
+		*f++=0.0;
 }
 
 static void deltas_set(t_deltas *x, t_float lo, t_float hi, t_float size)
@@ -137,16 +137,17 @@ static void deltas_set(t_deltas *x, t_float lo, t_float hi, t_float size)
 	if (hi<=lo)
 	{
 		logpost(x, 2, "[deltas]: higher bound (%g) must be greater than lower bound (%g)", hi, lo);	
-		lo=hi-1.0f;
+		lo=hi-1.0;
 	}
 
-	x->m_hi=(float)((int)hi);
-	x->m_lo=(float)((int)lo);
+	x->m_hi=(t_float)((int)hi);
+	x->m_lo=(t_float)((int)lo);
+
     if (x->m_buffer_size != size)
     {
         freebytes(x->m_buffer, x->m_buffer_size);
         x->m_buffer_size = (int)size;
-        x->m_buffer = (float*)getbytes(sizeof(float)*x->m_buffer_size);
+        x->m_buffer = (t_float*)getbytes(sizeof(t_float)*x->m_buffer_size);
         deltas_clear(x);
         x->m_buffer_index=0;
     }

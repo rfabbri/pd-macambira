@@ -18,10 +18,10 @@ static void vmin_perform(t_vmin *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
 	int mini;
-	float min=MAXFLOAT;
+	t_float min=MAXFLOAT;
 	for (i = 0; i < argc; i++)
 	{
-		float f=atom_getfloat(&argv[i]);
+		t_float f=atom_getfloat(&argv[i]);
 		if (f<min)
 		{ 
 			min=f;
@@ -29,7 +29,7 @@ static void vmin_perform(t_vmin *x, t_symbol *s, int argc, t_atom *argv)
 		}
 	}
 	outlet_float(x->x_obj.ob_outlet, min);
-	outlet_float(x->m_out_maxi, (float)(mini+1));
+	outlet_float(x->m_out_maxi, (t_float)(mini+1));
 }
 
 static void *vmin_new( t_float halfDecayTime)

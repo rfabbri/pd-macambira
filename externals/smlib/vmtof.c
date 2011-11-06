@@ -9,11 +9,11 @@ typedef struct _vmtof
     t_object x_obj;
 } t_vmtof;
 
-float mtof(float f)
+t_float mtof(t_float f)
 {
     if (f <= -1500) return(0);
     else if (f > 1499) return(mtof(1499));
-    else return (float)(8.17579891564 * exp(.0577622650 * f));
+    else return (t_float)(8.17579891564 * exp(.0577622650 * f));
 }
 
 static void vmtof_perform(t_vmtof *x, t_symbol *s, int argc, t_atom *argv)

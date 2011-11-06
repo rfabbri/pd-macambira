@@ -101,7 +101,7 @@ static void vvconv_lst(t_vvconv *x, t_symbol *s, int argc, t_atom *argv)
       SETFLOAT(a, *g++);
       a++;
     }
-    freebytes(f,sizeof(float)*n);
+    freebytes(f,sizeof(t_float)*n);
   }
   outlet_list(x->x_obj.ob_outlet, gensym("list"), n, ap);
   freebytes(ap, sizeof(t_atom)*n);

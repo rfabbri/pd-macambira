@@ -9,9 +9,9 @@ static t_class *linspace_class;
 typedef struct _linspace
 {
     t_object x_obj;
-	float m_lo;
-	float m_hi;
-	float m_n;
+	t_float m_lo;
+	t_float m_hi;
+	t_float m_n;
 } t_linspace;
 
 
@@ -22,7 +22,7 @@ static void linspace_bang(t_linspace *x)
 	if ((n<256)&&(n>1))
 	{
 		int i;
-		float lo,step;
+		t_float lo,step;
 		t_atom *ap,*app;
 
 		ap = (t_atom *)getbytes(sizeof(t_atom)*n);

@@ -4,18 +4,18 @@
 
 typedef struct hipctl
 {
-    float c_x;
-    float c_coef;
+    t_float c_x;
+    t_float c_coef;
 } t_hipctl;
 
 typedef struct hip
 {
     t_object x_obj;
-    float x_sr;
-    float x_hz;
+    t_float x_sr;
+    t_float x_hz;
     t_hipctl x_cspace;
     t_hipctl *x_ctl;
-    float x_f;
+    t_float x_f;
 } t_hip;
 
 t_class *hip_class;
@@ -45,11 +45,11 @@ static void hip_ft1(t_hip *x, t_floatarg f)
 static void hip_perform(t_hip *x, t_float in)
 {
     t_hipctl *c = x->x_ctl;
-    float last = c->c_x;
-    float coef = c->c_coef;
-	float out;
+    t_float last = c->c_x;
+    t_float coef = c->c_coef;
+	t_float out;
 
-	float new = in + coef * last;
+	t_float new = in + coef * last;
 	out = new - last;
 	last = new;
 

@@ -8,19 +8,19 @@ static t_class *lhisti_class;
 typedef struct _lhisti
 {
     t_object x_obj;
-	float m_lo;
-	float m_hi;
-	float m_scale;
-	float m_c_leak;
-	float m_leak;
+	t_float m_lo;
+	t_float m_hi;
+	t_float m_scale;
+	t_float m_c_leak;
+	t_float m_leak;
 	int m_nbins;
 //	int m_n_observations;
-	float *m_lhisti;
+	t_float *m_lhisti;
 } t_lhisti;
 
 static void lhisti_setHalfDecay(t_lhisti *x, t_float halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
+	x->m_c_leak=(t_float)powf(.5,(1.0f/halfDecayTime));
 	x->m_leak=1.0f-x->m_c_leak;
 }
 
@@ -47,8 +47,8 @@ static void lhisti_perform_list(t_lhisti *x, t_symbol *s, int argc, t_atom *argv
 static void lhisti_leak(t_lhisti *x)
 {
 	int i;
-	float *f;
-	float sc;
+	t_float *f;
+	t_float sc;
 	f=x->m_lhisti;
     sc=x->m_c_leak;
 	i=x->m_nbins;
@@ -59,7 +59,7 @@ static void lhisti_leak(t_lhisti *x)
 static void lhisti_bang(t_lhisti *x)
 {
 	int i,n;
-	float *f;
+	t_float *f;
 	t_atom *ap,*app;
 	n=x->m_nbins;
     ap = (t_atom *)getbytes(sizeof(t_atom)*n);
@@ -79,8 +79,8 @@ static void lhisti_bang(t_lhisti *x)
 static void lhisti_relative(t_lhisti *x)
 {
 	int i,n;
-	float *f;
-	float invn,sum;
+	t_float *f;
+	t_float invn,sum;
 	t_atom *ap,*app;
 
 	n=x->m_nbins;
@@ -107,7 +107,7 @@ static void lhisti_relative(t_lhisti *x)
 static void lhisti_clear(t_lhisti *x)
 {
 	int i;
-	float *f;
+	t_float *f;
 	f=x->m_lhisti;
 	for (i=0;i<x->m_nbins;i++)
 		*f++=0.0f;
@@ -131,8 +131,8 @@ static void lhisti_set(t_lhisti *x, t_float lo, t_float hi, t_float nbins)
 	x->m_hi=hi;
 	x->m_lo=lo;
 	x->m_nbins=(int)nbins;
-	x->m_scale=(float)x->m_nbins/(hi-lo);
-    x->m_lhisti = (float*)getbytes(sizeof(float)*x->m_nbins);
+	x->m_scale=(t_float)x->m_nbins/(hi-lo);
+    x->m_lhisti = (t_float*)getbytes(sizeof(t_float)*x->m_nbins);
 
 	lhisti_clear(x);
 }

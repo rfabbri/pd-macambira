@@ -7,9 +7,9 @@ static t_class *lavg_class;
 typedef struct _lavg
 {
     t_object x_obj;
-	float m_avg;
-	float m_c_leak;
-	float m_leak;
+	t_float m_avg;
+	t_float m_c_leak;
+	t_float m_leak;
 } t_lavg;
 
 
@@ -21,13 +21,13 @@ static void lavg_perform(t_lavg *x, t_float in)
 
 static void lavg_clear(t_lavg *x)
 {
-	x->m_avg=0.0f;
+	x->m_avg=0.0;
 }
 
 static void lavg_setHalfDecay(t_lavg *x, t_float halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
-	x->m_leak=1.0f-x->m_c_leak;
+	x->m_c_leak=(t_float)powf(.5,(1.0/halfDecayTime));
+	x->m_leak=1.0-x->m_c_leak;
 }
 
 static void *lavg_new( t_float halfDecayTime)

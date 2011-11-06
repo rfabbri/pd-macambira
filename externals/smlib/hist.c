@@ -8,12 +8,12 @@ static t_class *hist_class;
 typedef struct _hist
 {
     t_object x_obj;
-	float m_lo;
-	float m_hi;
-	float m_scale;
+	t_float m_lo;
+	t_float m_hi;
+	t_float m_scale;
 	int m_nbins;
 	int m_n_observations;
-	float *m_hist;
+	t_float *m_hist;
 } t_hist;
 
 
@@ -41,7 +41,7 @@ static void hist_perform_list(t_hist *x, t_symbol *s, int argc, t_atom *argv)
 static void hist_bang(t_hist *x)
 {
 	int i,n;
-	float *f;
+	t_float *f;
 	t_atom *ap,*app;
 
 	n=x->m_nbins;
@@ -63,8 +63,8 @@ static void hist_bang(t_hist *x)
 static void hist_relative(t_hist *x)
 {
 	int i,n;
-	float *f;
-	float invn;
+	t_float *f;
+	t_float invn;
 	t_atom *ap,*app;
 	n=x->m_nbins;
     ap = (t_atom *)getbytes(sizeof(t_atom)*n);
@@ -87,7 +87,7 @@ static void hist_relative(t_hist *x)
 static void hist_clear(t_hist *x)
 {
 	int i;
-	float *f;
+	t_float *f;
 	f=x->m_hist;
 	for (i=0;i<x->m_nbins;i++)
 		*f++=0.0f;
@@ -114,8 +114,8 @@ static void hist_set(t_hist *x, t_float lo, t_float hi, t_float nbins)
 	x->m_hi=hi;
 	x->m_lo=lo;
 	x->m_nbins=(int)nbins;
-	x->m_scale=(float)x->m_nbins/(hi-lo);
-    x->m_hist = (float*)getbytes(sizeof(float)*x->m_nbins);
+	x->m_scale=(t_float)x->m_nbins/(hi-lo);
+    x->m_hist = (t_float*)getbytes(sizeof(t_float)*x->m_nbins);
 
 	hist_clear(x);
 }

@@ -12,14 +12,14 @@ typedef struct _vrms
 
 static void vrms_perform(t_vrms *x, t_symbol *s, int argc, t_atom *argv)
 {
-	float sum=0.f;
+	t_float sum=0.;
 	int i;
 	for (i = 0; i < argc; i++)
 	{
-		float tmp=atom_getfloat(&argv[i]);
+		t_float tmp=atom_getfloat(&argv[i]);
 		sum+= tmp*tmp;
 	}
-	outlet_float(x->x_obj.ob_outlet, (float)sqrtf(sum/argc));
+	outlet_float(x->x_obj.ob_outlet, (t_float)sqrtf(sum/argc));
 }
 
 static void *vrms_new( t_float halfDecayTime)

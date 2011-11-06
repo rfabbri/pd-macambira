@@ -7,10 +7,10 @@ static t_class *lrange_class;
 typedef struct _lrange
 {
     t_object x_obj;
-	float m_min;
-	float m_max;
-	float m_c_leak;
-	float m_leak;
+	t_float m_min;
+	t_float m_max;
+	t_float m_c_leak;
+	t_float m_leak;
 } t_lrange;
 
 
@@ -23,7 +23,7 @@ static void lrange_perform(t_lrange *x, t_float in)
 
 static void lrange_setHalfDecay(t_lrange *x, t_float halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
+	x->m_c_leak=(t_float)powf(.5,(1.0f/halfDecayTime));
 	x->m_leak=1.0f-x->m_c_leak;
 }
 

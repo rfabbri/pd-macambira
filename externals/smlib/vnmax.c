@@ -21,10 +21,10 @@ static void vnmax_perform(t_vnmax *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
 	int maxi;
-	float max=-MAXFLOAT;
+	t_float max=-MAXFLOAT;
 	for (i = 0; i < argc; i++)
 	{
-		float f=atom_getfloat(&argv[i]);
+		t_float f=atom_getfloat(&argv[i]);
 		if (f>max)
 		{ 
 			max=f;
@@ -32,7 +32,7 @@ static void vnmax_perform(t_vnmax *x, t_symbol *s, int argc, t_atom *argv)
 		}
 	}
 	outlet_float(x->x_obj.ob_outlet, max);
-	outlet_float(x->m_out_maxi, (float)(maxi+1));
+	outlet_float(x->m_out_maxi, (t_float)(maxi+1));
 }
 
 static void *vnmax_new( t_float halfDecayTime)

@@ -9,12 +9,12 @@ typedef struct _vrmstodb
     t_object x_obj;
 } t_vrmstodb;
 
-float rmstodb(float f)
+static t_float rmstodecibel(t_float f)
 {
     if (f <= 0) return (0);
     else
     {
-    	float val = (float)(100 + 20./LOGTEN * log(f));
+    	t_float val = (t_float)(100 + 20./LOGTEN * log(f));
     	return (val < 0 ? 0 : val);
     }
 }
@@ -28,7 +28,7 @@ static void vrmstodb_perform(t_vrmstodb *x, t_symbol *s, int argc, t_atom *argv)
 
 	for (i = 0; i < argc; i++)
 	{
-		SETFLOAT(app, rmstodb(atom_getfloat(argv++)));
+		SETFLOAT(app, rmstodecibel(atom_getfloat(argv++)));
 		app++;
 	}
 	outlet_list(x->x_obj.ob_outlet,gensym("list"),argc,ap);

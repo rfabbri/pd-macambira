@@ -12,16 +12,16 @@ typedef struct _vcog
 
 static void vcog_perform(t_vcog *x, t_symbol *s, int argc, t_atom *argv)
 {
-	float sum=0.f;
-	float wsum=0.0f;
+	t_float sum=0.;
+	t_float wsum=0.0;
 	int i;
 	for (i = 0; i < argc; i++)
 	{
-		float tmp=atom_getfloat(&argv[i]);
+		t_float tmp=atom_getfloat(&argv[i]);
 		sum+= tmp;
 		wsum+= tmp*i;
 	}
-	if (sum!=0.0f) outlet_float(x->x_obj.ob_outlet, 1.0f+(wsum/sum));
+	if (sum!=0.0f) outlet_float(x->x_obj.ob_outlet, 1.0+(wsum/sum));
 }
 
 static void *vcog_new( t_float halfDecayTime)

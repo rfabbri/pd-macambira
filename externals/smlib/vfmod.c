@@ -9,14 +9,14 @@ static t_class *vfmod_class;
 typedef struct _vfmod
 {
     t_object x_obj;
-	float m_y;
+	t_float m_y;
 } t_vfmod;
 
 
 static void vfmod_perform(t_vfmod *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
-	float y;
+	t_float y;
 	t_atom *ap,*app;
     ap = (t_atom *)getbytes(sizeof(t_atom)*argc);
 	app=ap;
@@ -25,7 +25,7 @@ static void vfmod_perform(t_vfmod *x, t_symbol *s, int argc, t_atom *argv)
 		y=1.0f;
 	for (i = 0; i < argc; i++)
 	{
-		SETFLOAT(app, (float)fmod(atom_getfloat(argv++),y));
+		SETFLOAT(app, (t_float)fmod(atom_getfloat(argv++),y));
 		app++;
 	}
 	outlet_list(x->x_obj.ob_outlet,gensym("list"),argc,ap);

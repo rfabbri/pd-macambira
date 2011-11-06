@@ -9,9 +9,9 @@ typedef struct _vftom
     t_object x_obj;
 } t_vftom;
 
-float ftom(float f)
+t_float ftom(t_float f)
 {
-    return (float)(f > 0 ? 17.3123405046 * log(.12231220585 * f) : -1500);
+    return (t_float)(f > 0 ? 17.3123405046 * log(.12231220585 * f) : -1500);
 }
 
 static void vftom_perform(t_vftom *x, t_symbol *s, int argc, t_atom *argv)

@@ -9,9 +9,9 @@ static t_class *vlavg_class;
 typedef struct _vlavg
 {
     t_object x_obj;
-	float m_c_leak;
-	float m_leak;
-	float *m_avg;
+	t_float m_c_leak;
+	t_float m_leak;
+	t_float *m_avg;
 	int m_n;
 } t_vlavg;
 
@@ -20,9 +20,9 @@ static void vlavg_perform(t_vlavg *x, t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
 	t_atom *ap,*app;
-	float *fp;
-	float m_leak;
-	float m_c_leak;
+	t_float *fp;
+	t_float m_leak;
+	t_float m_c_leak;
 	m_leak=x->m_leak;
 	m_c_leak=x->m_c_leak;
 
@@ -31,7 +31,7 @@ static void vlavg_perform(t_vlavg *x, t_symbol *s, int argc, t_atom *argv)
 		int i;
 		if (x->m_avg)
 			freebytes(x->m_avg,x->m_n);
-		x->m_avg=(float*)getbytes(argc*sizeof(float));
+		x->m_avg=(t_float*)getbytes(argc*sizeof(t_float));
 		for(i=0;i<argc;i++)
 			x->m_avg[i]=0.0f;
 		x->m_n=argc;
@@ -42,7 +42,7 @@ static void vlavg_perform(t_vlavg *x, t_symbol *s, int argc, t_atom *argv)
 	app=ap;
 	for (i = 0; i < argc; i++)
 	{
-		float f=atom_getfloat(argv++);
+		t_float f=atom_getfloat(argv++);
 		*fp = *fp * m_c_leak + f * m_leak;
 		SETFLOAT(app, *fp);
 		app++;
@@ -54,7 +54,7 @@ static void vlavg_perform(t_vlavg *x, t_symbol *s, int argc, t_atom *argv)
 
 static void vlavg_setHalfDecay(t_vlavg *x, t_floatarg halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
+	x->m_c_leak=(t_float)powf(.5,(1.0f/halfDecayTime));
 	x->m_leak=1.0f-x->m_c_leak;
 }
 

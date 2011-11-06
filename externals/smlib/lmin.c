@@ -7,9 +7,9 @@ static t_class *lmin_class;
 typedef struct _lmin
 {
     t_object x_obj;
-	float m_min;
-	float m_leak;
-	float m_c_leak;
+	t_float m_min;
+	t_float m_leak;
+	t_float m_c_leak;
 } t_lmin;
 
 
@@ -21,7 +21,7 @@ static void lmin_perform(t_lmin *x, t_float in)
 
 static void lmin_setHalfDecay(t_lmin *x, t_float halfDecayTime)
 {
-	x->m_c_leak=(float)powf(.5,(1.0f/halfDecayTime));
+	x->m_c_leak=(t_float)powf(.5,(1.0f/halfDecayTime));
 	x->m_leak=1.0f-x->m_c_leak;
 }
 

@@ -11,11 +11,11 @@ typedef struct _threshold
     t_outlet *x_outlet2;    	/* bang out for low thresh */
     t_clock *x_clock;	    	/* wakeup for message output */
     int x_state;    			/* 1 = high, 0 = low */
-    float x_hithresh;	    	/* value of high threshold */
-    float x_lothresh;	    	/* value of low threshold */
-    float x_deadwait;	    	/* msec remaining in dead period */
-    float x_hideadtime;	    	/* hi dead */
-    float x_lodeadtime;	    	/* lo dead */
+    t_float x_hithresh;	    	/* value of high threshold */
+    t_float x_lothresh;	    	/* value of low threshold */
+    t_float x_deadwait;	    	/* msec remaining in dead period */
+    t_float x_hideadtime;	    	/* hi dead */
+    t_float x_lodeadtime;	    	/* lo dead */
 } t_threshold;
 
 static void threshold_tick(t_threshold *x);
