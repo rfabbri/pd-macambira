@@ -25,7 +25,7 @@ static inline int DSPI_IS_DENORMAL(t_float f)
 {
     t_dspiflint pun;
     pun.f = f;
-    return ((pun.i[1] & 0x7f800000) == 0);
+    return ((pun.i & 0x7f800000) == 0);
 }
 
 // test if almost denormal, choose whichever is fastest
@@ -33,7 +33,7 @@ static inline int DSPI_IS_ALMOST_DENORMAL(t_float f)
 {
     t_dspiflint pun;
     pun.f = f;
-    return ((pun.i[1] & 0x7f800000) < 0x08000000);
+    return ((pun.i & 0x7f800000) < 0x08000000);
 }
 
 #elif PD_FLOAT_PRECISION == 64
