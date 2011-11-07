@@ -5,7 +5,7 @@
 /* by Digi International Inc. http://www.digi.com */
 
 #include <stdio.h>
-//#include <string.h>
+#include <string.h>
 #include "m_pd.h"
 #include "pdxbee.h"
 
@@ -124,7 +124,11 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         error("packxbee_TX: first argument is not a hex string beginning with \"0x\"");
         return;
     }
-    result = sscanf(argv[0].a_w.w_symbol->s_name, "0x%I64X", &dest64);
+#ifdef _MSC_VER
+    result = sscanf(argv[0].a_w.w_symbol->s_name, "0x%I64X", &dest64); 
+#else
+    result = sscanf(argv[0].a_w.w_symbol->s_name, "0x%LX", &dest64);
+#endif
     if (result == 0)
     {
         error("packxbee_TX: first argument is not a hex string");
@@ -298,7 +302,6 @@ static void packxbee_pack_remote_frame(t_packxbee *x, t_symbol *s, int argc, t_a
     char                checksum = 0xFF;
     unsigned char       floatstring[256]; /* longer than the longest hex number with each character escaped plus the header and checksum overhead */
     int                 length = 0;
-    int                 usefloatstring = 0;
     unsigned char       c, digits;
     long                param;
     t_float             f;
@@ -323,7 +326,11 @@ static void packxbee_pack_remote_frame(t_packxbee *x, t_symbol *s, int argc, t_a
             error("packxbee_pack_remote_frame: first argument is not a hex string beginning with \"0x\"");
             return;
         }
+#ifdef _MSC_VER
         result = sscanf(argv[0].a_w.w_symbol->s_name, "0x%I64X", &dest64);
+#else
+        result = sscanf(argv[0].a_w.w_symbol->s_name, "0x%LX", &dest64);
+#endif
         if (result == 0)
         {
             error("packxbee_pack_remote_frame: first argument is not a hex string");
@@ -375,8 +382,8 @@ static void packxbee_pack_remote_frame(t_packxbee *x, t_symbol *s, int argc, t_a
             post ("packxbee_pack_remote_frame: argument 4 must be a two-character AT command");
             return;
         }
-        if (((argv[3].a_w.w_symbol->s_name[0] < 0x20) || (argv[3].a_w.w_symbol->s_name[0] > 0x7F))
-            || ((argv[3].a_w.w_symbol->s_name[1] < 0x20) || (argv[3].a_w.w_symbol->s_name[1] > 0x7F)))
+        if (((argv[3].a_w.w_symbol->s_name[0] < 0x20) || (argv[3].a_w.w_symbol->s_name[0] & 0x80))
+            || ((argv[3].a_w.w_symbol->s_name[1] < 0x20) || (argv[3].a_w.w_symbol->s_name[1] & 0x80)))
         {
             post ("packxbee_pack_remote_frame: argument 4 must be printable ascii");
             return;
@@ -513,7 +520,6 @@ static void packxbee_pack_frame(t_packxbee *x, t_symbol *s, int argc, t_atom *ar
     char            checksum = 0xFF;
     unsigned char   floatstring[256]; /* longer than the longest hex number with each character escaped plus the header and checksum overhead */
     int             length = 0;
-    int             usefloatstring = 0;
     unsigned char   c, digits;
     long            param;
     t_float         f;
@@ -532,8 +538,8 @@ static void packxbee_pack_frame(t_packxbee *x, t_symbol *s, int argc, t_atom *ar
             post ("packxbee_AT: argument 1 must be a two-character AT command");
             return;
         }
-        if (((argv[0].a_w.w_symbol->s_name[0] < 0x20) || (argv[0].a_w.w_symbol->s_name[0] > 0x7F))
-            || ((argv[0].a_w.w_symbol->s_name[1] < 0x20) || (argv[0].a_w.w_symbol->s_name[1] > 0x7F)))
+        if (((argv[0].a_w.w_symbol->s_name[0] < 0x20) || (argv[0].a_w.w_symbol->s_name[0] & 0x80))
+            || ((argv[0].a_w.w_symbol->s_name[1] < 0x20) || (argv[0].a_w.w_symbol->s_name[1] & 0x80)))
         {
             post ("packxbee_AT: argument 1 must be printable ascii");
             return;
@@ -615,22 +621,22 @@ static void packxbee_pack_frame(t_packxbee *x, t_symbol *s, int argc, t_atom *ar
                 }
             }
         } /* argc >= 2 */
-    } /* argc >= 1 */
-    length = i-3;
-    floatstring[LENGTH_LSB_INDEX] = length & 0x0FF;
-    floatstring[LENGTH_MSB_INDEX] = length >> 8;
-    floatstring[i++] = checksum;
-    k = j = 0; /* j indexes the outbuf, k indexes the floatbuf, i is the length of floatbuf */
-    for (k = 0; k < i; ++k) j = packxbee_outbuf_add(x, j, floatstring[k]);
-    outlet_list(x->x_listout, &s_list, j, x->x_outbuf);
-    if(x->x_verbosity > 1)
-    {
-        for (k = 0; k < j; ++k)
+        length = i-3;
+        floatstring[LENGTH_LSB_INDEX] = length & 0x0FF;
+        floatstring[LENGTH_MSB_INDEX] = length >> 8;
+        floatstring[i++] = checksum;
+        k = j = 0; /* j indexes the outbuf, k indexes the floatbuf, i is the length of floatbuf */
+        for (k = 0; k < i; ++k) j = packxbee_outbuf_add(x, j, floatstring[k]);
+        outlet_list(x->x_listout, &s_list, j, x->x_outbuf);
+        if(x->x_verbosity > 1)
         {
-            c = (unsigned char)atom_getfloat(&x->x_outbuf[k]);
-            post("buf[%d]: %d [0x%02X]", k, c, c);
+            for (k = 0; k < j; ++k)
+            {
+                c = (unsigned char)atom_getfloat(&x->x_outbuf[k]);
+                post("buf[%d]: %d [0x%02X]", k, c, c);
+            }
         }
-    }
+    } /* argc >= 1 */
 }
 
 static void packxbee_free(t_packxbee *x)
