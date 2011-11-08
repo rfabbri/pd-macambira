@@ -367,8 +367,8 @@ static int tcpclient_send_buf(t_tcpclient *x, char *buf, int buf_len)
         return 0;
     }
     x->x_nextthread++;
-    if (x->x_nextthread > MAX_TCPCLIENT_THREADS) x->x_nextthread = 0;
-    return buf_len;
+    if (x->x_nextthread >= MAX_TCPCLIENT_THREADS) x->x_nextthread = 0;
+    return max;
 }
 
 /* tcpclient_child_send runs in sendthread */
