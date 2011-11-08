@@ -1,0 +1,31 @@
+#N canvas 199 234 450 300 10;
+#X obj 190 139 exists;
+#X msg 181 45 exists.tcl;
+#X floatatom 193 175 5 0 0 0 - - -;
+#X msg 205 76 symbol /tmp;
+#X msg 222 101 spaces in a filename.txt;
+#X floatatom 209 225 5 0 0 0 - - -;
+#X symbolatom 257 224 10 0 0 0 - - -;
+#X obj 162 245 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144
+-1 -1;
+#X obj 162 201 route bang float symbol list;
+#X obj 209 245 bng 15 250 50 0 empty empty float -4 23 1 12 -262144
+-1 -1;
+#X obj 257 245 bng 15 250 50 0 empty empty symbol -12 23 1 12 -262144
+-1 -1;
+#X obj 305 245 bng 15 250 50 0 empty empty list -2 23 1 12 -262144
+-1 -1;
+#X obj 353 245 bng 15 250 50 0 empty empty undefined -18 23 1 12 -262144
+-1 -1;
+#X connect 0 0 2 0;
+#X connect 0 0 8 0;
+#X connect 1 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 9 0;
+#X connect 6 0 10 0;
+#X connect 8 0 7 0;
+#X connect 8 1 5 0;
+#X connect 8 2 6 0;
+#X connect 8 3 11 0;
+#X connect 8 4 12 0;
