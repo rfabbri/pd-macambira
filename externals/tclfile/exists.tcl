@@ -11,25 +11,18 @@ proc+ exists::constructor {self args} {
 
 proc+ exists::0_symbol {self args} {
     # HOT inlet
-    set @filename [lindex {*}$args 1]
-    exists::0_bang $self
-}
-
-proc+ exists::0_anything {self args} {
-    # HOT inlet
-    set @filename [lindex {*}$args 1]
-    pd::post "anything: $@filename"
+    set @filename [pd::arg 0 symbol]
     exists::0_bang $self
 }
 
 proc+ exists::0_bang {self} {
     if {$@filename == {}} return
-    pd::outlet $self 0 [list float [file exists $@filename]]
+    pd::outlet $self 0 float [file exists $@filename]
 }
 
 proc+ exists::1_anything {self args} {
     # COLD inlet
-    set @filename [lindex {*}$args 1]
+    set @filename [pd::arg 0 symbol]
 }
 
 pd::class exists
