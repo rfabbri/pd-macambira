@@ -14,7 +14,7 @@ for log in glob.glob('/var/www/auto-build/' + date + '/logs/20*.txt'):
 	f = open(log, 'r')
 	logoutput.append('======================================================================\n')
 	logoutput.append(log + '\n')
- 	logoutput.append('======================================================================\n')
+ 	logoutput.append('--------------------------\n')
 	for line in f:
 		if line.find('warning: dereferencing type-punned pointer will break strict-aliasing rules') > -1:
 			logoutput.append(line.replace('/home/pd/auto-build/', '')
