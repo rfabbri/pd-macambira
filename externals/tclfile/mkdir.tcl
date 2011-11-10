@@ -1,11 +1,7 @@
 package require Tclpd 0.2.3
 package require TclpdLib 0.19
 
-puts stderr "Loading mkdir.tcl"
-
-if {[namespace exists mkdir]} {return}
-namespace eval mkdir {
-}
+pd::post "Loading mkdir.tcl"
 
 proc+ mkdir::constructor {self args} {
     # add outlet
@@ -14,22 +10,22 @@ proc+ mkdir::constructor {self args} {
 
 # HOT inlet
 proc+ mkdir::0_list {self args} {
-    puts stderr "tclfile/mkdir: list"
+    pd::post "tclfile/mkdir: list"
     #pd::outlet $self 0 list $@curlist
 }
 
 # HOT inlet
 proc+ mkdir::0_symbol {self args} {
-    puts stderr "tclfile/mkdir: symbol"
+    pd::post "tclfile/mkdir: symbol"
 #    pd::outlet $self 0 list $@curlist
 }
 
 proc+ mkdir::0_bang {self} {
-    puts stderr "tclfile/mkdir: bang"
+    pd::post "tclfile/mkdir: bang"
 #    pd::outlet $self 0 list $@curlist
 }
 
-puts stderr "pd::class mkdir"
+pd::post "pd::class mkdir"
 pd::class mkdir
 
-puts stderr "Finished reading mkdir.tcl"
+pd::post "Finished reading mkdir.tcl"
