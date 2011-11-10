@@ -20,7 +20,7 @@ proc+ exists::0_bang {self} {
     pd::outlet $self 0 float [file exists $@filename]
 }
 
-proc+ exists::1_anything {self args} {
+proc+ exists::1_symbol {self args} {
     # COLD inlet
     set @filename [pd::arg 0 symbol]
 }
