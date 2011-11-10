@@ -1,11 +1,23 @@
 #N canvas 199 234 450 300 10;
-#X obj 190 139 exists;
-#X floatatom 193 175 5 0 0 0 - - -;
-#X obj 194 199 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 33 166 exists;
+#X floatatom 36 202 5 0 0 0 - - -;
+#X obj 37 226 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X msg 65 91 symbol unexistent?;
+#X msg 41 60 symbol exists.tcl;
+#X obj 239 183 exists;
+#X floatatom 242 219 5 0 0 0 - - -;
+#X obj 243 243 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X msg 205 76 symbol unexistent?;
-#X msg 181 45 symbol exists.tcl;
+#X msg 247 77 bang;
+#X msg 274 136 symbol /tmp/;
+#X msg 290 158 /tmp;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 8 0 5 0;
+#X connect 9 0 5 1;
+#X connect 10 0 5 1;

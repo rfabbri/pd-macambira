@@ -1,31 +1,33 @@
 package require Tclpd 0.2.3
 package require TclpdLib 0.19
 
-pd::post "Loading mkdir.tcl"
-
 proc+ mkdir::constructor {self args} {
-    # add outlet
-    pd::add_outlet $self list
+    set @current_canvas [canvas_getcurrent]
+    # set to blank so the var always mkdir
+    set @filename {}
+
+    # add second inlet (first created by default)
+    pd::add_inlet $self list
 }
 
-# HOT inlet
-proc+ mkdir::0_list {self args} {
-    pd::post "tclfile/mkdir: list"
-    #pd::outlet $self 0 list $@curlist
-}
-
-# HOT inlet
 proc+ mkdir::0_symbol {self args} {
-    pd::post "tclfile/mkdir: symbol"
-#    pd::outlet $self 0 list $@curlist
+    # HOT inlet
+    set @filename [pd::arg 0 symbol]
+    mkdir::0_bang $self
 }
 
 proc+ mkdir::0_bang {self} {
-    pd::post "tclfile/mkdir: bang"
-#    pd::outlet $self 0 list $@curlist
+    if {[file pathtype $@filename] eq "absolute"} {
+        file mkdir $@filename
+    } else {
+        set dir [[canvas_getdir $@current_canvas] cget -s_name]
+        file mkdir [file join $dir $@filename]
+    }
 }
 
-pd::post "pd::class mkdir"
-pd::class mkdir
+proc+ mkdir::1_symbol {self args} {
+    # COLD inlet
+    set @filename [pd::arg 0 symbol]
+}
 
-pd::post "Finished reading mkdir.tcl"
+pd::class mkdir

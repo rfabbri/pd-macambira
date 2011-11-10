@@ -2,6 +2,10 @@ package require Tclpd 0.2.3
 package require TclpdLib 0.19
 
 proc+ exists::constructor {self args} {
+    set @current_canvas [canvas_getcurrent]
+    # set to blank so the var always exists
+    set @filename {}
+
     # add second inlet (first created by default)
     pd::add_inlet $self list
 
@@ -16,8 +20,12 @@ proc+ exists::0_symbol {self args} {
 }
 
 proc+ exists::0_bang {self} {
-    if {![info exists @filename]} return
-    pd::outlet $self 0 float [file exists $@filename]
+    if {[file pathtype $@filename] eq "absolute"} {
+        pd::outlet $self 0 float [file exists $@filename]
+    } else {
+        set dir [[canvas_getdir $@current_canvas] cget -s_name]
+        pd::outlet $self 0 float [file exists [file join $dir $@filename]]
+    }
 }
 
 proc+ exists::1_symbol {self args} {
