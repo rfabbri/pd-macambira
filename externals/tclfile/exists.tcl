@@ -16,7 +16,7 @@ proc+ exists::0_symbol {self args} {
 }
 
 proc+ exists::0_bang {self} {
-    if {$@filename == {}} return
+    if {![info exists @filename]} return
     pd::outlet $self 0 float [file exists $@filename]
 }
 
