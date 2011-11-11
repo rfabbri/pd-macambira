@@ -5,10 +5,9 @@ proc mkdir::constructor {self args} {
     if {![namespace exists $self]} {
         namespace eval $self {}
     }
-    variable ${self}::filename
-    set @current_canvas [canvas_getcurrent]
     # set to blank so the var always mkdir
-    set filename {}
+    variable ${self}::filename {}
+    variable ${self}::current_canvas [canvas_getcurrent]
 
     # add second inlet (first created by default)
     pd::add_inlet $self list
@@ -21,6 +20,7 @@ proc mkdir::0_symbol {self args} {
 }
 
 proc mkdir::0_bang {self} {
+    variable ${self}::current_canvas
     variable ${self}::filename
     if {[file pathtype $filename] eq "absolute"} {
         file mkdir $filename
