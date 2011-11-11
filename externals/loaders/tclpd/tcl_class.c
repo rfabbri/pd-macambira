@@ -118,12 +118,12 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     av[2] = Tcl_NewStringObj("constructor", -1);
     Tcl_IncrRefCount(av[2]);
     for(int i=0; i<ac; i++) {
-        // NOTE: pd_to_tcl already calls Tcl_IncrRefCount
+        // NOTE: pdatom_to_tcl already calls Tcl_IncrRefCount
         //       so there is no need to call it here:
 
-        if(pd_to_tcl(&at[i], &av[3+i]) == TCL_ERROR) {
+        if(pdatom_to_tcl(&at[i], &av[3+i]) == TCL_ERROR) {
 #ifdef DEBUG
-            post("tclpd_new: failed conversion (pd_to_tcl)");
+            post("tclpd_new: failed conversion (pdatom_to_tcl)");
 #endif
             goto error;
         }
@@ -201,9 +201,12 @@ void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) 
     av[4] = Tcl_NewStringObj(s->s_name, -1);
     Tcl_IncrRefCount(av[4]);
     for(int i=0; i<ac; i++) {
-        if(pd_to_tcl(&at[i], &av[5+i]) == TCL_ERROR) {
+        // NOTE: pdatom_to_tcl already calls Tcl_IncrRefCount
+        //       so there is no need to call it here:
+
+        if(pdatom_to_tcl(&at[i], &av[5+i]) == TCL_ERROR) {
 #ifdef DEBUG
-            post("pd_to_tcl: tclpd_inlet_anything: failed during conversion. check memory leaks!");
+            post("pdatom_to_tcl: tclpd_inlet_anything: failed during conversion. check memory leaks!");
 #endif
             goto error;
         }

@@ -1,7 +1,7 @@
 #include "tcl_extras.h"
 #include <string.h>
 
-int tcl_to_pd(Tcl_Obj *input, t_atom *output) {
+int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
     int llength;
     if(Tcl_ListObjLength(tcl_for_pd, input, &llength) == TCL_ERROR)
         return TCL_ERROR;
@@ -28,7 +28,13 @@ int tcl_to_pd(Tcl_Obj *input, t_atom *output) {
     return TCL_OK;
 }
 
-const char* atom_type_string(t_atom* a) {
+int tcl_to_pdsymbol(Tcl_Obj *input, t_symbol **output) {
+    char* s = Tcl_GetStringFromObj(input, 0);
+    *output = gensym(s);
+    return TCL_OK;
+}
+
+const char* pdatom_type_string(t_atom* a) {
     switch(a->a_type) {
     case A_FLOAT:
     case A_DEFFLOAT:
@@ -48,7 +54,7 @@ const char* atom_type_string(t_atom* a) {
     }
 }
 
-const char* atom_symbol_value(t_atom* a) {
+const char* pdatom_symbol_value(t_atom* a) {
     if(a->a_type == A_DOLLAR) {
         char buf[6];
         snprintf(buf, 6, "$%d", a->a_w.w_index);
@@ -58,14 +64,14 @@ const char* atom_symbol_value(t_atom* a) {
     return a->a_w.w_symbol->s_name;
 }
 
-float atom_float_value(t_atom* a) {
+float pdatom_float_value(t_atom* a) {
     return a->a_w.w_float;
 }
 
-int pd_to_tcl(t_atom *input, Tcl_Obj **output) {
+int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
     Tcl_Obj* tcl_t_atom[2];
 #ifdef DEBUG
-    post("pd_to_tcl: atom type = %d (%s)",
+    post("pdatom_to_tcl: atom type = %d (%s)",
         input->a_type, input->a_type == A_FLOAT ? "A_FLOAT" :
         input->a_type == A_SYMBOL ? "A_SYMBOL" :
         input->a_type == A_POINTER ? "A_POINTER" : "?");
@@ -94,9 +100,19 @@ int pd_to_tcl(t_atom *input, Tcl_Obj **output) {
         }
     }
 #ifdef DEBUG
-    post("pd_to_tcl: atom value = \"%s\"", Tcl_GetStringFromObj(tcl_t_atom[1], 0));
+    post("pdatom_to_tcl: atom value = \"%s\"", Tcl_GetStringFromObj(tcl_t_atom[1], 0));
 #endif
     *output = Tcl_NewListObj(2, &tcl_t_atom[0]);
     Tcl_IncrRefCount(*output);
     return TCL_OK;
 }
+
+int pdsymbol_to_tcl(t_symbol *input, Tcl_Obj **output) {
+    Tcl_Obj* s[2];
+    s[0] = Tcl_NewStringObj("symbol", -1);
+    s[1] = Tcl_NewStringObj(input->s_name, -1);
+    *output = Tcl_NewListObj(2, &s[0]);
+    Tcl_IncrRefCount(*output);
+    return TCL_OK;
+}
+

@@ -50,11 +50,13 @@ void proxyinlet_setup(void);
 extern int Tclpd_SafeInit(Tcl_Interp *interp);
 
 /* tcl_typemap.c */
-int pd_to_tcl(t_atom* input, Tcl_Obj** output);
-int tcl_to_pd(Tcl_Obj* input, t_atom* output);
-const char* atom_type_string(t_atom* a);
-const char* atom_symbol_value(t_atom* a);
-float atom_float_value(t_atom* a);
+int tcl_to_pdatom(Tcl_Obj *input, t_atom *output);
+int tcl_to_pdsymbol(Tcl_Obj *input, t_symbol **output);
+const char* pdatom_type_string(t_atom* a);
+const char* pdatom_symbol_value(t_atom* a);
+float pdatom_float_value(t_atom* a);
+int pdatom_to_tcl(t_atom *input, Tcl_Obj **output);
+int pdsymbol_to_tcl(t_symbol *input, Tcl_Obj **output);
 
 /* tclpd.c */
 extern Tcl_Interp* tcl_for_pd;
