@@ -52,28 +52,36 @@
 %name(outlet_list) EXTERN void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 %name(outlet_anything) EXTERN void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 
+%typemap(in) (int argc, t_atom *argv) {
+    if(Tcl_ListObjLength(tcl_for_pd, $input, &$1) == TCL_ERROR)
+        return TCL_ERROR;
+    $2 = (t_atom *)getbytes(sizeof(t_atom) * $1);
+    int i;
+    Tcl_Obj *oi;
+    for(i = 0; i < len; i++) {
+        oi = Tcl_ListObjIndex(tcl_for_pd, $input, i, &oi);
+        if(tcl_to_pdatom(oi, $2[i]) == TCL_ERROR) {
+            SWIG_Fail;
+        }
+    }
+}
+
 %typemap(in) t_atom * {
     t_atom *a = (t_atom*)getbytes(sizeof(t_atom));
     if(tcl_to_pdatom($input, a) == TCL_ERROR) {
-#ifdef DEBUG
-        post("Tcl SWIG: typemap(in) [t_atom] error");
-#endif
-        return TCL_ERROR;
+        SWIG_Fail;
     }
     $1 = a;
 }
 
 %typemap(freearg) t_atom * {
-    freebytes($input sizeof(t_atom));
+    freebytes($input, sizeof(t_atom));
 }
 
 %typemap(out) t_atom * {
     Tcl_Obj* res_obj;
     if(pdatom_to_tcl($input, &res_obj) == TCL_ERROR) {
-#ifdef DEBUG
-        post("Tcl SWIG: typemap(out) [t_atom] error");
-#endif
-        return TCL_ERROR;
+        SWIG_Fail;
     }
     Tcl_SetObjResult(tcl_for_pd, res_obj);
 }
@@ -81,10 +89,7 @@
 %typemap(in) t_symbol * {
     t_symbol *s;
     if(tcl_to_pdsymbol($input, &s) == TCL_ERROR) {
-#ifdef DEBUG
-        post("Tcl SWIG: typemap(in) [t_symbol] error");
-#endif
-        return TCL_ERROR;
+        SWIG_Fail;
     }
     $1 = s;
 }
@@ -92,10 +97,7 @@
 %typemap(out) t_symbol * {
     Tcl_Obj* res_obj;
     if(pdsymbol_to_tcl($input, &res_obj) == TCL_ERROR) {
-#ifdef DEBUG
-        post("Tcl SWIG: typemap(out) [t_symbol] error");
-#endif
-        return TCL_ERROR;
+        SWIG_Fail;
     }
     Tcl_SetObjResult(tcl_for_pd, res_obj);
 }
