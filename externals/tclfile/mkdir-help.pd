@@ -1,18 +1,30 @@
 #N canvas 186 203 501 349 10;
-#X obj 120 161 mkdir;
-#X msg 120 109 symbol /tmp/blah;
-#X obj 268 155 exists;
-#X msg 268 109 symbol /tmp/blah;
-#X obj 268 176 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 203 190 exists;
+#X msg 203 144 symbol /tmp/blah;
+#X obj 203 211 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#X obj 268 196 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 203 231 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X msg 275 128 symbol /tmp/created_after_bang;
+#X msg 210 163 symbol /tmp/created_after_bang;
 #X text 28 294 this is a clone of this command:;
 #X obj 120 306 pddp/pddplink http://tcl.tk/man/tcl8.5/TclCmd/file.htm#M22
 ;
+#X msg 48 63 symbol /tmp/blah;
+#X text 25 20 make a new folder;
+#X obj 48 115 mkdir;
+#X obj 222 109 mkdir;
+#X msg 250 85 symbol /tmp/created_after_bang;
+#X msg 222 54 bang;
+#X msg 289 217 symbol /tmp/blah;
+#X msg 296 236 symbol /tmp/created_after_bang;
+#X obj 289 263 delete;
+#X text 267 199 and delete it:;
+#X connect 0 0 2 0;
 #X connect 1 0 0 0;
-#X connect 2 0 4 0;
-#X connect 3 0 2 0;
-#X connect 4 0 5 0;
-#X connect 6 0 2 0;
+#X connect 2 0 3 0;
+#X connect 4 0 0 0;
+#X connect 7 0 9 0;
+#X connect 11 0 10 1;
+#X connect 12 0 10 0;
+#X connect 13 0 15 0;
+#X connect 14 0 15 0;
