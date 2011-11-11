@@ -61,7 +61,7 @@
     for(i = 0; i < len; i++) {
         oi = Tcl_ListObjIndex(tcl_for_pd, $input, i, &oi);
         if(tcl_to_pdatom(oi, $2[i]) == TCL_ERROR) {
-            SWIG_Fail;
+            SWIG_fail;
         }
     }
 }
@@ -69,19 +69,19 @@
 %typemap(in) t_atom * {
     t_atom *a = (t_atom*)getbytes(sizeof(t_atom));
     if(tcl_to_pdatom($input, a) == TCL_ERROR) {
-        SWIG_Fail;
+        SWIG_fail;
     }
     $1 = a;
 }
 
 %typemap(freearg) t_atom * {
-    freebytes($input, sizeof(t_atom));
+    freebytes($1, sizeof(t_atom));
 }
 
 %typemap(out) t_atom * {
     Tcl_Obj* res_obj;
-    if(pdatom_to_tcl($input, &res_obj) == TCL_ERROR) {
-        SWIG_Fail;
+    if(pdatom_to_tcl($1, &res_obj) == TCL_ERROR) {
+        SWIG_fail;
     }
     Tcl_SetObjResult(tcl_for_pd, res_obj);
 }
@@ -89,15 +89,15 @@
 %typemap(in) t_symbol * {
     t_symbol *s;
     if(tcl_to_pdsymbol($input, &s) == TCL_ERROR) {
-        SWIG_Fail;
+        SWIG_fail;
     }
     $1 = s;
 }
 
 %typemap(out) t_symbol * {
     Tcl_Obj* res_obj;
-    if(pdsymbol_to_tcl($input, &res_obj) == TCL_ERROR) {
-        SWIG_Fail;
+    if(pdsymbol_to_tcl($1, &res_obj) == TCL_ERROR) {
+        SWIG_fail;
     }
     Tcl_SetObjResult(tcl_for_pd, res_obj);
 }
