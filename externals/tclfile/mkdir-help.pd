@@ -1,13 +1,16 @@
-#N canvas 186 203 502 300 10;
+#N canvas 186 203 501 349 10;
 #X obj 120 161 mkdir;
 #X msg 120 109 symbol /tmp/blah;
 #X obj 268 155 exists;
 #X msg 268 109 symbol /tmp/blah;
-#X obj 268 176 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 268 176 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 268 196 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X msg 275 128 symbol /tmp/created_after_bang;
+#X text 28 294 this is a clone of this command:;
+#X obj 120 306 pddp/pddplink http://tcl.tk/man/tcl8.5/TclCmd/file.htm#M22
+;
 #X connect 1 0 0 0;
 #X connect 2 0 4 0;
 #X connect 3 0 2 0;
