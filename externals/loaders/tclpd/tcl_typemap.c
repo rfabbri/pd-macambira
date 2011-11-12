@@ -49,7 +49,7 @@ const char* pdatom_type_string(t_atom* a) {
     case A_POINTER:
         return "pointer";
     default:
-        post("atom_type_string: unsupported/unknown selector: %d", a->a_type);
+        error("atom_type_string: unsupported/unknown selector: %d", a->a_type);
         return "???";
     }
 }

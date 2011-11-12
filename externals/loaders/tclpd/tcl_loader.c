@@ -60,9 +60,9 @@ gotone:
     result = Tcl_EvalFile(tcl_for_pd, filename);
     if(result == TCL_OK) {
         source_table_add(objectname, filename);
-        post("Tcl loader: loaded %s", filename);
+        verbose(0, "Tcl loader: loaded %s", filename);
     } else {
-        post("Tcl loader: error trying to load %s", filename);
+        error("Tcl loader: error trying to load %s", filename);
         tclpd_interp_error(NULL, result);
         return 0;
     }
@@ -74,7 +74,7 @@ gotone:
     result = Tcl_Eval(tcl_for_pd, cmd);
     if(result == TCL_OK) {
     } else {
-        post("Tcl loader: error in %s %s::setup", filename, classname);
+        error("Tcl loader: error in %s %s::setup", filename, classname);
         tclpd_interp_error(NULL, result);
         return 0;
     }
