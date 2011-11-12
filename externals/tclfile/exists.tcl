@@ -25,14 +25,13 @@ proc exists::constructor {self args} {
     pd::add_outlet $self list
 }
 
+# HOT inlet --------------------------------------------------------------------
 proc exists::0_symbol {self args} {
-    # HOT inlet
     variable ${self}::filename [pd::arg 0 symbol]
     exists::0_bang $self
 }
 
 proc exists::0_anything {self args} {
-    # HOT inlet
     variable ${self}::filename [make_symbol $args]
     exists::0_bang $self
 }
@@ -48,13 +47,12 @@ proc exists::0_bang {self} {
     }
 }
 
+# COLD inlet -------------------------------------------------------------------
 proc exists::1_symbol {self args} {
-    # COLD inlet
     variable ${self}::filename [pd::arg 0 symbol]
 }
 
 proc exists::1_anything {self args} {
-    # COLD inlet
     variable ${self}::filename [make_symbol $args]
 }
 
