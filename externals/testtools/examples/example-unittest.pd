@@ -1,4 +1,4 @@
-#N canvas 87 55 746 629 10;
+#N canvas 406 86 746 629 10;
 #X declare -path ../;
 #X declare -stdpath extra/testtools/;
 #X obj 53 300 unit-test-frame;
