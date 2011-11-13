@@ -5,6 +5,10 @@
 #endif
 #define LOGTEN 2.302585092994
 
+#ifndef PD_FLOAT_PRECISION
+#define PD_FLOAT_PRECISION 32
+#endif
+
 #if PD_FLOAT_PRECISION == 64
 #define sinf sin
 #define cosf cos
