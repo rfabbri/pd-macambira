@@ -13,6 +13,10 @@
 
 #if defined(__i386__) || defined(__x86_64__) // Type punning code:
 
+#ifndef PD_FLOAT_PRECISION
+#define PD_FLOAT_PRECISION 32
+#endif
+
 #if PD_FLOAT_PRECISION == 32
 
 typedef union
