@@ -1,3 +1,6 @@
+Version 0.3.0:
+	- Big rewrite, fixing typemaps
+
 Version 0.2.3:
 	- Big rewrite, using tcl namespaces (more tidy, more efficient)
 

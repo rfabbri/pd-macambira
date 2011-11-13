@@ -1,10 +1,10 @@
-# TCL objectized library for PD api
-# by Federico Ferri <mescalinum@gmail.com> - (C) 2007-2011
+# TCL helper library for PD/tclpd api
+# Copyright (c) 2007-2011 Federico Ferri <mescalinum@gmail.com>
 
-package provide TclpdLib 0.19
+package provide TclpdLib 0.20
 
 package require Tcl 8.5
-package require Tclpd 0.2.3
+package require Tclpd 0.3.0
 
 set verbose 0
 
@@ -23,30 +23,30 @@ namespace eval ::pd {
     proc add_inlet {self sel} {
         if $::verbose {post [info level 0]}
         variable _
-        tclpd_add_proxyinlet [tclpd_get_instance $self]
+        tclpd_add_proxyinlet $self
     }
 
     proc add_outlet {self {sel {}}} {
         if $::verbose {post [info level 0]}
         variable _
         if {$sel == {}} {
-            set o [outlet_new [tclpd_get_object $self] [null_symbol]]
+            set o [outlet_new $self NULL]
         } else {
             if {[lsearch -exact {bang float list symbol} $sel] == -1} {
                 return -code error [error_msg "unsupported selector: $sel"]
             }
-            set o [outlet_new [tclpd_get_object $self] [gensym $sel]]
+            set o [outlet_new $self $sel]
         }
         lappend _($self:x_outlet) $o
         return $o
     }
 
     # used inside class for outputting some value
-    proc outlet {self n sel args} {
+    proc outlet {self numInlet selector args} {
         if $::verbose {post [info level 0]}
         variable _
-        set outlet [lindex $_($self:x_outlet) $n]
-        switch -- $sel {
+        set outlet [lindex $_($self:x_outlet) $numInlet]
+        switch -- $selector {
             float {
                 set v [lindex $args 0]
                 outlet_float $outlet $v
@@ -57,26 +57,14 @@ namespace eval ::pd {
             }
             list {
                 set v [lindex $args 0]
-                set sz [llength $v]
-                set aa [new_atom_array $sz]
-                for {set i 0} {$i < $sz} {incr i} {
-                    set_atom_array $aa $i [lindex $v $i]
-                }
-                outlet_list $outlet [gensym "list"] $sz $aa
-                delete_atom_array $aa $sz
+                outlet_list $outlet list $v
             }
             bang {
                 outlet_bang $outlet
             }
             default {
                 set v [lindex $args 0]
-                set sz [llength $v]
-                set aa [new_atom_array $sz]
-                for {set i 0} {$i < $sz} {incr i} {
-                    set_atom_array $aa $i [lindex $v $i]
-                }
-                outlet_anything $outlet [gensym $sel] $sz $aa
-                delete_atom_array $aa $sz
+                outlet_anything $outlet $selector $v
             }
         }
     }
@@ -267,7 +255,10 @@ namespace eval ::pd {
     }
 
     proc get_binbuf {self} {
-        set binbuf [tclpd_get_object_binbuf $self]
+        set ob [CAST_t_object $self]
+        post "get_binbuf: ob = $ob"
+        if 0 {
+        set binbuf [$ob cget -te_binbuf]
         set len [binbuf_getnatom $binbuf]
         set result {}
         for {set i 0} {$i < $len} {incr i} {
@@ -282,6 +273,7 @@ namespace eval ::pd {
             lappend result [list $selector $value]
         }
         return $result
+        } else {return {}}
     }
 }
 

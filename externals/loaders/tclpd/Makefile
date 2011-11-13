@@ -25,7 +25,7 @@ TCLPD_SOURCES = hashtable.c tcl_class.c tcl_loader.c tcl_proxyinlet.c tcl_typema
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = tcl.i tcl_extras.h tclpd.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS.txt TODO.txt
+EXTRA_DIST = tclpd.i tclpd.h tclpd.tcl $(TCLPD_SOURCES) ChangeLog.txt AUTHORS.txt TODO.txt
 
 
 
@@ -54,7 +54,7 @@ LIBS_windows = -ltcl85 "$(LIBRARY_NAME).def"
 #------------------------------------------------------------------------------#
 
 # these can be set from outside without (usually) breaking the build
-DEBUG = 0
+DEBUG ?= 0
 CFLAGS = -fno-tree-vectorize -fno-strict-aliasing -Wno-strict-aliasing
 LDFLAGS =
 LIBS =
@@ -247,7 +247,7 @@ endif
 HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 
 ifeq ($(DEBUG),1)
-	ALL_CFLAGS += -O0 -g -ggdb
+	ALL_CFLAGS += -O0 -g -ggdb -DDEBUG
 	STRIP = echo
 else
 	ALL_CFLAGS += $(OPT_CFLAGS)
@@ -273,8 +273,8 @@ all: $(LIBRARY_NAME)
 	$(CC) $(ALL_LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(ALL_LIBS) $(SHARED_LIB)
 	chmod a-x "$*.$(EXTENSION)"
 
-tcl_wrap.c: tcl.i tcl_extras.h Makefile
-	swig -v -tcl -o tcl_wrap.c $(PD_INCLUDES) tcl.i
+tcl_wrap.c: tclpd.i tclpd.h Makefile
+	swig -v -tcl -o tcl_wrap.c $(PD_INCLUDES) tclpd.i
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.c=.o)

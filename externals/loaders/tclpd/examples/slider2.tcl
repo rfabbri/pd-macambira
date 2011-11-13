@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 set ::script_path [file dirname [info script]]
 
@@ -60,6 +60,7 @@ pd::guiproc slider2_update {self c x y config state} {
 }
 
 proc+ slider2::constructor {self args} {
+    set @canvas [canvas_getcurrent]
     pd::add_outlet $self float
     sys_gui "source {[file join $::script_path properties.tcl]}\n"
     # set defaults:
@@ -78,7 +79,7 @@ proc+ slider2::constructor {self args} {
 
 proc+ slider2::destructor {self} {
     if {[dict get $@config -receivesymbol] != {}} {
-        pd_unbind [tclpd_get_instance_pd $self] $@recv
+        pd_unbind $self $@recv
     }
 }
 
@@ -91,6 +92,10 @@ proc+ slider2::0_printconfig {self args} {
         pd::post $@config
         return
     }
+}
+
+proc+ slider2::0_config2 {self args} {
+    uplevel "0_config $self [string map {$ @} $args]"
 }
 
 proc+ slider2::0_config {self args} {
@@ -119,21 +124,18 @@ proc+ slider2::0_config {self args} {
     # process -{send,receive}symbol
     if {[dict exists $newconf -receivesymbol]} {
         set new_recv [dict get $newconf -receivesymbol]
-        set selfpd [tclpd_get_instance_pd $self]
         if {[dict get $@config -receivesymbol] != {}} {
-            pd_unbind $selfpd $@recv
+            pd_unbind $self $@recv
         }
         if {$new_recv != {}} {
-            set @recv [canvas_realizedollar \
-                [tclpd_get_glist $self] [gensym $new_recv]]
-            pd_bind $selfpd $@recv
+            set @recv [canvas_realizedollar $@canvas $new_recv]
+            pd_bind $self $@recv
         } else {set @recv {}}
     }
     if {[dict exists $newconf -sendsymbol]} {
         set new_send [dict get $newconf -sendsymbol]
         if {$new_send != {}} {
-            set @send [canvas_realizedollar \
-                [tclpd_get_glist $self] [gensym $new_send]]
+            set @send [canvas_realizedollar $@canvas $new_send]
         } else {set @send {}}
     }
     # changing orient -> swap sizes
@@ -168,8 +170,7 @@ proc+ slider2::0_config {self args} {
         sys_gui [list slider2_update $self $@c $@x $@y $@config $@state]\n
     }
     if {[dict exists $newconf -width] || [dict exists $newconf -height]} {
-        canvas_fixlinesfor \
-            [tclpd_get_glist $self] [tclpd_get_instance_text $self]
+        canvas_fixlinesfor $@canvas $self
     }
 }
 
@@ -221,12 +222,8 @@ proc+ slider2::properties {self} {
         dict set c $opt [dict get $c2 $opt]
     }
 
-    lappend c -foo
-    lappend c \$foo
-
-    pd::post gfxstub_new [tclpd_get_object_pd $self] [tclpd_get_instance $self] \
-        [list propertieswindow %s $c "\[slider2\] properties"]
-    gfxstub_new [tclpd_get_object_pd $self] [tclpd_get_instance $self] \
+    set c [string map {$ @} $c]
+    gfxstub_new $self $self \
         [list propertieswindow %s $c "\[slider2\] properties"]\n
 }
 
@@ -278,8 +275,7 @@ proc+ slider2::widgetbehavior_click {self args} {
             }
         }
         set @motion_start_v [dict get $@config -initvalue]
-        tclpd_guiclass_grab [tclpd_get_instance $self] \
-            [tclpd_get_glist $self] $x $y
+        tclpd_guiclass_grab $self $@canvas $x $y
     }
 }
 

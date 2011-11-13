@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 package require base64
 
@@ -49,7 +49,8 @@ proc tclpd-console::constructor {self} {
     set ::tclpd-console::loaded 1
     set ::${self}_loaded 1
 
-    pd_bind [tclpd_get_instance_pd $self] [gensym $self]
+    # beware: typemap magic (1st arg get cast to a t_pd, second to a t_symbol)
+    pd_bind $self $self
 
     sys_gui "set ::tclpd_console $self"
     sys_gui {
@@ -92,7 +93,7 @@ proc tclpd-console::destructor {self} {
     if {[set ::${self}_loaded]} {
         sys_gui { destroy .pdwindow.tcl.tclpd ; unset ::tclpd_console }
 
-        pd_unbind [tclpd_get_instance_pd $self] [gensym $self]
+        pd_unbind $self $self
 
         # restore original puts
         if {[info procs puts_tclpd_console] ne {}} {

@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 # dynroute: dynamically route messages based on first element
 # non-matching arguments are sent to last inlet

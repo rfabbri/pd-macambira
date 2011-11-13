@@ -1,26 +1,42 @@
-#include "tcl_extras.h"
+#include "tclpd.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "hashtable.h"
 
-static hash_table_t* class_table = NULL;
-static hash_table_t* object_table = NULL;
-static hash_table_t* source_table = NULL;
+static hash_table_t *class_table = NULL;
+static hash_table_t *object_table = NULL;
+static hash_table_t *source_table = NULL;
 
-#define class_table_add(n, c) hashtable_add(class_table, n, (void*)c)
-#define class_table_remove(n) hashtable_remove(class_table, n)
-#define class_table_get(n) ((t_class*)hashtable_get(class_table, n))
+void class_table_add(const char *n, t_class *c) {
+    hashtable_add(class_table, n, (void *)c);
+}
 
-#define object_table_add(n, c) hashtable_add(object_table, n, (void*)c)
-#define object_table_remove(n) hashtable_remove(object_table, n)
-#define object_table_get(n) ((t_tcl*)hashtable_get(object_table, n))
+void class_table_remove(const char *n) {
+    hashtable_remove(class_table, n);
+}
+
+t_class * class_table_get(const char *n) {
+    return (t_class *)hashtable_get(class_table, n);
+}
+
+void object_table_add(const char *n, t_tcl *o) {
+    hashtable_add(object_table, n, (void *)o);
+}
+
+void object_table_remove(const char *n) {
+    hashtable_remove(object_table, n);
+}
+
+t_tcl * object_table_get(const char *n) {
+    return (t_tcl *)hashtable_get(object_table, n);
+}
 
 static unsigned long objectSequentialId = 0;
 
 /* set up the class that handles loading of tcl classes */
-t_class* tclpd_class_new(const char* name, int flags) {
-    t_class* c = class_new(gensym(name), (t_newmethod)tclpd_new,
+t_class * tclpd_class_new(const char *name, int flags) {
+    t_class *c = class_new(gensym(name), (t_newmethod)tclpd_new,
         (t_method)tclpd_free, sizeof(t_tcl), flags, A_GIMME, A_NULL);
 
     if(!class_table)
@@ -36,23 +52,23 @@ t_class* tclpd_class_new(const char* name, int flags) {
     class_addmethod(c, (t_method)tclpd_open, gensym("menu-open"), A_NULL);
 
     char buf[80];
-    Tcl_Obj* res;
+    Tcl_Obj *res;
     int res_i;
 
     // use properties function if exists in tcl space.
     snprintf(buf, 80, "llength [info procs ::%s::properties]", name);
-    if(Tcl_Eval(tcl_for_pd, buf) == TCL_OK) {
-        res = Tcl_GetObjResult(tcl_for_pd);
-        if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK && res_i > 0) {
+    if(Tcl_Eval(tclpd_interp, buf) == TCL_OK) {
+        res = Tcl_GetObjResult(tclpd_interp);
+        if(Tcl_GetIntFromObj(tclpd_interp, res, &res_i) == TCL_OK && res_i > 0) {
             class_setpropertiesfn(c, tclpd_properties);
         }
     }
 
     // use save function if exists in tcl space.
     snprintf(buf, 80, "llength [info procs ::%s::save]", name);
-    if(Tcl_Eval(tcl_for_pd, buf) == TCL_OK) {
-        res = Tcl_GetObjResult(tcl_for_pd);
-        if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK && res_i > 0) {
+    if(Tcl_Eval(tclpd_interp, buf) == TCL_OK) {
+        res = Tcl_GetObjResult(tclpd_interp);
+        if(Tcl_GetIntFromObj(tclpd_interp, res, &res_i) == TCL_OK && res_i > 0) {
             class_setsavefn(c, tclpd_save);
         }
     }
@@ -60,9 +76,9 @@ t_class* tclpd_class_new(const char* name, int flags) {
     return c;
 }
 
-t_class* tclpd_guiclass_new(const char* name, int flags) {
-    t_class* c = tclpd_class_new(name, flags);
-    t_widgetbehavior* wb = (t_widgetbehavior*)getbytes(sizeof(t_widgetbehavior));
+t_class * tclpd_guiclass_new(const char *name, int flags) {
+    t_class *c = tclpd_class_new(name, flags);
+    t_widgetbehavior *wb = (t_widgetbehavior *)getbytes(sizeof(t_widgetbehavior));
     wb->w_getrectfn = tclpd_guiclass_getrect;
     wb->w_displacefn = tclpd_guiclass_displace;
     wb->w_selectfn = tclpd_guiclass_select;
@@ -74,14 +90,14 @@ t_class* tclpd_guiclass_new(const char* name, int flags) {
     return c;
 }
 
-t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
+t_tcl * tclpd_new(t_symbol *classsym, int ac, t_atom *at) {
     // lookup in class table
-    const char* name = classsym->s_name;
-    t_class* qlass = class_table_get(name);
+    const char *name = classsym->s_name;
+    t_class *qlass = class_table_get(name);
 
-    t_tcl* x = (t_tcl*)pd_new(qlass);
+    t_tcl *x = (t_tcl *)pd_new(qlass);
     x->ninlets = 1 /* qlass->c_firstin ??? */;
-    x->x_glist = (t_glist*)canvas_getcurrent();
+    x->x_glist = (t_glist *)canvas_getcurrent();
 
     x->source_file = (char *)hashtable_get(source_table, name);
     if(!x->source_file) {
@@ -130,7 +146,7 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     }
 
     // call constructor
-    if(Tcl_EvalObjv(tcl_for_pd, ac+3, av, 0) != TCL_OK) {
+    if(Tcl_EvalObjv(tclpd_interp, ac+3, av, 0) != TCL_OK) {
         goto error;
     }
 
@@ -143,14 +159,14 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
 error:
     tclpd_interp_error(NULL, TCL_ERROR);
     for(int i = 0; i < (ac+3); i++) {
-        if(!av[i]) break; // XXX: I don't remind why I add this
+        if(!av[i]) break; // could have gone here before doing all av[]s
         Tcl_DecrRefCount(av[i]);
     }
-    pd_free((t_pd*)x);
+    pd_free((t_pd *)x);
     return 0;
 }
 
-void tclpd_free(t_tcl* x) {
+void tclpd_free(t_tcl *x) {
     // build destructor command
     Tcl_Obj *av[3]; InitArray(av, 3, NULL);
     av[0] = x->dispatcher;
@@ -161,7 +177,7 @@ void tclpd_free(t_tcl* x) {
     Tcl_IncrRefCount(av[2]);
 
     // call destructor
-    if(Tcl_EvalObjv(tcl_for_pd, 3, av, 0) != TCL_OK) {
+    if(Tcl_EvalObjv(tclpd_interp, 3, av, 0) != TCL_OK) {
 #ifdef DEBUG
         post("tclpd_free: failed to call destructor");
 #endif
@@ -181,13 +197,13 @@ void tclpd_free(t_tcl* x) {
 #endif
 }
 
-void tclpd_anything(t_tcl* x, t_symbol* s, int ac, t_atom* at) {
+void tclpd_anything(t_tcl *x, t_symbol *s, int ac, t_atom *at) {
     tclpd_inlet_anything(x, 0, s, ac, at);
 }
 
-void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) {
+void tclpd_inlet_anything(t_tcl *x, int inlet, t_symbol *s, int ac, t_atom *at) {
     // proxy method - format: <classname> <self> method <inlet#> <selector> args...
-    Tcl_Obj* av[ac+5]; InitArray(av, ac+5, NULL);
+    Tcl_Obj *av[ac+5]; InitArray(av, ac+5, NULL);
     int result;
 
     av[0] = x->dispatcher;
@@ -211,7 +227,7 @@ void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) 
             goto error;
         }
     }
-    result = Tcl_EvalObjv(tcl_for_pd, ac+5, av, 0);
+    result = Tcl_EvalObjv(tclpd_interp, ac+5, av, 0);
     if(result != TCL_OK) {
         goto error;
     }
@@ -225,13 +241,13 @@ void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) 
 error:
     tclpd_interp_error(x, TCL_ERROR);
     for(int i=0; i < (ac+5); i++) {
-        if(!av[i]) break;
+        if(!av[i]) break; // could have gone here before doing all av[]s
         Tcl_DecrRefCount(av[i]);
     }
     return;
 }
 
-void tclpd_loadbang(t_tcl* x) {
+void tclpd_loadbang(t_tcl *x) {
     tclpd_inlet_anything(x, 0, gensym("loadbang"), 0, NULL);
 }
 
@@ -244,8 +260,8 @@ void tclpd_open(t_tcl *x) {
 
 /* Tcl glue: */
 
-t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x) {
-    t_proxyinlet* proxy = (t_proxyinlet*)pd_new(proxyinlet_class);
+t_proxyinlet * tclpd_add_proxyinlet(t_tcl *x) {
+    t_proxyinlet *proxy = (t_proxyinlet *)pd_new(proxyinlet_class);
     proxyinlet_init(proxy);
     proxy->target = x;
     proxy->ninlet = x->ninlets++;
@@ -253,57 +269,71 @@ t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x) {
     return proxy;
 }
 
-t_tcl* tclpd_get_instance(const char* objectSequentialId) {
-    return (t_tcl*)object_table_get(objectSequentialId);
+/*
+t_tcl * tclpd_get_instance(const char *objectSequentialId) {
+    return (t_tcl *)object_table_get(objectSequentialId);
 }
 
-t_pd* tclpd_get_instance_pd(const char* objectSequentialId) {
-    return (t_pd*)object_table_get(objectSequentialId);
+t_pd * tclpd_get_instance_pd(const char *objectSequentialId) {
+    return (t_pd *)object_table_get(objectSequentialId);
 }
 
-t_text* tclpd_get_instance_text(const char* objectSequentialId) {
-    return (t_text*)object_table_get(objectSequentialId);
+t_text * tclpd_get_instance_text(const char *objectSequentialId) {
+    return (t_text *)object_table_get(objectSequentialId);
 }
 
-t_object* tclpd_get_object(const char* objectSequentialId) {
-    t_tcl* x = tclpd_get_instance(objectSequentialId);
+t_object * tclpd_get_object(const char *objectSequentialId) {
+    t_tcl *x = tclpd_get_instance(objectSequentialId);
     return &x->o;
 }
 
-t_pd* tclpd_get_object_pd(const char* objectSequentialId) {
-    t_object* o = tclpd_get_object(objectSequentialId);
+t_pd * tclpd_get_object_pd(const char *objectSequentialId) {
+    t_object *o = tclpd_get_object(objectSequentialId);
     return &o->ob_pd;
 }
 
-t_binbuf* tclpd_get_object_binbuf(const char* objectSequentialId) {
-    t_object* o = tclpd_get_object(objectSequentialId);
+t_binbuf * tclpd_get_object_binbuf(const char *objectSequentialId) {
+    t_object *o = tclpd_get_object(objectSequentialId);
     return o->ob_binbuf;
 }
 
-t_glist* tclpd_get_glist(const char* objectSequentialId) {
-    t_tcl* x = tclpd_get_instance(objectSequentialId);
+t_glist * tclpd_get_glist(const char *objectSequentialId) {
+    t_tcl *x = tclpd_get_instance(objectSequentialId);
     return x->x_glist;
 }
 
-t_atom* tclpd_binbuf_get_atom(t_binbuf* b, int n) {
+t_atom * tclpd_binbuf_get_atom(t_binbuf *b, int n) {
     if(binbuf_getnatom(b) <= n || n < 0)
         return NULL;
     return binbuf_getvec(b) + n;
 }
+*/
 
-t_symbol* null_symbol() {
-    return (t_symbol*)0;
+t_object * CAST_t_object(t_object *o) {
+    return o;
+}
+
+t_pd * CAST_t_pd(t_pd *o) {
+    return o;
+}
+
+t_text * CAST_t_text(t_text *o) {
+    return o;
+}
+
+t_tcl * CAST_t_tcl(t_tcl *o) {
+    return o;
 }
 
 void poststring2 (const char *s) {
     post("%s", s);
 }
 
-void tclpd_save(t_gobj* z, t_binbuf* b) {
-    Tcl_Obj* av[3]; InitArray(av, 3, NULL);
-    Tcl_Obj* res;
+void tclpd_save(t_gobj *z, t_binbuf *b) {
+    Tcl_Obj *av[3]; InitArray(av, 3, NULL);
+    Tcl_Obj *res;
 
-    t_tcl* x = (t_tcl*)z;
+    t_tcl *x = (t_tcl *)z;
 
     av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
@@ -312,13 +342,13 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
     av[2] = Tcl_NewStringObj("save", -1);
     Tcl_IncrRefCount(av[2]);
 
-    int result = Tcl_EvalObjv(tcl_for_pd, 3, av, 0);
+    int result = Tcl_EvalObjv(tclpd_interp, 3, av, 0);
     if(result == TCL_OK) {
-        res = Tcl_GetObjResult(tcl_for_pd);
+        res = Tcl_GetObjResult(tclpd_interp);
         Tcl_IncrRefCount(res);
         int objc;
-        Tcl_Obj** objv;
-        result = Tcl_ListObjGetElements(tcl_for_pd, res, &objc, &objv);
+        Tcl_Obj **objv;
+        result = Tcl_ListObjGetElements(tclpd_interp, res, &objc, &objv);
         if(result == TCL_OK) {
             if(objc == 0 && objv == NULL) {
                 // call default savefn
@@ -328,11 +358,11 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
                 int i;
                 double tmp;
                 for(i = 0; i < objc; i++) {
-                    result = Tcl_GetDoubleFromObj(tcl_for_pd, objv[i], &tmp);
+                    result = Tcl_GetDoubleFromObj(tclpd_interp, objv[i], &tmp);
                     if(result == TCL_OK) {
                         binbuf_addv(b, "f", (t_float)tmp);
                     } else {
-                        char* tmps = Tcl_GetStringFromObj(objv[i], NULL);
+                        char *tmps = Tcl_GetStringFromObj(objv[i], NULL);
                         if(!strcmp(tmps, ";")) {
                             binbuf_addv(b, ";");
                         } else {
@@ -356,10 +386,10 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
     Tcl_DecrRefCount(av[2]);
 }
 
-void tclpd_properties(t_gobj* z, t_glist* owner) {
-    Tcl_Obj* av[3]; InitArray(av, 3, NULL);
+void tclpd_properties(t_gobj *z, t_glist *owner) {
+    Tcl_Obj *av[3]; InitArray(av, 3, NULL);
 
-    t_tcl* x = (t_tcl*)z;
+    t_tcl *x = (t_tcl *)z;
 
     av[0] = x->dispatcher;
     Tcl_IncrRefCount(av[0]);
@@ -368,9 +398,9 @@ void tclpd_properties(t_gobj* z, t_glist* owner) {
     av[2] = Tcl_NewStringObj("properties", -1);
     Tcl_IncrRefCount(av[2]);
 
-    int result = Tcl_EvalObjv(tcl_for_pd, 3, av, 0);
+    int result = Tcl_EvalObjv(tclpd_interp, 3, av, 0);
     if(result != TCL_OK) {
-        //res = Tcl_GetObjResult(tcl_for_pd);
+        //res = Tcl_GetObjResult(tclpd_interp);
         pd_error(x, "Tcl: object properties: failed");
         tclpd_interp_error(x, result);
     }
@@ -380,13 +410,13 @@ void tclpd_properties(t_gobj* z, t_glist* owner) {
     Tcl_DecrRefCount(av[2]);
 }
 
-void tclpd_class_namespace_init(const char* classname) {
+void tclpd_class_namespace_init(const char *classname) {
     char cmd[256];
     snprintf(cmd, 256, "if [namespace exists ::%s] "
         "{namespace delete ::%s}; "
         "namespace eval ::%s {}",
         classname, classname, classname);
-    Tcl_Eval(tcl_for_pd, cmd);
+    Tcl_Eval(tclpd_interp, cmd);
 }
 
 void source_table_remove(const char *object_name) {

@@ -1,22 +1,22 @@
-#include "tcl_extras.h"
+#include "tclpd.h"
 #include <string.h>
 
 int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
     int llength;
-    if(Tcl_ListObjLength(tcl_for_pd, input, &llength) == TCL_ERROR)
+    if(Tcl_ListObjLength(tclpd_interp, input, &llength) == TCL_ERROR)
         return TCL_ERROR;
     if(llength != 2)
         /*SWIG_exception(SWIG_ValueError, "Bad t_atom: expeting a 2-elements list.");*/
         return TCL_ERROR;
 
     int i;
-    Tcl_Obj* obj[2];
-    for(i = 0; i < 2; i++) Tcl_ListObjIndex(tcl_for_pd, input, i, &obj[i]);
-    char* argv0 = Tcl_GetStringFromObj(obj[0], 0);
+    Tcl_Obj *obj[2];
+    for(i = 0; i < 2; i++) Tcl_ListObjIndex(tclpd_interp, input, i, &obj[i]);
+    char *argv0 = Tcl_GetStringFromObj(obj[0], 0);
 
     if(strcmp(argv0, "float") == 0) {
         double dbl;
-        if(Tcl_GetDoubleFromObj(tcl_for_pd, obj[1], &dbl) == TCL_ERROR)
+        if(Tcl_GetDoubleFromObj(tclpd_interp, obj[1], &dbl) == TCL_ERROR)
             return TCL_ERROR;
         SETFLOAT(output, dbl);
     } else if(strcmp(argv0, "symbol") == 0) {
@@ -29,12 +29,12 @@ int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
 }
 
 int tcl_to_pdsymbol(Tcl_Obj *input, t_symbol **output) {
-    char* s = Tcl_GetStringFromObj(input, 0);
+    char *s = Tcl_GetStringFromObj(input, 0);
     *output = gensym(s);
     return TCL_OK;
 }
 
-const char* pdatom_type_string(t_atom* a) {
+const char * pdatom_type_string(t_atom *a) {
     switch(a->a_type) {
     case A_FLOAT:
     case A_DEFFLOAT:
@@ -54,28 +54,22 @@ const char* pdatom_type_string(t_atom* a) {
     }
 }
 
-const char* pdatom_symbol_value(t_atom* a) {
+const char * pdatom_symbol_value(t_atom *a) {
     if(a->a_type == A_DOLLAR) {
         char buf[6];
         snprintf(buf, 6, "$%d", a->a_w.w_index);
-        t_symbol* s = gensym(buf);
+        t_symbol *s = gensym(buf);
         return s->s_name;
     }
     return a->a_w.w_symbol->s_name;
 }
 
-float pdatom_float_value(t_atom* a) {
+float pdatom_float_value(t_atom *a) {
     return a->a_w.w_float;
 }
 
 int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
-    Tcl_Obj* tcl_t_atom[2];
-#ifdef DEBUG
-    post("pdatom_to_tcl: atom type = %d (%s)",
-        input->a_type, input->a_type == A_FLOAT ? "A_FLOAT" :
-        input->a_type == A_SYMBOL ? "A_SYMBOL" :
-        input->a_type == A_POINTER ? "A_POINTER" : "?");
-#endif
+    Tcl_Obj *tcl_t_atom[2];
     switch (input->a_type) {
         case A_FLOAT: {
             tcl_t_atom[0] = Tcl_NewStringObj("float", -1);
@@ -99,8 +93,10 @@ int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
             break;
         }
     }
-#ifdef DEBUG
-    post("pdatom_to_tcl: atom value = \"%s\"", Tcl_GetStringFromObj(tcl_t_atom[1], 0));
+#if 0
+    verbose(-1, "tclpd: pdatom_to_tcl: atom [type = %s, value = %s]",
+        Tcl_GetStringFromObj(tcl_t_atom[0], 0),
+        Tcl_GetStringFromObj(tcl_t_atom[1], 0));
 #endif
     *output = Tcl_NewListObj(2, &tcl_t_atom[0]);
     Tcl_IncrRefCount(*output);
@@ -108,10 +104,14 @@ int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
 }
 
 int pdsymbol_to_tcl(t_symbol *input, Tcl_Obj **output) {
-    Tcl_Obj* s[2];
+#if 0
+    Tcl_Obj *s[2];
     s[0] = Tcl_NewStringObj("symbol", -1);
     s[1] = Tcl_NewStringObj(input->s_name, -1);
     *output = Tcl_NewListObj(2, &s[0]);
+#else
+    *output = Tcl_NewStringObj(input->s_name, -1);
+#endif
     Tcl_IncrRefCount(*output);
     return TCL_OK;
 }

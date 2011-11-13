@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 proc+ list_change::constructor {self args} {
     # add second inlet (first created by default)

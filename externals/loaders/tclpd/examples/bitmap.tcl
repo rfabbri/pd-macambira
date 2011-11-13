@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 set ::script_path [file dirname [info script]]
 
@@ -28,6 +28,8 @@ pd::guiproc bitmap_draw_new {self c x y config data} {
 }
 
 proc+ bitmap::constructor {self args} {
+    set @canvas [canvas_getcurrent]
+
     set s [file join $::script_path properties.tcl]
     sys_gui "source {$s}\n"
 
@@ -58,17 +60,16 @@ proc+ bitmap::constructor {self args} {
     0_config $self {*}$args
 
     set @rcvLoadData {#bitmap}
-    pd_bind [tclpd_get_instance_pd $self] [gensym $@rcvLoadData]
+    pd_bind $self $@rcvLoadData
 }
 
 proc+ bitmap::destructor {self} {
-    set pdself [tclpd_get_instance_pd $self]
     if {$@rcvLoadData != {}} {
         #should not happen!
-        pd_unbind $pdself [gensym $@rcvLoadData]
+        pd_unbind $self $@rcvLoadData
     }
     if {[dict get $@config -receivesymbol] != {}} {
-        pd_unbind $pdself $@recv
+        pd_unbind $self $@recv
     }
 }
 
@@ -116,14 +117,12 @@ proc+ bitmap::0_config {self args} {
                 set new [dict get $newconf -$opt]
                 if {$old != $new} {
                     if {$opt == "receivesymbol"} {
-                        set selfpd [tclpd_get_instance_pd $self]
                         if {$old != {}} {
-                            pd_unbind $selfpd $@recv
+                            pd_unbind $self $@recv
                         }
                         if {$new != {}} {
-                            set @recv [canvas_realizedollar \
-                                [tclpd_get_glist $self] [gensym $new]]
-                            pd_bind $selfpd $@recv
+                            set @recv [canvas_realizedollar $@canvas $new]
+                            pd_bind $self $@recv
                         } else {
                             set @recv {}
                         }
@@ -250,7 +249,7 @@ proc+ bitmap::0_setdata {self args} {
     set @data [list]
     foreach i $d {lappend @data [expr {int($i)}]}
     if {$@rcvLoadData != {}} {
-        pd_unbind [tclpd_get_instance_pd $self] [gensym $@rcvLoadData]
+        pd_unbind $self $@rcvLoadData
         set @rcvLoadData {}
     }
 }
@@ -262,10 +261,8 @@ proc+ bitmap::save {self args} {
 
 proc+ bitmap::properties {self args} {
     set title "\[bitmap\] properties"
-    set x_xobj_obpd [tclpd_get_object_pd $self]
-    set x [tclpd_get_instance $self]
     set buf [list propertieswindow %s $@config $title]\n
-    gfxstub_new $x_xobj_obpd $x $buf
+    gfxstub_new $self $self $buf
 }
 
 proc+ bitmap::widgetbehavior_getrect {self args} {

@@ -1,4 +1,4 @@
-#include "tcl_extras.h"
+#include "tclpd.h"
 #include <string.h>
 #include <unistd.h>
 
@@ -7,9 +7,6 @@
 void source_table_add(const char *object_name, const char *source_path);
 
 extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
-#ifdef DEBUG
-    post("Tcl loader: registering tcl class loader mechanism");
-#endif
     char filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
         *classname, *nameptr;
     int fd;
@@ -20,49 +17,56 @@ extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
         classname = objectname;
 
     if(sys_onloadlist(objectname)) {
-        post("%s: already loaded", objectname);
-        return (1);
+        verbose(-1, "tclpd loader: already loaded: %s", objectname);
+        return 1;
     }
 
     /* try looking in the path for (objectname).(tcl) ... */
+    verbose(-1, "tclpd loader: searching for %s in path...", objectname);
     if ((fd = canvas_open(canvas, objectname, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
-            goto gotone;
+            goto found;
 
     /* next try (objectname)/(classname).(tcl) ... */
     strncpy(filename, objectname, MAXPDSTRING);
-    filename[MAXPDSTRING-2] = 0;
+    filename[MAXPDSTRING - 2] = 0;
     strcat(filename, "/");
     strncat(filename, classname, MAXPDSTRING-strlen(filename));
-    filename[MAXPDSTRING-1] = 0;
+    filename[MAXPDSTRING - 1] = 0;
+    verbose(-1, "tclpd loader: searching for %s in path...", filename);
     if ((fd = canvas_open(canvas, filename, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
-            goto gotone;
+            goto found;
 
+    verbose(-1, "tclpd loader: found nothing!");
     return 0;
 
-gotone:
+found:
+    verbose(-1, "tclpd loader: found!");
     close(fd);
     class_set_extern_dir(gensym(dirbuf));
     /* rebuild the absolute pathname */
     strncpy(filename, dirbuf, MAXPDSTRING);
-    filename[MAXPDSTRING-2] = 0;
+    filename[MAXPDSTRING - 2] = 0;
     strcat(filename, "/");
-    strncat(filename, nameptr, MAXPDSTRING-strlen(filename));
-    filename[MAXPDSTRING-1] = 0;
+    strncat(filename, nameptr, MAXPDSTRING - strlen(filename));
+    filename[MAXPDSTRING - 1] = 0;
+    verbose(-1, "tclpd loader: absolute path is %s", filename);
 
     int result;
 
     // create the required tcl namespace for the class
+    verbose(-1, "tclpd loader: init namespace for class %s", classname);
     tclpd_class_namespace_init(classname);
 
     // load tcl external:
-    result = Tcl_EvalFile(tcl_for_pd, filename);
+    verbose(-1, "tclpd loader: loading tcl file %s", filename);
+    result = Tcl_EvalFile(tclpd_interp, filename);
     if(result == TCL_OK) {
         source_table_add(objectname, filename);
-        verbose(0, "Tcl loader: loaded %s", filename);
+        verbose(0, "tclpd loader: loaded %s", filename);
     } else {
-        error("Tcl loader: error trying to load %s", filename);
+        error("tclpd loader: error trying to load %s", filename);
         tclpd_interp_error(NULL, result);
         return 0;
     }
@@ -71,10 +75,11 @@ gotone:
     // call the setup method:
     char cmd[64];
     snprintf(cmd, 64, "::%s::setup", classname);
-    result = Tcl_Eval(tcl_for_pd, cmd);
+    verbose(-1, "tclpd loader: calling setup function for %s", classname);
+    result = Tcl_Eval(tclpd_interp, cmd);
     if(result == TCL_OK) {
     } else {
-        error("Tcl loader: error in %s %s::setup", filename, classname);
+        error("tclpd loader: error in %s %s::setup", filename, classname);
         tclpd_interp_error(NULL, result);
         return 0;
     }

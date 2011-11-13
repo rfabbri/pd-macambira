@@ -8,9 +8,10 @@ proc propertieswindow {gfxstub_id {options {}} {title {}}} {
     set win $gfxstub_id
     set ::id($win.p) $gfxstub_id
     set ::optkeys($win.p) [list]
+    set options [string map {@ $} $options]
     foreach {k v} $options {
         if {$v eq "empty"} {set v {}}
-        set v [string map {\\$ $} $v]
+        #set v [string map {\\$ $} $v]
         set ::config($win.p:$k) $v
         lappend ::optkeys($win.p) $k
     }
@@ -416,8 +417,9 @@ proc propertiespanel_apply {w} {
         if {$v == ""} {set v "empty"}
         lappend newconf $key $v
     }
-    set newconf [string map {$ \\$} $newconf]
-    pdsend "$::id($w) config $newconf"
+    #set newconf [string map {$ \\$} $newconf]
+    set newconf [string map {$ @} $newconf]
+    pdsend "$::id($w) config2 $newconf"
 }
 
 proc propertiespanel_close {w} {
