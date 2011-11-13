@@ -1,5 +1,8 @@
 TODO-list for tclpd (most important things first)
 =================================================
-- missing handling of binbuf in savefn (objects that wants to update their creation arguments, end up saving expanded dollar-args)
+- binbuf support broken
+- unable to patch classes with dir prefixes (e.g. [dir/class]) (crashes pd)
+- bitmap's help make pd crash only when opened via context menu Help -> investigate
+- slider2.tcl is broken
 - add (or check) GOP
 - signal externals? (really?)
