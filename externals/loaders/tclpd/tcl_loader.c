@@ -7,7 +7,7 @@
 void source_table_add(const char *object_name, const char *source_path);
 
 extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
-    char filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
+    char filename[MAXPDSTRING], dirbuf[MAXPDSTRING], buf[MAXPDSTRING],
         *classname, *nameptr;
     int fd;
 
@@ -59,6 +59,12 @@ found:
     verbose(-1, "tclpd loader: init namespace for class %s", classname);
     tclpd_class_namespace_init(classname);
 
+    // add current dir to the Tcl auto_path so objects can use local packages
+    Tcl_Eval(tclpd_interp, "set current_auto_path $auto_path");
+    snprintf(buf, MAXPDSTRING, "set auto_path \"{%s} $auto_path\"", dirbuf);
+    Tcl_Eval(tclpd_interp, buf);
+    verbose(0, buf);
+
     // load tcl external:
     verbose(-1, "tclpd loader: loading tcl file %s", filename);
     result = Tcl_EvalFile(tclpd_interp, filename);
@@ -70,6 +76,8 @@ found:
         tclpd_interp_error(NULL, result);
         return 0;
     }
+    // reset auto_path
+    Tcl_Eval(tclpd_interp, "set auto_path $current_auto_path");
 
 #ifdef TCLPD_CALL_SETUP
     // call the setup method:
