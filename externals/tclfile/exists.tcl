@@ -1,14 +1,6 @@
 package require Tclpd 0.3.0
 package require TclpdLib 0.20
-
-proc exists::make_symbol {argslist} {
-    set output [pd::strip_selectors $argslist]
-    set selector [lindex $output 0]
-    if {$selector eq "list" || $selector eq "float"} {
-        set output [lrange $output 1 end]
-    }
-    return $output
-}
+package require tclfile
 
 proc exists::constructor {self args} {
     if {![namespace exists $self]} {
@@ -32,7 +24,7 @@ proc exists::0_symbol {self args} {
 }
 
 proc exists::0_anything {self args} {
-    variable ${self}::filename [make_symbol $args]
+    variable ${self}::filename [tclfile::make_symbol $args]
     exists::0_bang $self
 }
 
@@ -53,7 +45,7 @@ proc exists::1_symbol {self args} {
 }
 
 proc exists::1_anything {self args} {
-    variable ${self}::filename [make_symbol $args]
+    variable ${self}::filename [tclfile::make_symbol $args]
 }
 
 pd::class exists

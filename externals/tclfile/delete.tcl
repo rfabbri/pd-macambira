@@ -1,21 +1,27 @@
 package require Tclpd 0.3.0
 package require TclpdLib 0.20
+package require tclfile
 
 proc delete::constructor {self args} {
     if {![namespace exists $self]} {
         namespace eval $self {}
     }
-    # set to blank so the var always delete
-    variable ${self}::filename {}
     variable ${self}::current_canvas [canvas_getcurrent]
+    # set to blank so the var always exists
+    variable ${self}::filename {}
 
     # add second inlet (first created by default)
     pd::add_inlet $self list
 }
 
+# HOT inlet --------------------------------------------------------------------
 proc delete::0_symbol {self args} {
-    # HOT inlet
     variable ${self}::filename [pd::arg 0 symbol]
+    delete::0_bang $self
+}
+
+proc delete::0_anything {self args} {
+    variable ${self}::filename [tclfile::make_symbol $args]
     delete::0_bang $self
 }
 
@@ -30,9 +36,13 @@ proc delete::0_bang {self} {
     }
 }
 
-proc+ delete::1_symbol {self args} {
-    # COLD inlet
+# COLD inlet -------------------------------------------------------------------
+proc delete::1_symbol {self args} {
     variable ${self}::filename [pd::arg 0 symbol]
+}
+
+proc delete::1_anything {self args} {
+    variable ${self}::filename [tclfile::make_symbol $args]
 }
 
 pd::class delete
