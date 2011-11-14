@@ -29,7 +29,7 @@ namespace eval ::pd {
     proc add_outlet {self {sel {}}} {
         if $::verbose {post [info level 0]}
         variable _
-        if {$sel == {}} {
+        if {$sel eq {}} {
             set o [outlet_new $self NULL]
         } else {
             if {[lsearch -exact {bang float list symbol} $sel] == -1} {
@@ -94,24 +94,24 @@ namespace eval ::pd {
         }
 
         proc ::${classname}::dispatcher {self function args} "
-            if {\$function == \"method\"} {
+            if {\$function eq \"method\"} {
                 set inlet \[lindex \$args 0\]
                 set selector \[lindex \$args 1\]
                 set argsr \[lrange \$args 2 end\]
                 set i_s ::${classname}::\${inlet}_\${selector}
                 set i_a ::${classname}::\${inlet}_anything
-                if {\[info procs \$i_s\] != {}} {
+                if {\[info procs \$i_s\] ne {}} {
                     uplevel \[linsert \$argsr 0 \$i_s \$self\]
-                } elseif {\[info procs \$i_s\] == {} && \[info procs \$i_a\] != {}} {
+                } elseif {\[info procs \$i_s\] eq {} && \[info procs \$i_a\] ne {}} {
                     uplevel \[linsert \$argsr 0 \$i_a \$self \[pd::add_selector \$selector\]\]
                 } else {
                     return -code error \"${classname}: no such method: \$i_s\"
                 }
-            } elseif {\$function == \"widgetbehavior\"} {
+            } elseif {\$function eq \"widgetbehavior\"} {
                 set subfunction \[lindex \$args 0\]
                 set argsr \[lrange \$args 1 end\]
                 set f ::${classname}::\${function}_\${subfunction}
-                if {\[info procs \$f\] != {}} {
+                if {\[info procs \$f\] ne {}} {
                     uplevel \[linsert \$argsr 0 \$f \$self]
                 }
             } else {
@@ -171,19 +171,19 @@ namespace eval ::pd {
             return -code error "fatal: malformed atom: $v (full args: $up_args)"
         }
         foreach {selector value} $v {break}
-        if {$assertion == {int}} {
+        if {$assertion eq {int}} {
             set assertion {float}
             set i 1
         }
-        if {$assertion != {any}} {
-            if {$selector != $assertion} {
+        if {$assertion ne {any}} {
+            if {$selector ne $assertion} {
                 return -code error "arg #$n is $selector, must be $assertion"
             }
         }
-        if {$assertion == {float} && $i && $value != int($value)} {
+        if {$assertion eq {float} && $i && $value != int($value)} {
             return -code error "arg #$n is float, must be int"
         }
-        if {$assertion == {float} && $i} {
+        if {$assertion eq {float} && $i} {
             return [expr {int($value)}]
         } else {
             return $value
@@ -224,7 +224,7 @@ namespace eval ::pd {
     proc strip_empty {tcllist} {
         set r {}
         foreach i $tcllist {
-            if {$i == "empty"} {lappend r {}} {lappend r $i}
+            if {$i eq "empty"} {lappend r {}} {lappend r $i}
         }
         return $r
     }
@@ -232,7 +232,7 @@ namespace eval ::pd {
     proc add_empty {tcllist} {
         set r {}
         foreach i $tcllist {
-            if {$i == {}} {lappend r "empty"} {lappend r $i}
+            if {$i eq {}} {lappend r "empty"} {lappend r $i}
         }
         return $r
     }
@@ -265,9 +265,9 @@ namespace eval ::pd {
             set atom [tclpd_binbuf_get_atom $binbuf $i]
             set selector [atom_type_string $atom]
             set value {?}
-            if {$selector == "float"} {
+            if {$selector eq "float"} {
                 set value [atom_float_value $atom]
-            } elseif {$selector == "symbol"} {
+            } elseif {$selector eq "symbol"} {
                 set value [atom_symbol_value $atom]
             }
             lappend result [list $selector $value]
