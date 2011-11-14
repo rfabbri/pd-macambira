@@ -3,9 +3,6 @@ package require TclpdLib 0.20
 package require tclfile
 
 proc delete::constructor {self args} {
-    if {![namespace exists $self]} {
-        namespace eval $self {}
-    }
     variable ${self}::current_canvas [canvas_getcurrent]
     # set to blank so the var always exists
     variable ${self}::filename {}
