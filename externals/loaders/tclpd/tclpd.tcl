@@ -94,7 +94,7 @@ namespace eval ::pd {
         }
 
         proc ::${classname}::dispatcher {self function args} "
-            if {\$function eq \"method\"} {
+            if {\$function eq {method}} {
                 set inlet \[lindex \$args 0\]
                 set selector \[lindex \$args 1\]
                 set argsr \[lrange \$args 2 end\]
@@ -107,7 +107,7 @@ namespace eval ::pd {
                 } else {
                     return -code error \"${classname}: no such method: \$i_s\"
                 }
-            } elseif {\$function eq \"widgetbehavior\"} {
+            } elseif {\$function eq {widgetbehavior}} {
                 set subfunction \[lindex \$args 0\]
                 set argsr \[lrange \$args 1 end\]
                 set f ::${classname}::\${function}_\${subfunction}
@@ -115,6 +115,11 @@ namespace eval ::pd {
                     uplevel \[linsert \$argsr 0 \$f \$self]
                 }
             } else {
+                # feature request 3436774
+                if {\$function eq {constructor}} {
+                    namespace eval ::${classname}::\$self {}
+                }
+
                 uplevel \[linsert \$args 0 ::${classname}::\$function \$self\]
             }
         "
