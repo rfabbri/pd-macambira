@@ -40,13 +40,13 @@ proc+ bitmap::constructor {self args} {
     lappend @config -uwidth 8
     lappend @config -uheight 8
     lappend @config -cellsize 16
-    lappend @config -label ""
-    lappend @config -labelpos "top"
-    lappend @config -sendsymbol ""
-    lappend @config -receivesymbol ""
-    lappend @config -fgcolor "#000000"
-    lappend @config -bgcolor "#ffffff"
-    lappend @config -lblcolor "#000000"
+    lappend @config -label {}
+    lappend @config -labelpos {top}
+    lappend @config -sendsymbol {}
+    lappend @config -receivesymbol {}
+    lappend @config -fgcolor {#000000}
+    lappend @config -bgcolor {#ffffff}
+    lappend @config -lblcolor {#000000}
     set @data {
         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
         0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -64,17 +64,17 @@ proc+ bitmap::constructor {self args} {
 }
 
 proc+ bitmap::destructor {self} {
-    if {$@rcvLoadData != {}} {
+    if {$@rcvLoadData ne {}} {
         #should not happen!
         pd_unbind $self $@rcvLoadData
     }
-    if {[dict get $@config -receivesymbol] != {}} {
+    if {[dict get $@config -receivesymbol] ne {}} {
         pd_unbind $self $@recv
     }
 }
 
 proc+ bitmap::0_config {self args} {
-    if {$args == {}} {
+    if {$args eq {}} {
         return $@config
     } else {
         set newconf [list]
@@ -105,7 +105,7 @@ proc+ bitmap::0_config {self args} {
             set old [dict get $@config -$opt]
             if {[dict exists $newconf -$opt]} {
                 set new [dict get $newconf -$opt]
-                if {$old != $new} {
+                if {$old ne $new} {
                     dict set @config -$opt $new
                     set ui 1
                 }
@@ -115,12 +115,12 @@ proc+ bitmap::0_config {self args} {
             set old [dict get $@config -$opt]
             if {[dict exists $newconf -$opt]} {
                 set new [dict get $newconf -$opt]
-                if {$old != $new} {
-                    if {$opt == "receivesymbol"} {
-                        if {$old != {}} {
+                if {$old ne $new} {
+                    if {$opt eq {receivesymbol}} {
+                        if {$old ne {}} {
                             pd_unbind $self $@recv
                         }
-                        if {$new != {}} {
+                        if {$new ne {}} {
                             set @recv [canvas_realizedollar $@canvas $new]
                             pd_bind $self $@recv
                         } else {
@@ -196,7 +196,7 @@ proc+ bitmap::0_setrow {self args} {
     set bgcolor [dict get $@config -bgcolor]
     set colors [list $bgcolor $fgcolor]
     for {set idx [expr {$row*$w}]} {$idx < [expr {($row+1)*$w}]} {incr idx} {
-        set d [expr {0!=[pd::arg $z int]}]
+        set d [expr {0 != [pd::arg $z int]}]
         lset @data $idx $d
         sys_gui [list $@c itemconfigure cell_${col}_${row}_$self \
             -fill [lindex $colors $d]]\n
@@ -215,7 +215,7 @@ proc+ bitmap::0_setcol {self args} {
     set bgcolor [dict get $@config -bgcolor]
     set colors [list $bgcolor $fgcolor]
     for {set idx [expr {$col}]} {$idx < [expr {$w*$h}]} {incr idx $w} {
-        set d [expr {0!=[pd::arg $z int]}]
+        set d [expr {0 != [pd::arg $z int]}]
         lset @data $idx $d
         sys_gui [list $@c itemconfigure cell_${col}_${row}_$self \
             -fill [lindex $colors $d]]\n
@@ -227,7 +227,7 @@ proc+ bitmap::0_setcol {self args} {
 proc+ bitmap::0_setcell {self args} {
     set r [pd::arg 0 int]
     set c [pd::arg 1 int]
-    set d [expr {0!=[pd::arg 2 int]}]
+    set d [expr {0 != [pd::arg 2 int]}]
     set w [dict get $@config -uwidth]
     set fgcolor [dict get $@config -fgcolor]
     set bgcolor [dict get $@config -bgcolor]
@@ -248,7 +248,7 @@ proc+ bitmap::0_setdata {self args} {
     }
     set @data [list]
     foreach i $d {lappend @data [expr {int($i)}]}
-    if {$@rcvLoadData != {}} {
+    if {$@rcvLoadData ne {}} {
         pd_unbind $self $@rcvLoadData
         set @rcvLoadData {}
     }
@@ -290,7 +290,7 @@ proc+ bitmap::widgetbehavior_select {self args} {
     set sel [lindex $args 0]
     set fgcolor [dict get $@config -fgcolor]
     set bgcolor [dict get $@config -bgcolor]
-    set selcolor "blue"
+    set selcolor {blue}
     set colors [list $selcolor $fgcolor]
     sys_gui [list $@c itemconfigure $self \
         -outline [lindex $colors $sel]]\n
@@ -333,7 +333,7 @@ proc+ bitmap::widgetbehavior_click {self args} {
         set j [expr {$xpix/$sz}]
         set i [expr {$ypix/$sz}]
         set idx [expr {$w*${i}+${j}}]
-        set d [expr {[lindex $@data $idx]==0}]
+        set d [expr {[lindex $@data $idx] == 0}]
         lset @data $idx $d
         sys_gui [list $@c itemconfigure cell_${j}_${i}_$self \
             -fill [lindex $colors $d]]\n

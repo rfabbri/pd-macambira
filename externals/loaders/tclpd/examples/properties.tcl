@@ -10,7 +10,7 @@ proc propertieswindow {gfxstub_id {options {}} {title {}}} {
     set ::optkeys($win.p) [list]
     set options [string map {@ $} $options]
     foreach {k v} $options {
-        if {$v eq "empty"} {set v {}}
+        if {$v eq {empty}} {set v {}}
         #set v [string map {\\$ $} $v]
         set ::config($win.p:$k) $v
         lappend ::optkeys($win.p) $k
@@ -33,7 +33,7 @@ proc propertiespanel {w} {
     set subpanels {dimensions output behavior connective label colors}
     foreach subpanel $subpanels {
         set x [propertiespanel_$subpanel $w]
-        if {$x != {}} {grid $x -sticky ew -in $w}
+        if {$x ne {}} {grid $x -sticky ew -in $w}
     }
     set x [propertiespanel_buttons $w]
     grid $x -in $w
@@ -351,7 +351,7 @@ proc propertiespanel_colors_set_wrap {w x wp optkey config_ idx op} {
 }
 
 proc propertiespanel_colors_switchpicker {w x row cpt idx op} {
-    raise ${x}.cp[expr {1+($::cpt($w) == {hsv})}]
+    raise ${x}.cp[expr {1+($::cpt($w) eq {hsv})}]
 }
 
 proc propertiespanel_colors_pick {w x colors wb wp wt} {
@@ -359,7 +359,7 @@ proc propertiespanel_colors_pick {w x colors wb wp wt} {
         ${x}.b$color configure -relief raised -state normal
     }
     set r [$wb cget -relief]
-    if {$r == {sunken}} {
+    if {$r eq {sunken}} {
         $wb configure -relief raised
         ${x}.cp1 configure -command {}
         ${x}.cp2 configure -command {}
@@ -373,9 +373,9 @@ proc propertiespanel_colors_pick {w x colors wb wp wt} {
 }
 
 proc propertiespanel_colors_set {w x wp wt from color} {
-    if {$wt != {}} {$wt delete 0 end ; $wt insert 0 $color}
+    if {$wt ne {}} {$wt delete 0 end ; $wt insert 0 $color}
     $wp configure -background $color
-    if {$::cpt($w) == {switches} && $from == 1} {
+    if {$::cpt($w) eq {switches} && $from == 1} {
         ${x}.cp2 set $color
     }
 }
@@ -414,7 +414,7 @@ proc propertiespanel_apply {w} {
     set newconf [list]
     foreach key $::optkeys($w) {
         set v $::config($w:$key)
-        if {$v == ""} {set v "empty"}
+        if {$v eq {}} {set v {empty}}
         lappend newconf $key $v
     }
     #set newconf [string map {$ \\$} $newconf]

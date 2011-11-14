@@ -29,7 +29,7 @@ pd::guiproc slider2_update {self c x y config state} {
     if {$realvalue < 0.0} {set realvalue 0}
     if {$realvalue > 1.0} {set realvalue 1}
     if {$rev} {set realvalue [expr {1.0-$realvalue}]}
-    if {$orient == "vertical"} {set realvalue [expr {1.0-$realvalue}]}
+    if {$orient eq {vertical}} {set realvalue [expr {1.0-$realvalue}]}
     switch $orient {
         horizontal {
             set hr [expr {$width-$headsz}]
@@ -43,7 +43,7 @@ pd::guiproc slider2_update {self c x y config state} {
         }
     }
     $c delete label$self
-    if {$label != {}} {
+    if {$label ne {}} {
         switch $labelpos {
             top
             {set lx [expr {$x+$width/2}]; set ly [expr {$y}]; set a "s"}
@@ -66,9 +66,9 @@ proc+ slider2::constructor {self args} {
     # set defaults:
     set @config {
         -width 15 -height 130 -headsz 3 -rangebottom 0 -rangetop 127
-        -init 0 -initvalue 0 -jumponclick 0 -label "" -labelpos "top"
-        -orient "vertical" -sendsymbol "" -receivesymbol ""
-        -fgcolor "#000000" -bgcolor "#ffffff" -lblcolor "#000000"
+        -init 0 -initvalue 0 -jumponclick 0 -label {} -labelpos {top}
+        -orient {vertical} -sendsymbol {} -receivesymbol {}
+        -fgcolor {#000000} -bgcolor {#ffffff} -lblcolor {#000000}
     }
     set @state {_min 0 _max 127 _rev 0}
     # expanded ($n) send/recv symbols:
@@ -78,7 +78,7 @@ proc+ slider2::constructor {self args} {
 }
 
 proc+ slider2::destructor {self} {
-    if {[dict get $@config -receivesymbol] != {}} {
+    if {[dict get $@config -receivesymbol] ne {}} {
         pd_unbind $self $@recv
     }
 }
@@ -114,9 +114,9 @@ proc+ slider2::0_config {self args} {
         if {![dict exists $@config $k]} {
             return -code error "unknown option '$k'"
         }
-        if {[dict get $@config $k] == $v} {continue}
+        if {[dict get $@config $k] eq $v} {continue}
         if {[lsearch -exact $int_opts $k] != -1} {set v [expr {int($v)}]}
-        if {[lsearch -exact $bool_opts $k] != -1} {set v [expr {int($v)!=0}]}
+        if {[lsearch -exact $bool_opts $k] != -1} {set v [expr {int($v) != 0}]}
         if {[lsearch -exact $ui_opts $k] != -1} {set ui 1}
         if {[lsearch -exact $upd_opts $k] != -1} {set upd 1}
         dict set newconf $k $v
@@ -124,17 +124,17 @@ proc+ slider2::0_config {self args} {
     # process -{send,receive}symbol
     if {[dict exists $newconf -receivesymbol]} {
         set new_recv [dict get $newconf -receivesymbol]
-        if {[dict get $@config -receivesymbol] != {}} {
+        if {[dict get $@config -receivesymbol] ne {}} {
             pd_unbind $self $@recv
         }
-        if {$new_recv != {}} {
+        if {$new_recv ne {}} {
             set @recv [canvas_realizedollar $@canvas $new_recv]
             pd_bind $self $@recv
         } else {set @recv {}}
     }
     if {[dict exists $newconf -sendsymbol]} {
         set new_send [dict get $newconf -sendsymbol]
-        if {$new_send != {}} {
+        if {$new_send ne {}} {
             set @send [canvas_realizedollar $@canvas $new_send]
         } else {set @send {}}
     }
@@ -189,9 +189,9 @@ proc+ slider2::0_set {self args} {
 proc+ slider2::0_bang {self} {
     foreach v {initvalue} {set $v [dict get $@config -$v]}
     pd::outlet $self 0 float $initvalue
-    if {$@send != {}} {
+    if {$@send ne {}} {
         set s_thing [$@send cget -s_thing]
-        if {$s_thing != {NULL}} {pd_float $s_thing $initvalue}
+        if {$s_thing ne {NULL}} {pd_float $s_thing $initvalue}
     }
 }
 

@@ -13,7 +13,7 @@ proc+ dynreceive::constructor {self args} {
 proc+ dynreceive::destructor {self} {
     # don't forget to call pd_unbind, or sending things to a symbol
     # bound to dead object will crash pd!
-    if {$@sym != {}} {
+    if {$@sym ne {}} {
         pd_unbind $self $@sym
     }
 }
@@ -21,10 +21,10 @@ proc+ dynreceive::destructor {self} {
 proc+ dynreceive::0_set {self args} {
     # send [set empty( to clear the receive symbol
     set s [pd::arg 0 symbol]
-    if {$@sym != {}} {
+    if {$@sym eq {}} {
         pd_unbind $self $@sym
     }
-    if {$s == {empty}} {
+    if {$s eq {empty}} {
         set @sym {}
     } else {
         set @sym $s

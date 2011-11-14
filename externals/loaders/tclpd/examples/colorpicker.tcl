@@ -28,14 +28,14 @@ namespace eval ::colorpicker {
             error "bad mode: $mode. must be one of: $modes."
         }
         set ($w:mode) $mode
-        set ($w:color) "#000000"
+        set ($w:color) {#000000}
         set ($w:command) {}
         set ($w:textvar) {}
         frame $w
         init_$mode $w
         rename $w ::colorpicker::_$w
         interp alias {} $w {} ::colorpicker::dispatch $w
-        if {$args != {}} {uplevel 1 ::colorpicker::config $w $args}
+        if {$args ne {}} {uplevel 1 ::colorpicker::config $w $args}
         return $w
     }
 
@@ -66,7 +66,7 @@ namespace eval ::colorpicker {
                 default { lappend options $key $value }
             }
         }
-        if {!$flag || $options != ""} {
+        if {!$flag || $options ne {}} {
             uplevel 1 [linsert $options 0 ::scrolledframe::_$w config]
         }
     }
@@ -100,12 +100,12 @@ namespace eval ::colorpicker {
         variable {}
         set c [string tolower $c]
         set ($w:color) $c
-        if {$($w:command) != {}} {
+        if {$($w:command) ne {}} {
             set cmd $($w:command)
             lappend cmd $c
             uplevel #0 $cmd
         }
-        if {$($w:textvar) != {}} {
+        if {$($w:textvar) ne {}} {
             uplevel #0 [list set $($w:textvar) $c]
         }
         switch -exact -- $($w:mode) {
@@ -114,7 +114,7 @@ namespace eval ::colorpicker {
                 set q 0
                 for {set row 0} {$row < 3} {incr row} {
                     for {set col 0} {$col < 10} {incr col} {
-                        set b [expr {$c == "#[lindex $presets $q]"}]
+                        set b [expr {$c eq "#[lindex $presets $q]"}]
                         ${w}.r${row}c${col} configure \
                             -relief [lindex {raised sunken} $b]
                         incr q
@@ -131,7 +131,7 @@ namespace eval ::colorpicker {
         if {$r < 0} {set r 0} elseif {$r > 255} {set r 255}
         if {$g < 0} {set g 0} elseif {$g > 255} {set g 255}
         if {$b < 0} {set b 0} elseif {$b > 255} {set b 255}
-        return #[format "%2.2x%2.2x%2.2x" $r $g $b]
+        return #[format {%2.2x%2.2x%2.2x} $r $g $b]
     }
 
     proc rgbToHsv {r g b} {
@@ -199,7 +199,7 @@ namespace eval ::colorpicker {
         for {set row 0} {$row < 3} {incr row} {
             for {set col 0} {$col < 10} {incr col} {
                 set c "#[lindex $presets $q]"
-                set b [expr {$($w:color) == $c}]
+                set b [expr {$($w:color) eq $c}]
                 grid [frame ${w}.r${row}c${col} -width 18 -height 16 \
                     -borderwidth 1 -relief [lindex {raised sunken} $b] \
                     -background $c -highlightthickness 0] \
@@ -264,10 +264,10 @@ namespace eval ::colorpicker {
 
     proc hsv_set {w what val} {
         variable colorhsv
-        if {$what != {h} && $what != {s} && $what != {v}} {return}
+        if {$what ne {h} && $what ne {s} && $what ne {v}} {return}
         set colorhsv($w:$what) $val
         if {$colorhsv($w:$what) < 0.0} {set colorhsv($w:$what) 0}
-        if {$what == {h}} {
+        if {$what eq {h}} {
             if {$colorhsv($w:$what) >= 360.0} {set colorhsv($w:$what) 0}
             hsv_regen $w $colorhsv($w:$what)
         } else {

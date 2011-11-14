@@ -13,14 +13,14 @@ proc+ list_change::constructor {self args} {
 
 proc+ list_change::0_list {self args} {
     # HOT inlet
-    if {$args != $@curlist} {
+    if {$args ne $@curlist} {
         set @curlist $args
         pd::outlet $self 0 list $@curlist
     }
 }
 
 proc+ list_change::0_bang {self} {
-    if {$@curlist == {}} return
+    if {$@curlist eq {}} return
     pd::outlet $self 0 list $@curlist
 }
 
