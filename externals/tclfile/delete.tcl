@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 proc delete::constructor {self args} {
     if {![namespace exists $self]} {
@@ -25,7 +25,7 @@ proc delete::0_bang {self} {
     if {[file pathtype $filename] eq "absolute"} {
         file delete -- $filename
     } else {
-        set dir [[canvas_getdir $current_canvas] cget -s_name]
+        set dir [canvas_getdir $current_canvas]
         file delete -- [file join $dir $filename]
     }
 }

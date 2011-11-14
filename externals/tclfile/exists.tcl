@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 proc exists::make_symbol {argslist} {
     set output [pd::strip_selectors $argslist]
@@ -42,7 +42,7 @@ proc exists::0_bang {self} {
     if {[file pathtype $filename] eq "absolute"} {
         pd::outlet $self 0 float [file exists $filename]
     } else {
-        set dir [[canvas_getdir $current_canvas] cget -s_name]
+        set dir [canvas_getdir $current_canvas]
         pd::outlet $self 0 float [file exists [file join $dir $filename]]
     }
 }

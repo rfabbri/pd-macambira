@@ -1,5 +1,5 @@
-package require Tclpd 0.2.3
-package require TclpdLib 0.19
+package require Tclpd 0.3.0
+package require TclpdLib 0.20
 
 proc mkdir::constructor {self args} {
     if {![namespace exists $self]} {
@@ -25,7 +25,7 @@ proc mkdir::0_bang {self} {
     if {[file pathtype $filename] eq "absolute"} {
         file mkdir $filename
     } else {
-        set dir [[canvas_getdir $current_canvas] cget -s_name]
+        set dir [canvas_getdir $current_canvas]
         file mkdir [file join $dir $filename]
     }
 }
