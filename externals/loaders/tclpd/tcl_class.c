@@ -94,10 +94,25 @@ t_tcl * tclpd_new(t_symbol *classsym, int ac, t_atom *at) {
     // lookup in class table
     const char *name = classsym->s_name;
     t_class *qlass = class_table_get(name);
+    while(!qlass) {
+        // try progressively skipping namespace/ prefixes (bug 3436716)
+        name = strchr(name, '/');
+        if(!name || !*++name) break;
+        qlass = class_table_get(name);
+    }
+    if(!qlass) {
+        error("tclpd: class not found: %s", name);
+        return NULL;
+    }
 
     t_tcl *x = (t_tcl *)pd_new(qlass);
+    if(!x) {
+        error("tclpd: failed to create object of class %s", name);
+        return NULL;
+    }
+
+    /* used for numbering proxy inlets: */
     x->ninlets = 1 /* qlass->c_firstin ??? */;
-    x->x_glist = (t_glist *)canvas_getcurrent();
 
     x->source_file = (char *)hashtable_get(source_table, name);
     if(!x->source_file) {

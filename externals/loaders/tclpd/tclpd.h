@@ -17,7 +17,6 @@
 typedef struct _t_tcl {
     t_object o;
     int ninlets; /* used for proxy inlet count */
-    t_glist *x_glist;
 
     char *source_file;
 

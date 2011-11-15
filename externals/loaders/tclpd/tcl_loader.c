@@ -69,7 +69,7 @@ found:
     verbose(-1, "tclpd loader: loading tcl file %s", filename);
     result = Tcl_EvalFile(tclpd_interp, filename);
     if(result == TCL_OK) {
-        source_table_add(objectname, filename);
+        source_table_add(classname, filename);
         verbose(0, "tclpd loader: loaded %s", filename);
     } else {
         error("tclpd loader: error trying to load %s", filename);
