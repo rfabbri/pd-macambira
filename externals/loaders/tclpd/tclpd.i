@@ -26,20 +26,17 @@ void name_setitem(type *ary, int index, type value)
 
 %typemap(in) (int argc, t_atom *argv) {
     if(Tcl_ListObjLength(interp, $input, &$1) == TCL_ERROR) {
-        SWIG_exception(SWIG_RuntimeError, "failed to get list length");
-        SWIG_fail;
+        SWIG_exception_fail(SWIG_RuntimeError, "failed to get list length");
     }
     $2 = (t_atom *)getbytes(sizeof(t_atom) * $1);
     int i;
     Tcl_Obj *oi;
     for(i = 0; i < $1; i++) {
         if(Tcl_ListObjIndex(interp, $input, i, &oi) == TCL_ERROR) {
-            SWIG_exception(SWIG_RuntimeError, "failed to access list element");
-            SWIG_fail;
+            SWIG_exception_fail(SWIG_RuntimeError, "failed to access list element");
         }
         if(tcl_to_pdatom(oi, &$2[i]) == TCL_ERROR) {
-            SWIG_exception(SWIG_RuntimeError, "failed tcl_to_pdatom conversion");
-            SWIG_fail;
+            SWIG_exception_fail(SWIG_RuntimeError, "failed tcl_to_pdatom conversion");
         }
     }
 }
@@ -51,8 +48,7 @@ void name_setitem(type *ary, int index, type value)
 %typemap(in) t_atom * {
     $1 = (t_atom *)getbytes(sizeof(t_atom));
     if(tcl_to_pdatom($input, $1) == TCL_ERROR) {
-        SWIG_exception(SWIG_RuntimeError, "failed tcl_to_pdatom conversion");
-        SWIG_fail;
+        SWIG_exception_fail(SWIG_RuntimeError, "failed tcl_to_pdatom conversion");
     }
 }
 
@@ -63,24 +59,21 @@ void name_setitem(type *ary, int index, type value)
 %typemap(out) t_atom * {
     Tcl_Obj *lst;
     if(pdatom_to_tcl($1, &lst) == TCL_ERROR) {
-        SWIG_exception(SWIG_RuntimeError, "failed pdatom_to_tcl conversion");
-        SWIG_fail;
+        SWIG_exception_fail(SWIG_RuntimeError, "failed pdatom_to_tcl conversion");
     }
     Tcl_SetObjResult(interp, lst);
 }
 
 %typemap(in) t_symbol * {
     if(tcl_to_pdsymbol($input, &$1) == TCL_ERROR) {
-        SWIG_exception(SWIG_RuntimeError, "failed tcl_to_pdsymbol conversion");
-        SWIG_fail;
+        SWIG_exception_fail(SWIG_RuntimeError, "failed tcl_to_pdsymbol conversion");
     }
 }
 
 %typemap(out) t_symbol * {
     Tcl_Obj *lst;
     if(pdsymbol_to_tcl($1, &lst) == TCL_ERROR) {
-        SWIG_exception(SWIG_RuntimeError, "failed pdsymbol_to_tcl conversion");
-        SWIG_fail;
+        SWIG_exception_fail(SWIG_RuntimeError, "failed pdsymbol_to_tcl conversion");
     }
     Tcl_SetObjResult(interp, lst);
 }
@@ -88,37 +81,27 @@ void name_setitem(type *ary, int index, type value)
 %typemap(in) t_tcl * {
     const char *str = Tcl_GetStringFromObj($input, NULL);
     $1 = object_table_get(str);
-    if(!$1) {
-        SWIG_exception(SWIG_RuntimeError, "not a t_tcl * instance");
-        SWIG_fail;
-    }
-}
-
-%typemap(in) t_text * {
-    const char *str = Tcl_GetStringFromObj($input, NULL);
-    $1 = object_table_get(str);
-    if(!$1) {
-        SWIG_exception(SWIG_RuntimeError, "not a t_text * instance");
-        SWIG_fail;
+    SWIG_contract_assert($1, "not a t_tcl * instance");
     }
 }
 
 %typemap(in) t_pd * {
     const char *str = Tcl_GetStringFromObj($input, NULL);
     $1 = object_table_get(str);
-    if(!$1) {
-        SWIG_exception(SWIG_RuntimeError, "not a t_pd * instance");
-        SWIG_fail;
-    }
+    SWIG_contract_assert($1, "not a t_pd * instance");
+}
+
+%typemap(in) t_text * {
+    const char *str = Tcl_GetStringFromObj($input, NULL);
+    t_tcl *x = object_table_get(str);
+    SWIG_contract_assert(x, "not a t_text * instance");
+    $1 = &x->o;
 }
 
 %typemap(in) t_object * {
     const char *str = Tcl_GetStringFromObj($input, NULL);
     t_tcl *x = object_table_get(str);
-    if(!x) {
-        SWIG_exception(SWIG_RuntimeError, "not a t_tcl * instance");
-        SWIG_fail;
-    }
+    SWIG_contract_assert(x, "not a t_object * instance");
     $1 = &x->o;
 }
 
