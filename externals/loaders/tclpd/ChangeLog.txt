@@ -1,5 +1,6 @@
 Version 0.3.0:
 	- Big rewrite, fixing typemaps
+	- Support for most binbuf atoms (COMMA, SEMI, DOLLAR, DOLLSYM, ...)
 
 Version 0.2.3:
 	- Big rewrite, using tcl namespaces (more tidy, more efficient)

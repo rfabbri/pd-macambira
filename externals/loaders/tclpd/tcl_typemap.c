@@ -1,12 +1,41 @@
 #include "tclpd.h"
 #include <string.h>
 
+static const char *atomtype_map[] = {
+  /* A_NULL */     "null",
+  /* A_FLOAT */    "float",
+  /* A_SYMBOL */   "symbol",
+  /* A_POINTER */  "pointer",
+  /* A_SEMI */     "semi",
+  /* A_COMMA */    "comma",
+  /* A_DEFFLOAT */ "deffloat",
+  /* A_DEFSYM */   "defsym",
+  /* A_DOLLAR */   "dollar",
+  /* A_DOLLSYM */  "dollsym",
+  /* A_GIMME */    "gimme",
+  /* A_CANT */     "cant",
+  /* A_BLOB */     "blob"
+};
+
+#define atomtype_map_size (sizeof(atomtype_map)/sizeof(atomtype_map[0]))
+
+static const char * fwd_atomtype_map(t_atomtype t) {
+    if(t >= atomtype_map_size) return atomtype_map[A_NULL];
+    return atomtype_map[t];
+}
+
+static t_atomtype rev_atomtype_map(const char *s) {
+    for(t_atomtype i = 0; i < atomtype_map_size; i++) {
+        if(strcmp(s, atomtype_map[i]) == 0) return i;
+    }
+    return A_NULL;
+}
+
 int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
     int llength;
     if(Tcl_ListObjLength(tclpd_interp, input, &llength) == TCL_ERROR)
         return TCL_ERROR;
     if(llength != 2)
-        /*SWIG_exception(SWIG_ValueError, "Bad t_atom: expeting a 2-elements list.");*/
         return TCL_ERROR;
 
     int i;
@@ -14,17 +43,62 @@ int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
     for(i = 0; i < 2; i++) Tcl_ListObjIndex(tclpd_interp, input, i, &obj[i]);
     char *argv0 = Tcl_GetStringFromObj(obj[0], 0);
 
-    if(strcmp(argv0, "float") == 0) {
-        double dbl;
-        if(Tcl_GetDoubleFromObj(tclpd_interp, obj[1], &dbl) == TCL_ERROR)
+    t_atomtype a_type = rev_atomtype_map(argv0);
+
+    switch(a_type) {
+        case A_FLOAT:
+        case A_DEFFLOAT:
+        {
+            double dbl;
+            if(Tcl_GetDoubleFromObj(tclpd_interp, obj[1], &dbl) == TCL_ERROR)
+                return TCL_ERROR;
+            SETFLOAT(output, dbl);
+            break;
+        }
+        case A_SYMBOL:
+        case A_DEFSYM:
+        {
+            SETSYMBOL(output, gensym(Tcl_GetStringFromObj(obj[1], 0)));
+            break;
+        }
+        case A_POINTER:
+        {
+            SETPOINTER(output, NULL);
+            break;
+        }
+        case A_SEMI:
+        {
+            SETSEMI(output);
+            break;
+        }
+        case A_COMMA:
+        {
+            SETCOMMA(output);
+            break;
+        }
+        case A_DOLLAR:
+        {
+            int ii;
+            if(Tcl_GetIntFromObj(tclpd_interp, obj[1], &ii) == TCL_ERROR)
+                return TCL_ERROR;
+            SETDOLLAR(output, ii);
+            break;
+        }
+        case A_DOLLSYM:
+        {
+            SETSYMBOL(output, gensym(Tcl_GetStringFromObj(obj[1], 0)));
+            break;
+        }
+        case A_GIMME:
+        case A_CANT:
+        case A_BLOB:
+        case A_NULL:
+        {
+            // TODO: set error result
             return TCL_ERROR;
-        SETFLOAT(output, dbl);
-    } else if(strcmp(argv0, "symbol") == 0) {
-        SETSYMBOL(output, gensym(Tcl_GetStringFromObj(obj[1], 0)));
-    } else if(strcmp(argv0, "pointer") == 0) {
-        // TODO:
-        return TCL_ERROR;
+        }
     }
+
     return TCL_OK;
 }
 
@@ -34,62 +108,42 @@ int tcl_to_pdsymbol(Tcl_Obj *input, t_symbol **output) {
     return TCL_OK;
 }
 
-const char * pdatom_type_string(t_atom *a) {
-    switch(a->a_type) {
-    case A_FLOAT:
-    case A_DEFFLOAT:
-        return "float";
-    case A_SYMBOL:
-    case A_DEFSYM:
-    case A_DOLLAR:
-    case A_DOLLSYM:
-    case A_SEMI:
-    case A_COMMA:
-        return "symbol";
-    case A_POINTER:
-        return "pointer";
-    default:
-        error("atom_type_string: unsupported/unknown selector: %d", a->a_type);
-        return "???";
-    }
-}
-
-const char * pdatom_symbol_value(t_atom *a) {
-    if(a->a_type == A_DOLLAR) {
-        char buf[6];
-        snprintf(buf, 6, "$%d", a->a_w.w_index);
-        t_symbol *s = gensym(buf);
-        return s->s_name;
-    }
-    return a->a_w.w_symbol->s_name;
-}
-
-float pdatom_float_value(t_atom *a) {
-    return a->a_w.w_float;
-}
-
 int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
     Tcl_Obj *tcl_t_atom[2];
+    tcl_t_atom[0] = Tcl_NewStringObj(fwd_atomtype_map(input->a_type), -1);
     switch (input->a_type) {
-        case A_FLOAT: {
-            tcl_t_atom[0] = Tcl_NewStringObj("float", -1);
+        case A_FLOAT:
+        case A_DEFFLOAT:
+        {
             tcl_t_atom[1] = Tcl_NewDoubleObj(input->a_w.w_float);
             break;
         }
-        case A_SYMBOL: {
-            tcl_t_atom[0] = Tcl_NewStringObj("symbol", -1);
+        case A_SYMBOL:
+        case A_DEFSYM:
+        case A_DOLLSYM:
+        {
             tcl_t_atom[1] = Tcl_NewStringObj(input->a_w.w_symbol->s_name, strlen(input->a_w.w_symbol->s_name));
             break;
         }
-        case A_POINTER: {
-            return TCL_ERROR;
-            tcl_t_atom[0] = Tcl_NewStringObj("pointer", -1);
+        case A_POINTER:
+        {
             tcl_t_atom[1] = Tcl_NewDoubleObj((long)input->a_w.w_gpointer);
             break;
         }
-        default: {
-            tcl_t_atom[0] = Tcl_NewStringObj("?", -1);
-            tcl_t_atom[1] = Tcl_NewStringObj("", 0);
+        case A_DOLLAR:
+        {
+            tcl_t_atom[1] = Tcl_NewIntObj((int)input->a_w.w_index);
+            break;
+        }
+        case A_SEMI:
+        case A_COMMA:
+        case A_GIMME:
+        case A_CANT:
+        case A_BLOB:
+        case A_NULL:
+        default:
+        {
+            tcl_t_atom[1] = Tcl_NewStringObj("--", 2);
             break;
         }
     }

@@ -324,6 +324,12 @@ t_atom * tclpd_binbuf_get_atom(t_binbuf *b, int n) {
 }
 */
 
+/* helper function for accessing binbuf's atoms
+   cause, accessing C arrays and doing typemaps is not that easy */
+t_atom * binbuf_getatom(t_binbuf *x, int index) {
+    return binbuf_getvec(x) + index;
+}
+
 t_object * CAST_t_object(t_object *o) {
     return o;
 }

@@ -261,24 +261,14 @@ namespace eval ::pd {
 
     proc get_binbuf {self} {
         set ob [CAST_t_object $self]
-        post "get_binbuf: ob = $ob"
-        if 0 {
         set binbuf [$ob cget -te_binbuf]
         set len [binbuf_getnatom $binbuf]
         set result {}
         for {set i 0} {$i < $len} {incr i} {
-            set atom [tclpd_binbuf_get_atom $binbuf $i]
-            set selector [atom_type_string $atom]
-            set value {?}
-            if {$selector eq "float"} {
-                set value [atom_float_value $atom]
-            } elseif {$selector eq "symbol"} {
-                set value [atom_symbol_value $atom]
-            }
-            lappend result [list $selector $value]
+            set atom [binbuf_getatom $binbuf $i]
+            lappend result $atom
         }
         return $result
-        } else {return {}}
     }
 }
 

@@ -11,11 +11,11 @@
 %include carrays.i
 %include typemaps.i
 
-%pointer_functions(t_atom, atom)
-%pointer_functions(t_symbol, symbol)
+%pointer_functions(t_atom, atom);
+%pointer_functions(t_symbol, symbol);
 
-%array_functions(t_atom, atom_array)
 /*
+%array_functions(t_atom_array, atom_array);
 Creates four functions.
 
 type *new_name(int nelements)
@@ -81,26 +81,29 @@ void name_setitem(type *ary, int index, type value)
 %typemap(in) t_tcl * {
     const char *str = Tcl_GetStringFromObj($input, NULL);
     $1 = object_table_get(str);
-    SWIG_contract_assert($1, "not a t_tcl * instance");
+    SWIG_contract_assert($1, "not a t_tcl * instance") {};
 }
 
 %typemap(in) t_pd * {
     const char *str = Tcl_GetStringFromObj($input, NULL);
     $1 = object_table_get(str);
-    SWIG_contract_assert($1, "not a t_pd * instance");
+    SWIG_contract_assert($1, "not a t_pd * instance") {};
 }
 
 %typemap(in) t_text * {
-    const char *str = Tcl_GetStringFromObj($input, NULL);
-    t_tcl *x = object_table_get(str);
-    SWIG_contract_assert(x, "not a t_text * instance");
-    $1 = &x->o;
+    int res = SWIG_ConvertPtr($input, &$1, SWIGTYPE_p__text, 0 |  0 );
+    if(!SWIG_IsOK(res)) {
+        const char *str = Tcl_GetStringFromObj($input, NULL);
+        t_tcl *x = object_table_get(str);
+        SWIG_contract_assert(x, "not a t_text * instance") {};
+        $1 = &x->o;
+    }
 }
 
 %typemap(in) t_object * {
     const char *str = Tcl_GetStringFromObj($input, NULL);
     t_tcl *x = object_table_get(str);
-    SWIG_contract_assert(x, "not a t_object * instance");
+    SWIG_contract_assert(x, "not a t_object * instance") {};
     $1 = &x->o;
 }
 

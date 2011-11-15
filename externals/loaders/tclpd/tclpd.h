@@ -51,9 +51,6 @@ extern int Tclpd_SafeInit(Tcl_Interp *interp);
 /* tcl_typemap.c */
 int tcl_to_pdatom(Tcl_Obj *input, t_atom *output);
 int tcl_to_pdsymbol(Tcl_Obj *input, t_symbol **output);
-const char * pdatom_type_string(t_atom *a);
-const char * pdatom_symbol_value(t_atom *a);
-float pdatom_float_value(t_atom *a);
 int pdatom_to_tcl(t_atom *input, Tcl_Obj **output);
 int pdsymbol_to_tcl(t_symbol *input, Tcl_Obj **output);
 
@@ -88,6 +85,7 @@ t_binbuf * tclpd_get_object_binbuf(const char *objectSequentialId);
 t_glist * tclpd_get_glist(const char *objectSequentialId);
 t_atom * tclpd_binbuf_get_atom(t_binbuf *b, int n);
 */
+t_atom * binbuf_getatom(t_binbuf *x, int index);
 t_object * CAST_t_object(t_object *o);
 t_pd * CAST_t_pd(t_pd *o);
 t_text * CAST_t_text(t_text *o);
