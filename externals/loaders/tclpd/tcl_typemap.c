@@ -63,7 +63,10 @@ int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
         }
         case A_POINTER:
         {
-            SETPOINTER(output, NULL);
+            long gpointer;
+            if(Tcl_GetLongFromObj(tclpd_interp, obj[1], &gpointer) == TCL_ERROR)
+                return TCL_ERROR;
+            SETPOINTER(output, (t_gpointer *)gpointer);
             break;
         }
         case A_SEMI:
@@ -78,9 +81,12 @@ int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
         }
         case A_DOLLAR:
         {
-            int ii;
-            if(Tcl_GetIntFromObj(tclpd_interp, obj[1], &ii) == TCL_ERROR)
+            char *str = Tcl_GetStringFromObj(obj[1], 0);
+            if(!str) {
                 return TCL_ERROR;
+            }
+            if(*str == '$') str++;
+            int ii = atoi(str);
             SETDOLLAR(output, ii);
             break;
         }
@@ -136,14 +142,22 @@ int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
             break;
         }
         case A_SEMI:
+        {
+            tcl_t_atom[1] = Tcl_NewStringObj(";", 1);
+            break;
+        }
         case A_COMMA:
+        {
+            tcl_t_atom[1] = Tcl_NewStringObj(",", 1);
+            break;
+        }
         case A_GIMME:
         case A_CANT:
         case A_BLOB:
         case A_NULL:
         default:
         {
-            tcl_t_atom[1] = Tcl_NewStringObj("--", 2);
+            tcl_t_atom[1] = Tcl_NewStringObj("?", 1);
             break;
         }
     }
