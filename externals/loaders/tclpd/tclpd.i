@@ -82,7 +82,6 @@ void name_setitem(type *ary, int index, type value)
     const char *str = Tcl_GetStringFromObj($input, NULL);
     $1 = object_table_get(str);
     SWIG_contract_assert($1, "not a t_tcl * instance");
-    }
 }
 
 %typemap(in) t_pd * {
