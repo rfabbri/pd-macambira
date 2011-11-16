@@ -24,7 +24,8 @@ MANUAL =
 # automatically included
 EXTRA_DIST = define_loudspeakers.h max2pd.h vbap.h makefile.irix so_locations
 
-
+# unit tests and related files here, in the 'unittests' subfolder
+UNITTESTS = define-loudspeaker-unittest.wav define_loudspeakers-unittest.pd rvbap-unittest.pd rvbap-unittest.wav vbap-unittest.pd vbap-unittest.wav vbap.wav
 
 #------------------------------------------------------------------------------#
 #
@@ -237,7 +238,7 @@ SHARED_SOURCE ?= $(shell test ! -e lib$(LIBRARY_NAME).c || \
 SHARED_HEADER ?= $(shell test ! -e $(LIBRARY_NAME).h || echo $(LIBRARY_NAME).h)
 SHARED_LIB = $(SHARED_SOURCE:.c=.$(SHARED_EXTENSION))
 
-.PHONY = install libdir_install single_install install-doc install-examples install-manual clean distclean dist etags $(LIBRARY_NAME)
+.PHONY = install libdir_install single_install install-doc install-examples install-manual install-unittests clean distclean dist etags $(LIBRARY_NAME)
 
 all: $(SOURCES:.c=.$(EXTENSION)) $(SHARED_LIB)
 
@@ -260,7 +261,7 @@ install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: $(SOURCES:.c=.$(EXTENSION)) $(SHARED_LIB) install-doc install-examples install-manual
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) $(SHARED_LIB) install-doc install-examples install-manual install-unittests
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -278,7 +279,7 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) $(SHARED_LIB) install-doc install-ex
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
-single_install: $(LIBRARY_NAME) install-doc install-examples install-manual
+single_install: $(LIBRARY_NAME) install-doc install-examples install-manual install-unittests
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_PROGRAM) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
@@ -305,6 +306,12 @@ install-manual:
 			$(INSTALL_DATA) manual/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual; \
 		done
 
+install-unittests:
+	test -z "$(strip $(UNITTESTS))" || \
+		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/unittests && \
+		for file in $(UNITTESTS); do \
+			$(INSTALL_DATA) unittests/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/unittests; \
+		done
 
 clean:
 	-rm -f -- $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o) $(SHARED_SOURCE:.c=.o)
@@ -367,6 +374,11 @@ dist: $(DISTDIR)
 		$(INSTALL_DIR) $(DISTDIR)/manual && \
 		for file in $(MANUAL); do \
 			$(INSTALL_DATA) manual/$$file $(DISTDIR)/manual; \
+		done
+	test -z "$(strip $(UNITTESTS))" || \
+		$(INSTALL_DIR) $(DISTDIR)/unittests && \
+		for file in $(UNITTESTS); do \
+			$(INSTALL_DATA) unittests/$$file $(DISTDIR)/unittests; \
 		done
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
