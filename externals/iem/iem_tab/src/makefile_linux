@@ -2,14 +2,16 @@ current: all
 
 .SUFFIXES: .pd_linux
 
-INCLUDE = -I. -I/usr/local/src/pd/src
+PD_INCLUDE=/usr/local/src/pd/src
+
+INCLUDE = -I. -I$(PD_INCLUDE)
 
 LDFLAGS = -export-dynamic -shared
 LIB = -ldl -lm
 
 #select either the DBG and OPT compiler flags below:
 
-CFLAGS = -DPD -DUNIX -W -Werror -Wno-unused \
+CFLAGS = -DPD -DUNIX -W -Wno-unused \
 	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
         -DDL_OPEN -fPIC
 
