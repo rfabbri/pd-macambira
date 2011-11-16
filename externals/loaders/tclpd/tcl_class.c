@@ -208,6 +208,11 @@ void tclpd_free(t_tcl *x) {
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
 
+    // remove obj instance -> classname mapping
+    char delmapcmd[256];
+    snprintf(delmapcmd, 256, "unset ::pd::classname(%s)", Tcl_GetStringFromObj(x->self, NULL));
+    Tcl_Eval(tclpd_interp, delmapcmd);
+
     // here ends the lifetime of x->classname and x->self
     Tcl_DecrRefCount(x->self);
     Tcl_DecrRefCount(x->classname);
