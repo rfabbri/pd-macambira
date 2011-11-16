@@ -134,7 +134,11 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         error("packxbee_TX: first argument is not a hex string");
         return;
     }
-    if (x->x_verbosity > 0) post ("packxbee_TX: dest64:0x%I64X", dest64);
+#ifdef _MSC_VER
+    if (x->x_verbosity > 0) post ("packxbee_TX: dest64:0x%016I64X", dest64);
+#else
+    if (x->x_verbosity > 0) post ("packxbee_TX: dest64:0x%016LX", dest64);
+#endif
     /* second arg is dest16 also a symbol starting with "0x" */
     if (argv[1].a_type != A_SYMBOL)
     {
@@ -244,7 +248,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         {
             if (x->x_verbosity > 0)  post("packxbee_TX symbol parameter %s", argv[k].a_w.w_symbol->s_name);
             j = i;
-            i += sprintf(&floatstring[i], "%s", argv[k].a_w.w_symbol->s_name);
+            i += sprintf((char *)&floatstring[i], "%s", argv[k].a_w.w_symbol->s_name);
             for (;j < i; ++j) checksum -= floatstring[j];
         }
         else
@@ -336,7 +340,11 @@ static void packxbee_pack_remote_frame(t_packxbee *x, t_symbol *s, int argc, t_a
             error("packxbee_pack_remote_frame: first argument is not a hex string");
             return;
         }
-        if (x->x_verbosity > 0) post ("packxbee_pack_remote_frame: dest64:0x%I64X", dest64);
+#ifdef _MSC_VER
+        if (x->x_verbosity > 0) post ("packxbee_pack_remote_frame: dest64:0x%016I64X", dest64);
+#else
+        if (x->x_verbosity > 0) post ("packxbee_pack_remote_frame: dest64:0x%016LX", dest64);
+#endif
         /* second arg is dest16 also a symbol starting with "0x" */
         if (argv[1].a_type != A_SYMBOL)
         {
@@ -440,7 +448,7 @@ static void packxbee_pack_remote_frame(t_packxbee *x, t_symbol *s, int argc, t_a
                 if (x->x_verbosity > 0)  post("packxbee_pack_remote_frame symbol parameter %s", argv[4].a_w.w_symbol->s_name);
                 if (('0' == argv[4].a_w.w_symbol->s_name[0])&&(('x' == argv[4].a_w.w_symbol->s_name[1])))
                 { /* this is a hexadecimal number: strip the "0x" and copy the rest to the buffer as ascii digits */
-                    i += sprintf(&floatstring[i], "%s", &argv[4].a_w.w_symbol->s_name[2]);
+                    i += sprintf((char *)&floatstring[i], "%s", &argv[4].a_w.w_symbol->s_name[2]);
                 }
                 else // if ((0 == strncmp("NI", argv[0].a_w.w_symbol->s_name, 2))||(0 == strncmp("DN", argv[0].a_w.w_symbol->s_name, 2)))
                 { /* we hope it's just an ascii string for the NI command */
@@ -568,7 +576,7 @@ static void packxbee_pack_frame(t_packxbee *x, t_symbol *s, int argc, t_atom *ar
                 if (x->x_verbosity > 0)  post("packxbee_AT symbol parameter %s", argv[1].a_w.w_symbol->s_name);
                 if (('0' == argv[1].a_w.w_symbol->s_name[0])&&(('x' == argv[1].a_w.w_symbol->s_name[1])))
                 { /* this is a hexadecimal number: strip the "0x" and copy the rest to the buffer as ascii digits */
-                    i += sprintf(&floatstring[i], "%s", &argv[1].a_w.w_symbol->s_name[2]);
+                    i += sprintf((char *)&floatstring[i], "%s", &argv[1].a_w.w_symbol->s_name[2]);
                 }
                 else // if ((0 == strncmp("NI", argv[0].a_w.w_symbol->s_name, 2))||(0 == strncmp("DN", argv[0].a_w.w_symbol->s_name, 2)))
                 { /* we hope it's just an ascii string for the NI command */

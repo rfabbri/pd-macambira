@@ -281,7 +281,11 @@ buf[9]: 214 [0xD6]
                 addr64 |= x->x_message[16];
                 addr64 <<= 8;
                 addr64 |= x->x_message[17];
-                sprintf(floatstring, "0x%I64X", addr64);
+#ifdef _MSC_VER
+                sprintf(floatstring, "0x%016I64X", addr64);
+#else
+                sprintf(floatstring, "0x%016LX", addr64);
+#endif
                 SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* addr64 */
                 statuslength++;
 /* 
@@ -399,7 +403,11 @@ buf[28]: 36 [0x24] checksum
             addr64 |= x->x_message[i++];
             addr64 <<= 8;
             addr64 |= x->x_message[i++];
-            sprintf(floatstring, "0x%I64X", addr64);
+#ifdef _MSC_VER
+            sprintf(floatstring, "0x%016I64X", addr64);
+#else
+            sprintf(floatstring, "0x%016LX", addr64);
+#endif
             SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* addr64 */
             statuslength++;
             /* 16-bit source address */
