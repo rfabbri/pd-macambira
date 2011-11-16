@@ -70,8 +70,7 @@ namespace eval ::pd {
     }
 
     proc read_class_options {classname options} {
-        set patchable_flag 1
-        set noinlet_flag 0
+        set flag $::CLASS_DEFAULT
 
         foreach {k v} $options {
             switch -- $k {
@@ -79,19 +78,20 @@ namespace eval ::pd {
                     if {$v != 0 && $v != 1} {
                         return -code error [error_msg "-patchable must be 0/1"]
                     }
-                    set patchable_flag $v
+                    set flag [expr {$flag|($::CLASS_PATCHABLE*$v)}]
                 }
                 -noinlet {
                     if {$v != 0 && $v != 1} {
                         return -code error [error_msg "-noinlet must be 0/1"]
                     }
-                    set noinlet_flag $v
+                    set flag [expr {$flag|($::CLASS_NOINLET*$v)}]
                 }
                 default {
                     return -code error [error_msg "unknown option: $k"]
                 }
             }
         }
+        # TODO: c->c_gobj = (typeflag >= CLASS_GOBJ)
 
         proc ::${classname}::dispatcher {self function args} "
             if {\$function eq {method}} {
@@ -126,12 +126,6 @@ namespace eval ::pd {
 
 	# some dummy function to suppress eventual errors if they are not deifned:
 	proc ::${classname}::0_loadbang {self} {}
-
-        # TODO: c->c_gobj = (typeflag >= CLASS_GOBJ)
-        set flag [expr {
-            8 * ($noinlet_flag != 0) +
-            3 * ($patchable_flag != 0)
-        }]
 
         return $flag
     }
