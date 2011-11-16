@@ -127,6 +127,11 @@ t_tcl * tclpd_new(t_symbol *classsym, int ac, t_atom *at) {
     snprintf(sd, 64, "::%s::dispatcher", name);
     x->dispatcher = Tcl_NewStringObj(sd, -1);
 
+    // obj instance -> classname mapping
+    char addmapcmd[256];
+    snprintf(addmapcmd, 256, "array set ::pd::classname {{%s} {%s}}", so, name);
+    Tcl_Eval(tclpd_interp, addmapcmd);
+
     // the lifetime of x->{classname,self,dispatcher} is greater than this
     // function, hence they get an extra Tcl_IncrRefCount here:
     //      (see tclpd_free())
