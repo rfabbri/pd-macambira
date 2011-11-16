@@ -2,6 +2,8 @@ current: all
 
 .SUFFIXES: .pd_linux
 
+#edit or define outside
+
 PD_INCLUDE=/usr/local/src/pd/src
 
 INCLUDE = -I. -I$(PD_INCLUDE)
@@ -12,14 +14,15 @@ LIB = -ldl -lm
 #select either the DBG and OPT compiler flags below:
 
 CFLAGS = -DPD -DUNIX -W -Wno-unused \
-	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
-        -DDL_OPEN -fPIC
+	-Wno-parentheses -Wno-switch -O2 -funroll-loops -fomit-frame-pointer \
+        -fno-strict-aliasing -DDL_OPEN -fPIC
 
 SYSTEM = $(shell uname -m)
 
 # the sources
 
-SRC = tab_abs.c \
+SRC = \
+	tab_abs.c \
 	tab_add.c \
 	tab_add_scalar.c \
 	tab_carth2polar.c \
