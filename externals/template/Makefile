@@ -386,7 +386,9 @@ dpkg-source:
 	cd .. && dpkg-source -b $(LIBRARY_NAME)
 
 etags:
-	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
+	etags $(wildcard $(PD_INCLUDE)/*.h)
+	etags -a *.h $(SOURCES)
+	etags -a --language=none --regex="/proc[ \t]+\([^ \t]+\)/\1/" *.tcl
 
 showsetup:
 	@echo "CC: $(CC)"
