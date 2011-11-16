@@ -17,8 +17,8 @@
 #define VBAP_VERSION "vbap - v1.0.3.2 - 20 Nov 2010 - (c) Ville Pulkki 1999-2006 (Pd port by HCS)"
 #define DFLS_VERSION "define_loudspeakers - v1.0.3.2 - 20 Nov 2010 - (c) Ville Pulkki 1999-2006"
 
-static float rad2ang = 360.0 / ( 2.0f * M_PI );
-static float atorad = (2.0f * M_PI) / 360.0f ;
+static t_float rad2ang = 360.0 / ( 2.0f * M_PI );
+static t_float atorad = (2.0f * M_PI) / 360.0f ;
 
 #ifdef VBAP_OBJECT
 	// We are inside vbap object, so sending matrix from define_loudspeakers is a simple call to the vbap receiver...
@@ -35,11 +35,11 @@ static float atorad = (2.0f * M_PI) / 360.0f ;
 /* A struct for a loudspeaker instance */
 typedef struct 
 {  					// distance value is 1.0 == unit vectors
-  float x;  // cartesian coordinates
-  float y;
-  float z;
-  float azi;  // polar coordinates
-  float ele;
+  t_float x;  // cartesian coordinates
+  t_float y;
+  t_float z;
+  t_float azi;  // polar coordinates
+  t_float ele;
   int channel_nbr;  // which speaker channel number 
 } t_ls;
 
@@ -47,7 +47,7 @@ typedef struct
 typedef struct t_ls_set 
 {
   int ls_nos[3];  // channel numbers
-  float inv_mx[9]; // inverse 3x3 or 2x2 matrix
+  t_float inv_mx[9]; // inverse 3x3 or 2x2 matrix
   struct t_ls_set *next;  // next set (triplet or pair)
 } t_ls_set;
 
@@ -55,15 +55,15 @@ typedef struct t_ls_set
 	typedef struct vbap				/* This defines the object as an entity made up of other things */
 	{
 		t_object x_obj;				
-		float x_azi; 	// panning direction azimuth
-		float x_ele;		// panning direction elevation			
+		t_float x_azi; 	// panning direction azimuth
+		t_float x_ele;		// panning direction elevation			
 		void *x_outlet0;				/* outlet creation - inlets are automatic */
 		void *x_outlet1;				
 		void *x_outlet2;				
 		void *x_outlet3;				
 		void *x_outlet4;				
-		float x_set_inv_matx[MAX_LS_SETS][9];  // inverse matrice for each loudspeaker set
-		float x_set_matx[MAX_LS_SETS][9];      // matrice for each loudspeaker set
+		t_float x_set_inv_matx[MAX_LS_SETS][9];  // inverse matrice for each loudspeaker set
+		t_float x_set_matx[MAX_LS_SETS][9];      // matrice for each loudspeaker set
 		long x_lsset[MAX_LS_SETS][3];          // channel numbers of loudspeakers in each LS set 
 		long x_lsset_available;                // have loudspeaker sets been defined with define_loudspeakers
 		long x_lsset_amount;								   // amount of loudspeaker sets
@@ -75,7 +75,7 @@ typedef struct t_ls_set
 		long x_spread;                         // speading amount of virtual source (0-100)
 		double x_gain;                         // general gain control (0-2)
 # endif /* PD */
-		float x_spread_base[3];                // used to create uniform spreading
+		t_float x_spread_base[3];                // used to create uniform spreading
 
 		// define_loudspeaker data
 		long x_ls_read;	 						// 1 if loudspeaker directions have been read
