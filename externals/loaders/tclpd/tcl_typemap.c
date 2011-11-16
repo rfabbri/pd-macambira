@@ -1,5 +1,6 @@
 #include "tclpd.h"
 #include <string.h>
+#include <stdlib.h>
 
 static const char *atomtype_map[] = {
   /* A_NULL */     "null",
@@ -14,7 +15,9 @@ static const char *atomtype_map[] = {
   /* A_DOLLSYM */  "dollsym",
   /* A_GIMME */    "gimme",
   /* A_CANT */     "cant",
+#ifdef A_BLOB
   /* A_BLOB */     "blob"
+#endif
 };
 
 #define atomtype_map_size (sizeof(atomtype_map)/sizeof(atomtype_map[0]))
@@ -95,10 +98,11 @@ int tcl_to_pdatom(Tcl_Obj *input, t_atom *output) {
             SETSYMBOL(output, gensym(Tcl_GetStringFromObj(obj[1], 0)));
             break;
         }
-        case A_GIMME:
-        case A_CANT:
-        case A_BLOB:
-        case A_NULL:
+        // case A_GIMME:
+        // case A_CANT:
+        // case A_BLOB:
+        // case A_NULL:
+        default:
         {
             // TODO: set error result
             return TCL_ERROR;
@@ -153,7 +157,9 @@ int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
         }
         case A_GIMME:
         case A_CANT:
+#ifdef A_BLOB
         case A_BLOB:
+#endif
         case A_NULL:
         default:
         {
