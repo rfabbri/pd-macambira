@@ -810,7 +810,7 @@ static void dumpOSC_PrintTypeTaggedArgs(t_dumpOSC *x, void *v, int n) {
 
     case 'f': {
       int i = ntohl(*((int *) p));
-      float *floatp = ((float *) (&i));
+      t_float *floatp = ((t_float *) (&i));
 #ifdef DEBUG
       post("float: %f", *floatp);
 #endif
@@ -893,7 +893,7 @@ static void dumpOSC_PrintTypeTaggedArgs(t_dumpOSC *x, void *v, int n) {
 
 static void dumpOSC_PrintHeuristicallyTypeGuessedArgs(t_dumpOSC *x, void *v, int n, int skipComma) {
   int i, thisi;
-  float thisf;
+  t_float thisf;
   int *ints;
   char *chars;
   char *string, *nextString;
@@ -911,7 +911,7 @@ static void dumpOSC_PrintHeuristicallyTypeGuessedArgs(t_dumpOSC *x, void *v, int
     string = &chars[i*4];
     thisi = ntohl(ints[i]);
     /* Reinterpret the (potentially byte-reversed) thisi as a float */
-    thisf = *(((float *) (&thisi)));
+    thisf = *(((t_float *) (&thisi)));
 
     if  (thisi >= -1000 && thisi <= 1000000) {
 #ifdef DEBUG

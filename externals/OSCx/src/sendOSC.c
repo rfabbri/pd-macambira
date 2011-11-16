@@ -81,7 +81,7 @@ typedef struct
   union
   {
         int i;
-        float f;
+        t_float f;
         char *s;
     } datum;
 } typedArg;
@@ -152,7 +152,7 @@ void sendOSC_openbundle(t_sendOSC *x)
     return;
   }
   x->x_bundle = 1;
-  outlet_float(x->x_bdpthout, (float)x->x_oscbuf->bundleDepth);
+  outlet_float(x->x_bdpthout, (t_float)x->x_oscbuf->bundleDepth);
 }
 
 static void sendOSC_closebundle(t_sendOSC *x)
@@ -162,7 +162,7 @@ static void sendOSC_closebundle(t_sendOSC *x)
     error("Problem closing bundle: %s\n", OSC_errorMessage);
     return;
   }
-  outlet_float(x->x_bdpthout, (float)x->x_oscbuf->bundleDepth);
+  outlet_float(x->x_bdpthout, (t_float)x->x_oscbuf->bundleDepth);
   // in bundle mode we send when bundle is closed?
   if(!OSC_isBufferEmpty(x->x_oscbuf) > 0 && OSC_isBufferDone(x->x_oscbuf))
   {
@@ -190,7 +190,7 @@ static void sendOSC_settypetags(t_sendOSC *x, t_float *f)
 
 static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv) // t_symbol *hostname, t_floatarg fportno, int argc, t_atom *argv)
 {
-  float fportno=0;
+  t_float fportno=0;
   t_symbol *hostname;
   int portno = fportno;
   short ttl=-1;
