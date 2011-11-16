@@ -32,7 +32,8 @@ endif
 #STRIP = strip --strip-unneeded -R .note -R .comment
 STRIP = echo
 
-OPT_CFLAGS = -g
+DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE
+OPT_CFLAGS = 
 
 TARGET_PLATFORM := $(shell uname -m)
 ifeq ($(TARGET_PLATFORM),i686)
@@ -46,6 +47,8 @@ endif
 ifeq ($(TARGET_PLATFORM),ppc)
   OPT_CFLAGS += -pipe -fsigned-char -mpowerpc
 endif
+
+OPT_CFLAGS += $(DEBUG_CFLAGS)
 
 # lots more here: http://www.gentoo.se/docs/doc-cflags.php
 

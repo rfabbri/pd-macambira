@@ -17,12 +17,14 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #STRIP = strip --strip-unneeded -R .note -R .comment
 STRIP = echo
 
-OPT_CFLAGS = -g
+DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE
+OPT_CFLAGS = 
 
 # compile for pentium4 so we can use SSE2
 OPT_CFLAGS += -march=pentium4 -msse2 -mfpmath=sse
 OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=1
 
+OPT_CFLAGS += $(DEBUG_CFLAGS)
 
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree

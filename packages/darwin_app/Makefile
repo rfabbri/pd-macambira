@@ -27,11 +27,12 @@ WISH_CONTENTS = "$(WISH)/Contents"
 #STRIP = strip -x
 STRIP = echo
 
+DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE
+
 # CPU-specific gleaned from:
 # http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
 # http://hpc.sourceforge.net/
-
-OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=1 -g
+OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=1
 
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
@@ -46,7 +47,7 @@ else
   OPT_CFLAGS += -mcpu=7450 -mtune=7450
 endif
 
-OPT_FLAGS += -DDEBUG_SOUNDFILE
+OPT_CFLAGS += $(DEBUG_CFLAGS)
 
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
