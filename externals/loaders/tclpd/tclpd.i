@@ -91,7 +91,7 @@ void name_setitem(type *ary, int index, type value)
 }
 
 %typemap(in) t_text * {
-    int res = SWIG_ConvertPtr($input, &$1, SWIGTYPE_p__text, 0 |  0 );
+    int res = SWIG_ConvertPtr($input, &$1, $1_descriptor, 0 |  0 );
     if(!SWIG_IsOK(res)) {
         const char *str = Tcl_GetStringFromObj($input, NULL);
         t_tcl *x = object_table_get(str);
