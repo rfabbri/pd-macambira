@@ -287,6 +287,9 @@ $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o tcl_wrap.o $(TCLPD_SOURCES:.
 $(SHARED_LIB): $(SHARED_SOURCE:.c=.o)
 	$(CC) $(SHARED_LDFLAGS) -o $(SHARED_LIB) $(SHARED_SOURCE:.c=.o) $(LIBS)
 
+test:
+	make -C tests
+
 install: single_install
 
 # The meta and help files are explicitly installed to make sure they are
@@ -352,6 +355,7 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).o
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 	-rm -f -- $(SHARED_LIB)
+	make -C tests clean
 
 distclean: clean
 	-rm -f -- $(DISTBINDIR).tar.gz
