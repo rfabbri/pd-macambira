@@ -23,7 +23,7 @@ typedef struct _unpackxbee
     unsigned int    x_frame_length;
     int             x_verbosity;
     unsigned char   x_message[MAX_XBEE_PACKET_LENGTH];
-    int             x_message_index;
+    unsigned int    x_message_index;
     int             x_escaped;
     t_atom          x_outbuf[MAX_XBEE_PACKET_LENGTH];
     t_atom          x_statusbuf[32]; /* some number bigger than we will ever reach */
@@ -48,7 +48,7 @@ static void *unpackxbee_new(t_floatarg f)
 
         if (1 == f) x->x_api_mode = 1;
         else x->x_api_mode = 2; /* default to escaped mode */
-        x->x_verbosity = 2; /* debug level */
+        x->x_verbosity = 0; /* debug level */
         for(i = 0; i < MAX_XBEE_PACKET_LENGTH; ++i) x->x_outbuf[i].a_type = A_FLOAT; /* init output atoms as floats */
     }
     return (x);
@@ -70,7 +70,7 @@ int unpackxbee_add(t_unpackxbee *x, unsigned char d)
 {
     if (XFRAME == d)
     {
-        if (x->x_verbosity > 1) post ("frame start");
+        if (x->x_verbosity > 0) post ("frame start");
         x->x_message_index = 0;
         x->x_frame_length = 0;
         x->x_frame_type = 0;
@@ -92,17 +92,17 @@ int unpackxbee_add(t_unpackxbee *x, unsigned char d)
     if (LENGTH_LSB_INDEX == x->x_message_index) /* length is a bigendian pair */
     {
         x->x_frame_length = (x->x_message[LENGTH_MSB_INDEX]<<8) + d;
-        if (x->x_verbosity > 1) post ("frame length %d", x->x_frame_length);
+        if (x->x_verbosity > 0) post ("frame length %d", x->x_frame_length);
     }
     else if (FRAME_TYPE_INDEX == x->x_message_index)
     {
         x->x_frame_type = d;
-        if (x->x_verbosity > 1) post ("frame type 0x%02X", x->x_frame_type);
+        if (x->x_verbosity > 0) post ("frame type 0x%02X", x->x_frame_type);
     }
     else if (FRAME_ID_INDEX == x->x_message_index)
     { /* this is part of the payload and may not be valid in some frame types */
         x->x_frame_ID = d;
-        if (x->x_verbosity > 1) post ("frame ID %d", x->x_frame_ID);
+        if (x->x_verbosity > 0) post ("frame ID %d", x->x_frame_ID);
     }
     x->x_message[x->x_message_index++] = d; /* add the unescaped character to the output list */
     return 1;
@@ -121,14 +121,14 @@ static void unpackxbee_input(t_unpackxbee *x, t_symbol *s, int argc, t_atom *arg
     unsigned long long  addr64;
     unsigned int        addr16;
 
-    if (x->x_verbosity > 1) post("unpackxbee_input: s is %s, argc is %d", s->s_name, argc);
+    if (x->x_verbosity > 0) post("unpackxbee_input: s is %s, argc is %d", s->s_name, argc);
     for (i = 0; i < argc; ++i)
     {
         if (A_FLOAT == argv[i].a_type)
         {
             f = argv[i].a_w.w_float;
             d = ((unsigned int)f)&0x0FF;
-            if (x->x_verbosity > 1) post("unpackxbee_input: argv[%d] is %f int is %d", i, f, d);
+            if (x->x_verbosity > 0) post("unpackxbee_input: argv[%d] is %f int is %d", i, f, d);
             if (f != d)
             {
                 post ("unpackxbee_input not a positive integer from 0 to 255");
@@ -141,7 +141,7 @@ static void unpackxbee_input(t_unpackxbee *x, t_symbol *s, int argc, t_atom *arg
     if ((x->x_frame_length > 0)&&(x->x_frame_length + 4 == x->x_message_index))
     { /* end of frame reached */
         k = x->x_frame_length+4; /* total packet length is payload + 1 start 2 length 1 checksum*/
-        if(x->x_verbosity > 1)
+        if(x->x_verbosity > 0)
         {
             post("frame end");
             for (j = 0; j < k; ++j)
@@ -160,7 +160,7 @@ static void unpackxbee_input(t_unpackxbee *x, t_symbol *s, int argc, t_atom *arg
             post("unpackxbee: wrong checksum; dropping packet");
             return;
         }
-        if(x->x_verbosity > 1) post("unpackxbee checksum %d [0x%02X]", checksum, checksum);
+        if(x->x_verbosity > 0) post("unpackxbee checksum %d [0x%02X]", checksum, checksum);
         switch(x->x_frame_type)
         {
             case AT_Command:
@@ -230,7 +230,7 @@ static void unpackxbee_input(t_unpackxbee *x, t_symbol *s, int argc, t_atom *arg
             ||(AT_Command_Queue_Parameter_Value == x->x_frame_type)
         )
         {
-            if (x->x_verbosity > 1) 
+            if (x->x_verbosity > 0) 
                 post("AT_Command_Response  AT_Command AT_Command_Queue_Parameter_Value statuslength %d", statuslength);
             SETFLOAT(&x->x_statusbuf[statuslength], x->x_frame_ID);
             statuslength++;
@@ -257,8 +257,8 @@ buf[6]: 68 [0x44] D
 buf[7]: 0 [0x00] status
 */
                 addr16 = (x->x_message[8]<<8) + x->x_message[9];
-                sprintf(floatstring, "0x%X", addr16);
-                SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring));
+                sprintf((char *)floatstring, "0x%X", addr16);
+                SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring));
                 statuslength++;
 /*
 buf[8]: 121 [0x79] MY
@@ -282,11 +282,11 @@ buf[9]: 214 [0xD6]
                 addr64 <<= 8;
                 addr64 |= x->x_message[17];
 #ifdef _MSC_VER
-                sprintf(floatstring, "0x%016I64X", addr64);
+                sprintf((char *)floatstring, "0x%016I64X", addr64);
 #else
-                sprintf(floatstring, "0x%016LX", addr64);
+                sprintf((char *)floatstring, "0x%016LX", addr64);
 #endif
-                SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* addr64 */
+                SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* addr64 */
                 statuslength++;
 /* 
 buf[10]: 0 [0x00] SH
@@ -307,16 +307,16 @@ buf[17]: 30 [0x1E]
                         break;/* Node Identifier should be a null-terminated ascii string */
                     }
                 }
-                SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* Node Identifier */
+                SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* Node Identifier */
                 statuslength++;
 /*
 buf[18]: 32 [0x20] NI
 buf[19]: 0 [0x00]
 */
                 addr16 = (x->x_message[i]<<8) + x->x_message[i+1];
-                sprintf(floatstring, "0x%X", addr16);
+                sprintf((char *)floatstring, "0x%X", addr16);
                 i += 2;
-                SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* parent addr16 */
+                SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* parent addr16 */
                 statuslength++;
 /*
 buf[20]: 255 [0xFF] parent
@@ -334,17 +334,17 @@ buf[23]: 0 [0x00] source event
 */
                 addr16 = x->x_message[i++]<<8;
                 addr16 |= x->x_message[i++];
-                sprintf(floatstring, "0x%X", addr16);
-                SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* Profile ID */
+                sprintf((char *)floatstring, "0x%X", addr16);
+                SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* Profile ID */
                 statuslength++;
 /*
 buf[24]: 193 [0xC1] Profile ID
 buf[25]: 5 [0x05]
 */
                 addr16 = (x->x_message[i]<<8) + x->x_message[i+1];
-                sprintf(floatstring, "0x%X", addr16);
+                sprintf((char *)floatstring, "0x%X", addr16);
                 i += 2;
-                SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* Manufacturer ID */
+                SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* Manufacturer ID */
                 statuslength++;
 /*
 buf[26]: 16 [0x10] Manufacturer ID
@@ -361,9 +361,71 @@ buf[28]: 36 [0x24] checksum
                 payloadstart = 8;
             }
         }
+/* RAT */
+        if (Remote_Command_Response == x->x_frame_type)
+        {
+            if (x->x_verbosity > 0) 
+                post("Remote_Command_Response statuslength %d", statuslength);
+            SETFLOAT(&x->x_statusbuf[statuslength], x->x_frame_ID);
+            statuslength++;
+/*
+buf[0]: 126 [0x7E] packet start
+buf[1]: 0 [0x00] Length MSB
+
+buf[2]: 25 [0x19] Length LSB
+buf[3]: 151 [0x97] remote response frame type
+buf[4]: 5 [0x05] packet ID
+buf[5-12]: 0 [0x00] 64-bit source (remote) address
+buf[13-14]: 68 [0x44] 16-bit source address
+buf[15-16]: AT command
+buf[17]: status
+buf[18...] data
+*/
+
+            addr64 = x->x_message[5]; 
+            addr64 <<= 8;
+            addr64 |= x->x_message[6];
+            addr64 <<= 8;
+            addr64 |= x->x_message[7];
+            addr64 <<= 8;
+            addr64 |= x->x_message[8];
+            addr64 <<= 8;
+            addr64 |= x->x_message[9];
+            addr64 <<= 8;
+            addr64 |= x->x_message[10];
+            addr64 <<= 8;
+            addr64 |= x->x_message[11];
+            addr64 <<= 8;
+            addr64 |= x->x_message[12];
+#ifdef _MSC_VER
+            sprintf((char *)floatstring, "0x%016I64X", addr64);
+#else
+            sprintf((char *)floatstring, "0x%016LX", addr64);
+#endif
+            SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* addr64 */
+            statuslength++;
+
+            addr16 = (x->x_message[13]<<8) + x->x_message[14];
+            sprintf((char *)floatstring, "0x%X", addr16);
+            SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring));
+            statuslength++;
+            atbuf[0] = x->x_message[15]; /* the remote AT command string */
+            atbuf[1] = x->x_message[16];
+            atbuf[2] = '\0';
+            SETSYMBOL(&x->x_statusbuf[statuslength], gensym(atbuf));
+            statuslength++;
+
+            SETFLOAT(&x->x_statusbuf[statuslength], x->x_message[17]);/* AT command status */
+            statuslength++;
+            /* data doesn't include 1byte frame type 1byte ID 8byte addr64 2byte addr16 2byte AT command 1byte status = 15bytes */
+            SETFLOAT(&x->x_statusbuf[statuslength], x->x_frame_length-15);
+            statuslength++;
+            payloadstart = 18;
+         }
+/* RAT */
         else if (ZigBee_Transmit_Status == x->x_frame_type)
         {
-            if (x->x_verbosity > 1) 
+            if (x->x_verbosity > 0) 
                 post("ZigBee_Transmit_Status statuslength %d", statuslength);
             SETFLOAT(&x->x_statusbuf[statuslength], x->x_frame_ID);
             statuslength++;
@@ -380,7 +442,7 @@ buf[28]: 36 [0x24] checksum
         }
         else if (ZigBee_Receive_Packet == x->x_frame_type)
         {
-            if (x->x_verbosity > 1) 
+            if (x->x_verbosity > 0) 
                 post("ZigBee_Receive_Packet statuslength %d", statuslength);
             /* data doesn't include 1byte frametype, 8byte addr64, 2byte addr16, 1byte options = 12bytes*/
             SETFLOAT(&x->x_statusbuf[statuslength], x->x_frame_length-12);
@@ -404,17 +466,17 @@ buf[28]: 36 [0x24] checksum
             addr64 <<= 8;
             addr64 |= x->x_message[i++];
 #ifdef _MSC_VER
-            sprintf(floatstring, "0x%016I64X", addr64);
+            sprintf((char *)floatstring, "0x%016I64X", addr64);
 #else
-            sprintf(floatstring, "0x%016LX", addr64);
+            sprintf((char *)floatstring, "0x%016LX", addr64);
 #endif
-            SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* addr64 */
+            SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* addr64 */
             statuslength++;
             /* 16-bit source address */
             addr16 = x->x_message[i++]<<8;
             addr16 |= x->x_message[i++];
-            sprintf(floatstring, "0x%X", addr16);
-            SETSYMBOL(&x->x_statusbuf[statuslength], gensym(floatstring)); /* addr16 */
+            sprintf((char *)floatstring, "0x%X", addr16);
+            SETSYMBOL(&x->x_statusbuf[statuslength], gensym((char *)floatstring)); /* addr16 */
             statuslength++;
             /* receive options byte */
             SETFLOAT(&x->x_statusbuf[statuslength], x->x_message[i++]);/* 1 2 32 64 */
@@ -424,7 +486,7 @@ buf[28]: 36 [0x24] checksum
         }
         else
         {
-            if (x->x_verbosity > 1) 
+            if (x->x_verbosity > 0) 
                 post("some other packet statuslength %d", statuslength);
             SETFLOAT(&x->x_statusbuf[statuslength], x->x_frame_ID);/* may not be valid */
             statuslength++;

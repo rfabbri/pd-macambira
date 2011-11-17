@@ -46,7 +46,7 @@ static void *packxbee_new(t_floatarg f)
         x->x_listout = outlet_new(&x->x_obj, &s_list);
         if (1 == f) x->x_api_mode = 1;
         else x->x_api_mode = 2; /* default to escaped mode */
-        x->x_verbosity = 2; /* debug level */
+        x->x_verbosity = 0; /* debug level */
         for(i = 0; i < MAX_XBEE_PACKET_LENGTH; ++i) x->x_outbuf[i].a_type = A_FLOAT; /* init output atoms as floats */
     }
     return (x);
@@ -135,9 +135,9 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
 #ifdef _MSC_VER
-    if (x->x_verbosity > 0) post ("packxbee_TX: dest64:0x%016I64X", dest64);
+    if (x->x_verbosity > 1) post ("packxbee_TX: dest64:0x%016I64X", dest64);
 #else
-    if (x->x_verbosity > 0) post ("packxbee_TX: dest64:0x%016LX", dest64);
+    if (x->x_verbosity > 1) post ("packxbee_TX: dest64:0x%016LX", dest64);
 #endif
     /* second arg is dest16 also a symbol starting with "0x" */
     if (argv[1].a_type != A_SYMBOL)
@@ -156,7 +156,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         error("packxbee_TX: second argument is not a hex string");
         return;
     }
-    if (x->x_verbosity > 0) post ("packxbee_TX: dest16: 0x%X", dest16);
+    if (x->x_verbosity > 1) post ("packxbee_TX: dest16: 0x%X", dest16);
     /* broadcast radius is a single byte as a float */
     if (argv[2].a_type != A_FLOAT)
     {
@@ -164,7 +164,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     f = argv[2].a_w.w_float;
-    if (x->x_verbosity > 0)  post("packxbee_TX float parameter %f", f);
+    if (x->x_verbosity > 1)  post("packxbee_TX float parameter %f", f);
     d = ((unsigned int)f)&0x0FF;
     if (f != d)
     {
@@ -172,7 +172,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     else broadcast_radius = d;
-    if (x->x_verbosity > 0)  post("packxbee_TX: broadcast_radius: %d", d);
+    if (x->x_verbosity > 1)  post("packxbee_TX: broadcast_radius: %d", d);
 
     /* options is a single byte as a float */
     if (argv[3].a_type != A_FLOAT)
@@ -181,7 +181,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     f = argv[3].a_w.w_float;
-    if (x->x_verbosity > 0)  post("packxbee_TX float parameter %f", f);
+    if (x->x_verbosity > 1)  post("packxbee_TX float parameter %f", f);
     d = ((unsigned int)f)&0x0FF;
     if (f != d)
     {
@@ -189,7 +189,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     else options = d;
-    if (x->x_verbosity > 0)  post("packxbee_TX: options: %d", d);
+    if (x->x_verbosity > 1)  post("packxbee_TX: options: %d", d);
 
     x->x_frameType = ZigBee_Transmit_Request;/* because we're building a queued AT frame */
     floatstring[0] = XFRAME; /* as usual */
@@ -234,7 +234,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         if (A_FLOAT == argv[k].a_type)
         {
             f = argv[k].a_w.w_float;
-            if (x->x_verbosity > 0)  post("packxbee_TX float parameter %f", f);
+            if (x->x_verbosity > 1)  post("packxbee_TX float parameter %f", f);
             d = ((unsigned int)f)&0x0FF;
             if (f != d)
             {
@@ -246,7 +246,7 @@ static void packxbee_TX(t_packxbee *x, t_symbol *s, int argc, t_atom *argv)
         }
         else if (A_SYMBOL == argv[k].a_type)
         {
-            if (x->x_verbosity > 0)  post("packxbee_TX symbol parameter %s", argv[k].a_w.w_symbol->s_name);
+            if (x->x_verbosity > 1)  post("packxbee_TX symbol parameter %s", argv[k].a_w.w_symbol->s_name);
             j = i;
             i += sprintf((char *)&floatstring[i], "%s", argv[k].a_w.w_symbol->s_name);
             for (;j < i; ++j) checksum -= floatstring[j];
@@ -307,7 +307,6 @@ static void packxbee_pack_remote_frame(t_packxbee *x, t_symbol *s, int argc, t_a
     unsigned char       floatstring[256]; /* longer than the longest hex number with each character escaped plus the header and checksum overhead */
     int                 length = 0;
     unsigned char       c, digits;
-    long                param;
     t_float             f;
 
     unsigned long long  dest64;
@@ -529,7 +528,6 @@ static void packxbee_pack_frame(t_packxbee *x, t_symbol *s, int argc, t_atom *ar
     unsigned char   floatstring[256]; /* longer than the longest hex number with each character escaped plus the header and checksum overhead */
     int             length = 0;
     unsigned char   c, digits;
-    long            param;
     t_float         f;
 
     if (x->x_verbosity > 0) post("packxbee_AT s is %s, argc is %d", s->s_name, argc);
