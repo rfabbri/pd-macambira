@@ -9,7 +9,7 @@
 #X obj 560 105 osc~ 90;
 #X obj 641 104 osc~ 100;
 #X text 485 225 "quaternion ring modulation";
-#X obj 47 264 unit-test-frame~;
+#X obj 47 264 testtools/unit-test-frame~;
 #X msg 402 51 0;
 #X msg 47 235 qmult~ 100;
 #X obj 47 208 loadbang;

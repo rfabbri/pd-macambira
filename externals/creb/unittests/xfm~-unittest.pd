@@ -1,6 +1,6 @@
 #N canvas 0 22 749 571 10;
 #X obj 369 228 creb/xfm~ 1;
-#X obj 48 281 unit-test-frame~;
+#X obj 48 281 testtools/unit-test-frame~;
 #X floatatom 369 196 5 0 0 0 - - -;
 #X floatatom 406 196 5 0 0 0 - - -;
 #X floatatom 456 196 5 0 0 0 - - -;

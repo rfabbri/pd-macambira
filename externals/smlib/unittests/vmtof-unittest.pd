@@ -1,5 +1,5 @@
 #N canvas 457 36 730 465 10;
-#X obj 40 153 unit-test-frame;
+#X obj 40 153 testtools/unit-test-frame;
 #X obj 40 88 loadbang;
 #X obj 361 95 smlib/vmtof;
 #X msg 40 118 vmtof 0;

@@ -1,6 +1,6 @@
 #N canvas 0 22 746 542 10;
 #X obj 352 71 creb/ratio;
-#X obj 31 139 unit-test-frame;
+#X obj 31 139 testtools/unit-test-frame;
 #X msg 31 112 ratio 0;
 #X obj 31 87 loadbang;
 #X text 104 41 ratio is an octave shifter.;

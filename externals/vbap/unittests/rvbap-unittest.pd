@@ -1,5 +1,5 @@
 #N canvas 90 22 726 609 10;
-#X obj 38 -190 unit-test-frame;
+#X obj 38 -190 testtools/unit-test-frame;
 #X text 383 -369 azimuth \, elevation \, spread and distance;
 #N canvas 0 22 450 300 tba 0;
 #X obj 143 51 inlet;

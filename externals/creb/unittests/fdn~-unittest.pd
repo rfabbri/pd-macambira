@@ -1,5 +1,5 @@
 #N canvas 98 70 727 466 10;
-#X obj 39 177 unit-test-frame~;
+#X obj 39 177 testtools/unit-test-frame~;
 #X obj 360 86 phasor~ 1;
 #X msg 411 57 0;
 #X obj 39 106 loadbang;

@@ -1,5 +1,5 @@
 #N canvas 407 51 722 560 10;
-#X obj 49 186 unit-test-frame;
+#X obj 49 186 testtools/unit-test-frame;
 #X obj 49 58 loadbang;
 #X msg 49 90 itov 0;
 #X text 118 41 - value of first class;

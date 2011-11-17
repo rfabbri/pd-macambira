@@ -9,7 +9,7 @@
 #X msg 475 80 12;
 #X text 55 21 stabilized scroll grid chaotic oscillator with scroll
 centers located on a line.;
-#X obj 77 220 unit-test-frame~;
+#X obj 77 220 testtools/unit-test-frame~;
 #X obj 398 159 -~ 1;
 #X obj 398 26 loadbang;
 #X obj 77 152 loadbang;

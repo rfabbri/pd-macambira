@@ -1,5 +1,5 @@
 #N canvas 0 22 856 657 10;
-#X obj 119 374 unit-test-frame~;
+#X obj 119 374 testtools/unit-test-frame~;
 #X msg 440 144 timefreq 1 23 10 \, timefreq 2 15 0 \, timefreq 3 1
 5 \, timefreq 5 1 8 \, timefreq 7 13 4 \, timefreq 11 11 12 \, timefreq
 17 2 32 \, timefreq 30 6 2;

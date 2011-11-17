@@ -1,7 +1,7 @@
 #N canvas 0 22 769 474 10;
 #X obj 306 162 creb/bitsplit~ 4;
 #X obj 306 117 osc~ 440;
-#X obj 78 203 unit-test-frame~;
+#X obj 78 203 testtools/unit-test-frame~;
 #X msg 351 82 0;
 #X obj 78 131 loadbang;
 #X msg 78 162 bitsplit~ 10;

@@ -13,7 +13,7 @@
 #X floatatom 431 -106 5 -1 1 0 - - -;
 #X text 434 278 lattice~ a lattice filter;
 #X text 434 291 creation argument sets order;
-#X obj 18 315 unit-test-frame~;
+#X obj 18 315 testtools/unit-test-frame~;
 #X obj 232 163 phasor~ 440;
 #X msg 295 137 0;
 #X obj 232 194 -~ 0.5;

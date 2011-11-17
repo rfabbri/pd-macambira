@@ -5,7 +5,7 @@
 #X obj 527 168 osc~ 60;
 #X obj 370 238 creb/qnorm~;
 #X msg 386 114 0;
-#X obj 70 282 unit-test-frame~;
+#X obj 70 282 testtools/unit-test-frame~;
 #X text 324 64 qnorm normalizes a quaternion signal to unit norm;
 #X msg 70 248 qnorm 100;
 #X obj 70 221 loadbang;

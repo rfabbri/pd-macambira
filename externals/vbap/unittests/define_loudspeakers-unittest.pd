@@ -21,7 +21,7 @@ the data to:;
 #X text 423 202 (3 azi1 ele1 azi2 ele2 ...);
 #X text 637 47 a 2D setup;
 #X text 679 77 a 3D setup;
-#X obj 56 355 unit-test-frame;
+#X obj 56 355 testtools/unit-test-frame;
 #X obj 377 14 t b b b b;
 #X msg 56 322 define-loudspeaker-unittest;
 #X obj 56 296 loadbang;

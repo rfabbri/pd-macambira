@@ -1,5 +1,5 @@
 #N canvas 0 22 692 541 10;
-#X obj 21 262 unit-test-frame~;
+#X obj 21 262 testtools/unit-test-frame~;
 #X msg 21 226 junction 12;
 #X obj 342 103 osc~ 440;
 #X obj 373 125 osc~ 550;

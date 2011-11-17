@@ -1,6 +1,6 @@
 #N canvas 0 22 744 443 10;
 #X obj 373 90 creb/bwin~ hann;
-#X obj 52 137 unit-test-frame~;
+#X obj 52 137 testtools/unit-test-frame~;
 #X obj 373 49 sig~ 1;
 #X obj 52 58 loadbang;
 #X msg 52 100 bwin~ 0;

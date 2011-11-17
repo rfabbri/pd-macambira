@@ -83,7 +83,7 @@ front). This is a classic 5.1 setup.;
 #X connect 29 0 28 0;
 #X restore 421 139 pd simple 5.1 example;
 #X obj 421 277 vbap/vbap 90 0 30;
-#X obj 100 371 unit-test-frame;
+#X obj 100 371 testtools/unit-test-frame;
 #X msg 100 342 vbap;
 #X floatatom 454 342 5 0 0 0 - - -;
 #X floatatom 487 322 5 0 0 0 - - -;

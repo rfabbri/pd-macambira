@@ -1,5 +1,5 @@
 #N canvas 167 104 735 504 10;
-#X obj 37 215 unit-test-frame~;
+#X obj 37 215 testtools/unit-test-frame~;
 #X obj 358 138 creb/blosc~ saw;
 #X msg 445 104 0;
 #X obj 37 139 loadbang;

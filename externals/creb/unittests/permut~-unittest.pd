@@ -1,6 +1,6 @@
 #N canvas 0 22 705 451 10;
 #X obj 342 105 creb/permut~;
-#X obj 21 164 unit-test-frame~;
+#X obj 21 164 testtools/unit-test-frame~;
 #X msg 21 125 permute~ 0;
 #X obj 21 95 loadbang;
 #X obj 342 76 phasor~ 440;

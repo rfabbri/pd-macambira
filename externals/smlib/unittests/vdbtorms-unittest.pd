@@ -1,5 +1,5 @@
 #N canvas 152 59 718 503 10;
-#X obj 34 193 unit-test-frame;
+#X obj 34 193 testtools/unit-test-frame;
 #X obj 34 128 loadbang;
 #X obj 376 100 list prepend;
 #X obj 445 52 t l;

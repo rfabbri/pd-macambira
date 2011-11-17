@@ -3,7 +3,7 @@
 #X obj 414 43 bang~;
 #X msg 414 70 0.25;
 #X msg 501 118 0;
-#X obj 48 224 unit-test-frame~;
+#X obj 48 224 testtools/unit-test-frame~;
 #X obj 48 150 loadbang;
 #X obj 438 145 phasor~ 220;
 #X obj 369 102 osc~ 120;
