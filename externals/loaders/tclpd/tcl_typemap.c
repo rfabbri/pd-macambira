@@ -142,7 +142,9 @@ int pdatom_to_tcl(t_atom *input, Tcl_Obj **output) {
         }
         case A_DOLLAR:
         {
-            tcl_t_atom[1] = Tcl_NewIntObj((int)input->a_w.w_index);
+            char dolbuf[8];
+            snprintf(dolbuf, 8, "$%d", (int)input->a_w.w_index);
+            tcl_t_atom[1] = Tcl_NewStringObj(dolbuf, -1);
             break;
         }
         case A_SEMI:
