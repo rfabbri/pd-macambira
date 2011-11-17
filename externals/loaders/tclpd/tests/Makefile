@@ -6,6 +6,8 @@ all:
 	@sh runtest.sh basic_output
 	@# basic input test - dispatching to correct methods
 	@sh runtest.sh basic_input
+	@# atoms conversion test & binbuf retrieval
+	@sh runtest.sh binbuf
 
 clean:
 	rm -fv *.out runtest-*.pd
