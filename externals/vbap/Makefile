@@ -1,4 +1,4 @@
-## Pd library template version 1.0.11
+## Pd library template version 1.0.12
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = vbap
@@ -26,6 +26,8 @@ EXTRA_DIST = define_loudspeakers.h max2pd.h vbap.h makefile.irix so_locations
 
 # unit tests and related files here, in the 'unittests' subfolder
 UNITTESTS = define-loudspeaker-unittest.wav define_loudspeakers-unittest.pd rvbap-unittest.pd rvbap-unittest.wav vbap-unittest.pd vbap-unittest.wav vbap.wav
+
+
 
 #------------------------------------------------------------------------------#
 #
@@ -155,7 +157,7 @@ ifeq ($(UNAME),Linux)
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
-  ALL_LDFLAGS += -rdynamic -shared -fPIC
+  ALL_LDFLAGS += -rdynamic -shared -fPIC -Wl,-rpath,"\$$ORIGIN",--enable-new-dtags
   SHARED_LDFLAGS += -Wl,-soname,$(SHARED_LIB) -shared
   ALL_LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
@@ -171,7 +173,7 @@ ifeq ($(UNAME),GNU)
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
-  ALL_LDFLAGS += -rdynamic -shared -fPIC
+  ALL_LDFLAGS += -rdynamic -shared -fPIC -Wl,-rpath,"\$$ORIGIN",--enable-new-dtags
   SHARED_LDFLAGS += -shared -Wl,-soname,$(SHARED_LIB)
   ALL_LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
@@ -187,7 +189,7 @@ ifeq ($(UNAME),GNU/kFreeBSD)
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
-  ALL_LDFLAGS += -rdynamic -shared -fPIC
+  ALL_LDFLAGS += -rdynamic -shared -fPIC -Wl,-rpath,"\$$ORIGIN",--enable-new-dtags
   SHARED_LDFLAGS += -shared -Wl,-soname,$(SHARED_LIB)
   ALL_LIBS += -lc $(LIBS_linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
@@ -233,10 +235,10 @@ ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS) $(OPT_CFLAGS)
 ALL_LDFLAGS := $(LDFLAGS) $(ALL_LDFLAGS)
 ALL_LIBS := $(LIBS) $(ALL_LIBS)
 
-SHARED_SOURCE ?= $(shell test ! -e lib$(LIBRARY_NAME).c || \
-	echo lib$(LIBRARY_NAME).c )
+SHARED_SOURCE ?= $(wildcard lib$(LIBRARY_NAME).c)
 SHARED_HEADER ?= $(shell test ! -e $(LIBRARY_NAME).h || echo $(LIBRARY_NAME).h)
 SHARED_LIB = $(SHARED_SOURCE:.c=.$(SHARED_EXTENSION))
+SHARED_TCL_LIB = $(wildcard lib$(LIBRARY_NAME).tcl)
 
 .PHONY = install libdir_install single_install install-doc install-examples install-manual install-unittests clean distclean dist etags $(LIBRARY_NAME)
 
@@ -276,6 +278,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) $(SHARED_LIB) install-doc install-ex
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(strip $(SHARED_TCL_LIB))" || \
+		$(INSTALL_DATA) $(SHARED_TCL_LIB) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
@@ -359,6 +364,8 @@ dist: $(DISTDIR)
 		$(INSTALL_DATA) $(SHARED_HEADER)  $(DISTDIR)
 	test -z "$(strip $(SHARED_SOURCE))" || \
 		$(INSTALL_DATA) $(SHARED_SOURCE)  $(DISTDIR)
+	test -z "$(strip $(SHARED_TCL_LIB))" || \
+		$(INSTALL_DATA) $(SHARED_TCL_LIB)  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
@@ -393,7 +400,9 @@ dpkg-source:
 	cd .. && dpkg-source -b $(LIBRARY_NAME)
 
 etags:
-	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
+	etags $(wildcard $(PD_INCLUDE)/*.h)
+	etags -a *.h $(SOURCES)
+	etags -a --language=none --regex="/proc[ \t]+\([^ \t]+\)/\1/" *.tcl
 
 showsetup:
 	@echo "CC: $(CC)"
@@ -412,6 +421,7 @@ showsetup:
 	@echo "SHARED_HEADER: $(SHARED_HEADER)"
 	@echo "SHARED_SOURCE: $(SHARED_SOURCE)"
 	@echo "SHARED_LIB: $(SHARED_LIB)"
+	@echo "SHARED_TCL_LIB: $(SHARED_TCL_LIB)"
 	@echo "PDOBJECTS: $(PDOBJECTS)"
 	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "ALLSOURCES TCL: $(wildcard $(ALLSOURCES:.c=.tcl))"
