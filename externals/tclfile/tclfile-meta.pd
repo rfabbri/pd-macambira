@@ -1,0 +1,7 @@
+#N canvas 141 142 200 200 10;
+#N canvas 25 49 420 300 META 0;
+#X text 10 9 VERSION 0;
+#X text 13 41 NAME tclfile;
+#X text 10 25 AUTHOR Hans-Christoph Steiner <hans@eds.org>;
+#X text 13 61 DESCRIPTION Tcl's "file" command as a Pd library;
+#X restore 10 10 pd META;
