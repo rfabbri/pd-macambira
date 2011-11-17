@@ -538,7 +538,7 @@ void PrintClientAddr(ClientAddr CA) {
     printf("  clilen %d, sockfd %d\n", CA->clilen, CA->sockfd);
     printf("  sin_family %d, sin_port %d\n", CA->cl_addr.sin_family,
 	   CA->cl_addr.sin_port);
-    printf("  address: (%x) %s\n", addr, inet_ntoa(CA->cl_addr.sin_addr));
+    printf("  address: (%lx) %s\n", addr, inet_ntoa(CA->cl_addr.sin_addr));
 
     printf("  sin_zero = \"%c%c%c%c%c%c%c%c\"\n", 
 	   CA->cl_addr.sin_zero[0],
@@ -902,6 +902,11 @@ static void dumpOSC_PrintHeuristicallyTypeGuessedArgs(t_dumpOSC *x, void *v, int
   t_atom* mya = x->x_outat;
   //int myi;
 
+  union
+  {
+      float f;
+      int32_t i;
+  }u;
 
   /* Go through the arguments 32 bits at a time */
   ints = v;
@@ -909,9 +914,9 @@ static void dumpOSC_PrintHeuristicallyTypeGuessedArgs(t_dumpOSC *x, void *v, int
 
   for (i = 0; i<n/4; ) {
     string = &chars[i*4];
-    thisi = ntohl(ints[i]);
+    u.i = thisi = ntohl(ints[i]);
     /* Reinterpret the (potentially byte-reversed) thisi as a float */
-    thisf = *(((t_float *) (&thisi)));
+    thisf = (t_float) u.f;
 
     if  (thisi >= -1000 && thisi <= 1000000) {
 #ifdef DEBUG
