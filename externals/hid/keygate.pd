@@ -2,7 +2,7 @@
 #X obj 44 36 inlet;
 #X obj 44 365 outlet;
 #X obj 44 334 spigot;
-#X text 109 401 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 109 401 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 326 415 released under the GNU GPL;
 #X text 16 444 $Author: eighthave $;

@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
 /* converts a GID number to a user name symbol                               */
-/* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
+/* Written by Hans-Christoph Steiner <hans@eds.org>                         */
 /*                                                                           */
 /* Copyright (c) 2006 Hans-Christoph Steiner                                 */
 /*                                                                           */
@@ -216,7 +216,7 @@ static void *group_new(t_symbol *s, int argc, t_atom *argv)
 	if(!group_instance_count) 
 	{
 		post("[group] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+		post("\twritten by Hans-Christoph Steiner <hans@eds.org>");
 		post("\tcompiled on "__DATE__" at "__TIME__ " ");
 	}
 	group_instance_count++;

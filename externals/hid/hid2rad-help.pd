@@ -5,7 +5,7 @@
 ;
 #X text 254 249 released under the GNU GPL;
 #X text 185 208 For more info:;
-#X text 40 234 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 40 234 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 276 148 related objects:;
 #X obj 233 164 hid/rad2hid;

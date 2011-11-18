@@ -5,7 +5,7 @@
 #X text 234 467 released under the GNU GPL;
 #X text 17 486 $Revision: 1.2 $$Date: 2006-03-17 04:50:03 $;
 #X text 18 499 $Author: eighthave $;
-#X text 17 453 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 17 453 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X obj 122 78 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
 -1;

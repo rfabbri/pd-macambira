@@ -1,6 +1,6 @@
 /* (C) Guenter Geiger <geiger@epy.co.at> */
 
-/* I started with stripdir.c and turned it into split_path.c <hans@at.or.at> */
+/* I started with stripdir.c and turned it into split_path.c <hans@eds.org> */
 
 #include <m_pd.h>
 #include <string.h>
@@ -63,7 +63,7 @@ static void *split_path_new()
 	if(!split_path_instance_count) 
 	{
 		post("[split_path] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+		post("\twritten by Hans-Christoph Steiner <hans@eds.org>");
 	}
 	split_path_instance_count++;
 	return (x);

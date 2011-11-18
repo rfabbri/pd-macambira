@@ -10,7 +10,7 @@
 #X text 221 26 y-axis value;
 #X text 11 5 [hid_spiral];
 #X text 254 411 released under the GNU GPL;
-#X text 40 396 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 40 396 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X obj 268 258 +;
 #X obj 299 258 f;

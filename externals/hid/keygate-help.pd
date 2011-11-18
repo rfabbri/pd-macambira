@@ -6,7 +6,7 @@
 #X obj 160 121 loadbang;
 #X msg 160 141 1;
 #X obj 160 169 metro 150;
-#X text 33 416 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 33 416 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 250 430 released under the GNU GPL;
 #X obj 237 369 pddp/pddplink ../all_about_hid.pd -text all_about_hid

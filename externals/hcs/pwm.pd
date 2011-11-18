@@ -21,7 +21,7 @@
 #X obj 290 177 abs;
 #X obj 184 493 outlet;
 #X text 228 533 released under the GNU GPL;
-#X text 14 517 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+#X text 14 517 (C) Copyright 2006 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 299 32 pulse width (0-1);
 #X obj 290 154 purepd/float_argument \$1 30;

@@ -8,7 +8,7 @@
 #X floatatom 98 335 7 0 0 0 radius-> - -;
 #X text 124 370 For more info:;
 #X obj 98 295 hid/hid_polar;
-#X text 27 397 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 27 397 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X obj 101 161 hsl 128 15 0 1 0 0 empty empty x-axis 133 7 1 10 -225280
 -1 -1 0 0;

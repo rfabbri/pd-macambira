@@ -3,7 +3,7 @@
 0;
 #X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#X text 17 280 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 17 280 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 234 294 released under the GNU GPL;
 #X text 88 251 For more info:;

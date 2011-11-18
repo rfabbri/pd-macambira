@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
 /* object for getting file type (dir, link, exe, etc) using a filename       */
-/* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
+/* Written by Hans-Christoph Steiner <hans@eds.org>                         */
 /*                                                                           */
 /* Copyright (c) 2006 Hans-Christoph Steiner                                 */
 /*                                                                           */
@@ -267,7 +267,7 @@ static void *stat_new(t_symbol *s)
 	if(!stat_instance_count) 
 	{
 		post("[stat] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+		post("\twritten by Hans-Christoph Steiner <hans@eds.org>");
 		post("\tcompiled on "__DATE__" at "__TIME__ " ");
 	}
 	stat_instance_count++;

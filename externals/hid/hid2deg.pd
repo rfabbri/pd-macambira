@@ -5,7 +5,7 @@
 #X obj 88 74 max 0;
 #X text 133 63 its a [hid] object \, so limit input range;
 #X text 232 311 released under the GNU GPL;
-#X text 15 297 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 15 297 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 19 9 [hid2deg];
 #X text 129 28 input range: 0 to 1 \, 0 = east/right;

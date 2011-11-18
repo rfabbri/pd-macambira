@@ -446,7 +446,7 @@ IDs (it is not case sensitive):;
 #X connect 10 0 8 1;
 #X restore 197 303 pd test;
 #X msg 504 201 poll 200;
-#X text 69 533 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 69 533 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #N canvas 162 133 570 420 serin 0;
 #X obj 209 61 cnv 15 15 15 empty \$0-debug-canvas 0 4 8 0 14 -233017

@@ -20,7 +20,7 @@
 #X obj 327 34 trigger bang bang;
 #X obj 16 270 bang;
 #X text 244 404 released under the GNU GPL;
-#X text 27 390 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+#X text 27 390 (C) Copyright 2006 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 25 366 TODO: make it support negative numbers;
 #X connect 0 0 1 1;

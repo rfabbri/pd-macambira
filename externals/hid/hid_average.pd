@@ -5,7 +5,7 @@
 #X msg 76 113 weight;
 #X obj 67 149 average \$1;
 #X msg 130 113 10;
-#X text 27 266 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 27 266 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 244 280 released under the GNU GPL;
 #X text 9 9 [hid_average];

@@ -106,7 +106,7 @@ static void *classpath_new()
 	if(!classpath_instance_count) 
 	{
 		post("[classpath] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+		post("\twritten by Hans-Christoph Steiner <hans@eds.org>");
 		post("\tcompiled on "__DATE__" at "__TIME__ " ");
 		post("\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
 			 PD_MINOR_VERSION, PD_BUGFIX_VERSION);

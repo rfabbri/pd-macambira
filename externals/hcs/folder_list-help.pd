@@ -28,7 +28,7 @@
 #X msg 119 219 symbol /var/*/*.log;
 #X text 173 173 patterns default to path that Pd launched from;
 #X text 329 464 released under the GNU GPL;
-#X text 15 449 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+#X text 15 449 (C) Copyright 2006 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 8 5 Get a listing of files based on a wildcard pattern. On
 UNIX \, it follows glob rules \, on ReactOS/Windows it follows the

@@ -14,7 +14,7 @@
 #X obj 398 313 print MOUSE_UNIMPLEMENTED_EVENT;
 #X obj 195 210 route rel key;
 #X text 554 493 button code/value list;
-#X text 71 562 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 71 562 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 288 576 released under the GNU GPL;
 #X text 484 576 $Author: eighthave $;

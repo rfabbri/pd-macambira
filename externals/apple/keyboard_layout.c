@@ -1,6 +1,6 @@
 /* Copyright 2006 Fredrik Olofsson
  * Copyright 2007 Free Software Foundation
- *   ported to Pd by Hans-Christoph Steiner <hans@at.or.at> from f0.keyboard_layout.c
+ *   ported to Pd by Hans-Christoph Steiner <hans@eds.org> from f0.keyboard_layout.c
  */
 
 #include "m_pd.h"

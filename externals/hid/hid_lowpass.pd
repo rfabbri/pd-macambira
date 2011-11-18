@@ -1,7 +1,7 @@
 #N canvas 666 425 438 310 10;
 #X obj 67 31 inlet;
 #X obj 67 235 outlet;
-#X text 7 266 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 7 266 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 224 280 released under the GNU GPL;
 #X obj 252 30 inlet;

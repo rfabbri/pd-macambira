@@ -16,7 +16,7 @@ takes the control signal with 0 = left \, 1 = right \, and 0.5 = center.
 #X text 15 36 Pan a mono signal using an algorithm posted by Michael
 Gogins to the Csound list. The aim is to have the pan feel like its
 wrapping around more.;
-#X text 27 350 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 27 350 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 244 364 released under the GNU GPL;
 #X text 40 277 [gogins_pan~] implements an algorithm conceived by Michael

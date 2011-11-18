@@ -2,7 +2,7 @@
 #X obj 88 30 inlet;
 #X obj 89 264 outlet;
 #X text 232 311 released under the GNU GPL;
-#X text 15 297 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 15 297 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 143 264 output range: 0 to 360 \, 0 = north/top;
 #X text 19 9 [deg2hid];

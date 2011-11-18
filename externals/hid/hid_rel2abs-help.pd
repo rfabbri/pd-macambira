@@ -3,7 +3,7 @@
 -66577 0;
 #X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 244 284 released under the GNU GPL;
 #X text 30 38 Converts relative axis data into an absolute position.

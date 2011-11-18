@@ -10,7 +10,7 @@
 #X obj 2 2 cnv 15 550 20 empty empty keyboard 2 11 1 18 -233017 -66577
 0;
 #X msg 204 93 open 1;
-#X text 1 432 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 1 432 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 218 446 released under the GNU GPL;
 #X text 414 446 $Author: eighthave $;

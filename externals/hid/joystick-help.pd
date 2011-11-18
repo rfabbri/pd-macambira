@@ -31,7 +31,7 @@
 #X obj 2 2 cnv 15 650 20 empty empty joystick 2 11 1 18 -233017 -66577
 0;
 #X msg 215 93 open 1;
-#X text 1 412 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 1 412 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 218 426 released under the GNU GPL;
 #X text 414 426 $Author: eighthave $;

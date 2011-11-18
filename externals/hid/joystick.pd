@@ -15,7 +15,7 @@
 #X text 171 509 X-axis;
 #X text 232 468 Y-axis;
 #X text 302 430 twist;
-#X text 11 552 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 11 552 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 228 566 released under the GNU GPL;
 #X text 424 566 $Author: eighthave $;

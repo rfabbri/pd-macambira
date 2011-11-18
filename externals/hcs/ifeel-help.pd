@@ -24,7 +24,7 @@
 #X text 37 359 If you feed data to the ifeel mouse too quickly \, it
 has a tendency to crash the whole machine. I suspect a bug in the kernel
 module ifeel.o.;
-#X text 13 449 by Hans-Christoph Steiner <hans@at.or.at>;
+#X text 13 449 by Hans-Christoph Steiner <hans@eds.org>;
 #X obj 324 416 pddp/pddplink ../all_about_haptics.pd -text all_about_haptics
 ;
 #X text 201 417 For more info:;

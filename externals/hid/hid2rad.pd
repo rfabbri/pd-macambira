@@ -11,7 +11,7 @@
 #X text 129 28 input range: 0 to 1;
 #X text 143 264 output range: -pi to pi;
 #X text 232 311 released under the GNU GPL;
-#X text 15 297 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 15 297 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X connect 0 0 5 0;
 #X connect 3 0 1 0;

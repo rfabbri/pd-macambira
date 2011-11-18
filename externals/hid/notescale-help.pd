@@ -8,7 +8,7 @@
 #X floatatom 137 266 5 0 0 0 - - -;
 #X obj 140 330 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 17 393 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 17 393 (C) Copyright 2004 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X text 234 407 released under the GNU GPL;
 #X floatatom 150 160 0 0 0 0 - - -;

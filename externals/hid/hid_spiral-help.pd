@@ -7,7 +7,7 @@
 #X floatatom 70 283 5 0 0 0 - - -;
 #X floatatom 70 375 5 0 0 0 radius-> - -;
 #X text 175 408 For more info:;
-#X text 28 437 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+#X text 28 437 (C) Copyright 2005 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X obj 73 201 hsl 128 15 0 1 0 0 empty empty x-axis 133 7 1 10 -225280
 -1 -1 0 0;

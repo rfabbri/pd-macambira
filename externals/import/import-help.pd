@@ -13,7 +13,7 @@ older versions \, it loads the libraries into the global namespace.
 ;
 #X text 29 239 Sending bangs to [import] makes it output the loaded
 libraries one at a time.;
-#X text 18 301 (C) Copyright 2004-6 Hans-Christoph Steiner <hans@at.or.at>
+#X text 18 301 (C) Copyright 2004-6 Hans-Christoph Steiner <hans@eds.org>
 ;
 #X connect 0 0 1 0;
 #X connect 1 0 4 0;
