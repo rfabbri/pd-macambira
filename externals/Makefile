@@ -2207,21 +2207,18 @@ etags:
 	find $(externals_src) -type f -name '*.[ch]' -exec etags -a '{}' \;
 	find $(externals_src) -type f -name '*.cc' -exec etags -a '{}' \;
 	find $(externals_src) -type f -name '*.cpp' -exec etags -a '{}' \;
-	etags --append --language=none --regex="/proc[ \t]+\([^ \t]+\)/\1/" \
-		$(externals_src)/unauthorized/*/*.tk
-	find /usr/include -type f -name \*.h -exec etags -a '{}' \;
+	find $(externals_src) -type f -name '*.tcl' \
+		-exec etags -a --language=none \
+		--regex="/proc[ \t]+\([^ \t]+\)/\1/" \
+		'{}' \;
 	make etags_`uname -s`
 
 etags_Darwin:
 	etags -a $(externals_src)/hid/HID\ Utilities\ Source/*.[ch]
-	find /System/Library/Frameworks  -type f -name \*.h -exec etags -a '{}' \;
-	find /Library/Frameworks  -type f -name \*.h -exec etags -a '{}' \;
-	find /sw/include -type f -name \*.h -exec etags -a '{}' \;
 
 etags_Linux:
 
 etags_MINGW:
-	find /usr/local/include/ -type f -name \*.h -exec etags -a '{}' \;
 
 
 #==============================================================================#
@@ -2256,6 +2253,5 @@ test_locations:
 
 
 .PHONY: all install clean distclean test_locations $(LIB_TARGETS) \
-$(patsubst %, %_install,$(LIB_TARGETS)) $(patsubst %, %_clean,$(LIB_TARGETS))
-
-
+$(patsubst %, %_install,$(LIB_TARGETS)) $(patsubst %, %_clean,$(LIB_TARGETS)) \
+etags etags_Darwin etags_Linux etags_MINGW
