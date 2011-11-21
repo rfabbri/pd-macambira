@@ -1155,7 +1155,7 @@ moocow_clean:
 #------------------------------------------------------------------------------#
 # MOONLIB
 moonlib:
-	make -C $(externals_src)/moonlib CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
+	make -C $(externals_src)/moonlib CFLAGS="$(CFLAGS)" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 moonlib_install:
