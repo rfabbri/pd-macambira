@@ -60,13 +60,20 @@ proc+ bitmap::constructor {self args} {
     0_config $self {*}$args
 
     set @rcvLoadData {#bitmap}
+
+    set x [pd_findbyclass $@rcvLoadData bitmap]
+    if {$x ne "NULL"} {
+        # prevent crash due to stale bound receivers:
+        pd_unbind $x $@rcvLoadData
+    }
+
     pd_bind $self $@rcvLoadData
 }
 
 proc+ bitmap::destructor {self} {
-    if {$@rcvLoadData ne {}} {
-        #should not happen!
-        pd_unbind $self $@rcvLoadData
+    set x [pd_findbyclass $@rcvLoadData bitmap]
+    if {$x ne "NULL"} {
+        pd_unbind $x $@rcvLoadData
     }
     if {[dict get $@config -receivesymbol] ne {}} {
         pd_unbind $self $@recv
@@ -248,9 +255,10 @@ proc+ bitmap::0_setdata {self args} {
     }
     set @data [list]
     foreach i $d {lappend @data [expr {int($i)}]}
-    if {$@rcvLoadData ne {}} {
+
+    set x [pd_findbyclass $@rcvLoadData bitmap]
+    if {$x ne "NULL"} {
         pd_unbind $self $@rcvLoadData
-        set @rcvLoadData {}
     }
 }
 

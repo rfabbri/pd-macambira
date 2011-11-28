@@ -88,6 +88,7 @@ void name_setitem(type *ary, int index, type value)
     const char *str = Tcl_GetStringFromObj($input, NULL);
     $1 = object_table_get(str);
     SWIG_contract_assert($1, "not a t_pd * instance") {};
+    // XXX: %typemap(out) missing!!!
 }
 
 %typemap(in) t_text * {
@@ -105,6 +106,13 @@ void name_setitem(type *ary, int index, type value)
     t_tcl *x = object_table_get(str);
     SWIG_contract_assert(x, "not a t_object * instance") {};
     $1 = &x->o;
+}
+
+%typemap(in) struct _class * {
+    const char *str = Tcl_GetStringFromObj($input, NULL);
+    t_class *c = class_table_get(str);
+    SWIG_contract_assert(c, "invalid class name") {};
+    $1 = c;
 }
 
 /* functions that are in m_pd.h but don't exist in modern versions of pd */
