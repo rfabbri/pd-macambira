@@ -22,7 +22,7 @@ proc tclfile::expand_vars {filename} {
         if {[catch {set got $::env($varname)} fid]} {
             #puts stderr "caught $fid"
         } else {
-            set sub [string map [list "\$$varname" $got \{ "" \} ""] $filename]
+            set sub [string map [list "\$$varname" $got] $filename]
             # TODO this should really be a regex that properly
             # recognizes {} around the symbol as separate from just {}
             # used in a filename.  But first, Pd will need a full
@@ -30,5 +30,5 @@ proc tclfile::expand_vars {filename} {
             #set sub [regsub "\(.+\)HOME\(.+\)" $sub "==\1==$got==\2=="]
         }
     }
-    return $sub
+    return [string map {\{ "" \} ""} $sub]
 }
