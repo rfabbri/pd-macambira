@@ -16,12 +16,12 @@ proc isdirectory::constructor {self args} {
 
 # HOT inlet --------------------------------------------------------------------
 proc isdirectory::0_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
     isdirectory::0_bang $self
 }
 
 proc isdirectory::0_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
     isdirectory::0_bang $self
 }
 
@@ -38,11 +38,11 @@ proc isdirectory::0_bang {self} {
 
 # COLD inlet -------------------------------------------------------------------
 proc isdirectory::1_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
 }
 
 proc isdirectory::1_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
 }
 
 pd::class isdirectory

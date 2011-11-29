@@ -16,18 +16,19 @@ proc exists::constructor {self args} {
 
 # HOT inlet --------------------------------------------------------------------
 proc exists::0_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
     exists::0_bang $self
 }
 
 proc exists::0_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
     exists::0_bang $self
 }
 
 proc exists::0_bang {self} {
     variable ${self}::current_canvas
     variable ${self}::filename
+    pd::post "filename: $filename"
     if {[file pathtype $filename] eq "absolute"} {
         pd::outlet $self 0 float [file exists $filename]
     } else {
@@ -38,11 +39,11 @@ proc exists::0_bang {self} {
 
 # COLD inlet -------------------------------------------------------------------
 proc exists::1_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
 }
 
 proc exists::1_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
 }
 
 pd::class exists

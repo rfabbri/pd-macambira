@@ -1,4 +1,4 @@
-#N canvas 657 79 501 349 10;
+#N canvas 378 55 501 349 10;
 #X obj 297 261 mkdir;
 #X obj 202 160 exists;
 #X obj 202 181 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
@@ -9,15 +9,23 @@
 #X text 28 294 this is a clone of this command:;
 #X obj 48 115 delete;
 #X text 25 20 delete a file or empty folder;
-#X text 253 209 make a new one:;
+#X text 248 189 make a new one:;
 #X obj 120 306 pddp/pddplink http://tcl.tk/man/tcl8.5/TclCmd/file.htm#M12
 ;
-#X msg 48 63 this is a test;
-#X msg 298 233 this is a test;
-#X msg 202 114 this is a test;
+#X msg 48 63 ~/this is a test;
+#X msg 298 233 ~/this is a test;
+#X msg 202 114 ~/this is a test;
+#X msg 62 87 $HOME/this is a test;
+#X msg 193 91 $HOME/this is a test;
+#X msg 282 210 $HOME/this is a test;
+#X obj 191 50 loadbang;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
 #X connect 4 0 1 0;
 #X connect 10 0 6 0;
 #X connect 11 0 0 0;
 #X connect 12 0 1 0;
+#X connect 13 0 6 0;
+#X connect 14 0 1 0;
+#X connect 15 0 0 0;
+#X connect 16 0 14 0;

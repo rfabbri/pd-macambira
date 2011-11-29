@@ -13,12 +13,12 @@ proc delete::constructor {self args} {
 
 # HOT inlet --------------------------------------------------------------------
 proc delete::0_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
     delete::0_bang $self
 }
 
 proc delete::0_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
     delete::0_bang $self
 }
 
@@ -35,11 +35,11 @@ proc delete::0_bang {self} {
 
 # COLD inlet -------------------------------------------------------------------
 proc delete::1_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
 }
 
 proc delete::1_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
 }
 
 pd::class delete

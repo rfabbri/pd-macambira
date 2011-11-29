@@ -16,12 +16,12 @@ proc isfile::constructor {self args} {
 
 # HOT inlet --------------------------------------------------------------------
 proc isfile::0_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
     isfile::0_bang $self
 }
 
 proc isfile::0_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
     isfile::0_bang $self
 }
 
@@ -38,11 +38,11 @@ proc isfile::0_bang {self} {
 
 # COLD inlet -------------------------------------------------------------------
 proc isfile::1_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
 }
 
 proc isfile::1_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
 }
 
 pd::class isfile

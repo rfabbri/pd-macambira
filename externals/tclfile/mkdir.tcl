@@ -13,12 +13,12 @@ proc mkdir::constructor {self args} {
 
 # HOT inlet --------------------------------------------------------------------
 proc mkdir::0_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
     mkdir::0_bang $self
 }
 
 proc mkdir::0_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
     mkdir::0_bang $self
 }
 
@@ -35,11 +35,11 @@ proc mkdir::0_bang {self} {
 
 # COLD inlet -------------------------------------------------------------------
 proc mkdir::1_symbol {self args} {
-    variable ${self}::filename [pd::arg 0 symbol]
+    variable ${self}::filename [tclfile::expand_vars [pd::arg 0 symbol]]
 }
 
 proc mkdir::1_anything {self args} {
-    variable ${self}::filename [tclfile::make_symbol $args]
+    variable ${self}::filename [tclfile::expand_vars [tclfile::make_symbol $args]]
 }
 
 pd::class mkdir
