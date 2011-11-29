@@ -38,10 +38,9 @@
 
 #ifdef HAVE_LIBV4L1_VIDEODEV_H
 # include <libv4l1-videodev.h>
-#elif 1 //defined  HAVE_LINUX_VIDEODEV_H
-# include <linux/videodev.h>
 #else
-# error cannot compile pdp_v4l without new kernel and without libv4l-dev
+# warning trying to use deprecated V4L-1 API
+# include <linux/videodev.h>
 #endif
 
 #include <sys/mman.h>
