@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-extern t_symbol *notein_sym;
+static t_symbol *notein_sym;
 
 static t_class *notein_class;
 

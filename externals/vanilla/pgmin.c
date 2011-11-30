@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-extern t_symbol *pgmin_sym;
+static t_symbol *pgmin_sym;
 
 static t_class *pgmin_class;
 
