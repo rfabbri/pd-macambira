@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-static t_symbol *bendin_sym;
+extern t_symbol *bendin_sym;
 
 static t_class *bendin_class;
 

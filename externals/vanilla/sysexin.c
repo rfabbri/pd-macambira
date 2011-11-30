@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-static t_symbol *sysexin_sym;
+extern t_symbol *sysexin_sym;
 
 static t_class *sysexin_class;
 

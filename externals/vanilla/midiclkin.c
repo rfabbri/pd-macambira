@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-static t_symbol *midiclkin_sym;
+extern t_symbol *midiclkin_sym;
 
 static t_class *midiclkin_class;
 

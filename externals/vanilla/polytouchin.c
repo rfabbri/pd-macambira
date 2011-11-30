@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-static t_symbol *polytouchin_sym;
+extern t_symbol *polytouchin_sym;
 
 static t_class *polytouchin_class;
 

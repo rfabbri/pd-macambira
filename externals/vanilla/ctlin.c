@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 
-static t_symbol *ctlin_sym;
+extern t_symbol *ctlin_sym;
 
 static t_class *ctlin_class;
 
