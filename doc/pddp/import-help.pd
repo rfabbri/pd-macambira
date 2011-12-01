@@ -16,7 +16,7 @@
 #X text 12 205 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
 to conform to the PDDP template for Pd version 0.42.;
 #X text 12 5 KEYWORDS control;
-#X text 12 45 DESCRIPTION append directories to the canvas-local path;
+#X text 12 45 DESCRIPTION load libraries from a patch;
 #X text 12 65 INLET_0 bang rewind;
 #X text 12 85 OUTLET_0 symbol;
 #X text 12 105 OUTLET_1 bang;
@@ -60,7 +60,7 @@ On older versions \, it loads the libraries into the global namespace.
 #X obj 262 184 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X text 283 183 bang after the end of the list is reached;
-#X text 11 23 append directories to the canvas-local path;
+#X text 11 23 load libraries from a patch;
 #X text 168 377 - a "bang" to the inlet of [import] sends a symbol
 to the left outlet which the name of a loaded library.;
 #X text 168 332 - the "rewind" message starts at the top of the list
