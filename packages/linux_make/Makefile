@@ -32,7 +32,7 @@ endif
 #STRIP = strip --strip-unneeded -R .note -R .comment
 STRIP = echo
 
-DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE
+DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE -Wstrict-aliasing=2
 OPT_CFLAGS = 
 
 TARGET_PLATFORM := $(shell uname -m)

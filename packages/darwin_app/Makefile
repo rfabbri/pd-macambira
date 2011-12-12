@@ -27,7 +27,7 @@ WISH_CONTENTS = "$(WISH)/Contents"
 #STRIP = strip -x
 STRIP = echo
 
-DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE
+DEBUG_CFLAGS = -g -fno-inline-functions -fno-omit-frame-pointer -DDEBUG_SOUNDFILE -Wstrict-aliasing=2
 
 # CPU-specific gleaned from:
 # http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
