@@ -6,11 +6,11 @@ LIBRARY_NAME = vanilla
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
-SOURCES = abs~.c adc~.c bang~.c bng.c clip~.c cnv.c cputime.c dac~.c dbtopow~.c dbtorms~.c del.c delay.c exp~.c fft~.c framp~.c ftom~.c hdl.c hradio.c hsl.c hslider.c ifft~.c key.c keyname.c keyup.c line.c list.c loadbang.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c namecanvas.c nbx.c netreceive.c netsend.c openpanel.c pipe.c powtodb~.c pow~.c print.c print~.c qlist.c radiobut.c radiobutton.c random.c rdb.c realtime.c rfft~.c rifft~.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vdl.c vradio.c vsl.c vslider.c vu.c wrap~.c midiin.c sysexin.c notein.c ctlin.c pgmin.c bendin.c touchin.c polytouchin.c midiclkin.c midirealtimein.c midiout.c noteout.c ctlout.c pgmout.c bendout.c touchout.c polytouchout.c makenote.c stripnote.c poly.c bag.c
+SOURCES = adc~.c bang~.c bng.c cnv.c cputime.c dac~.c del.c delay.c fft~.c framp~.c hdl.c hradio.c hsl.c hslider.c ifft~.c key.c keyname.c keyup.c line.c list.c loadbang.c metro.c my_canvas.c my_numbox.c namecanvas.c nbx.c netreceive.c netsend.c openpanel.c pipe.c print.c print~.c qlist.c radiobut.c radiobutton.c random.c rdb.c realtime.c rfft~.c rifft~.c savepanel.c textfile.c tgl.c timer.c toggle.c vdl.c vradio.c vsl.c vslider.c vu.c midiin.c sysexin.c notein.c ctlin.c pgmin.c bendin.c touchin.c polytouchin.c midiclkin.c midirealtimein.c midiout.c noteout.c ctlout.c pgmout.c bendout.c touchout.c polytouchout.c makenote.c stripnote.c poly.c bag.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = q8_sqrt~.pd q8_rsqrt~.pd
+PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = 
@@ -25,7 +25,7 @@ MANUAL =
 EXTRA_DIST = 
 
 
-HELPPATCHES = abs~-help.pd adc~_dac~-help.pd bang~-help.pd bng-help.pd clip~-help.pd cputime-help.pd dbtopow~-help.pd dbtorms~-help.pd delay-help.pd exp~-help.pd ftom~-help.pd hdial-help.pd hradio-help.pd hslider-help.pd key-help.pd keyname-help.pd keyup-help.pd line-help.pd list-help.pd loadbang-help.pd log~-help.pd metro-help.pd midi-help.pd mtof~-help.pd my_canvas-help.pd namecanvas-help.pd netreceive-help.pd netsend-help.pd numbox2-help.pd openpanel-help.pd pipe-help.pd powtodb~-help.pd pow~-help.pd print-help.pd print~-help.pd q8_rsqrt~-help.pd q8_sqrt~-help.pd qlist-help.pd random-help.pd realtime-help.pd rmstodb~-help.pd rsqrt~-help.pd savepanel-help.pd sqrt~-help.pd textfile-help.pd timer-help.pd toggle-help.pd vdial-help.pd vradio-help.pd vslider-help.pd vu-help.pd wrap~-help.pd 
+HELPPATCHES = adc~_dac~-help.pd bang~-help.pd bng-help.pd cputime-help.pd delay-help.pd hdial-help.pd hradio-help.pd hslider-help.pd key-help.pd keyname-help.pd keyup-help.pd line-help.pd list-help.pd loadbang-help.pd metro-help.pd midi-help.pd my_canvas-help.pd namecanvas-help.pd netreceive-help.pd netsend-help.pd numbox2-help.pd openpanel-help.pd pipe-help.pd print-help.pd print~-help.pd qlist-help.pd random-help.pd realtime-help.pd savepanel-help.pd textfile-help.pd timer-help.pd toggle-help.pd vdial-help.pd vradio-help.pd vslider-help.pd vu-help.pd 
 
 
 #------------------------------------------------------------------------------#
