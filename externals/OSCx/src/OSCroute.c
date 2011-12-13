@@ -53,16 +53,10 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #include "OSC-common.h"
 #include "OSC-pattern-match.h"
 
+#include <stdio.h>
 #ifdef _WIN32
 	#include <stdlib.h>
 	#include <string.h>
-  #include <stdio.h>
-#endif
-#ifdef __APPLE__
-  #include <stdio.h>
-#endif
-#ifdef UNIX
-  #include <stdio.h>
 #endif
 
 /* structure definition of your object */

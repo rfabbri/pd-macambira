@@ -95,6 +95,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 	#include <ctype.h>
 	#include <signal.h>
 	#include <stdio.h>
+	#include <stdint.h>
     #include <ws2tcpip.h>
 #else
 	#include <stdio.h>
