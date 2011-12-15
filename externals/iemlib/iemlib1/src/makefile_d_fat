@@ -33,6 +33,7 @@ SRC = biquad_freq_resp.c \
 	prvu~.c \
 	pvu~.c \
 	rvu~.c \
+	sin_freq~.c \
 	sin_phase~.c \
 	sparse_FIR~.c \
 	soundfile_info.c \
