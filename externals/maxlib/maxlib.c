@@ -22,7 +22,7 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 #ifndef VERSION
-#define VERSION "1.5.3"
+#define VERSION "1.5.4"
 #endif
 
 #include "m_pd.h"
