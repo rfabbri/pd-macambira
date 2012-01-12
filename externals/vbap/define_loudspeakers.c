@@ -227,7 +227,7 @@ static void initContent_ls_directions(t_def_ls *x,int ac,Atom*av)
     int i;
 	for(i=0; i < x->x_def_ls_amount;i++)
 	{
-		float azi = 0;
+		t_float azi = 0;
 /*		if(av[pointer].a_type == A_LONG) azi = (float) av[pointer].a_w.w_long;
 		else */ if(av[pointer].a_type == A_FLOAT) azi = av[pointer].a_w.w_float;
 		else { error("define-loudspeakers: direction angle #%d NaN",i+1); x->x_ls_read = 0; return; }
@@ -543,7 +543,7 @@ static int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
  t_ls v1;
   t_ls v2;
   t_ls v3, neg_v3;
-  //float angle;
+  //t_float angle;
   t_float dist_ij,dist_kl,dist_iv3,dist_jv3,dist_inv3,dist_jnv3;
   t_float dist_kv3,dist_lv3,dist_knv3,dist_lnv3;
 
@@ -590,7 +590,7 @@ static void  calculate_3x3_matrixes(t_def_ls *x)
   t_float invdet;
   t_ls *lp1, *lp2, *lp3;
   t_float *invmx;
-  //float *ptr;
+  //t_float *ptr;
   struct t_ls_set *tr_ptr = x->x_ls_set;
   int triplet_amount = 0, /*ftable_size,*/i,pointer,list_length=0;
   Atom *at;
@@ -667,17 +667,17 @@ static void choose_ls_tuplets(t_def_ls *x)
      /* selects the loudspeaker pairs, calculates the inversion
         matrices and stores the data to a global array*/
 {
-  //float atorad = (2 * 3.1415927 / 360) ;
+  //t_float atorad = (2 * 3.1415927 / 360) ;
   int i,j;
-  //float w1,w2;
-  //float p1,p2;
+  //t_float w1,w2;
+  //t_float p1,p2;
   int sorted_lss[MAX_LS_AMOUNT];
   int exist[MAX_LS_AMOUNT];   
   int amount=0;
   t_float inv_mat[MAX_LS_AMOUNT][4];  // In 2-D ls amount == max amount of LS pairs
   t_float mat[MAX_LS_AMOUNT][4];
-  //float *ptr;   
-  //float *ls_table;
+  //t_float *ptr;   
+  //t_float *ls_table;
   t_ls *lss = x->x_ls;
   long ls_amount=x->x_def_ls_amount;
   long list_length;
@@ -763,9 +763,9 @@ void sort_2D_lss(t_ls lss[MAX_LS_AMOUNT], int sorted_lss[MAX_LS_AMOUNT],
 // sort loudspeakers according to azimuth angle
 {
   t_float tmp, tmp_azi;
-//  float rad2ang = 360.0f / ( 2.0f * M_PI );
+//  t_float rad2ang = 360.0f / ( 2.0f * M_PI );
 
-  //float x,y;
+  //t_float x,y;
   /* Transforming angles between -180 and 180 */
   int i;
   for (i=0;i<ls_amount;i++) 
@@ -807,7 +807,7 @@ static int calc_2D_inv_tmatrix(t_float azi1,t_float azi2, t_float inv_mat[4],t_f
 // calculate inverse 2x2 matrix
 {
   t_float x1,x2,x3,x4; /* x1 x3 */
-  //float y1,y2,y3,y4; /* x2 x4 */
+  //t_float y1,y2,y3,y4; /* x2 x4 */
   t_float det;
   
   mat[0]=x1 = cos(azi1 / rad2ang);
