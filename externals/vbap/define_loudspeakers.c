@@ -546,6 +546,8 @@ static int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
   //t_float angle;
   t_float dist_ij,dist_kl,dist_iv3,dist_jv3,dist_inv3,dist_jnv3;
   t_float dist_kv3,dist_lv3,dist_knv3,dist_lnv3;
+  // TODO epsilon needs to be updated for 64-bit/double precision
+  t_float epsilon = 1e-9;
 
   ls_cross_prod(lss[i],lss[j],&v1);
   ls_cross_prod(lss[k],lss[l],&v2);
@@ -567,17 +569,17 @@ static int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
   dist_lnv3 = (vec_angle(neg_v3,lss[l]));
 
   /* if one of loudspeakers is close to crossing point, don't do anything*/
-  if(fabsf(dist_iv3) <= 0.01 || fabsf(dist_jv3) <= 0.01 || 
-		 fabsf(dist_kv3) <= 0.01 || fabsf(dist_lv3) <= 0.01 ||
-     fabsf(dist_inv3) <= 0.01 || fabsf(dist_jnv3) <= 0.01 || 
-     fabsf(dist_knv3) <= 0.01 || fabsf(dist_lnv3) <= 0.01 )
+  if(fabsf(dist_iv3)  <= epsilon || fabsf(dist_jv3)  <= epsilon || 
+     fabsf(dist_kv3)  <= epsilon || fabsf(dist_lv3)  <= epsilon ||
+     fabsf(dist_inv3) <= epsilon || fabsf(dist_jnv3) <= epsilon || 
+     fabsf(dist_knv3) <= epsilon || fabsf(dist_lnv3) <= epsilon )
     return(0);
 
   // if crossing point is on line between both loudspeakers return 1
-  if (((fabsf(dist_ij - (dist_iv3 + dist_jv3)) <= 0.01 ) &&
-       (fabsf(dist_kl - (dist_kv3 + dist_lv3))  <= 0.01)) ||
-      ((fabsf(dist_ij - (dist_inv3 + dist_jnv3)) <= 0.01)  &&
-       (fabsf(dist_kl - (dist_knv3 + dist_lnv3)) <= 0.01 ))) {
+  if (((fabsf(dist_ij - (dist_iv3 + dist_jv3))   <= epsilon)  &&
+       (fabsf(dist_kl - (dist_kv3 + dist_lv3))   <= epsilon)) ||
+      ((fabsf(dist_ij - (dist_inv3 + dist_jnv3)) <= epsilon)  &&
+       (fabsf(dist_kl - (dist_knv3 + dist_lnv3)) <= epsilon))) {
     return (1);
   } else {
     return (0);
