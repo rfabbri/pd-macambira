@@ -16,7 +16,7 @@
 #include <sys/param.h>
 #include <unistd.h>
 #endif
-#ifdef MSW
+#ifdef _WIN32
 #include <wtypes.h>
 #include <time.h>
 #endif
@@ -36,7 +36,7 @@ typedef struct _cputime
 #ifdef UNISTD
     struct tms x_setcputime;
 #endif
-#ifdef MSW
+#ifdef _WIN32
     LARGE_INTEGER x_kerneltime;
     LARGE_INTEGER x_usertime;
     int x_warned;
@@ -48,7 +48,7 @@ static void cputime_bang(t_cputime *x)
 #ifdef UNISTD
     times(&x->x_setcputime);
 #endif
-#ifdef MSW
+#ifdef _WIN32
     FILETIME ignorethis, ignorethat;
     BOOL retval;
     retval = GetProcessTimes(GetCurrentProcess(), &ignorethis, &ignorethat,
@@ -75,7 +75,7 @@ static void cputime_bang2(t_cputime *x)
             x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / CLOCKHZ;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
 #endif
-#ifdef MSW
+#ifdef _WIN32
     t_float elapsedcpu;
     FILETIME ignorethis, ignorethat;
     LARGE_INTEGER usertime, kerneltime;
@@ -98,7 +98,7 @@ static void *cputime_new(void)
     outlet_new(&x->x_obj, gensym("float"));
 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("bang"), gensym("bang2"));
-#ifdef MSW
+#ifdef _WIN32
     x->x_warned = 0;
 #endif
     cputime_bang(x);

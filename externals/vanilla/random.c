@@ -16,7 +16,7 @@
 #include <sys/param.h>
 #include <unistd.h>
 #endif
-#ifdef MSW
+#ifdef _WIN32
 #include <wtypes.h>
 #include <time.h>
 #endif
