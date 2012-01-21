@@ -1,4 +1,4 @@
-#N canvas 320 324 492 389 10;
+#N canvas 1 53 492 389 10;
 #X text 13 14 [multiselect] is part of MarkEx \, which was formerly
 in GEM \, and was written by Mark Danks.;
 #X text 16 52 [multiselect] is like [select] \, except that you send
@@ -30,6 +30,18 @@ on the fly.;
 #X msg 283 215 list 57 23 5;
 #X text 19 139 WARNING: changing the argument crashes Pd! I could not
 figure out how to get this to work.;
+#N canvas 495 53 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 145 AUTHOR Mark Danks;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 45 DESCRIPTION invert;
+#X text 12 5 KEYWORDS control;
+#X text 12 65 INLET_0 float;
+#X text 12 85 INLET_1 list;
+#X text 12 105 OUTLET_N bang;
+#X text 12 125 OUTLET_R anything;
+#X restore 433 360 pd META;
 #X connect 6 0 10 0;
 #X connect 7 0 6 0;
 #X connect 8 0 6 0;

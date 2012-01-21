@@ -1,4 +1,4 @@
-#N canvas 344 338 481 346 10;
+#N canvas 1 53 481 346 10;
 #X obj 127 223 unpack 0 0 0;
 #X floatatom 206 245 5 0 0 1 Blue - -;
 #X floatatom 166 265 5 0 0 1 Green - -;
@@ -12,6 +12,17 @@
 #X obj 127 97 pack 0 0 0;
 #X obj 145 65 t b f;
 #X obj 182 65 t b f;
+#N canvas 485 263 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 115 AUTHOR Mark Danks;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 5 KEYWORDS control conversion;
+#X text 12 75 INLET_0 list;
+#X text 12 95 OUTLET_0 list;
+#X text 12 45 DESCRIPTION convert between HSV colorspace and RGB colorspace
+;
+#X restore 422 315 pd META;
 #X connect 0 0 3 0;
 #X connect 0 1 2 0;
 #X connect 0 2 1 0;

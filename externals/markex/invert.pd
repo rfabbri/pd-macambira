@@ -1,4 +1,4 @@
-#N canvas 135 98 268 230 10;
+#N canvas 1 53 268 230 10;
 #X obj 115 71 inlet;
 #X obj 115 97 t f;
 #X obj 115 120 == 0;

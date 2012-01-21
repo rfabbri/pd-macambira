@@ -1,4 +1,4 @@
-#N canvas 172 190 432 490 10;
+#N canvas 1 53 432 490 10;
 #X text 89 388 convert between RGB colorspace and HSV colorspace;
 #X text 91 412 RGB is red \, green \, blue;
 #X text 91 434 HSV is hue \, saturation \, value (luminance);
@@ -16,6 +16,17 @@
 #X obj 141 103 t b f;
 #X obj 178 103 t b f;
 #X text 83 9 [rgb2hsv];
+#N canvas 486 292 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 115 AUTHOR Mark Danks;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 5 KEYWORDS control conversion;
+#X text 12 75 INLET_0 list;
+#X text 12 95 OUTLET_0 list;
+#X text 12 45 DESCRIPTION convert between RGB colorspace and HSV colorspace
+;
+#X restore 364 463 pd META;
 #X connect 3 0 6 0;
 #X connect 4 0 3 0;
 #X connect 5 0 3 0;
