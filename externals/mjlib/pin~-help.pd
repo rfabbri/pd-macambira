@@ -1,4 +1,4 @@
-#N canvas 146 80 623 617 12;
+#N canvas 1 53 554 617 12;
 #X obj 210 485 dac~;
 #X obj 159 395 osc~;
 #X msg 159 282 69;
@@ -28,6 +28,21 @@ so many milliseconds.;
 #X text 25 523 note that no panning or envelopes are applied and therefore
 low choice intervals will add "switching" noise to the output.;
 #X text 19 30 by mark williamson (mark@junklight.com);
+#N canvas 464 162 494 344 META 0;
+#X text 12 195 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 175 AUTHOR Mark Williamson <mark@junklight.com>;
+#X text 12 45 DESCRIPTION take a single signal input and output it
+to the left or right output at random based on the probability set
+;
+#X text 12 75 INLET_0 signal;
+#X text 12 95 INLET_1 float;
+#X text 12 115 INLET_2 float;
+#X text 12 135 OUTLET_0 signal;
+#X text 12 155 OUTLET_1 signal;
+#X text 12 5 KEYWORDS signal random;
+#X restore 478 583 pd META;
 #X connect 1 0 17 0;
 #X connect 2 0 4 0;
 #X connect 3 0 5 0;

@@ -1,5 +1,6 @@
-#N canvas 144 132 614 505 12;
+#N canvas 1 53 473 505 12;
 #X obj 235 384 prob;
+#C restore;
 #X obj 235 448 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 134 317 start;
@@ -26,9 +27,19 @@ a bang.;
 #X text 64 372 bang has the;
 #X text 64 389 same effect;
 #X text 64 405 as start;
+#N canvas 465 191 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 135 AUTHOR Mark Williamson <mark@junklight.com>;
+#X text 12 45 DESCRIPTION designed to generate a random event with
+a given probability at a given interval;
+#X text 12 75 INLET_0 bang start stop;
+#X text 12 95 OUTLET_0 bang;
+#X text 12 115 OUTLET_1;
+#X text 12 5 KEYWORDS control random needs_work (OUTLET_1?);
+#X restore 402 477 pd META;
 #X connect 0 0 1 0;
 #X connect 2 0 0 0;
 #X connect 3 0 0 0;
-#X connect 4 0 0 1;
-#X connect 5 0 0 2;
 #X connect 14 0 0 0;
