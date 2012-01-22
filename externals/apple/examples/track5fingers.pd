@@ -1,7 +1,7 @@
 #N canvas 407 233 708 547 10;
 #X obj 8 -143 cnv 15 325 245 empty empty empty 0 0 0 14 -233017 -66577
 0;
-#X obj 137 -364 multitouch;
+#X obj 137 -364 apple/multitouch;
 #X msg 175 -424 bang;
 #X msg 208 -399 info;
 #X obj 232 -352 pddp/print;
