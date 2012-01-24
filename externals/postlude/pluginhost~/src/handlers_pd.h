@@ -34,10 +34,10 @@ void handle_pd_bang(ph *x);
 void handle_pd_info(ph *x);
 void handle_pd_listplugins(ph *x);
 void handle_pd_dsp(ph *x, t_signal **sp);
-void handle_pd_reset(ph *x, int i);
+void handle_pd_reset(ph *x, t_float i);
 void handle_pd_list(ph *x, t_symbol *s, int argc, t_atom *argv);
 void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv); 
 void handle_pd_control (ph *x, t_symbol* ctrl_name, t_float ctrl_value, 
-        int instance);
+        t_float instance);
 void handle_pd_plug(ph *x, t_symbol *s, int argc, t_atom *argv);
 void handle_pd_osc(ph *x, t_symbol *s, int argc, t_atom *argv);

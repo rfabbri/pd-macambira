@@ -977,7 +977,7 @@ void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv)
 }
 
 void handle_pd_control (ph *x, t_symbol* ctrl_name, t_float ctrl_value, 
-        int instance)
+        t_float instance)
 /* Change the value of a named control port of the plug-in */
 {
     unsigned param = 0;
@@ -1050,7 +1050,7 @@ void handle_pd_info (ph *x)
     }
 }
 
-void handle_pd_reset(ph *x, int i)
+void handle_pd_reset(ph *x, t_float i)
 {
     unsigned int n;
     const LADSPA_Descriptor *ladspa;
@@ -1058,7 +1058,7 @@ void handle_pd_reset(ph *x, int i)
     ladspa = x->descriptor->LADSPA_Plugin;
 
     for(n = 0; n < x->n_instances; n++) {
-        if (i == -1 || (int)n == i) {
+        if ((int)i == -1 || n == (int)i) {
             if (ladspa->deactivate && ladspa->activate){
                 ladspa->deactivate(x->instance_handles[n]);
                 ladspa->activate(x->instance_handles[n]);
