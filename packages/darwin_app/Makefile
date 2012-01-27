@@ -130,11 +130,13 @@ endif # NOT /System
 #------------------------------------------------------------------------------#
 # generate Info.plist using PD_APP_NAME and PD_VERSION
 Info.plist: CFBUNDLEVERSION_DATE := $(shell date +%Y.%m.%d)
+Info.plist:  CFBUNDLELOCALIZATIONS := $(shell $(packages_src)/darwin_app/embed-languages-in-info-list.py $(pd_src)/po/Makefile.am)
 Info.plist: Info.plist.in 
 	cat Info.plist.in | \
 		sed 's/PD_APP_NAME/$(PD_APP_NAME)/' | \
 		sed 's/CFBUNDLESHORTVERSIONSTRING/$(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)/' | \
-		sed 's/CFBUNDLEVERSION/$(CFBUNDLEVERSION_DATE)/' > \
+		sed 's/CFBUNDLEVERSION/$(CFBUNDLEVERSION_DATE)/' | \
+		sed 's|CFBUNDLELOCALIZATIONS|$(CFBUNDLELOCALIZATIONS)|' > \
 		Info.plist
 
 spotlight_importer_install:

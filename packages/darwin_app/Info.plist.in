@@ -25,6 +25,10 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>PD_APP_NAME</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+      CFBUNDLELOCALIZATIONS
+    </array>
 	<key>CFBundleIconFile</key>
 	<string>pd.icns</string>
 	<key>CFBundleIdentifier</key>
