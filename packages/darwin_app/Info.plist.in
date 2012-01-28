@@ -27,6 +27,7 @@
 	<string>PD_APP_NAME</string>
     <key>CFBundleLocalizations</key>
     <array>
+      <string>en</string>
       CFBUNDLELOCALIZATIONS
     </array>
 	<key>CFBundleIconFile</key>
