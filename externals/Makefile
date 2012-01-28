@@ -134,13 +134,13 @@ else
   ifeq ($(OS_NAME),darwin)
 # on Mac OS X 10.6/Snow Leopard don't build hid since it needs Carbon
 #    LIB_TARGETS += gem pdp gem2pdp iem16 apple
-    LIB_TARGETS += pdp iem16 apple
+    LIB_TARGETS += pdp iem16 apple syslog
     ifneq ($(shell uname -r | sed 's|10\.[0-9][0-9]*\.[0-9][0-9]*|10|'),10)
       LIB_TARGETS += hid
     endif
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += gem hid pdp gem2pdp iem16
+    LIB_TARGETS += gem hid pdp gem2pdp iem16 syslog
   endif
 endif
 
@@ -1607,6 +1607,19 @@ smlib_clean:
 
 
 #------------------------------------------------------------------------------#
+# SYSLOG
+syslog:
+	make -C $(externals_src)/iem/syslog PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+
+syslog_install:
+	make -C $(externals_src)/iem/syslog \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+syslog_clean:
+	make -C $(externals_src)/iem/syslog clean
+
+
+#------------------------------------------------------------------------------#
 # TESTTOOLS
 testtools:
 	make -C $(externals_src)/testtools \
@@ -1714,7 +1727,7 @@ vbap_clean:
 #------------------------------------------------------------------------------#
 # VANILLA
 vanilla:
-	make -C $(externals_src)/vanilla CFLAGS="$(CFLAGS) -fno-tree-vectorize -fno-strict-aliasing" \
+	make -C $(externals_src)/vanilla CFLAGS="$(CFLAGS)" \
 		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 vanilla_install:
