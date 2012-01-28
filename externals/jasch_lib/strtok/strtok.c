@@ -23,7 +23,7 @@
 ____________________________________________________________________________*/
 
 #include "m_pd.h"
-#include <strings.h>
+#include <string.h>
 
 
 typedef struct strtok 		
