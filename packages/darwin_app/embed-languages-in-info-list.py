@@ -12,4 +12,4 @@ for line in f.readlines():
                 iso = s[0] + '_' + s[1].upper()
             else:
                 iso = po
-            print '<string>' + iso + '</string>\\n\\t',
+            print '<string>' + iso + '</string>',
