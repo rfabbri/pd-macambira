@@ -1,4 +1,4 @@
-## Pd library template version 1.0.12
+## Pd library template version 1.0.13
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
