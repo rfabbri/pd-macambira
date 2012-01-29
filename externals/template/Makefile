@@ -402,9 +402,11 @@ dpkg-source:
 	rm -rf -- $(DISTDIR) $(ORIGDIR)
 	cd .. && dpkg-source -b $(LIBRARY_NAME)
 
-etags:
+etags: TAGS
+
+TAGS: $(wildcard $(PD_INCLUDE)/*.h) $(SOURCES) $(SHARED_SOURCE) $(SHARED_HEADER)
 	etags $(wildcard $(PD_INCLUDE)/*.h)
-	etags -a *.h $(SOURCES)
+	etags -a *.h $(SOURCES) $(SHARED_SOURCE) $(SHARED_HEADER)
 	etags -a --language=none --regex="/proc[ \t]+\([^ \t]+\)/\1/" *.tcl
 
 showsetup:
