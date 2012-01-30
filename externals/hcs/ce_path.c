@@ -104,8 +104,8 @@ void ce_path_setup(void)
     class_addmethod(ce_path_class, (t_method) ce_path_rewind,
                     gensym("rewind"), 0);
 
-    post("[ce_path] %s", version);  
-    post("\tcompiled on "__DATE__" at "__TIME__ " ");
-    post("\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
-         PD_MINOR_VERSION, PD_BUGFIX_VERSION);
+    verbose(0, "[ce_path] %s", version);  
+    verbose(0, "\tcompiled on "__DATE__" at "__TIME__ " ");
+    verbose(0, "\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
+            PD_MINOR_VERSION, PD_BUGFIX_VERSION);
 }
