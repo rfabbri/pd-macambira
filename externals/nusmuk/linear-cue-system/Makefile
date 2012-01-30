@@ -9,7 +9,7 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = cue_between.pd cue.pd  cue_init.pd  cue_sel.pd
+PDOBJECTS = cue_between.pd cue.pd  cue_init.pd  cue_sel.pd cue_bang cue_jump cue_merge cue_oioe 
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = 

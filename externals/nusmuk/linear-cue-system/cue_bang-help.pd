@@ -1,0 +1,36 @@
+#N canvas 315 91 771 471 10;
+#X obj 10 22 cue_init cue1;
+#X obj 10 233 cue test1a 2000;
+#X obj 10 176 cue initialisation;
+#X obj 10 252 cue test1;
+#X obj 10 271 cue test2;
+#X obj 10 195 cue debut;
+#X obj 10 214 cue foo 1000;
+#X text 252 135 parametters :;
+#X text 252 96 outlet 1 : 0/1 if cue is between the 1st and last cue
+;
+#X text 252 115 outlet 2 : 0..1 : same as outlet 1 \, but with an envelope
+;
+#X obj 10 290 cue test3;
+#X obj 10 309 cue test4;
+#X obj 10 328 cue test5;
+#X text 250 220 you can force a on/off state \, and jump to the end
+of the fade;
+#X obj 245 298 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 253 24 cue bang allow to send a bang when selecting a specific
+cue.;
+#X text 253 61 inlet 1 : cue;
+#X obj 245 275 cue_bang 1000;
+#X text 283 151 delay before bang;
+#X connect 0 0 2 0;
+#X connect 1 0 3 0;
+#X connect 2 0 5 0;
+#X connect 3 0 4 0;
+#X connect 3 1 17 0;
+#X connect 4 0 10 0;
+#X connect 5 0 6 0;
+#X connect 6 0 1 0;
+#X connect 10 0 11 0;
+#X connect 11 0 12 0;
+#X connect 17 0 14 0;

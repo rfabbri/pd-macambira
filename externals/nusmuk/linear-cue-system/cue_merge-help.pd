@@ -1,0 +1,51 @@
+#N canvas 317 84 771 471 10;
+#X obj 10 22 cue_init cue1;
+#X obj 10 233 cue test1a 2000;
+#X obj 10 176 cue initialisation;
+#X obj 10 252 cue test1;
+#X obj 10 271 cue test2;
+#X obj 10 195 cue debut;
+#X obj 10 214 cue foo 1000;
+#X obj 221 250 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 221 231 cue_between 1000 1000;
+#X obj 10 290 cue test3;
+#X obj 219 329 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 10 309 cue test4;
+#X obj 10 328 cue test5;
+#X obj 220 310 cue_between 100 100 4000 2000;
+#X obj 249 252 s test;
+#X obj 241 329 s test;
+#X obj 221 271 cue_sel;
+#X obj 221 291 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 241 291 s test;
+#X obj 504 225 r test;
+#X obj 504 246 cue_merge;
+#X obj 504 267 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 302 66 cue_merge allow to filter when many value are send in
+the same logical time.;
+#X connect 0 0 2 0;
+#X connect 1 0 3 0;
+#X connect 1 1 8 0;
+#X connect 2 0 5 0;
+#X connect 3 0 4 0;
+#X connect 4 0 9 0;
+#X connect 4 1 16 0;
+#X connect 5 0 6 0;
+#X connect 5 1 8 1;
+#X connect 6 0 1 0;
+#X connect 7 0 14 0;
+#X connect 8 0 7 0;
+#X connect 9 0 11 0;
+#X connect 9 1 13 1;
+#X connect 10 0 15 0;
+#X connect 11 0 12 0;
+#X connect 11 1 13 0;
+#X connect 13 0 10 0;
+#X connect 16 0 17 0;
+#X connect 17 0 18 0;
+#X connect 19 0 20 0;
+#X connect 20 0 21 0;
