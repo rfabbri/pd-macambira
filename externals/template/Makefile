@@ -1,4 +1,4 @@
-## Pd library template version 1.0.13
+## Pd library template version 1.0.12
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
@@ -361,7 +361,7 @@ dist: $(DISTDIR)
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
 	test -z "$(strip $(wildcard $(ALLSOURCES:.c=.tcl)))" || \
 		$(INSTALL_DATA) $(wildcard $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
-	test -z "$(strip $(LIBRARY_NAME).c)" || \
+	test -z "$(strip $(wildcard $(LIBRARY_NAME).c))" || \
 		$(INSTALL_DATA) $(LIBRARY_NAME).c  $(DISTDIR)
 	test -z "$(strip $(SHARED_HEADER))" || \
 		$(INSTALL_DATA) $(SHARED_HEADER)  $(DISTDIR)
