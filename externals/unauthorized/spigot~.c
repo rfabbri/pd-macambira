@@ -65,7 +65,7 @@ static void spigot_set(t_spigot *x, t_float f)
 
 void spigot_tilde_setup(void)
 {
-    post ( spigot_version );
+    verbose(0, spigot_version );
     spigot_class = class_new(gensym("spigot~"), (t_newmethod)spigot_new, 0,
     	sizeof(t_spigot), 0, 0);
     CLASS_MAINSIGNALIN( spigot_class, t_spigot, x_f );

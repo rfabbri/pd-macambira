@@ -1056,7 +1056,7 @@ static void *oggamp_new(t_floatarg fdographics, t_floatarg fnchannels, t_floatar
     x->x_graphic = (int)fdographics;
     x->x_canvas = canvas_getcurrent(); 
     
-    post(oggamp_version);
+    verbose(0, oggamp_version);
 	post("oggamp~: set buffer to %dk bytes", bufsize/1024);
 
 		/* start child thread */
