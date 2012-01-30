@@ -349,7 +349,7 @@ static void mp3cast_tilde_lame_init(t_mp3cast *x)
 #endif  /* _WIN32 */
     {
        const char *lameVersion = get_lame_version();
-       post( "mp3cast~ : using lame version : %s", lameVersion );
+       verbose(0,  "mp3cast~ : using lame version : %s", lameVersion );
     }
 
 
@@ -785,7 +785,7 @@ static void mp3cast_mpeg(t_mp3cast *x, t_floatarg fsamplerate, t_floatarg fbitra
 static void mp3cast_print(t_mp3cast *x)
 {
     const char        * buf = 0;
-    post(mp3cast_version);
+    verbose(0, mp3cast_version);
     post("  LAME mp3 settings:\n"
          "    output sample rate: %d Hz\n"
          "    bitrate: %d kbit/s", x->x_samplerate, x->x_bitrate);
@@ -947,7 +947,7 @@ static void *mp3cast_new(void)
 
 void mp3cast_tilde_setup(void)
 {
-    post(mp3cast_version);
+    verbose(0, mp3cast_version);
     mp3cast_class = class_new(gensym("mp3cast~"), (t_newmethod)mp3cast_new, (t_method)mp3cast_free,
         sizeof(t_mp3cast), 0, 0);
     CLASS_MAINSIGNALIN(mp3cast_class, t_mp3cast, x_f );

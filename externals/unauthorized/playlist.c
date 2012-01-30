@@ -1022,7 +1022,7 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
 
 void playlist_setup(void)
 {
-    post( playlist_version );
+    verbose(0,  playlist_version );
     playlist_class = class_new(gensym("playlist"), (t_newmethod)playlist_new,
 			      (t_method)playlist_free, sizeof(t_playlist), 
                               CLASS_DEFAULT, A_GIMME, 0);

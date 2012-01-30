@@ -779,7 +779,7 @@ static void *scratcher_new(t_symbol *s, int argc, t_atom *argv)
 
 void scratcher_tilde_setup(void)
 {
-    post(scratcher_version);
+    verbose(0, scratcher_version);
     scratcher_class = class_new(gensym("scratcher~"), (t_newmethod)scratcher_new, (t_method)scratcher_free,
                     sizeof(t_scratcher), 0, A_GIMME, 0);
 

@@ -391,7 +391,7 @@ static void *wahwah_new(void)
 
 void wahwah_tilde_setup(void)
 {
-    post( wahwah_version );
+    verbose(0,  wahwah_version );
     wahwah_class = class_new(gensym("wahwah~"), (t_newmethod)wahwah_new, (t_method)wahwah_free,
     	sizeof(t_wahwah), 0, 0);
 

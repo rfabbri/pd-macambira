@@ -1237,7 +1237,7 @@ static void *mp3amp_new(t_floatarg fdographics)
         /* init mpg123 decoder */
     mp3amp_tilde_mpglib_init(x);
 
-    post(mp3amp_version);
+    verbose(0, mp3amp_version);
 
     return (x);
 }

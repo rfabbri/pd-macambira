@@ -95,7 +95,7 @@ static void compressor_dsp(t_compressor *x, t_signal **sp)
 
 void compressor_tilde_setup(void)
 {
-    post( compressor_version );
+    verbose(0,  compressor_version );
     compressor_class = class_new(gensym("compressor~"), (t_newmethod)compressor_new, 0,
     	sizeof(t_compressor), 0, 0);
     CLASS_MAINSIGNALIN( compressor_class, t_compressor, x_f );

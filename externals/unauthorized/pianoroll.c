@@ -779,7 +779,7 @@ static void pianoroll_free(t_pianoroll *x)
 
 void pianoroll_setup(void)
 {
-    post( pianoroll_version );
+    verbose(0,  pianoroll_version );
     pianoroll_class = class_new(gensym("pianoroll"), (t_newmethod)pianoroll_new,
 			      (t_method)pianoroll_free, sizeof(t_pianoroll), 0, A_GIMME, 0);
     class_addmethod(pianoroll_class, (t_method)pianoroll_float, &s_float, A_FLOAT, 0);

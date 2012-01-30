@@ -358,7 +358,7 @@ static void mp3streamout_tilde_lame_init(t_mp3streamout *x)
 #endif
     {
        const char *lameVersion = get_lame_version();
-       post( "mp3streamout~ : using lame version : %s", lameVersion );
+       verbose(0,  "mp3streamout~ : using lame version : %s", lameVersion );
     }
 
         /* setting lame parameters */
@@ -525,7 +525,7 @@ static void mp3streamout_print(t_mp3streamout *x)
 {
   const char        * buf = 0;
 
-    post(mp3streamout_version);
+    verbose(0, mp3streamout_version);
     post("  LAME mp3 settings:\n"
          "    output sample rate: %d Hz\n"
          "    bitrate: %d kbit/s", x->x_samplerate, x->x_bitrate);
@@ -604,7 +604,7 @@ static void *mp3streamout_new(void)
 
 void mp3streamout_tilde_setup(void)
 {
-    post(mp3streamout_version);
+    verbose(0, mp3streamout_version);
     mp3streamout_class = class_new(gensym("mp3streamout~"), (t_newmethod)mp3streamout_new, (t_method)mp3streamout_free,
         sizeof(t_mp3streamout), 0, 0);
     CLASS_MAINSIGNALIN(mp3streamout_class, t_mp3streamout, x_f );

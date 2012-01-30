@@ -998,7 +998,7 @@ static void scrolllist_free(t_scrolllist *x)
 
 void scrolllist_setup(void)
 {
-    post( scrolllist_version );
+    verbose(0,  scrolllist_version );
     scrolllist_class = class_new(gensym("scrolllist"), (t_newmethod)scrolllist_new,
 			      (t_method)scrolllist_free, sizeof(t_scrolllist), 
                               CLASS_DEFAULT, A_GIMME, 0);

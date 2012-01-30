@@ -471,7 +471,7 @@ static void *disto_new(void)
 
 void disto_tilde_setup(void)
 {
-    post( disto_version );
+    verbose(0,  disto_version );
     disto_class = class_new(gensym("disto~"), (t_newmethod)disto_new, (t_method)disto_free,
     	sizeof(t_disto), 0, 0);
 
