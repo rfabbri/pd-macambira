@@ -83,6 +83,13 @@ pd._whoami = function (object)
   end
 end
 
+--class method dispatcher
+pd._get_class = function (object)
+  if nil ~= pd._objects[object] then
+    return pd._objects[object]:get_class()
+  end
+end
+
 -- prototypical OO system
 pd.Prototype = { }
 function pd.Prototype:new(o)
@@ -287,6 +294,9 @@ function pd.Class:error(msg)
 end
 function pd.Class:whoami()
   return self._scriptname or self._name
+end
+function pd.Class:get_class() -- accessor for t_class*
+  return self._class or nil
 end
 
 local lua = pd.Class:new():register("pdlua")  -- global controls (the [pdlua] object only)

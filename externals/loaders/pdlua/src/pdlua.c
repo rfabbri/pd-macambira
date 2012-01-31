@@ -395,6 +395,9 @@ static void pdlua_free( t_pdlua *o /**< The object to destruct. */)
 static void pdlua_menu_open(t_pdlua *o)
 {
     const char  *name;
+    const char  *path;
+    char        pathname[FILENAME_MAX];
+    t_class     *class;
 
 #ifdef PDLUA_DEBUG
     post("pdlua_menu_open");
@@ -412,7 +415,34 @@ static void pdlua_menu_open(t_pdlua *o)
 #ifdef PDLUA_DEBUG
     post("pdlua_menu_open: L is %p, name is %s", L, name);
 #endif // PDLUA_DEBUG
-    if (name) sys_vgui("::pd_menucommands::menu_openfile {%s}\n", name);
+    if (name)
+    {
+        if (name[strlen(name)-1] == 'x')
+        {
+            /* pdluax is a class, the particular file should loadable by name alone, we hope */
+            sprintf(pathname, "%s", name);
+        }
+        else
+        {
+            lua_getglobal(L, "pd");
+            lua_getfield(L, -1, "_get_class");
+            lua_pushlightuserdata(L, o);
+            if (lua_pcall(L, 1, 1, 0))
+            {
+                error("lua: error in get_class:\n%s", lua_tostring(L, -1));
+                return;
+            }
+            class = (t_class *)lua_touserdata(L, -1);
+            path = class->c_externdir->s_name;
+            sprintf(pathname, "%s/%s", path, name);
+        }
+#if PD_MAJOR_VERSION==0 && PD_MINOR_VERSION<43
+        post("Opening %s for editing", pathname);
+#else
+        logpost(NULL, 3, "Opening %s for editing", pathname);
+#endif
+          sys_vgui("::pd_menucommands::menu_openfile {%s}\n", pathname);
+    }
 }
 
 /** Lua class registration. This is equivalent to the "setup" method for an ordinary Pd class */
@@ -459,6 +489,10 @@ static int pdlua_object_new(lua_State *L)
         t_class *c = lua_touserdata(L, 1);
         if (c)
         {
+#ifdef PDLUA_DEBUG
+            char *path = c->c_externdir->s_name;
+            post("pdlua_object_new: path is %s", path);
+#endif // PDLUA_DEBUG
             t_pdlua *o = (t_pdlua *) pd_new(c);
             if (o)
             {
@@ -1121,6 +1155,7 @@ static int pdlua_error(lua_State *L)
 {
     t_pdlua     *o;
 
+
     const char  *s;
 
     if (lua_islightuserdata(L, 1))
@@ -1203,6 +1238,9 @@ static int pdlua_dofile(lua_State *L)
             fd = canvas_open(o->canvas, filename, "", buf, &ptr, MAXPDSTRING, 1);
             if (fd >= 0)
             {
+#ifdef PDLUA_DEBUG
+                post("pdlua_dofile path is %s", buf);
+#endif // PDLUA_DEBUG
                 pdlua_setrequirepath(L, buf);
                 reader.fd = fd;
                 if (lua_load(L, pdlua_reader, &reader, filename))
@@ -1370,7 +1408,7 @@ void pdlua_setup(void)
     t_pdlua_readerdata  reader;
     int                 fd;
     int                 result;
-    char*               pdluaver = "pdlua 0.6 (GPL) 2011 Martin Peach, based on";
+    char*               pdluaver = "pdlua 0.7 (GPL) 2012 Martin Peach, based on";
     char*               luaver = "lua 0.6~svn (GPL) 2008 Claude Heiland-Allen <claudiusmaximus@goto10.org>";
     char                compiled[MAXPDSTRING];
 
