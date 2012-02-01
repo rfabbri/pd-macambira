@@ -1,6 +1,7 @@
 --[[
 pdlua -- a Lua embedding for Pd
 Copyright (C) 2007,2008 Claude Heiland-Allen <claudiusmaximus@goto10.org>
+Copyright (C) 2012 Martin Peach martin.peach@sympatico.ca
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -92,6 +93,7 @@ end
 
 -- prototypical OO system
 pd.Prototype = { }
+
 function pd.Prototype:new(o)
   o = o or {}
   setmetatable(o, self)
@@ -99,9 +101,9 @@ function pd.Prototype:new(o)
   return o
 end
 
-
 -- clocks
 pd.Clock = pd.Prototype:new()
+
 function pd.Clock:register(object, method)
   if nil ~= object then
     if nil ~= object._object then
@@ -114,11 +116,13 @@ function pd.Clock:register(object, method)
   end
   return nil
 end
+
 function pd.Clock:destruct()
   pd._clocks[self._clock] = nil
   pd._clockfree(self._clock)
   self._clock = nil
 end
+
 function pd.Clock:dispatch()
   local m = self._target[self._method]
   if type(m) == "function" then
@@ -130,18 +134,22 @@ function pd.Clock:dispatch()
     )
   end
 end
+
 function pd.Clock:set(systime)
   pd._clockset(self._clock, systime)
 end
+
 function pd.Clock:delay(delaytime)
   pd._clockdelay(self._clock, delaytime)
 end
+
 function pd.Clock:unset()
   pd._clockunset(self._clock)
 end
 
 -- tables
 pd.Table = pd.Prototype:new()
+
 function pd.Table:sync(name)
   self.name = name
   self._length, self._array = pd._getarray(name)
@@ -151,10 +159,12 @@ function pd.Table:sync(name)
     return self
   end
 end
+
 function pd.Table:destruct()
   self._length = -3
   self._array = nil
 end
+
 function pd.Table:get(i)
   if type(i) == "number" and 0 <= i and i < self._length then
     return pd._readarray(self._length, self._array, i)
@@ -162,6 +172,7 @@ function pd.Table:get(i)
     return nil
   end
 end
+
 function pd.Table:set(i, f)
   if type(i) == "number" and type(f) == "number" and 0 <= i and i < self._length then
     return pd._writearray(self._length, self._array, i, f)
@@ -169,6 +180,7 @@ function pd.Table:set(i, f)
     return nil
   end
 end
+
 function pd.Table:length()
   if self._length >= 0 then
     return self._length
@@ -176,6 +188,7 @@ function pd.Table:length()
     return nil
   end
 end
+
 function pd.Table:redraw()
   pd._redrawarray(self.name)
 end
@@ -186,7 +199,9 @@ function pd._receivedispatch(receive, sel, atoms)
     pd._receives[receive]:dispatch(sel, atoms)
   end
 end
+
 pd.Receive = pd.Prototype:new()
+
 function pd.Receive:register(object, name, method)
   if nil ~= object then
     if nil ~= object._object then
@@ -200,6 +215,7 @@ function pd.Receive:register(object, name, method)
   end
   return nil
 end
+
 function pd.Receive:destruct()
   pd._receives[self._receive] = nil
   pd._receivefree(self._receive)
@@ -208,12 +224,14 @@ function pd.Receive:destruct()
   self._target = nil
   self._method = nil
 end
+
 function pd.Receive:dispatch(sel, atoms)
   self._target[self._method](self._target, sel, atoms)
 end
 
 -- patchable objects
 pd.Class = pd.Prototype:new()
+
 function pd.Class:register(name)
   if nil ~= pd._classes[name] then    -- already registered
     return pd._classes[name]          -- return existing
@@ -229,6 +247,7 @@ function pd.Class:register(name)
     return self                       -- return new
   end
 end
+
 function pd.Class:construct(sel, atoms)
   self._object = pd._create(self._class)
   self.inlets = 0
@@ -242,11 +261,13 @@ function pd.Class:construct(sel, atoms)
     return nil
   end
 end
+
 function pd.Class:destruct()
   pd._objects[self] = nil
   self:finalize()
   pd._destroy(self._object)
 end
+
 function pd.Class:dispatch(inlet, sel, atoms)
   local m = self["in_" .. inlet .. "_" .. sel]
   if type(m) == "function" then
@@ -280,41 +301,52 @@ function pd.Class:dispatch(inlet, sel, atoms)
     " of Lua object `" .. self._name .. "'"
   )
 end
+
 function pd.Class:outlet(outlet, sel, atoms)
   pd._outlet(self._object, outlet, sel, atoms)
 end
+
 function pd.Class:initialize(sel, atoms) end
+
 function pd.Class:postinitialize() end
+
 function pd.Class:finalize() end
+
 function pd.Class:dofile(file)
   return pd._dofile(self._object, file)
 end
+
 function pd.Class:error(msg)
   pd._error(self._object, msg)
 end
+
 function pd.Class:whoami()
   return self._scriptname or self._name
 end
+
 function pd.Class:get_class() -- accessor for t_class*
   return self._class or nil
 end
 
 local lua = pd.Class:new():register("pdlua")  -- global controls (the [pdlua] object only)
+
 function lua:initialize(sel, atoms)
   self.inlets = 1
   self.outlets = 0    -- FIXME: might be nice to have errors go here?
   return true
 end
+
 function lua:in_1_load(atoms)  -- execute a script
   self:dofile(atoms[1])
 end
 
 
 local luax = pd.Class:new():register("pdluax")  -- classless lua externals (like [pdluax foo])
+
 function luax:initialize(sel, atoms)          -- motivation: pd-list 2007-09-23
-  local f = self:dofile(atoms[1] .. ".pd_luax")
+  local f, pathname = self:dofile(atoms[1] .. ".pd_luax")
   if nil ~= f then
-    self._scriptname = atoms[1] .. ".pd_luax" -- mrpeach 20111027
+    self._scriptname = pathname .. '/' .. atoms[1] .. ".pd_luax" -- mrpeach 20120201
     local atomstail = { }          -- munge for better lua<->luax compatibility
     for i,_ in ipairs(atoms) do                  
       if i > 1 then
@@ -326,3 +358,5 @@ function luax:initialize(sel, atoms)          -- motivation: pd-list 2007-09-23
     return false   -- error message already output by dofile()
   end
 end
+
+-- fin pd.lua

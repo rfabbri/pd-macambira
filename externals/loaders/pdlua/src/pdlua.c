@@ -82,6 +82,7 @@
 
 /* If defined, PDLUA_DEBUG lets pdlua post a lot of text */
 //#define PDLUA_DEBUG
+
 /** Global Lua interpreter state, needed in the constructor. */
 static lua_State *L;
 
@@ -91,6 +92,150 @@ typedef struct pdlua_readerdata
     int         fd; /**< File descriptor to read from. */
     char        buffer[MAXPDSTRING]; /**< Buffer to read into. */
 } t_pdlua_readerdata;
+
+/** Pd object data. */
+typedef struct pdlua 
+{
+    t_object                pd; /**< We are a Pd object. */
+    int                     inlets; /**< Number of inlets. */
+    struct pdlua_proxyinlet *in; /**< The inlets themselves. */
+    int                     outlets; /**< Number of outlets. */
+    t_outlet                **out; /**< The outlets themselves. */
+    t_canvas                *canvas; /**< The canvas that the object was created on. */
+} t_pdlua;
+
+/** Proxy inlet object data. */
+typedef struct pdlua_proxyinlet
+{
+    t_pd            pd; /**< Minimal Pd object. */
+    struct pdlua    *owner; /**< The owning object to forward inlet messages to. */
+    unsigned int    id; /**< The number of this inlet. */
+} t_pdlua_proxyinlet;
+
+/** Proxy receive object data. */
+typedef struct pdlua_proxyreceive
+{
+    t_pd            pd; /**< Minimal Pd object. */
+    struct pdlua    *owner; /**< The owning object to forward received messages to. */
+    t_symbol        *name; /**< The receive-symbol to bind to. */
+} t_pdlua_proxyreceive;
+
+/** Proxy clock object data. */
+typedef struct pdlua_proxyclock
+{
+    t_pd            pd; /**< Minimal Pd object. */
+    struct pdlua    *owner; /**< Object to forward messages to. */
+    t_clock         *clock; /** Pd clock to use. */
+} t_pdlua_proxyclock;
+/* prototypes*/
+
+static const char *pdlua_reader (lua_State *L, void *rr, size_t *size);
+/** Proxy inlet 'anything' method. */
+static void pdlua_proxyinlet_anything (t_pdlua_proxyinlet *p, t_symbol *s, int argc, t_atom *argv);
+/** Proxy inlet initialization. */
+static void pdlua_proxyinlet_init (t_pdlua_proxyinlet *p, struct pdlua *owner, unsigned int id);
+/** Register the proxy inlet class with Pd. */
+static void pdlua_proxyinlet_setup (void);
+/** Proxy receive 'anything' method. */
+static void pdlua_proxyreceive_anything (t_pdlua_proxyreceive *r, t_symbol *s, int argc, t_atom *argv);
+/** Proxy receive allocation and initialization. */
+static t_pdlua_proxyreceive *pdlua_proxyreceive_new (struct pdlua *owner, t_symbol *name);
+/** Proxy receive cleanup and deallocation. */
+static void pdlua_proxyreceive_free (t_pdlua_proxyreceive *r /**< The proxy receive to free. */);
+/** Register the proxy receive class with Pd. */
+static void pdlua_proxyreceive_setup (void);
+/** Proxy clock 'bang' method. */
+static void pdlua_proxyclock_bang (t_pdlua_proxyclock *c);
+/** Proxy clock allocation and initialization. */
+static t_pdlua_proxyclock *pdlua_proxyclock_new (struct pdlua *owner);
+/** Register the proxy clock class with Pd. */
+static void pdlua_proxyclock_setup (void);
+/** Dump an array of atoms into a Lua table. */
+static void pdlua_pushatomtable (int argc, t_atom *argv);
+/** Pd object constructor. */
+static t_pdlua *pdlua_new (t_symbol *s, int argc, t_atom *argv);
+/** Pd object destructor. */
+static void pdlua_free (t_pdlua *o );
+/** a handler for the open item in the right-click menu (mrpeach 20111025) */
+/** Here we find the lua code for the object and open it in an editor */
+static void pdlua_menu_open (t_pdlua *o);
+/** Lua class registration. This is equivalent to the "setup" method for an ordinary Pd class */
+static int pdlua_class_new (lua_State *L);
+/** Lua object creation. */
+static int pdlua_object_new (lua_State *L);
+/** Lua object inlet creation. */
+static int pdlua_object_createinlets (lua_State *L);
+/** Lua object outlet creation. */
+static int pdlua_object_createoutlets (lua_State *L);
+/** Lua object receive creation. */
+static int pdlua_receive_new (lua_State *L);
+/** Lua object receive destruction. */
+static int pdlua_receive_free (lua_State *L);
+/** Lua object clock creation. */
+static int pdlua_clock_new (lua_State *L);
+/** Lua proxy clock delay. */
+static int pdlua_clock_delay (lua_State *L);
+/** Lua proxy clock set. */
+static int pdlua_clock_set (lua_State *L);
+/** Lua proxy clock unset. */
+static int pdlua_clock_unset (lua_State *L);
+/** Lua proxy clock destruction. */
+static int pdlua_clock_free (lua_State *L);
+/** Lua object destruction. */
+static int pdlua_object_free (lua_State *L);
+/** Dispatch Pd inlet messages to Lua objects. */
+static void pdlua_dispatch (t_pdlua *o, unsigned int inlet, t_symbol *s, int argc, t_atom *argv);
+/** Dispatch Pd receive messages to Lua objects. */
+static void pdlua_receivedispatch (t_pdlua_proxyreceive *r, t_symbol *s, int argc, t_atom *argv);
+/** Dispatch Pd clock messages to Lua objects. */
+static void pdlua_clockdispatch(t_pdlua_proxyclock *clock);
+/** Convert a Lua table into a Pd atom array. */
+static t_atom *pdlua_popatomtable (lua_State *L, int *count, t_pdlua *o);
+/** Send a message from a Lua object outlet. */
+static int pdlua_outlet (lua_State *L);
+/** Send a message from a Lua object to a Pd receiver. */
+static int pdlua_send (lua_State *L);
+/** Set a [value] object's value. */
+static int pdlua_setvalue (lua_State *L);
+/** Get a [value] object's value. */
+static int pdlua_getvalue (lua_State *L);
+/** Get a [table] object's array. */
+static int pdlua_getarray (lua_State *L);
+/** Read from a [table] object's array. */
+static int pdlua_readarray (lua_State *L);
+/** Write to a [table] object's array. */
+static int pdlua_writearray (lua_State *L);
+/** Redraw a [table] object's graph. */
+static int pdlua_redrawarray (lua_State *L);
+/** Post to Pd's console. */
+static int pdlua_post (lua_State *L);
+/** Report an error from a Lua object to Pd's console. */
+static int pdlua_error (lua_State *L);
+static void pdlua_setrequirepath (lua_State *L, const char *path);
+static void pdlua_clearrequirepath (lua_State *L);
+/** Run a Lua script using Pd's path. */
+static int pdlua_dofile (lua_State *L);
+/** Initialize the pd API for Lua. */
+static void pdlua_init (lua_State *L);
+/** Pd loader hook for loading and executing Lua scripts. */
+static int pdlua_loader (t_canvas *canvas, char *name);
+/** Start the Lua runtime and register our loader hook. */
+#ifdef _WIN32
+__declspec(dllexport)
+#endif 
+void pdlua_setup (void);
+/* end prototypes*/
+
+/* globals */
+struct pdlua_proxyinlet;
+struct pdlua_proxyreceive;
+struct pdlua_proxyclock;
+/** Proxy inlet class pointer. */
+static t_class *pdlua_proxyinlet_class;
+/** Proxy receive class pointer. */
+static t_class *pdlua_proxyreceive_class;
+/** Proxy clock class pointer. */
+static t_class *pdlua_proxyclock_class;
 
 /** Lua file reader callback. */
 static const char *pdlua_reader
@@ -120,38 +265,6 @@ static const char *pdlua_reader
         return r->buffer;
     }
 }
-
-/* declare some stuff in advance */
-struct pdlua_proxyinlet;
-struct pdlua_proxyreceive;
-struct pdlua_proxyclock;
-
-/** Pd object data. */
-typedef struct pdlua 
-{
-    t_object                pd; /**< We are a Pd object. */
-    int                     inlets; /**< Number of inlets. */
-    struct pdlua_proxyinlet *in; /**< The inlets themselves. */
-    int                     outlets; /**< Number of outlets. */
-    t_outlet                **out; /**< The outlets themselves. */
-    t_canvas                *canvas; /**< The canvas that the object was created on. */
-} t_pdlua;
-
-/* more forward declarations */
-static void pdlua_dispatch(t_pdlua *o, unsigned int inlet, t_symbol *s, int argc, t_atom *argv);
-static void pdlua_receivedispatch(struct pdlua_proxyreceive *r, t_symbol *s, int argc, t_atom *argv);
-static void pdlua_clockdispatch(struct pdlua_proxyclock *clock);
-
-/** Proxy inlet class pointer. */
-static t_class *pdlua_proxyinlet_class;
-
-/** Proxy inlet object data. */
-typedef struct pdlua_proxyinlet
-{
-    t_pd            pd; /**< Minimal Pd object. */
-    struct pdlua    *owner; /**< The owning object to forward inlet messages to. */
-    unsigned int    id; /**< The number of this inlet. */
-} t_pdlua_proxyinlet;
 
 /** Proxy inlet 'anything' method. */
 static void pdlua_proxyinlet_anything
@@ -184,17 +297,6 @@ static void pdlua_proxyinlet_setup(void)
     pdlua_proxyinlet_class = class_new(gensym("pdlua proxy inlet"), 0, 0, sizeof(t_pdlua_proxyinlet), 0, 0);
     class_addanything(pdlua_proxyinlet_class, pdlua_proxyinlet_anything);
 }
-
-/** Proxy receive class pointer. */
-static t_class *pdlua_proxyreceive_class;
-
-/** Proxy receive object data. */
-typedef struct pdlua_proxyreceive
-{
-    t_pd            pd; /**< Minimal Pd object. */
-    struct pdlua    *owner; /**< The owning object to forward received messages to. */
-    t_symbol        *name; /**< The receive-symbol to bind to. */
-} t_pdlua_proxyreceive;
 
 /** Proxy receive 'anything' method. */
 static void pdlua_proxyreceive_anything(
@@ -238,18 +340,6 @@ static void pdlua_proxyreceive_setup()
     pdlua_proxyreceive_class = class_new(gensym("pdlua proxy receive"), 0, 0, sizeof(t_pdlua_proxyreceive), 0, 0);
     class_addanything(pdlua_proxyreceive_class, pdlua_proxyreceive_anything);
 }
-
-
-/** Proxy clock class pointer. */
-static t_class *pdlua_proxyclock_class;
-
-/** Proxy clock object data. */
-typedef struct pdlua_proxyclock
-{
-    t_pd            pd; /**< Minimal Pd object. */
-    struct pdlua    *owner; /**< Object to forward messages to. */
-    t_clock         *clock; /** Pd clock to use. */
-} t_pdlua_proxyclock;
 
 /** Proxy clock 'bang' method. */
 static void pdlua_proxyclock_bang(t_pdlua_proxyclock *c /**< The proxy clock that received the message. */)
@@ -1173,8 +1263,8 @@ static int pdlua_error(lua_State *L)
     return 0;
 }
 
-void pdlua_setrequirepath
-( /* FIXME: documentation */
+static void pdlua_setrequirepath
+( /* FIXME: documentation (is this of any use at all?) */
     lua_State   *L,
     const char  *path
 )
@@ -1191,8 +1281,8 @@ void pdlua_setrequirepath
     lua_pop(L, 1);
 }
 
-void pdlua_clearrequirepath
-( /* FIXME: documentation */
+static void pdlua_clearrequirepath
+( /* FIXME: documentation (is this of any use at all?) */
     lua_State *L
 )
 {
@@ -1241,6 +1331,7 @@ static int pdlua_dofile(lua_State *L)
 #ifdef PDLUA_DEBUG
                 post("pdlua_dofile path is %s", buf);
 #endif // PDLUA_DEBUG
+                //pdlua_setpathname(o, buf);/* change the scriptname to include its path */
                 pdlua_setrequirepath(L, buf);
                 reader.fd = fd;
                 if (lua_load(L, pdlua_reader, &reader, filename))
@@ -1271,6 +1362,7 @@ static int pdlua_dofile(lua_State *L)
         else error("lua: error in object:dofile() - object is null");
     }
     else error("lua: error in object:dofile() - object is wrong type");
+    lua_pushstring(L, buf); /* return the path as well so we can open it later with pdlua_menu_open() */
     return lua_gettop(L) - n;
 }
 
@@ -1383,6 +1475,7 @@ static int pdlua_loader
         reader.fd = fd;
         if (lua_load(L, pdlua_reader, &reader, name) || lua_pcall(L, 0, 0, 0))
         {
+
             error("lua: error loading `%s':\n%s", name, lua_tostring(L, -1));
             lua_pop(L, 1);
             close(fd);
