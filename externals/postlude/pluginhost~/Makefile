@@ -10,10 +10,10 @@ LIBRARY_NAME = pluginhost~
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = src/pluginhost~.c
+SOURCES = pluginhost~.c
 
 # Additional source files
-EXTRASOURCES = src/handlers_osc.c src/jload.c src/ph_common.c src/handlers_pd.c src/jsearch.c
+EXTRASOURCES = handlers_osc.c jload.c ph_common.c handlers_pd.c jsearch.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
