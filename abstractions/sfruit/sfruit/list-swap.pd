@@ -10,7 +10,7 @@
 #X obj 101 53 t a b b a;
 #X obj 246 112 list length;
 #X obj 145 162 list-remove;
-#X obj 243 67 import-disabled list-abs;
+#X obj 243 67 import list-abs;
 #X connect 0 0 7 0;
 #X connect 1 0 6 0;
 #X connect 2 0 9 0;

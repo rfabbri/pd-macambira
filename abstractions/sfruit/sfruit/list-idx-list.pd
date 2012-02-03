@@ -7,7 +7,7 @@
 #X obj 39 23 inlet;
 #X obj 39 44 t b a;
 #X obj 39 156 outlet;
-#X obj 135 68 import-disabled list-abs iemlib;
+#X obj 135 68 import list-abs iemlib;
 #X obj 140 23 inlet;
 #X connect 0 0 6 0;
 #X connect 1 0 2 1;

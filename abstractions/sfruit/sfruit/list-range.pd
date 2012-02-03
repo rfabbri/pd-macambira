@@ -125,7 +125,7 @@ count up from zero.;
 #X obj 148 113 list-onearg \$2;
 #X obj 129 143 list-onearg \$3;
 #X obj 168 83 \$1;
-#X obj 152 246 import-disabled list-abs;
+#X obj 152 246 import list-abs;
 #X connect 0 0 20 0;
 #X connect 0 1 19 0;
 #X connect 0 2 21 0;

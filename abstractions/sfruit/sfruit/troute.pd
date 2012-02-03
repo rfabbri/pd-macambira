@@ -223,7 +223,7 @@
 #X obj 227 39 initbang;
 #N canvas 122 62 611 204 \$0canvas 1;
 #X restore 30 243 pd \$0canvas;
-#X obj 378 17 import-disabled iemlib list-abs;
+#X obj 378 17 import iemlib list-abs;
 #X obj 30 263 saveclear pd-\$0canvas;
 #X connect 1 0 13 0;
 #X connect 1 1 2 0;

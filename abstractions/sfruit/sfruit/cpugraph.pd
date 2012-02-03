@@ -48,7 +48,7 @@
 #X obj 26 155 r \$0markbang;
 #X obj 288 501 min 1;
 #X msg 377 397 100;
-#X obj 436 72 import-disabled maxlib;
+#X obj 436 72 import maxlib;
 #X connect 2 0 7 0;
 #X connect 3 0 4 0;
 #X connect 4 0 34 0;

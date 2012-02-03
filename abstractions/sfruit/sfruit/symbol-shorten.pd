@@ -6,7 +6,7 @@
 #X obj 131 308 outlet;
 #X obj 214 198 loadbang;
 #X obj 214 219 list-onearg \$2 >;
-#X obj 187 37 import-disabled list-abs;
+#X obj 187 37 import list-abs;
 #X obj 41 90 list-decorate;
 #X obj 239 120 loadbang;
 #X obj 131 171 list split;

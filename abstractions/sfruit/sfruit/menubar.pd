@@ -23,7 +23,7 @@
 #X obj 144 80 r \$0edit;
 #X obj 175 110 r \$0fullFile;
 #X msg 144 137 mate \$1;
-#X obj 51 204 import-disabled zexy ggee;
+#X obj 51 204 import zexy ggee;
 #X connect 0 0 1 0;
 #X connect 3 0 14 0;
 #X connect 5 0 9 0;

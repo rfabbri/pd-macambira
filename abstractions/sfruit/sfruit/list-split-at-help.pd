@@ -24,7 +24,7 @@ encountering a delimiter;
 #X msg 49 227;
 #X text 271 289 2008 Luke Iannini;
 #X text 271 303 proyekto.net;
-#X obj 256 36 import-disabled list-abs;
+#X obj 256 36 import list-abs;
 #X connect 0 0 3 0;
 #X connect 0 1 6 0;
 #X connect 1 0 0 1;

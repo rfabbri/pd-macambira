@@ -1,6 +1,6 @@
 #N canvas 1079 646 553 411 10;
 
-#X obj 285 34 import-disabled iemlib list-abs;
+#X obj 285 34 import iemlib list-abs;
 #X obj 133 61 dollarg;
 #X obj 112 153 list;
 #X obj 133 40 loadbang;

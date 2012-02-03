@@ -5,7 +5,7 @@
 -1 -1;
 #X obj 263 199 list-value cheese;
 #X obj 111 200 list-value cheese;
-#X obj 439 23 import-disabled list-abs;
+#X obj 439 23 import list-abs;
 #X obj 263 272 prepent set;
 #X msg 159 152 e f g;
 #X text 17 22 [list-value] - [v]/[value] for lists \, or anything else.

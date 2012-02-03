@@ -70,7 +70,7 @@
 #X obj 139 228 list-apply - 1;
 #X obj 80 63 list;
 #X obj 28 32 route bang seek;
-#X obj 180 9 import-disabled list-abs iemlib;
+#X obj 180 9 import list-abs iemlib;
 #X obj 26 194 t a a a a;
 #X connect 0 0 18 0;
 #X connect 0 0 26 0;

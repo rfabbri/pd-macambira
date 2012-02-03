@@ -28,7 +28,7 @@
 #X obj 310 319 loadbang;
 #X obj 310 351 blocksize_in_ms;
 #X obj 310 385 s \$0block-ms;
-#X obj 66 113 import-disabled hcs;
+#X obj 66 113 import hcs;
 #X connect 0 0 3 0;
 #X connect 1 0 11 0;
 #X connect 2 0 8 0;

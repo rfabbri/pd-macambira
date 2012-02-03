@@ -29,7 +29,7 @@
 #X msg -274 46 4;
 #X obj -244 76 s \$0packObjID;
 #X obj -315 111 dollarg;
-#X obj -95 18 import-disabled iemlib;
+#X obj -95 18 import iemlib;
 #X connect 0 0 15 0;
 #X connect 3 0 4 0;
 #X connect 4 0 7 0;

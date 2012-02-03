@@ -30,7 +30,7 @@
 #X obj 262 106 screendimens;
 #X obj 262 127 unpack f f;
 #X obj 38 31 t b;
-#X obj 351 21 import-disabled hcs;
+#X obj 351 21 import hcs;
 #X connect 0 0 28 0;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;

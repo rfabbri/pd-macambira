@@ -27,7 +27,7 @@
 #X obj 103 255 s pd-\$0.dialog-box;
 #X obj 31 67 s pd-\$0.dialog-box;
 #X obj 344 62 list-onearg \$1 Are_you_sure?;
-#X obj 481 22 import-disabled list-abs;
+#X obj 481 22 import list-abs;
 #X msg 64 203 0;
 #X obj 31 45 dialog.under-cursor 310 110 1440 900;
 #X connect 1 0 21 0;

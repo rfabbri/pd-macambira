@@ -1,6 +1,6 @@
 #N canvas 73 356 492 370 10;
 
-#X obj 308 24 import-disabled list-abs;
+#X obj 308 24 import list-abs;
 #X obj 57 14 inlet;
 #X obj 85 318 outlet;
 #X obj 114 15 inlet start-at-idx;

@@ -1,7 +1,7 @@
 #N canvas 355 364 450 300 10;
 
 #X obj 153 85 t a b;
-#X obj 281 42 import-disabled list-abs;
+#X obj 281 42 import list-abs;
 #X obj 153 165 list-extend;
 #X obj 60 36 inlet;
 #X obj 60 195 list-value \$1;

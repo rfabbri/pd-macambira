@@ -6,7 +6,7 @@
 #X obj 46 41 inlet;
 #X obj 46 125 outlet;
 #X obj 46 67 list;
-#X obj 119 128 import-disabled zexy;
+#X obj 119 128 import zexy;
 #X connect 0 0 4 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;

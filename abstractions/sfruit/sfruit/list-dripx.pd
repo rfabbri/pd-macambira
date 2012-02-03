@@ -36,7 +36,7 @@ to its right inlet.;
 #X obj 133 212 outlet;
 #X obj 177 181 outlet;
 #X obj 172 90 inlet;
-#X obj 238 123 import-disabled list-abs;
+#X obj 238 123 import list-abs;
 #X connect 0 0 2 0;
 #X connect 0 1 3 0;
 #X connect 1 0 0 0;
