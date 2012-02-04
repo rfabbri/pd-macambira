@@ -1,5 +1,5 @@
-#N canvas 0 31 963 634 10;
-#X declare -lib jasch_lib;
+#N canvas 61 69 970 701 10;
+#X declare -lib cyclone -lib Gem;
 #X msg -99 601 dump;
 #X msg 266 113 neighbors \$1;
 #X floatatom 266 98 5 0 4 0 - neighbors -;
@@ -69,8 +69,7 @@ the herding dinosaurs.;
 Use the 'dump' message to output a list of the current parameter settings.
 ;
 #X text -190 328 For more information about the Boids algorithm \,
-see Craig Reynolds' Web site at http://www.red3d.com/cwr/boids/
-;
+see Craig Reynolds' Web site at http://www.red3d.com/cwr/boids/;
 #X text -188 64 arguments: <float> number of boids \, <float> output
 mode;
 #X obj -72 460 print dump;
@@ -2045,11 +2044,11 @@ prefdist flyrect attractpt;
 #X text 12 25 LICENSE GPL v2;
 #X restore 710 674 pd META;
 #X obj -151 438 boids3d 16 0;
-#X obj 604 10 import jasch_lib;
 #X text -191 208 Boids takes an integer argument which is the number
 of boids. Each time Boids receives a bang \, it calculates and outputs
 the new positions of the boids. The output consists of the coordinates
 for each boid \, the number and type depending on the mode.;
+#X obj 604 10 declare -lib cyclone Gem;
 #X connect 0 0 48 0;
 #X connect 1 0 47 0;
 #X connect 2 0 1 0;
