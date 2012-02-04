@@ -1,4 +1,5 @@
 #N canvas 469 25 909 767 12;
+#X declare -lib Gem pdp;
 #X obj 38 229 gemwin;
 #X msg 70 12 create;
 #X obj 526 46 gemhead;
@@ -32,7 +33,7 @@
 #X text 76 536 PDP field;
 #X obj 275 424 gem2pdp;
 #X msg 148 423 stop;
-#X obj 124 425 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 124 425 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 195 423 metro 70;
 #X obj 236 479 pdp_spigot;
@@ -65,7 +66,7 @@
 #X obj 292 82 gemhead;
 #X msg 303 386 buffer \$1;
 #X obj 429 263 vradio 15 1 0 13 empty empty empty 0 -8 0 10 -262144
--1 -1 4;
+-1 -1 0;
 #X text 270 262 set buffer to capture;
 #X text 464 259 GL_FRONT_LEFT;
 #X text 464 276 GL_FRONT_RIGTH;
@@ -81,6 +82,7 @@
 #X text 464 427 GL_AUX2;
 #X text 464 441 GL_AUX3;
 #X text 561 258 ( default );
+#X obj 716 14 declare -lib Gem pdp;
 #X connect 1 0 0 0;
 #X connect 2 0 7 0;
 #X connect 3 0 0 0;

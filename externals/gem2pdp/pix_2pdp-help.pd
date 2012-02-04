@@ -1,4 +1,5 @@
-#N canvas 0 0 889 703 10;
+#N canvas 0 22 889 703 10;
+#X declare -lib Gem pdp;
 #X obj 92 298 gemwin;
 #X obj 399 302 gemhead;
 #X obj 151 557 pix_texture;
@@ -15,8 +16,7 @@
 #X obj 466 252 openpanel;
 #X obj 466 232 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 466 300 open ../examples/Gem/data/homer.avi
-;
+#X msg 466 300 open ../examples/Gem/data/homer.avi;
 #X msg 92 251 create \, 1;
 #X msg 104 273 0 \, destroy;
 #X text 90 229 Gem Control:;
@@ -58,6 +58,7 @@ from Gem to PDP to Gem to PDP to ... if you use the Gem pix objects!
 #X msg 276 202 colorspace Gray;
 #X text 382 181 <- use YUV if possible to be fast;
 #X obj 276 158 loadbang;
+#X obj 679 17 declare -lib Gem pdp;
 #X connect 1 0 9 0;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;
