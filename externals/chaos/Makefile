@@ -32,8 +32,8 @@ EXTRA_DIST = chaos.ncb chaos.sln chaos.suo chaos.vcproj Makefile.nt
 #
 #------------------------------------------------------------------------------#
 
-ALL_CFLAGS = -I"$(PD_INCLUDE)"
-ALL_LDFLAGS =  
+ALL_CFLAGS = -I"$(PD_INCLUDE)" -D'srand48(n)=srand((n))' -D'drand48()=((double)rand()/RAND_MAX)'
+ALL_LDFLAGS = 
 SHARED_LDFLAGS =
 ALL_LIBS = 
 
