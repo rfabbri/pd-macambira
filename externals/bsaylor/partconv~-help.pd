@@ -1,4 +1,5 @@
 #N canvas 1 53 680 606 10;
+#X declare -lib zexy;
 #X obj 201 569 dac~;
 #X obj 40 168 dirac~;
 #X msg 40 148 0;
@@ -51,6 +52,7 @@ Wilkes for Pd version 0.42.;
 #X text 12 25 LICENSE GPL v2;
 #X text 12 105 AUTHOR Benjamin R. Saylor <bensaylor@fastmail.fm>;
 #X restore 594 570 pd META;
+#X obj 541 44 declare -lib zexy;
 #X connect 1 0 21 0;
 #X connect 1 0 33 0;
 #X connect 2 0 1 0;
