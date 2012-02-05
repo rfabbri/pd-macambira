@@ -1,12 +1,13 @@
 #N canvas 145 39 541 656 10;
+#X declare -lib smlib creb zexy;
 #X obj 28 22 adc~;
 #X obj 20 330 vmin;
-#X floatatom 69 348 5 0 0;
+#X floatatom 69 348 5 0 0 0 - - -;
 #X obj 10 127 bang;
 #X obj 58 473 /;
-#X floatatom 59 526 5 0 0;
-#X floatatom 1 361 5 0 0;
-#N canvas 0 0 450 300 graph2 0;
+#X floatatom 59 526 5 0 0 0 - - -;
+#X floatatom 1 361 5 0 0 0 - - -;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array arrayP 140 float 1;
 #A 0 12.745 12.6021 12.4917 12.4624 12.4428 12.4083 12.357 12.3169
 12.2838 12.3642 12.4992 12.6125 12.8334 13.1195 13.2091 13.3636 13.427
@@ -30,7 +31,7 @@
 #X obj 291 454 spigot;
 #X msg 347 454 0;
 #X msg 330 427 1;
-#X obj 292 380 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 292 380 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 109 208 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -39,7 +40,7 @@
 -1;
 #X obj 107 252 vpow 2;
 #X obj 129 321 vpow 2;
-#X obj 69 315 vv+;
+#X obj 69 315 vvplus;
 #X msg 85 102 0;
 #X obj 26 56 ear~ 256;
 #X obj 107 228 linspace 1 0.1 140;
@@ -48,11 +49,11 @@
 #X obj 56 421 + 60;
 #X obj 20 196 vabs;
 #X obj 121 49 env~ 256;
-#X floatatom 206 55 5 0 0;
+#X floatatom 206 55 5 0 0 0 - - -;
 #X obj 57 375 moses 2;
 #X obj 55 400 moses 138;
 #X obj 324 297 hsl 200 15 0 140 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 10376 1;
+-1 -1 0 1;
 #X text 11 75 samplerate = 44100/256 = 172.26 Hz = 0.348 BPM resolution
 ;
 #X obj 57 500 * 172.26;
@@ -61,10 +62,10 @@
 #X text 102 122 172.26Hz/60 = 172 BPM;
 #X text 103 138 172.26Hz/200 = 51.6 BPM;
 #X obj 39 95 vsum;
-#X obj 20 300 vv+;
+#X obj 20 300 vvplus;
 #X obj 55 138 * 0.1;
 #X obj 59 572 ftom;
-#X floatatom 169 574 5 0 0;
+#X floatatom 169 574 5 0 0 0 - - -;
 #X obj 96 573 vfmod 12;
 #X text 109 524 BPM;
 #X msg 56 451 60;
@@ -73,8 +74,9 @@
 #X obj 1 395 vmax;
 #X obj 1 431 -;
 #X obj 1 470 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 493 1;
+-1 -1 0 1;
 #X text 441 593 j#|@2002;
+#X obj 362 -26 declare -lib smlib creb zexy;
 #X connect 0 0 20 0;
 #X connect 0 0 26 0;
 #X connect 1 0 6 0;

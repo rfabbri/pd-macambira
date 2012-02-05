@@ -6,13 +6,13 @@
 #X msg 25 66 1;
 #X msg 168 71 1;
 #X text 248 191 j#|@2002;
-#X text 18 10 vv- substracts two lists of floats;
+#X text 18 10 vvminus substracts two lists of floats;
 #X text 18 26 or a float from a list of floats;
-#X obj 49 124 vv-;
-#X obj 189 125 vv- 0;
+#X obj 49 124 vvminus;
+#X obj 189 125 vvminus 0;
 #X obj 268 170 SMLib-help;
-#X obj 49 148 print vv-;
-#X obj 189 149 print vv-;
+#X obj 49 148 print vvminus;
+#X obj 189 149 print vvminus;
 #N canvas 102 157 494 344 META 0;
 #X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
 Wilkes for Pd version 0.42.;
