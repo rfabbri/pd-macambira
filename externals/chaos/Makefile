@@ -24,6 +24,7 @@ MANUAL =
 # automatically included
 EXTRA_DIST = chaos.ncb chaos.sln chaos.suo chaos.vcproj Makefile.nt
 
+# Customization Note: added to MinGW's ALL_CFLAGS below
 
 
 #------------------------------------------------------------------------------#
@@ -32,7 +33,7 @@ EXTRA_DIST = chaos.ncb chaos.sln chaos.suo chaos.vcproj Makefile.nt
 #
 #------------------------------------------------------------------------------#
 
-ALL_CFLAGS = -I"$(PD_INCLUDE)" -D'srand48(n)=srand((n))' -D'drand48()=((double)rand()/RAND_MAX)'
+ALL_CFLAGS = -I"$(PD_INCLUDE)"
 ALL_LDFLAGS = 
 SHARED_LDFLAGS =
 ALL_LIBS = 
@@ -217,7 +218,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   # MinGW doesn't seem to include cc so force gcc
   CC=gcc
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
-  ALL_CFLAGS += -mms-bitfields
+  ALL_CFLAGS += -mms-bitfields -D'srand48(n)=srand((n))' -D'drand48()=((double)rand()/RAND_MAX)'
   ALL_LDFLAGS += -s -shared -Wl,--enable-auto-import -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj"
   SHARED_LDFLAGS += -shared
   ALL_LIBS += -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 $(LIBS_windows)
