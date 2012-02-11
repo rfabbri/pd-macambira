@@ -172,6 +172,9 @@ pddp_clean:
 #------------------------------------------------------------------------------#
 # TUTORIALS
 tutorials_install: $(manualsdir)
+# start-here
+	install -d "$(DESTDIR)$(manualsdir)/+ Start Here"
+	install -p $(doc_src)/tutorials/start-here/*.* "$(DESTDIR)$(manualsdir)/+ Start Here"
 # pddrums
 	install -d $(DESTDIR)$(manualsdir)/PdDrums
 	install -p $(doc_src)/tutorials/footils/pddrums/*.* $(DESTDIR)$(manualsdir)/PdDrums
