@@ -29,3 +29,6 @@ for section in abstractions doc externals packages pd scripts; do
          svn update ${SVNOPTIONS}
 	 cd ..
 done
+
+test -e $dir/pd/.git && \
+    cd $dir/pd && git pull origin master
