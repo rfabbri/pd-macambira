@@ -7,27 +7,29 @@
 # out in the standard dev layout, or used checkout-developer-layout.sh to
 # checkout your pd source tree
 
-cvs_root_dir=$(echo $0 | sed 's|\(.*\)/.*$|\1|')/..
+cd "$(echo $0 | sed 's|\(.*\)/.*$|\1|')/.."
+svn_root_dir=`pwd`
 
 SVNOPTIONS="--ignore-externals"
 
-cd $cvs_root_dir
-echo "Running svn update:"
+cd $svn_root_dir
+echo "Running svn update in $svn_root_dir:"
 svn update ${SVNOPTIONS}
 echo "Running svn update for svn-externals individually:"
-for section in externals/*; do
-	 echo "Section: $section"
-	 cd $section
-         svn update ${SVNOPTIONS}
-	 cd ../..
+for subsection in $svn_root_dir/externals/*; do
+    test -d $subsection || continue
+    echo "Subsection: $subsection"
+    cd "$subsection"
+    svn update ${SVNOPTIONS}
 done
 
+cd "$svn_root_dir"
 echo "Running svn update for other sections:"
 for section in abstractions doc externals packages pd scripts; do
-	 echo "Section: $section"
-	 cd $section
+    echo "Section: $svn_root_dir/$section"
+    cd "$svn_root_dir/$section"
          svn update ${SVNOPTIONS}
-	 cd ..
+         cd ..
 done
 
 test -e $dir/pd/.git && \
