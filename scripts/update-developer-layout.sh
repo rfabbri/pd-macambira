@@ -14,8 +14,8 @@ SVNOPTIONS="--ignore-externals"
 cd $cvs_root_dir
 echo "Running svn update:"
 svn update ${SVNOPTIONS}
-echo "Running svn update for Gem:"
-for section in externals/Gem; do
+echo "Running svn update for svn-externals individually:"
+for section in externals/*; do
 	 echo "Section: $section"
 	 cd $section
          svn update ${SVNOPTIONS}
