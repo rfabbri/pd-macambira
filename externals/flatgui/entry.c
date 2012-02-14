@@ -119,7 +119,7 @@ static t_widgetbehavior   entry_widgetbehavior = {
 w_getrectfn:  entry_getrect,
 w_displacefn: entry_displace,
 w_selectfn:   entry_select,
-w_activatefn: entry_activate,
+w_activatefn: NULL,
 w_deletefn:   entry_delete,
 w_visfn:      entry_vis,
 w_clickfn:    NULL,
@@ -369,11 +369,12 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
         sys_vgui("destroy %s\n", x->handle_id);
         x->x_selected = 0;
     }
+    entry_activate(z, glist, state);
 }
 
 static void entry_activate(t_gobj *z, t_glist *glist, int state)
 {
-    DEBUG(post("entry_activate"););    
+    DEBUG(post("entry_activate %d", state););    
     t_entry *x = (t_entry *)z;
  	int x1, y1, x2, y2;
 
