@@ -4,5 +4,5 @@
 #X text 10 10 NAME windowing;
 #X text 10 10 AUTHOR Joe Sarlo;
 #X text 10 10 LICENSE GPLv2 or later;
-#X text 10 110 VERSION 0.1.1-svn;
+#X text 10 110 VERSION 0.1.1;
 #X restore 10 10 pd META;
