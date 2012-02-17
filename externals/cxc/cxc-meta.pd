@@ -5,5 +5,5 @@
 #X text 10 50 AUTHOR jdl@xdv.org;
 #X text 10 70 DESCRIPTION library of randoms \, averages \, and system tools;
 #X text 10 90 LICENSE ;
-#X text 10 110 VERSION 0.5.1;
+#X text 10 110 VERSION 0.5.2;
 #X restore 10 10 pd META;
