@@ -5,5 +5,5 @@
 #X text 10 50 AUTHOR Hans-Christoph Steiner;
 #X text 10 70 DESCRIPTION;
 #X text 10 90 LICENSE GNU GPL;
-#X text 10 110 VERSION 0.7;
+#X text 10 110 VERSION 0.7.1;
 #X restore 10 10 pd META;
