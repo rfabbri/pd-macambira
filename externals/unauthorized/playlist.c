@@ -216,7 +216,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
         // post( "playlist : scandir : %s", x->x_curdir );
         if ( ( nentries = scandir(x->x_curdir, &dentries, NULL, (x->x_sort==1)?alphasort:NULL ) ) == -1 )
         {
-            post( "playlist : could not scan current directory ( where the hell are you ??? )" );
+            pd_error(x, "playlist : could not scan current directory ( where the hell are you ??? )" );
             perror( "scandir" );
             return;
         }
@@ -668,7 +668,7 @@ static int playlist_click(t_gobj *z, struct _glist *glist,
                     {
                         if ( strlen( x->x_curdir ) + strlen( x->x_dentries[x->x_itemselected] ) + 2 > MAX_DIR_LENGTH )
                         {
-                            post( "playlist : maximum dir length reached : cannot change directory" );
+                            pd_error(x, "playlist : maximum dir length reached : cannot change directory" );
                             return -1;
                         }
                         if ( strcmp( x->x_curdir, "/" ) )
@@ -709,11 +709,11 @@ static void playlist_dialog(t_playlist *x, t_symbol *s, int argc, t_atom *argv)
 {
     if ( !x )
     {
-        post( "playlist : error :tried to set properties on an unexisting object" );
+        pd_error(x, "playlist : error :tried to set properties on an unexisting object" );
     }
     if ( argc != 10 )
     {
-        post( "playlist : error in the number of arguments ( %d instead of 10 )", argc );
+        pd_error(x, "playlist : error in the number of arguments ( %d instead of 10 )", argc );
         return;
     }
     if ( argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT ||
@@ -722,7 +722,7 @@ static void playlist_dialog(t_playlist *x, t_symbol *s, int argc, t_atom *argv)
             argv[6].a_type != A_SYMBOL || argv[7].a_type != A_SYMBOL ||
             argv[8].a_type != A_SYMBOL || argv[9].a_type != A_SYMBOL )
     {
-        post( "playlist : wrong arguments" );
+        pd_error(x, "playlist : wrong arguments" );
         return;
     }
     x->x_extension = argv[0].a_w.w_symbol->s_name;
@@ -770,13 +770,13 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[0].a_type != A_SYMBOL )
         {
-            error( "playlist : wrong argument (extension : 1)" );
+            pd_error(x, "playlist : wrong argument (extension : 1)" );
             return NULL;
         }
         if ( !strcmp( argv[0].a_w.w_symbol->s_name, "" ) )
         {
-            error( "playlist : no extension specified" );
-            error( "playlist : usage : playlist <extension> <width> <height>" );
+            pd_error(x, "playlist : no extension specified" );
+            pd_error(x, "playlist : usage : playlist <extension> <width> <height>" );
             return NULL;
         }
         strcpy( x->x_extension, argv[0].a_w.w_symbol->s_name );
@@ -785,13 +785,13 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[1].a_type != A_FLOAT )
         {
-            error( "playlist : wrong argument (width : 2)" );
+            pd_error(x, "playlist : wrong argument (width : 2)" );
             return NULL;
         }
         if ( (int)argv[1].a_w.w_float <= 0 )
         {
-            error( "playlist : wrong width (%d)", (t_int)(int)argv[1].a_w.w_float );
-            error( "playlist : usage : playlist <extension> <width> <height>" );
+            pd_error(x, "playlist : wrong width (%d)", (t_int)(int)argv[1].a_w.w_float );
+            pd_error(x, "playlist : usage : playlist <extension> <width> <height>" );
             return NULL;
         }
         x->x_width = (int)argv[1].a_w.w_float;
@@ -800,13 +800,13 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[2].a_type != A_FLOAT )
         {
-            error( "playlist : wrong argument (height : 3)" );
+            pd_error(x, "playlist : wrong argument (height : 3)" );
             return NULL;
         }
         if ( (int)argv[2].a_w.w_float <= 0 )
         {
-            error( "playlist : wrong height (%d)", (t_int)(int)argv[2].a_w.w_float );
-            error( "playlist : usage : playlist <extension> <width> <height>" );
+            pd_error(x, "playlist : wrong height (%d)", (t_int)(int)argv[2].a_w.w_float );
+            pd_error(x, "playlist : usage : playlist <extension> <width> <height>" );
             return NULL;
         }
         x->x_height = (int)argv[2].a_w.w_float;
@@ -816,15 +816,15 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
         if ( argv[3].a_type != A_SYMBOL ||
                 argv[5].a_type != A_SYMBOL )
         {
-            error( "playlist : wrong arguments (font : 4,6)" );
-            error( "argument types : %d %d", argv[3].a_type, argv[5].a_type );
+            pd_error(x, "playlist : wrong arguments (font : 4,6)" );
+            pd_error(x, "argument types : %d %d", argv[3].a_type, argv[5].a_type );
             return NULL;
         }
         if ( argv[4].a_type != A_SYMBOL &&
                 argv[4].a_type != A_FLOAT )
         {
-            error( "playlist : wrong arguments (font size : 5)" );
-            error( "argument types : %d", argv[4].a_type );
+            pd_error(x, "playlist : wrong arguments (font size : 5)" );
+            pd_error(x, "argument types : %d", argv[4].a_type );
             return NULL;
         }
         if ( argv[4].a_type == A_SYMBOL )
@@ -840,13 +840,13 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
                      (int)x->x_charheight, argv[5].a_w.w_symbol->s_name );
             argoffset=0;
         }
-        post( "playlist : font : %s, size : %d", x->x_font, x->x_charheight );
+        verbose(0, "playlist : font : %s, size : %d", x->x_font, x->x_charheight );
     }
     if ( argc >= 7-argoffset )
     {
         if ( argv[6-argoffset].a_type != A_SYMBOL )
         {
-            error( "playlist : wrong arguments (background color : %d)", 7-argoffset );
+            pd_error(x, "playlist : wrong arguments (background color : %d)", 7-argoffset );
             return NULL;
         }
         strcpy( x->x_bgcolor, argv[6-argoffset].a_w.w_symbol->s_name );
@@ -855,7 +855,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[7-argoffset].a_type != A_SYMBOL )
         {
-            error( "playlist : wrong arguments (scrollbar color : %d)", 8-argoffset );
+            pd_error(x, "playlist : wrong arguments (scrollbar color : %d)", 8-argoffset );
             return NULL;
         }
         strcpy( x->x_sbcolor, argv[7-argoffset].a_w.w_symbol->s_name );
@@ -864,7 +864,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[8-argoffset].a_type != A_SYMBOL )
         {
-            error( "playlist : wrong arguments (foreground color : %d)", 9-argoffset );
+            pd_error(x, "playlist : wrong arguments (foreground color : %d)", 9-argoffset );
             return NULL;
         }
         strcpy( x->x_fgcolor, argv[8-argoffset].a_w.w_symbol->s_name );
@@ -873,7 +873,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[9-argoffset].a_type != A_SYMBOL )
         {
-            error( "playlist : wrong arguments (selection color : %d)", 10-argoffset );
+            pd_error(x, "playlist : wrong arguments (selection color : %d)", 10-argoffset );
             return NULL;
         }
         strcpy( x->x_secolor, argv[9-argoffset].a_w.w_symbol->s_name );
@@ -946,7 +946,7 @@ static void playlist_seek(t_playlist *x, t_floatarg fseeked)
 
     if ( fseeked < 0 )
     {
-        post( "playlist : wrong searched file : %f", fseeked );
+        pd_error(x, "playlist : wrong searched file : %f", fseeked );
         return;
     }
 
@@ -989,7 +989,7 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
         // absolute path required
         if ( strlen( flocation->s_name ) >= MAX_DIR_LENGTH )
         {
-            error( "playlist : maximum dir length reached : cannot change directory" );
+            pd_error(x, "playlist : maximum dir length reached : cannot change directory" );
             return;
         }
         strncpy( x->x_curdir, flocation->s_name, MAX_DIR_LENGTH );
@@ -999,7 +999,7 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
         // relative path
         if ( strlen( x->x_curdir ) + strlen( flocation->s_name ) + 2 > MAX_DIR_LENGTH )
         {
-            post( "playlist : maximum dir length reached : cannot change directory" );
+            pd_error(x, "playlist : maximum dir length reached : cannot change directory" );
             return;
         }
         if ( strcmp( x->x_curdir, "/" ) )
@@ -1014,7 +1014,7 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
 
     if ( chdir( x->x_curdir ) < 0 )
     {
-        error( "playlist : requested location >%s< is not a directory", x->x_curdir );
+        pd_error(x, "playlist : requested location '%s' is not a directory", x->x_curdir );
         strcpy( x->x_curdir, olddir );
         return;
     }
