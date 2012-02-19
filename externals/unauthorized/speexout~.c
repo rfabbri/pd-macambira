@@ -66,8 +66,8 @@
 #define MSG_NOSIGNAL 0
 #endif
 
-#include <speex/speex.h>        /* speex codec stuff */ 
-#include <speex/speex_bits.h>   /* speex codec stuff */ 
+#include <speex/speex.h>        /* speex codec stuff */
+#include <speex/speex_bits.h>   /* speex codec stuff */
 
 #include "m_pd.h"            /* standard pd stuff */
 
@@ -90,14 +90,14 @@ typedef struct _speexout
     t_object x_obj;
     int x_samplerate;         /* pd sampling rate          */
 
-        /* Speex stuff */
+    /* Speex stuff */
     SpeexBits x_bits;         /* bits packing structure    */
     void *x_encstate;         /* encoder state             */
     t_int x_framesize;        /* frame size                */
     t_int x_mode;             /* Narrow or Wide Band       */
     int x_quality;            /* encoding quality ( 0 to 10 ) */
 
-        /* buffer stuff */
+    /* buffer stuff */
     unsigned short x_inp;     /* in position for buffer */
     unsigned short x_outp;    /* out position for buffer */
     t_int x_encsize;          /* size of encoded data */
@@ -108,7 +108,7 @@ typedef struct _speexout
     int x_start;
     t_float *x_encchunk;
 
-        /* connection data        */
+    /* connection data        */
     int x_fd;                 /* info about connection status */
     int x_outpackets;         /* speex packets sent           */
 
@@ -117,132 +117,132 @@ typedef struct _speexout
 } t_speexout;
 
 
-    /* encode PCM data to speex frames */
+/* encode PCM data to speex frames */
 static void speexout_encode(t_speexout *x)
 {
     if ( x->x_bytesbuffered > x->x_framesize )
     {
-      speex_bits_reset(&x->x_bits);
-      
-      {
-        t_int sp=0, rp=0;
-     
-          while( sp < x->x_framesize )
-          {
-             rp=(x->x_outp+sp)%IN_BUFFER_SIZE;
-             // post( "speexout~ : sp=%d : rp=%d", sp, rp );
-             x->x_encchunk[ sp++ ] = *(x->x_inbuf+rp);
-          }
-          speex_encode(x->x_encstate, x->x_encchunk, &x->x_bits);
-      }
+        speex_bits_reset(&x->x_bits);
 
-      x->x_outp = (x->x_outp+x->x_framesize)%IN_BUFFER_SIZE;
-      x->x_bytesbuffered -= x->x_framesize;
-      x->x_encsize = speex_bits_write(&x->x_bits, x->x_outbuf+1, OUT_BUFFER_SIZE );
-      if ( x->x_encsize < 127 )
-      {
-         *(x->x_outbuf) = (char)x->x_encsize; 
-      }
-      else
-      {
-         post( "speexout~ : encoding error : frame is more than 127 bytes" );
-         x->x_encsize = -1;
-      }
-      x->x_bytesemitted += x->x_encsize;
+        {
+            t_int sp=0, rp=0;
+
+            while( sp < x->x_framesize )
+            {
+                rp=(x->x_outp+sp)%IN_BUFFER_SIZE;
+                // post( "speexout~ : sp=%d : rp=%d", sp, rp );
+                x->x_encchunk[ sp++ ] = *(x->x_inbuf+rp);
+            }
+            speex_encode(x->x_encstate, x->x_encchunk, &x->x_bits);
+        }
+
+        x->x_outp = (x->x_outp+x->x_framesize)%IN_BUFFER_SIZE;
+        x->x_bytesbuffered -= x->x_framesize;
+        x->x_encsize = speex_bits_write(&x->x_bits, x->x_outbuf+1, OUT_BUFFER_SIZE );
+        if ( x->x_encsize < 127 )
+        {
+            *(x->x_outbuf) = (char)x->x_encsize;
+        }
+        else
+        {
+            post( "speexout~ : encoding error : frame is more than 127 bytes" );
+            x->x_encsize = -1;
+        }
+        x->x_bytesemitted += x->x_encsize;
 #ifdef DATADEBUG
-      {
-        t_int si;
+        {
+            t_int si;
 
-          printf( "speexout~ : encoded :  " );
-          for ( si=0; si<x->x_encsize; si++ )
-          {
-              printf( "%d ", *(x->x_outbuf+si) );
-          }
-          printf( "\n" );
-      }
+            printf( "speexout~ : encoded :  " );
+            for ( si=0; si<x->x_encsize; si++ )
+            {
+                printf( "%d ", *(x->x_outbuf+si) );
+            }
+            printf( "\n" );
+        }
 #endif
     }
     else
     {
-      x->x_encsize = -1;
+        x->x_encsize = -1;
     }
 }
 
-    /* stream data to the peer */
+/* stream data to the peer */
 static void speexout_stream(t_speexout *x)
 {
-  int count = -1, i; 
+    int count = -1, i;
 
-  if ( x->x_encsize > 0 ) 
-  {
-    count = send(x->x_fd, x->x_outbuf, x->x_encsize+1, MSG_NOSIGNAL);
-    if(count < 0)
+    if ( x->x_encsize > 0 )
     {
-        error("speexout~: could not send encoded data to the peer (%d)", count);
+        count = send(x->x_fd, x->x_outbuf, x->x_encsize+1, MSG_NOSIGNAL);
+        if(count < 0)
+        {
+            error("speexout~: could not send encoded data to the peer (%d)", count);
 #ifdef _WIN32
-        closesocket(x->x_fd);
+            closesocket(x->x_fd);
 #else
-        close(x->x_fd);
+            close(x->x_fd);
 #endif
-        x->x_fd = -1;
-        outlet_float(x->x_obj.ob_outlet, 0);
-    } 
-    else
-    {
-       x->x_outpackets++;
-       // post( "speexout~ : emitted %d bytes (packets = %d)", count, x->x_outpackets );
-       if ( x->x_outpackets%100 == 0 )
-       {
-           // post( "speexout~ : emitted %d bytes (packets = %d)", x->x_bytesemitted, x->x_outpackets );
-       }
-       if(count != x->x_encsize+1)
-       {
-         error("speexout~: %d bytes skipped", x->x_encsize - count);
-       }
+            x->x_fd = -1;
+            outlet_float(x->x_obj.ob_outlet, 0);
+        }
+        else
+        {
+            x->x_outpackets++;
+            // post( "speexout~ : emitted %d bytes (packets = %d)", count, x->x_outpackets );
+            if ( x->x_outpackets%100 == 0 )
+            {
+                // post( "speexout~ : emitted %d bytes (packets = %d)", x->x_bytesemitted, x->x_outpackets );
+            }
+            if(count != x->x_encsize+1)
+            {
+                error("speexout~: %d bytes skipped", x->x_encsize - count);
+            }
+        }
+        x->x_encsize = -1;
     }
-    x->x_encsize = -1;
-  }
 }
 
-    
-    /* buffer and downsample the data */
+
+/* buffer and downsample the data */
 static t_int *speexout_perform(t_int *w)
 {
     t_float *in   = (t_float *)(w[1]);       /* audio inlet */
     t_speexout *x = (t_speexout *)(w[2]);
     int n = (int)(w[3]);                      /* number of samples */
     unsigned short i,wp;
-    t_float accum = 0.; 
+    t_float accum = 0.;
     int sratio;
 
     /* samplerate is supposed to be > 16kHz, thus sratio > 1 */
-    if ( x->x_mode == SPEEX_NB_MODE ) 
+    if ( x->x_mode == SPEEX_NB_MODE )
     {
-       sratio = x->x_samplerate / 8000;
+        sratio = x->x_samplerate / 8000;
     }
     else
     {
-       sratio = x->x_samplerate / 16000;
+        sratio = x->x_samplerate / 16000;
     }
 
     /* copy the data into the buffer and resample audio data */
-    
+
     accum=0;
     for(wp = 0; wp < n; wp++)
     {
         accum += *(in+wp);
         if ( wp % sratio == sratio - 1 )
         {
-           x->x_inbuf[x->x_inp] = ( accum / sratio ) * 8000; // scale the input for speex best efficiency
-           // post( "x->x_inp : %d", x->x_inp );
-           x->x_inp = (x->x_inp+1)%IN_BUFFER_SIZE;
-           x->x_bytesbuffered ++;
-           accum = 0;
+            x->x_inbuf[x->x_inp] = ( accum / sratio ) * 8000; // scale the input for speex best efficiency
+            // post( "x->x_inp : %d", x->x_inp );
+            x->x_inp = (x->x_inp+1)%IN_BUFFER_SIZE;
+            x->x_bytesbuffered ++;
+            accum = 0;
         }
     }
 
     if( ( x->x_fd >= 0 ) && ( x->x_bytesbuffered > x->x_framesize ) )
-    { 
+    {
         /* encode and send to the peer */
         speexout_encode(x);        /* speex encoding         */
         speexout_stream(x);        /* stream mp3 to the peer */
@@ -259,23 +259,23 @@ static void speexout_dsp(t_speexout *x, t_signal **sp)
     dsp_add(speexout_perform, 3, sp[0]->s_vec, x, sp[0]->s_n);
 }
 
-    /* initialize the speex library */
+/* initialize the speex library */
 static void speexout_tilde_speex_init(t_speexout *x)
 {
 
     speex_bits_init(&x->x_bits);
 
-    switch ( x->x_mode ) 
+    switch ( x->x_mode )
     {
-      case SPEEX_NB_MODE :
+    case SPEEX_NB_MODE :
         x->x_encstate = speex_encoder_init(&speex_nb_mode);
         break;
 
-      case SPEEX_WB_MODE :
+    case SPEEX_WB_MODE :
         x->x_encstate = speex_encoder_init(&speex_wb_mode);
         break;
-  
-      default :
+
+    default :
         error( "speexout~ : severe error : encoding scheme is unknown" );
         break;
     }
@@ -285,14 +285,14 @@ static void speexout_tilde_speex_init(t_speexout *x)
 
 }
 
-    /* connect to the peer         */
+/* connect to the peer         */
 static void speexout_connect(t_speexout *x, t_symbol *hostname, t_floatarg fportno)
 {
     struct          sockaddr_in csocket;
     struct          hostent *hp;
     int             portno            = fportno;    /* get port from message box */
 
-        /* variables used for communication with the peer */
+    /* variables used for communication with the peer */
     const char      *buf = 0;
     unsigned int    len;
     int    sockfd;
@@ -316,7 +316,7 @@ static void speexout_connect(t_speexout *x, t_symbol *hostname, t_floatarg fport
         return;
     }
 
-        /* connect socket using hostname provided in command line */
+    /* connect socket using hostname provided in command line */
     csocket.sin_family = AF_INET;
     hp = gethostbyname(hostname->s_name);
     if (hp == 0)
@@ -331,10 +331,10 @@ static void speexout_connect(t_speexout *x, t_symbol *hostname, t_floatarg fport
     }
     memcpy((char *)&csocket.sin_addr, (char *)hp->h_addr, hp->h_length);
 
-        /* assign client port number */
+    /* assign client port number */
     csocket.sin_port = htons((unsigned short)portno);
 
-        /* try to connect.  */
+    /* try to connect.  */
     post("speexout~: connecting to port %d", portno);
     if (connect(sockfd, (struct sockaddr *) &csocket, sizeof (csocket)) < 0)
     {
@@ -355,11 +355,11 @@ static void speexout_connect(t_speexout *x, t_symbol *hostname, t_floatarg fport
 
 }
 
-    /* close connection to the peer         */
+/* close connection to the peer         */
 static void speexout_disconnect(t_speexout *x)
 {
 
-  int err = -1;
+    int err = -1;
 
     if(x->x_fd >= 0)            /* close socket */
     {
@@ -374,20 +374,21 @@ static void speexout_disconnect(t_speexout *x)
     }
 }
 
-    /* settings for encoding quality */
+/* settings for encoding quality */
 static void speexout_quality(t_speexout *x, t_floatarg fquality )
 {
-    if ( fquality < 0 || fquality > 10 ) {
-       post( "speexout~ : wrong quality." );
-       return;
+    if ( fquality < 0 || fquality > 10 )
+    {
+        post( "speexout~ : wrong quality." );
+        return;
     }
     x->x_quality = fquality;
     post("speexout~: setting quality to : %d", x->x_quality);
     speex_encoder_ctl(x->x_encstate, SPEEX_SET_QUALITY, &x->x_quality);
 }
 
-    /* clean up */
-static void speexout_free(t_speexout *x)    
+/* clean up */
+static void speexout_free(t_speexout *x)
 {
 
     speex_bits_destroy(&x->x_bits);
@@ -445,7 +446,7 @@ void speexout_tilde_setup(void)
 {
     verbose(0, speexout_version);
     speexout_class = class_new(gensym("speexout~"), (t_newmethod)speexout_new, (t_method)speexout_free,
-        sizeof(t_speexout), 0, A_GIMME, 0);
+                               sizeof(t_speexout), 0, A_GIMME, 0);
     CLASS_MAINSIGNALIN(speexout_class, t_speexout, x_f );
     class_addmethod(speexout_class, (t_method)speexout_dsp, gensym("dsp"), 0);
     class_addmethod(speexout_class, (t_method)speexout_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);

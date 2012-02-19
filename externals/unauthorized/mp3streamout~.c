@@ -70,8 +70,8 @@ extern void print_header_compact( struct frame* fr );
 extern int head_check( unsigned long head, int check_layer );
 
 #define        MY_MP3_MALLOC_IN_SIZE        65536
-                                            /* max size taken from lame readme */
-#define        MY_MP3_MALLOC_OUT_SIZE       1.25*MY_MP3_MALLOC_IN_SIZE+7200 
+/* max size taken from lame readme */
+#define        MY_MP3_MALLOC_OUT_SIZE       1.25*MY_MP3_MALLOC_IN_SIZE+7200
 
 #define        MAXDATARATE 320        /* maximum mp3 data rate is 320kbit/s */
 #define        STRBUF_SIZE 32
@@ -84,12 +84,12 @@ typedef struct _mp3streamout
 {
     t_object x_obj;
 
-        /* LAME stuff */
+    /* LAME stuff */
     int x_lame;               /* info about encoder status */
     int x_lamechunk;          /* chunk size for LAME encoder */
     int x_mp3size;            /* number of returned mp3 samples */
 
-        /* buffer stuff */
+    /* buffer stuff */
     unsigned short x_inp;     /* in position for buffer */
     unsigned short x_outp;    /* out position for buffer*/
     short *x_mp3inbuf;        /* data to be sent to LAME */
@@ -98,13 +98,13 @@ typedef struct _mp3streamout
     int x_bytesbuffered;      /* number of unprocessed bytes in buffer */
     int x_start;
 
-        /* mp3 format stuff */
+    /* mp3 format stuff */
     int x_samplerate;
     int x_bitrate;            /* bitrate of mp3 stream */
     int x_mp3mode;            /* mode (mono, joint stereo, stereo, dual mono) */
     int x_mp3quality;         /* quality of encoding */
 
-        /* connection data        */
+    /* connection data        */
     int x_fd;                 /* info about connection status */
     int x_outpackets;         /* mp3 packets sent             */
 
@@ -114,7 +114,7 @@ typedef struct _mp3streamout
 } t_mp3streamout;
 
 
-    /* encode PCM data to mp3 stream */
+/* encode PCM data to mp3 stream */
 static void mp3streamout_encode(t_mp3streamout *x)
 {
     unsigned short i, wp;
@@ -131,11 +131,11 @@ static void mp3streamout_encode(t_mp3streamout *x)
         return;
     }
 
-        /* on start/reconnect set outpoint that it not interferes with inpoint */ 
+    /* on start/reconnect set outpoint that it not interferes with inpoint */
     if(x->x_start == -1)
     {
         post("mp3streamout~: initializing buffers");
-            /* we try to keep 2.5 times the data the encoder needs in the buffer */
+        /* we try to keep 2.5 times the data the encoder needs in the buffer */
         if(x->x_inp > (2 * x->x_lamechunk))
         {
             x->x_outp = (short) x->x_inp - (2.5 * x->x_lamechunk);
@@ -150,10 +150,10 @@ static void mp3streamout_encode(t_mp3streamout *x)
 
     i = MY_MP3_MALLOC_IN_SIZE - x->x_outp;
 
-        /* read from buffer */
-    if(x->x_lamechunk <= i)    
+    /* read from buffer */
+    if(x->x_lamechunk <= i)
     {
-            /* enough data until end of buffer */
+        /* enough data until end of buffer */
         for(n = 0; n < x->x_lamechunk; n++)                                /* fill encode buffer */
         {
             x->x_mp3inbuf[n] = x->x_buffer[n + x->x_outp];
@@ -174,15 +174,15 @@ static void mp3streamout_encode(t_mp3streamout *x)
         x->x_outp = x->x_lamechunk - i;
     }
 
-        /* encode mp3 data */
+    /* encode mp3 data */
 
-    x->x_mp3size = lame_encode_buffer_interleaved(x->lgfp, x->x_mp3inbuf, 
-                   x->x_lamechunk/lame_get_num_channels(x->lgfp), 
+    x->x_mp3size = lame_encode_buffer_interleaved(x->lgfp, x->x_mp3inbuf,
+                   x->x_lamechunk/lame_get_num_channels(x->lgfp),
                    x->x_mp3outbuf, MY_MP3_MALLOC_OUT_SIZE);
     x->x_mp3size+=lame_encode_flush( x->lgfp, x->x_mp3outbuf+x->x_mp3size, MY_MP3_MALLOC_OUT_SIZE-x->x_mp3size );
     // post( "mp3streamout~ : encoding returned %d frames", x->x_mp3size );
 
-        /* check result */
+    /* check result */
     if(x->x_mp3size<0)
     {
         lame_close( x->lgfp );
@@ -191,21 +191,21 @@ static void mp3streamout_encode(t_mp3streamout *x)
     }
 }
 
-    /* stream mp3 to the peer */
+/* stream mp3 to the peer */
 static void mp3streamout_stream(t_mp3streamout *x)
 {
-    int count = -1, i; 
+    int count = -1, i;
     struct frame hframe;
 
     /* header needs to be included in each packet */
 
     for( i=0; i<x->x_mp3size; i++ )
     {
-      // track valid data
-      if ( head_check( *((unsigned long*)x->x_mp3outbuf+i), 3 ) )
-      {
-         // post( "valid header emitted @ %d (byte %d)", i, i*sizeof(unsigned long) );
-      }
+        // track valid data
+        if ( head_check( *((unsigned long*)x->x_mp3outbuf+i), 3 ) )
+        {
+            // post( "valid header emitted @ %d (byte %d)", i, i*sizeof(unsigned long) );
+        }
     }
 
     count = send(x->x_fd, x->x_mp3outbuf, x->x_mp3size, MSG_NOSIGNAL);
@@ -221,23 +221,23 @@ static void mp3streamout_stream(t_mp3streamout *x)
 #endif
         x->x_fd = -1;
         outlet_float(x->x_obj.ob_outlet, 0);
-    } 
+    }
     else
     {
         x->x_outpackets++;
         if ( x->x_outpackets%100 == 0 )
         {
-           // post( "mp3streamout~ : emitted %d bytes (packets = %d)", count, x->x_outpackets );
+            // post( "mp3streamout~ : emitted %d bytes (packets = %d)", count, x->x_outpackets );
         }
     }
     if((count > 0)&&(count != x->x_mp3size))
     {
-       error("mp3streamout~: %d bytes skipped", x->x_mp3size - count);
+        error("mp3streamout~: %d bytes skipped", x->x_mp3size - count);
     }
 }
 
-    
-    /* buffer data as channel interleaved PCM */
+
+/* buffer data as channel interleaved PCM */
 static t_int *mp3streamout_perform(t_int *w)
 {
     t_float *in1   = (t_float *)(w[1]);       /* left audio inlet */
@@ -247,76 +247,94 @@ static t_int *mp3streamout_perform(t_int *w)
     unsigned short i,wp;
     float in;
 
-        /* copy the data into the buffer */
+    /* copy the data into the buffer */
     i = MY_MP3_MALLOC_IN_SIZE - x->x_inp;     /* space left at the end of buffer */
-    
+
     n *= 2;                                  /* two channels go into one buffer */
 
-    if( n <= i ) 
+    if( n <= i )
     {
         /* the place between inp and MY_MP3_MALLOC_IN_SIZE */
         /* is big enough to hold the data                  */
 
-            for(wp = 0; wp < n; wp++)
+        for(wp = 0; wp < n; wp++)
+        {
+            if(wp%2)
             {
-                if(wp%2)
-                {
-                    in = *(in2++);    /* right channel / inlet */
-                }
-                else
-                {
-                    in = *(in1++);    /* left channel / inlet */
-                }
-                if (in > 1.0) { in = 1.0; }
-                if (in < -1.0) { in = -1.0; }
-                x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+                in = *(in2++);    /* right channel / inlet */
             }
-            x->x_inp += n;    /* n more samples written to buffer */
-    } 
-    else 
+            else
+            {
+                in = *(in1++);    /* left channel / inlet */
+            }
+            if (in > 1.0)
+            {
+                in = 1.0;
+            }
+            if (in < -1.0)
+            {
+                in = -1.0;
+            }
+            x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+        }
+        x->x_inp += n;    /* n more samples written to buffer */
+    }
+    else
     {
-                /* the place between inp and MY_MP3_MALLOC_IN_SIZE is not */    
-                /* big enough to hold the data                              */
-                /* writing will take place in two turns, one from         */
-                /* x->x_inp -> MY_MP3_MALLOC_IN_SIZE, then from 0 on      */
+        /* the place between inp and MY_MP3_MALLOC_IN_SIZE is not */
+        /* big enough to hold the data                              */
+        /* writing will take place in two turns, one from         */
+        /* x->x_inp -> MY_MP3_MALLOC_IN_SIZE, then from 0 on      */
 
-            for(wp = 0; wp < i; wp++)            /* fill up to end of buffer */
+        for(wp = 0; wp < i; wp++)            /* fill up to end of buffer */
+        {
+            if(wp%2)
             {
-                if(wp%2)
-                {
-                    in = *(in2++);
-                }
-                else
-                {
-                    in = *(in1++);
-                }
-                if (in > 1.0) { in = 1.0; }
-                if (in < -1.0) { in = -1.0; }
-                x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+                in = *(in2++);
             }
-            for(wp = i; wp < n; wp++)        /* write rest at start of buffer */
+            else
             {
-                if(wp%2)
-                {
-                    in = *(in2++);
-                }
-                else
-                {
-                    in = *(in1++);
-                }
-                if (in > 1.0) { in = 1.0; }
-                if (in < -1.0) { in = -1.0; }
-                x->x_buffer[wp - i] = (short) (32767.0 * in);
+                in = *(in1++);
             }
-            x->x_inp = n - i;                /* new writeposition in buffer */
+            if (in > 1.0)
+            {
+                in = 1.0;
+            }
+            if (in < -1.0)
+            {
+                in = -1.0;
+            }
+            x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+        }
+        for(wp = i; wp < n; wp++)        /* write rest at start of buffer */
+        {
+            if(wp%2)
+            {
+                in = *(in2++);
+            }
+            else
+            {
+                in = *(in1++);
+            }
+            if (in > 1.0)
+            {
+                in = 1.0;
+            }
+            if (in < -1.0)
+            {
+                in = -1.0;
+            }
+            x->x_buffer[wp - i] = (short) (32767.0 * in);
+        }
+        x->x_inp = n - i;                /* new writeposition in buffer */
     }
 
     if((x->x_fd >= 0)&&(x->x_lame >= 0))
-    { 
-            /* count buffered samples when things are running */
+    {
+        /* count buffered samples when things are running */
         x->x_bytesbuffered += n;
 
-            /* encode and send to the peer */
+        /* encode and send to the peer */
         if(x->x_bytesbuffered > x->x_lamechunk)
         {
             mp3streamout_encode(x);        /* encode to mp3 */
@@ -336,7 +354,7 @@ static void mp3streamout_dsp(t_mp3streamout *x, t_signal **sp)
     dsp_add(mp3streamout_perform, 4, sp[0]->s_vec, sp[1]->s_vec, x, sp[0]->s_n);
 }
 
-    /* initialize the lame library */
+/* initialize the lame library */
 static void mp3streamout_tilde_lame_init(t_mp3streamout *x)
 {
     int    ret;
@@ -357,11 +375,11 @@ static void mp3streamout_tilde_lame_init(t_mp3streamout *x)
     }
 #endif
     {
-       const char *lameVersion = get_lame_version();
-       verbose(0,  "mp3streamout~ : using lame version : %s", lameVersion );
+        const char *lameVersion = get_lame_version();
+        verbose(0,  "mp3streamout~ : using lame version : %s", lameVersion );
     }
 
-        /* setting lame parameters */
+    /* setting lame parameters */
     lame_set_num_channels( x->lgfp, 2);
     lame_set_in_samplerate( x->lgfp, sys_getsr() );
     lame_set_out_samplerate( x->lgfp, x->x_samplerate );
@@ -374,26 +392,29 @@ static void mp3streamout_tilde_lame_init(t_mp3streamout *x)
     lame_set_disable_reservoir( x->lgfp, 0 );
     lame_set_padding_type( x->lgfp, PAD_NO );
     ret = lame_init_params( x->lgfp );
-    if ( ret<0 ) {
-       post( "mp3streamout~ : error : lame params initialization returned : %d", ret );
-    } else {
-       x->x_lame=1;
-       /* magic formula copied from windows dll for MPEG-I */
-       x->x_lamechunk = 2*1152;
+    if ( ret<0 )
+    {
+        post( "mp3streamout~ : error : lame params initialization returned : %d", ret );
+    }
+    else
+    {
+        x->x_lame=1;
+        /* magic formula copied from windows dll for MPEG-I */
+        x->x_lamechunk = 2*1152;
 
-       post( "mp3streamout~ : lame initialization done. (%d)", x->x_lame );
+        post( "mp3streamout~ : lame initialization done. (%d)", x->x_lame );
     }
     lame_init_bitstream( x->lgfp );
 }
 
-    /* connect to the peer         */
+/* connect to the peer         */
 static void mp3streamout_connect(t_mp3streamout *x, t_symbol *hostname, t_floatarg fportno)
 {
     struct          sockaddr_in csocket;
     struct          hostent *hp;
     int             portno            = fportno;    /* get port from message box */
 
-        /* variables used for communication with the peer */
+    /* variables used for communication with the peer */
     const char      *buf = 0;
     char            resp[STRBUF_SIZE];
     unsigned int    len;
@@ -418,7 +439,7 @@ static void mp3streamout_connect(t_mp3streamout *x, t_symbol *hostname, t_floata
         return;
     }
 
-        /* connect socket using hostname provided in command line */
+    /* connect socket using hostname provided in command line */
     csocket.sin_family = AF_INET;
     hp = gethostbyname(hostname->s_name);
     if (hp == 0)
@@ -433,10 +454,10 @@ static void mp3streamout_connect(t_mp3streamout *x, t_symbol *hostname, t_floata
     }
     memcpy((char *)&csocket.sin_addr, (char *)hp->h_addr, hp->h_length);
 
-        /* assign client port number */
+    /* assign client port number */
     csocket.sin_port = htons((unsigned short)portno);
 
-        /* try to connect.  */
+    /* try to connect.  */
     post("mp3streamout~: connecting to port %d", portno);
     if (connect(sockfd, (struct sockaddr *) &csocket, sizeof (csocket)) < 0)
     {
@@ -458,15 +479,16 @@ static void mp3streamout_connect(t_mp3streamout *x, t_symbol *hostname, t_floata
 
 }
 
-    /* close connection to the peer         */
+/* close connection to the peer         */
 static void mp3streamout_disconnect(t_mp3streamout *x)
 {
 
     int err = -1;
     if(x->x_lame >= 0)
     {
-            /* ignore remaining bytes */
-        if ( x->x_mp3size = lame_encode_flush( x->lgfp, x->x_mp3outbuf, 0) < 0 ) {
+        /* ignore remaining bytes */
+        if ( x->x_mp3size = lame_encode_flush( x->lgfp, x->x_mp3outbuf, 0) < 0 )
+        {
             post( "mp3streamout~ : warning : remaining encoded bytes" );
         }
         lame_close( x->lgfp );
@@ -487,43 +509,46 @@ static void mp3streamout_disconnect(t_mp3streamout *x)
     }
 }
 
-    /* settings for mp3 encoding */
+/* settings for mp3 encoding */
 static void mp3streamout_mpeg(t_mp3streamout *x, t_floatarg fbitrate,
-                           t_floatarg fmode, t_floatarg fquality)
+                              t_floatarg fmode, t_floatarg fquality)
 {
     if ( fbitrate != 32 && fbitrate != 40 && fbitrate != 48 && fbitrate != 56 &&
-         fbitrate != 64 && fbitrate != 80 && fbitrate != 96 && fbitrate != 112 &&
-         fbitrate != 128 && fbitrate != 160 && fbitrate != 192 && fbitrate != 224 &&
-         fbitrate != 256 && fbitrate != 320 ) {
-       post( "mp3streamout~ : wrong bitrate." );
-       return;
+            fbitrate != 64 && fbitrate != 80 && fbitrate != 96 && fbitrate != 112 &&
+            fbitrate != 128 && fbitrate != 160 && fbitrate != 192 && fbitrate != 224 &&
+            fbitrate != 256 && fbitrate != 320 )
+    {
+        post( "mp3streamout~ : wrong bitrate." );
+        return;
     }
-    if ( fmode <0 || fmode>2 ) {
-       post( "mp3streamout~ : wrong mp3 mode." );
-       if ( fmode == 3 )
-       {
-          post( "mp3streamout~ : mone is not supported by streamout~ for now." );
-       }
-       return;
+    if ( fmode <0 || fmode>2 )
+    {
+        post( "mp3streamout~ : wrong mp3 mode." );
+        if ( fmode == 3 )
+        {
+            post( "mp3streamout~ : mone is not supported by streamout~ for now." );
+        }
+        return;
     }
     /* there is a bug in lame 3.92 and quality below 5 will not work */
     /* WAIT FOR A FIX */
-    if ( fquality <5 || fquality>9 ) {
-       post( "mp3streamout~ : wrong quality." );
-       return;
+    if ( fquality <5 || fquality>9 )
+    {
+        post( "mp3streamout~ : wrong quality." );
+        return;
     }
     x->x_bitrate = fbitrate;
     x->x_mp3mode = fmode;
     x->x_mp3quality = (int)fquality;
     post("mp3streamout~: setting mp3 stream to %dHz, %dkbit/s, mode %d, quality %d",
-          x->x_samplerate, x->x_bitrate, x->x_mp3mode, x->x_mp3quality);
+         x->x_samplerate, x->x_bitrate, x->x_mp3mode, x->x_mp3quality);
     mp3streamout_tilde_lame_init(x);
 }
 
-    /* print settings */
+/* print settings */
 static void mp3streamout_print(t_mp3streamout *x)
 {
-  const char        * buf = 0;
+    const char        * buf = 0;
 
     verbose(0, mp3streamout_version);
     post("  LAME mp3 settings:\n"
@@ -531,18 +556,18 @@ static void mp3streamout_print(t_mp3streamout *x)
          "    bitrate: %d kbit/s", x->x_samplerate, x->x_bitrate);
     switch(x->x_mp3mode)
     {
-        case 0 : 
-            buf = "stereo";
-            break;
-        case 1 : 
-            buf = "joint stereo";
-            break;
-        case 2 : 
-            buf = "dual channel";
-            break;
-        case 3 : 
-            buf = "mono";
-            break;
+    case 0 :
+        buf = "stereo";
+        break;
+    case 1 :
+        buf = "joint stereo";
+        break;
+    case 2 :
+        buf = "dual channel";
+        break;
+    case 3 :
+        buf = "mono";
+        break;
     }
     post("    mode: %s\n"
          "    quality: %d", buf, x->x_mp3quality);
@@ -557,8 +582,8 @@ static void mp3streamout_print(t_mp3streamout *x)
     }
 }
 
-    /* clean up */
-static void mp3streamout_free(t_mp3streamout *x)    
+/* clean up */
+static void mp3streamout_free(t_mp3streamout *x)
 {
 
     if(x->x_lame >= 0)
@@ -606,7 +631,7 @@ void mp3streamout_tilde_setup(void)
 {
     verbose(0, mp3streamout_version);
     mp3streamout_class = class_new(gensym("mp3streamout~"), (t_newmethod)mp3streamout_new, (t_method)mp3streamout_free,
-        sizeof(t_mp3streamout), 0, 0);
+                                   sizeof(t_mp3streamout), 0, 0);
     CLASS_MAINSIGNALIN(mp3streamout_class, t_mp3streamout, x_f );
     class_addmethod(mp3streamout_class, (t_method)mp3streamout_dsp, gensym("dsp"), 0);
     class_addmethod(mp3streamout_class, (t_method)mp3streamout_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);

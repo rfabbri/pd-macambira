@@ -54,62 +54,71 @@ typedef struct _countund
     t_int x_up;
 } t_countund;
 
-	/* clean up */
-static void countund_free(t_countund *x)    
+/* clean up */
+static void countund_free(t_countund *x)
 {
 }
 
 static void *countund_new(t_float flimit)
 {
-  t_countund *x = (t_countund *)pd_new(countund_class);
-  outlet_new(&x->x_obj, &s_float);
-  inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("limit"));
-  if ( flimit < 0 ) {
-       post( "countund~: wrong creation argument" );
-       return NULL;
-  }
-  x->x_limit = (int) flimit;
-  x->x_value = 0;
-  x->x_up = 1;
-  return(x);
+    t_countund *x = (t_countund *)pd_new(countund_class);
+    outlet_new(&x->x_obj, &s_float);
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("limit"));
+    if ( flimit < 0 )
+    {
+        post( "countund~: wrong creation argument" );
+        return NULL;
+    }
+    x->x_limit = (int) flimit;
+    x->x_value = 0;
+    x->x_up = 1;
+    return(x);
 }
 
 static void *countund_limit(t_countund* x, t_float flimit)
 {
-  if ( flimit < 0 ) {
-       post( "countund~: wrong count limit" );
-       return;
-  } else {
-       x->x_limit=(int)flimit;
-  }
+    if ( flimit < 0 )
+    {
+        post( "countund~: wrong count limit" );
+        return;
+    }
+    else
+    {
+        x->x_limit=(int)flimit;
+    }
 }
 
 static void *countund_bang(t_countund *x)
 {
 
-  if ( x->x_up ) {
-     x->x_value+=1;
-     if (x->x_value>x->x_limit) {
-        x->x_value=x->x_limit-1;
-        x->x_up=0;
-     }
-  } else {
-     x->x_value-=1;
-     if (x->x_value<0) {
-        x->x_value=1;
-        x->x_up=1;
-     }
-  }
-  outlet_float( x->x_obj.ob_outlet, x->x_value );
-  return;
+    if ( x->x_up )
+    {
+        x->x_value+=1;
+        if (x->x_value>x->x_limit)
+        {
+            x->x_value=x->x_limit-1;
+            x->x_up=0;
+        }
+    }
+    else
+    {
+        x->x_value-=1;
+        if (x->x_value<0)
+        {
+            x->x_value=1;
+            x->x_up=1;
+        }
+    }
+    outlet_float( x->x_obj.ob_outlet, x->x_value );
+    return;
 }
 
 void countund_setup(void)
 {
-  verbose(0, countund_version);
-  countund_class = class_new(gensym("countund"), (t_newmethod)countund_new, 
-        (t_method)countund_free,
-        sizeof(t_countund), 0, A_DEFFLOAT, 0);
-  class_addmethod( countund_class, (t_method)countund_bang, &s_bang, 0);
-  class_addmethod( countund_class, (t_method)countund_limit, gensym("limit"), A_FLOAT, 0);
+    verbose(0, countund_version);
+    countund_class = class_new(gensym("countund"), (t_newmethod)countund_new,
+                               (t_method)countund_free,
+                               sizeof(t_countund), 0, A_DEFFLOAT, 0);
+    class_addmethod( countund_class, (t_method)countund_bang, &s_bang, 0);
+    class_addmethod( countund_class, (t_method)countund_limit, gensym("limit"), A_FLOAT, 0);
 }

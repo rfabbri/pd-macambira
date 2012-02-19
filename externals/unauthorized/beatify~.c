@@ -54,60 +54,65 @@ static t_class *beatify_class;
 
 static void beatify_attack(t_beatify *x, t_floatarg fattack )
 {
-    if (fattack < 1.0) 
+    if (fattack < 1.0)
     {
-       x->x_attack = 1.0;
+        x->x_attack = 1.0;
     }
     else
     {
-       x->x_attack = fattack;
+        x->x_attack = fattack;
     }
 }
 
 static void beatify_sustain(t_beatify *x, t_floatarg fsustain )
 {
-    if (fsustain < 0.0) 
+    if (fsustain < 0.0)
     {
-       x->x_sustain = 0.0;
+        x->x_sustain = 0.0;
     }
     else
     {
-       x->x_sustain = fsustain;
+        x->x_sustain = fsustain;
     }
 }
 
 static void beatify_decay(t_beatify *x, t_floatarg fdecay )
 {
-    if (fdecay < 1.0) 
+    if (fdecay < 1.0)
     {
-       x->x_decay = 1.0;
+        x->x_decay = 1.0;
     }
     else
     {
-       x->x_decay = fdecay;
+        x->x_decay = fdecay;
     }
 }
 
 static void beatify_size(t_beatify *x, t_floatarg fsize )
 {
-    if (fsize < 100.0) 
+    if (fsize < 100.0)
     {
-       x->x_size = 100.0;
+        x->x_size = 100.0;
     }
     else
     {
-       x->x_size = fsize;
+        x->x_size = fsize;
     }
 }
 
 static void beatify_gamplitude(t_beatify *x, t_floatarg fgamplitude )
 {
-    if (fgamplitude < 0.0) {
-       x->x_gamplitude = 0.0;
-    } else if (fgamplitude > 1.0) {
-       x->x_gamplitude = 1.0;
-    } else {
-       x->x_gamplitude = fgamplitude;
+    if (fgamplitude < 0.0)
+    {
+        x->x_gamplitude = 0.0;
+    }
+    else if (fgamplitude > 1.0)
+    {
+        x->x_gamplitude = 1.0;
+    }
+    else
+    {
+        x->x_gamplitude = fgamplitude;
     }
 }
 
@@ -137,22 +142,24 @@ static t_int *beatify_perform(t_int *w)
     t_beatify *x = (t_beatify*)(w[4]);
     t_float adelta = 0., ddelta = 0.;
 
-    while (n--) {
-       if ( x->x_current>=x->x_size ) 
-       {
+    while (n--)
+    {
+        if ( x->x_current>=x->x_size )
+        {
             adelta = (x->x_gamplitude-x->x_vol)/x->x_attack;
             ddelta = x->x_gamplitude/x->x_decay;
             x->x_current = 0;
-       }
-       if ( x->x_current<x->x_attack ) x->x_vol+= adelta;
-       if ( x->x_current>x->x_attack+x->x_sustain && x->x_current<x->x_attack+x->x_sustain+x->x_decay ) 
-       {
-          x->x_vol-= ddelta;
-       }
-       x->x_current++;
+        }
+        if ( x->x_current<x->x_attack ) x->x_vol+= adelta;
+        if ( x->x_current>x->x_attack+x->x_sustain && x->x_current<x->x_attack+x->x_sustain+x->x_decay )
+        {
+            x->x_vol-= ddelta;
+        }
+        x->x_current++;
 
-       *(out) = *(in)*x->x_vol;
-       out++; in++;
+        *(out) = *(in)*x->x_vol;
+        out++;
+        in++;
     }
     return (w+5);
 }
@@ -166,7 +173,7 @@ void beatify_tilde_setup(void)
 {
     verbose(0,  beatify_version );
     beatify_class = class_new(gensym("beatify~"), (t_newmethod)beatify_new, 0,
-    	sizeof(t_beatify), 0, 0);
+                              sizeof(t_beatify), 0, 0);
     CLASS_MAINSIGNALIN( beatify_class, t_beatify, x_f );
     class_addmethod(beatify_class, (t_method)beatify_dsp, gensym("dsp"), 0);
     class_addmethod(beatify_class, (t_method)beatify_attack, gensym("attack"), A_FLOAT, 0);

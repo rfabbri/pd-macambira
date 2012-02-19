@@ -47,17 +47,17 @@ static t_class *compressor_class;
 
 static void compressor_strength(t_compressor *x, t_floatarg fstrength )
 {
-    if (fstrength < -1.0) 
+    if (fstrength < -1.0)
     {
-       x->x_strength = -1.0;
+        x->x_strength = -1.0;
     }
-    else if (fstrength > 5) 
+    else if (fstrength > 5)
     {
-       x->x_strength = 5;
+        x->x_strength = 5;
     }
     else
     {
-       x->x_strength = fstrength;
+        x->x_strength = fstrength;
     }
     x->x_pifactor = pow( M_PI, x->x_strength );
 }
@@ -81,9 +81,11 @@ static t_int *compressor_perform(t_int *w)
     t_float isample_fact = x->x_pifactor;
     t_float osample_fact = 2.0 / M_PI;
 
-    while (n--) {
-       *out = atan (*in * isample_fact) * osample_fact;
-       out++; in++;
+    while (n--)
+    {
+        *out = atan (*in * isample_fact) * osample_fact;
+        out++;
+        in++;
     }
     return (w+5);
 }
@@ -97,7 +99,7 @@ void compressor_tilde_setup(void)
 {
     verbose(0,  compressor_version );
     compressor_class = class_new(gensym("compressor~"), (t_newmethod)compressor_new, 0,
-    	sizeof(t_compressor), 0, 0);
+                                 sizeof(t_compressor), 0, 0);
     CLASS_MAINSIGNALIN( compressor_class, t_compressor, x_f );
     class_addmethod(compressor_class, (t_method)compressor_dsp, gensym("dsp"), 0);
     class_addmethod(compressor_class, (t_method)compressor_strength, gensym("strength"), A_FLOAT, 0);

@@ -37,8 +37,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifdef __APPLE__  
-#include <sys/malloc.h>  
+#ifdef __APPLE__
+#include <sys/malloc.h>
 #else
 #include <malloc.h>
 #endif
@@ -62,8 +62,8 @@
 
 static int guidebug=0;
 static int ignorevisible=1; // ignore visible test
-                         // because this seems to lead to bad refresh
-                         // wait for a fix                            
+// because this seems to lead to bad refresh
+// wait for a fix
 
 #define SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -141,7 +141,7 @@ typedef struct _sonogram
     t_int x_uys;                   /* starting y position for undo                              */
     t_int x_uye;                   /* ending y position for undo                                */
 
-           /* graphical data block */
+    /* graphical data block */
     t_int x_enhancemode;           /* flag to set enhance mode                    */
     t_int x_graphic;               /* flag to set graphic mode                    */
     t_int x_phaso;                 /* flag to indicate if phasogram is shown      */
@@ -151,11 +151,11 @@ typedef struct _sonogram
     t_int x_nbupdated;             /* number of points updated                    */
     t_glist *x_glist;              /* keep graphic context for various operations */
     t_int x_zoom;                  /* zoom factor                                 */
-	#ifndef _WIN32
+#ifndef _WIN32
     pthread_t x_updatechild;       /* thread id for the update child              */
-	#else
-	int x_updatechild;
-	#endif
+#else
+    int x_updatechild;
+#endif
     t_int x_updatestart;           /* starting position for update                */
     t_int x_updateend;             /* ending position for update                  */
     t_int x_xpos;                  /* stuck x position                            */
@@ -178,136 +178,201 @@ typedef struct _sonogram
 /* ------------------------ drawing functions ---------------------------- */
 static char* sonogram_get_fill_color( t_float fspectrum )
 {
-      if ( fspectrum < 0.01 ) {
-          return "#EEEEEE ";
-      } else if ( fspectrum < 0.1 ) {
-          return "#DDDDDD ";
-      } else if ( fspectrum < 0.5 ) {
-          return "#CCCCCC ";
-      } else if ( fspectrum < 1 ) {
-          return "#BBBBBB ";
-      } else if ( fspectrum < 2 ) {
-          return "#AAAAAA ";
-      } else if ( fspectrum < 5 ) {
-          return "#999999 ";
-      } else if ( fspectrum < 10 ) {
-          return "#888888 ";
-      } else if ( fspectrum < 20 ) {
-          return "#777777 ";
-      } else if ( fspectrum < 30 ) {
-          return "#666666 ";
-      } else if ( fspectrum < 40 ) {
-          return "#555555 ";
-      } else if ( fspectrum < 50 ) {
-          return "#444444 ";
-      } else if ( fspectrum < 60 ) {
-          return "#333333 ";
-      } else if ( fspectrum < 80 ) {
-          return "#222222 ";
-      } else if ( fspectrum < 100 ) {
-          return "#111111 ";
-      } else {
-          return "#000000 ";
-      }
+    if ( fspectrum < 0.01 )
+    {
+        return "#EEEEEE ";
+    }
+    else if ( fspectrum < 0.1 )
+    {
+        return "#DDDDDD ";
+    }
+    else if ( fspectrum < 0.5 )
+    {
+        return "#CCCCCC ";
+    }
+    else if ( fspectrum < 1 )
+    {
+        return "#BBBBBB ";
+    }
+    else if ( fspectrum < 2 )
+    {
+        return "#AAAAAA ";
+    }
+    else if ( fspectrum < 5 )
+    {
+        return "#999999 ";
+    }
+    else if ( fspectrum < 10 )
+    {
+        return "#888888 ";
+    }
+    else if ( fspectrum < 20 )
+    {
+        return "#777777 ";
+    }
+    else if ( fspectrum < 30 )
+    {
+        return "#666666 ";
+    }
+    else if ( fspectrum < 40 )
+    {
+        return "#555555 ";
+    }
+    else if ( fspectrum < 50 )
+    {
+        return "#444444 ";
+    }
+    else if ( fspectrum < 60 )
+    {
+        return "#333333 ";
+    }
+    else if ( fspectrum < 80 )
+    {
+        return "#222222 ";
+    }
+    else if ( fspectrum < 100 )
+    {
+        return "#111111 ";
+    }
+    else
+    {
+        return "#000000 ";
+    }
 }
 
 static char* phasogram_get_fill_color( t_int phase )
 {
-   if ( phase < 0 )
-   {
-      if ( phase > -10 ) {
-          return "#111111 ";
-      } else if ( phase > -20 ) {
-          return "#222222 ";
-      } else if ( phase > -30 ) {
-          return "#333333 ";
-      } else if ( phase > -40 ) {
-          return "#444444 ";
-      } else if ( phase > -50 ) {
-          return "#555555 ";
-      } else if ( phase > -60 ) {
-          return "#666666 ";
-      } else if ( phase > -70 ) {
-          return "#777777 ";
-      } else if ( phase > -80 ) {
-          return "#888888 ";
-      } else {
-          return "#999999 ";
-      }
-   }
-   else
-   {
-      if ( phase == 0 ) {
-          return "#FFFFFF ";
-      } else if ( phase < 10 ) {
-          return "#111111 ";
-      } else if ( phase < 20 ) {
-          return "#222222 ";
-      } else if ( phase < 30 ) {
-          return "#333333 ";
-      } else if ( phase < 40 ) {
-          return "#444444 ";
-      } else if ( phase < 50 ) {
-          return "#555555 ";
-      } else if ( phase < 60 ) {
-          return "#666666 ";
-      } else if ( phase < 70 ) {
-          return "#777777 ";
-      } else if ( phase < 80 ) {
-          return "#888888 ";
-      } else {
-          return "#999999 ";
-      }
-   }
-   // normally never reached
-   return "";
+    if ( phase < 0 )
+    {
+        if ( phase > -10 )
+        {
+            return "#111111 ";
+        }
+        else if ( phase > -20 )
+        {
+            return "#222222 ";
+        }
+        else if ( phase > -30 )
+        {
+            return "#333333 ";
+        }
+        else if ( phase > -40 )
+        {
+            return "#444444 ";
+        }
+        else if ( phase > -50 )
+        {
+            return "#555555 ";
+        }
+        else if ( phase > -60 )
+        {
+            return "#666666 ";
+        }
+        else if ( phase > -70 )
+        {
+            return "#777777 ";
+        }
+        else if ( phase > -80 )
+        {
+            return "#888888 ";
+        }
+        else
+        {
+            return "#999999 ";
+        }
+    }
+    else
+    {
+        if ( phase == 0 )
+        {
+            return "#FFFFFF ";
+        }
+        else if ( phase < 10 )
+        {
+            return "#111111 ";
+        }
+        else if ( phase < 20 )
+        {
+            return "#222222 ";
+        }
+        else if ( phase < 30 )
+        {
+            return "#333333 ";
+        }
+        else if ( phase < 40 )
+        {
+            return "#444444 ";
+        }
+        else if ( phase < 50 )
+        {
+            return "#555555 ";
+        }
+        else if ( phase < 60 )
+        {
+            return "#666666 ";
+        }
+        else if ( phase < 70 )
+        {
+            return "#777777 ";
+        }
+        else if ( phase < 80 )
+        {
+            return "#888888 ";
+        }
+        else
+        {
+            return "#999999 ";
+        }
+    }
+    // normally never reached
+    return "";
 }
 
 static void sonogram_update_point(t_sonogram *x, t_glist *glist, t_int sample, t_int frequency)
 {
-  t_canvas *canvas=glist_getcanvas(glist);
-  t_float fspectrum=0.0;
-  t_int phase=0.0;
-  char newColor[ 8 ], olColor[8];
-  int i;
+    t_canvas *canvas=glist_getcanvas(glist);
+    t_float fspectrum=0.0;
+    t_int phase=0.0;
+    char newColor[ 8 ], olColor[8];
+    int i;
 
-      fspectrum = 
-          sqrt( pow( *(x->x_rdata+sample*x->x_blocksize+frequency), 2) +
-                pow( *(x->x_idata+sample*x->x_blocksize+frequency), 2) );
-      phase = (int) ( atan2( *(x->x_idata+(sample*x->x_blocksize)+frequency), 
-                      *(x->x_rdata+(sample*x->x_blocksize)+frequency) )*180/M_PI );
-      if ( x->x_empty && ( fspectrum != 0 ))
-      {
-         x->x_empty = 0;
-      }
-      strncpy( newColor, sonogram_get_fill_color( fspectrum ), 8 );
+    fspectrum =
+        sqrt( pow( *(x->x_rdata+sample*x->x_blocksize+frequency), 2) +
+              pow( *(x->x_idata+sample*x->x_blocksize+frequency), 2) );
+    phase = (int) ( atan2( *(x->x_idata+(sample*x->x_blocksize)+frequency),
+                           *(x->x_rdata+(sample*x->x_blocksize)+frequency) )*180/M_PI );
+    if ( x->x_empty && ( fspectrum != 0 ))
+    {
+        x->x_empty = 0;
+    }
+    strncpy( newColor, sonogram_get_fill_color( fspectrum ), 8 );
 
-      for ( i=0; i<x->x_zoom; i++ )
-      {
-          sprintf( x->x_gifdata, "%s", newColor );
-      }
-      for ( i=0; i<x->x_zoom; i++ )
-      {
-          SYS_VGUI5("SONIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata, 
+    for ( i=0; i<x->x_zoom; i++ )
+    {
+        sprintf( x->x_gifdata, "%s", newColor );
+    }
+    for ( i=0; i<x->x_zoom; i++ )
+    {
+        SYS_VGUI5("SONIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata,
+                  sample*x->x_zoom+i, (x->x_blocksize/2-frequency)*x->x_zoom );
+    }
+
+    if ( x->x_phaso )
+    {
+        strncpy( newColor, phasogram_get_fill_color( phase ), 8 );
+        strcpy( x->x_gifdata, "" );
+        for ( i=0; i<x->x_zoom; i++ )
+        {
+            sprintf( x->x_gifdata, "%s", newColor );
+        }
+        for ( i=0; i<x->x_zoom; i++ )
+        {
+            SYS_VGUI5("FAZIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata,
                       sample*x->x_zoom+i, (x->x_blocksize/2-frequency)*x->x_zoom );
-      }
+        }
+    }
 
-      if ( x->x_phaso )
-      {
-           strncpy( newColor, phasogram_get_fill_color( phase ), 8 );
-           strcpy( x->x_gifdata, "" );
-           for ( i=0; i<x->x_zoom; i++ )
-           {
-                sprintf( x->x_gifdata, "%s", newColor );
-           }
-           for ( i=0; i<x->x_zoom; i++ )
-           {
-              SYS_VGUI5("FAZIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata, 
-                               sample*x->x_zoom+i, (x->x_blocksize/2-frequency)*x->x_zoom );
-           }
-      }
-
-      x->x_nbupdated++;
+    x->x_nbupdated++;
 }
 
 static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
@@ -320,14 +385,14 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
     // update sonogram
     for ( fi=x->x_blocksize/2-1; fi>=0; fi-- )
     {
-      fspectrum = 
-         sqrt( pow( *(x->x_rdata+bnumber*x->x_blocksize+fi), 2) +
-                pow( *(x->x_idata+bnumber*x->x_blocksize+fi), 2) );
-      strncpy( color, sonogram_get_fill_color( fspectrum ), 8 );
-      for ( i=0; i<x->x_zoom; i++ )
-      {
-           strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, color, 8 );
-      }
+        fspectrum =
+            sqrt( pow( *(x->x_rdata+bnumber*x->x_blocksize+fi), 2) +
+                  pow( *(x->x_idata+bnumber*x->x_blocksize+fi), 2) );
+        strncpy( color, sonogram_get_fill_color( fspectrum ), 8 );
+        for ( i=0; i<x->x_zoom; i++ )
+        {
+            strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, color, 8 );
+        }
     }
     for ( i=0; i<x->x_zoom; i++ )
     {
@@ -336,24 +401,24 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
     }
 
     // update phasogram
-    if ( x->x_phaso ) 
+    if ( x->x_phaso )
     {
-      strcpy( x->x_gifdata, "" );
-      for ( fi=x->x_blocksize/2-1; fi>=0; fi-- )
-      {
-        phase = (int) ( atan2( *(x->x_idata+bnumber*x->x_blocksize+fi), 
-                      *(x->x_rdata+bnumber*x->x_blocksize+fi) )*180/M_PI );
-        strncpy( color, phasogram_get_fill_color( phase ), 8 );
+        strcpy( x->x_gifdata, "" );
+        for ( fi=x->x_blocksize/2-1; fi>=0; fi-- )
+        {
+            phase = (int) ( atan2( *(x->x_idata+bnumber*x->x_blocksize+fi),
+                                   *(x->x_rdata+bnumber*x->x_blocksize+fi) )*180/M_PI );
+            strncpy( color, phasogram_get_fill_color( phase ), 8 );
+            for ( i=0; i<x->x_zoom; i++ )
+            {
+                strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, color, 8 );
+            }
+        }
         for ( i=0; i<x->x_zoom; i++ )
         {
-           strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, color, 8 );
+            sprintf( x->x_guicommand, "FAZIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (bnumber*x->x_zoom)+i );
+            sys_gui( x->x_guicommand );
         }
-      }
-      for ( i=0; i<x->x_zoom; i++ )
-      {
-        sprintf( x->x_guicommand, "FAZIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (bnumber*x->x_zoom)+i );
-        sys_gui( x->x_guicommand );
-      }
     }
 
 }
@@ -365,199 +430,204 @@ static void sonogram_erase_block(t_sonogram *x, t_glist *glist, t_int bnumber )
     t_float fspectrum=0.0;
     char fillColor[ 16 ];
 
-     for ( fi=0; fi<x->x_blocksize/2; fi++)
-     {
+    for ( fi=0; fi<x->x_blocksize/2; fi++)
+    {
         {
-           int i;
+            int i;
 
-           for ( i=0; i<x->x_zoom; i++ )
-           {
+            for ( i=0; i<x->x_zoom; i++ )
+            {
                 strncpy( x->x_gifdata+i*sizeof("#FFFFFF "), "#FFFFFF ", 8 );
-           }
-           SYS_VGUI5("SONIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata, 
-                               bnumber*x->x_zoom, (x->x_blocksize/2-fi)*x->x_zoom );
+            }
+            SYS_VGUI5("SONIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata,
+                      bnumber*x->x_zoom, (x->x_blocksize/2-fi)*x->x_zoom );
         }
-     }
+    }
 }
 
 static void *sonogram_do_update_part(void *tdata)
 {
- t_sonogram *x = (t_sonogram*) tdata;
- t_int si;
- t_int nbpoints = 0;
- t_float percentage = 0, opercentage = 0;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
- 
+    t_sonogram *x = (t_sonogram*) tdata;
+    t_int si;
+    t_int nbpoints = 0;
+    t_float percentage = 0, opercentage = 0;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
-   // loose synchro
-   usleep( THREAD_SLEEP_TIME );
 
-   // check boundaries
-   if ( x->x_updateend > x->x_size-1 ) x->x_updateend = x->x_size-1;
-   if ( x->x_updatestart < 0 ) x->x_updatestart = 0;
+    // loose synchro
+    usleep( THREAD_SLEEP_TIME );
 
-   // post("sonogram~ : ok, let's go [updating %d, %d]", x->x_updatestart, x->x_updateend );
+    // check boundaries
+    if ( x->x_updateend > x->x_size-1 ) x->x_updateend = x->x_size-1;
+    if ( x->x_updatestart < 0 ) x->x_updatestart = 0;
 
-   if ( x->x_erase )
-   {
-     for ( si=x->x_updatestart; si<=x->x_updateend; si++ )
-     {
-       sonogram_erase_block(x, x->x_glist, si);
-       nbpoints++;
-       percentage = (nbpoints*100/(x->x_updateend-x->x_updatestart+1));
-       if ( (percentage == (int) percentage) && ((int)percentage%5 == 0) && ( percentage != opercentage ) )
-       {
-         // post( "sonogram~ : erase part : %d %% completed", (int)percentage );
-         opercentage = percentage;
-       }
-     }
-   }
-   
-   percentage = opercentage = nbpoints = 0;
+    // post("sonogram~ : ok, let's go [updating %d, %d]", x->x_updatestart, x->x_updateend );
 
-   if ( x->x_redraw )
-   {
-     for ( si=x->x_updatestart; si<=x->x_updateend; si++ )
-     {
-      sonogram_update_block(x, x->x_glist, si);
-      nbpoints++;
-      percentage = (nbpoints*100/(x->x_updateend-x->x_updatestart+1));
-      if ( (percentage == (int) percentage) && ((int)percentage%5 == 0) && ( percentage != opercentage ) )
-      {
-         // post( "sonogram~ : update part : %d %% completed", (int)percentage );
-         opercentage = percentage;
-      }
-     }
-   }
-
-   // set borders in black
-   SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #000000\n", canvas, x);
-   if ( x->x_phaso )
-   {
-      SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #000000\n", canvas, x);
-   }
-
-   // post("sonogram~ : child thread %d ended (nb_updated=%d)", (int)x->x_updatechild, x->x_nbupdated );
-   x->x_updatechild = 0;
-   return NULL;
-}
-
-static void sonogram_update_part(t_sonogram *x, t_glist *glist, t_int bstart, t_int bend, 
-                                 t_int erase, t_int redraw, t_int keepframe)
-{
- pthread_attr_t update_child_attr;
- pthread_t  update_child;
- t_canvas *canvas=glist_getcanvas(glist);
-
-   if ( x->x_graphic )
-   {
-    if ( x->x_updatechild != 0 )
+    if ( x->x_erase )
     {
-       // post( "sonogram~ : error : no update is possible for now" );
-       return;
+        for ( si=x->x_updatestart; si<=x->x_updateend; si++ )
+        {
+            sonogram_erase_block(x, x->x_glist, si);
+            nbpoints++;
+            percentage = (nbpoints*100/(x->x_updateend-x->x_updatestart+1));
+            if ( (percentage == (int) percentage) && ((int)percentage%5 == 0) && ( percentage != opercentage ) )
+            {
+                // post( "sonogram~ : erase part : %d %% completed", (int)percentage );
+                opercentage = percentage;
+            }
+        }
     }
-    x->x_updatestart = bstart;
-    x->x_updateend = bend;
-    if ( !keepframe ) 
+
+    percentage = opercentage = nbpoints = 0;
+
+    if ( x->x_redraw )
     {
-       x->x_erase = 0;
+        for ( si=x->x_updatestart; si<=x->x_updateend; si++ )
+        {
+            sonogram_update_block(x, x->x_glist, si);
+            nbpoints++;
+            percentage = (nbpoints*100/(x->x_updateend-x->x_updatestart+1));
+            if ( (percentage == (int) percentage) && ((int)percentage%5 == 0) && ( percentage != opercentage ) )
+            {
+                // post( "sonogram~ : update part : %d %% completed", (int)percentage );
+                opercentage = percentage;
+            }
+        }
     }
-    else
-    {
-       x->x_erase = erase;
-    }
-    x->x_redraw = redraw;
-    x->x_nbupdated = 0;
-    // recreate the square if needed
-    if ( ( bstart == 0 ) && ( bend == x->x_size-1 ) && !keepframe )
-    {
-      SYS_VGUI3(".x%lx.c delete %xSONOGRAM\n", canvas, x );
-      SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xSONOGRAM\n",
-	     glist_getcanvas(glist), x->x_xpos-1, x->x_ypos-1,
-	     x->x_xpos + x->x_size*x->x_zoom+1, 
-             x->x_ypos + x->x_blocksize/2*x->x_zoom+1,
-	     x);
-      SYS_VGUI2("image delete SONIMAGE%x\n", x );
-      SYS_VGUI3(".x%lx.c delete ISONIMAGE%x\n", canvas, x );
-      SYS_VGUI4("image create photo SONIMAGE%x -format gif -width %d -height %d\n", 
-                          x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
-      SYS_VGUI2("SONIMAGE%x blank\n", x);
-      SYS_VGUI6(".x%lx.c create image %d %d -image SONIMAGE%x -tags ISONIMAGE%x\n", 
-                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
-                          (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)), x, x );
-      if ( x->x_phaso )
-      {
-          SYS_VGUI3(".x%lx.c delete %xPHASOGRAM\n", canvas, x );
-          SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xPHASOGRAM\n",
-	     canvas, x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
-	     x->x_xpos + x->x_size*x->x_zoom +1, 
-             x->x_ypos + x->x_blocksize*x->x_zoom + 3,
-	     x);
-          SYS_VGUI2("image delete FAZIMAGE%x\n", x );
-          SYS_VGUI3(".x%lx.c delete IFAZIMAGE%x\n", canvas, x );
-          SYS_VGUI4("image create photo FAZIMAGE%x -format gif -width %d -height %d\n", 
-                          x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
-          SYS_VGUI2("FAZIMAGE%x blank\n", x);
-          SYS_VGUI6(".x%lx.c create image %d %d -image FAZIMAGE%x -tags IFAZIMAGE%x\n", 
-                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
-                          x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
-      }
-      canvas_fixlinesfor( canvas, (t_text*)x );
-    }
-    // set borders in red
-    SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #FF0000\n", canvas, x);
+
+    // set borders in black
+    SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #000000\n", canvas, x);
     if ( x->x_phaso )
     {
-       SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #FF0000\n", canvas, x);
+        SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #000000\n", canvas, x);
     }
 
-    // launch update thread
-    if ( pthread_attr_init( &update_child_attr ) < 0 ) {
-       post( "sonogram~ : could not launch update thread" );
-       perror( "pthread_attr_init" );
-       return;
-    }
-    if ( pthread_attr_setdetachstate( &update_child_attr, PTHREAD_CREATE_DETACHED ) < 0 ) {
-       post( "sonogram~ : could not launch update thread" );
-       perror( "pthread_attr_setdetachstate" );
-       return;
-    }
-    if ( pthread_create( &x->x_updatechild, &update_child_attr, sonogram_do_update_part, x ) < 0 ) {
-       post( "sonogram~ : could not launch update thread" );
-       perror( "pthread_create" );
-       return;
-    }
-    else 
-    {
-       // post( "sonogram~ : drawing thread %d launched", (int)x->x_updatechild );
-    }
-   }
+    // post("sonogram~ : child thread %d ended (nb_updated=%d)", (int)x->x_updatechild, x->x_nbupdated );
+    x->x_updatechild = 0;
+    return NULL;
 }
 
-    /* paste selection at the drawing point */
+static void sonogram_update_part(t_sonogram *x, t_glist *glist, t_int bstart, t_int bend,
+                                 t_int erase, t_int redraw, t_int keepframe)
+{
+    pthread_attr_t update_child_attr;
+    pthread_t  update_child;
+    t_canvas *canvas=glist_getcanvas(glist);
+
+    if ( x->x_graphic )
+    {
+        if ( x->x_updatechild != 0 )
+        {
+            // post( "sonogram~ : error : no update is possible for now" );
+            return;
+        }
+        x->x_updatestart = bstart;
+        x->x_updateend = bend;
+        if ( !keepframe )
+        {
+            x->x_erase = 0;
+        }
+        else
+        {
+            x->x_erase = erase;
+        }
+        x->x_redraw = redraw;
+        x->x_nbupdated = 0;
+        // recreate the square if needed
+        if ( ( bstart == 0 ) && ( bend == x->x_size-1 ) && !keepframe )
+        {
+            SYS_VGUI3(".x%lx.c delete %xSONOGRAM\n", canvas, x );
+            SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xSONOGRAM\n",
+                      glist_getcanvas(glist), x->x_xpos-1, x->x_ypos-1,
+                      x->x_xpos + x->x_size*x->x_zoom+1,
+                      x->x_ypos + x->x_blocksize/2*x->x_zoom+1,
+                      x);
+            SYS_VGUI2("image delete SONIMAGE%x\n", x );
+            SYS_VGUI3(".x%lx.c delete ISONIMAGE%x\n", canvas, x );
+            SYS_VGUI4("image create photo SONIMAGE%x -format gif -width %d -height %d\n",
+                      x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
+            SYS_VGUI2("SONIMAGE%x blank\n", x);
+            SYS_VGUI6(".x%lx.c create image %d %d -image SONIMAGE%x -tags ISONIMAGE%x\n",
+                      canvas, x->x_xpos+((x->x_size*x->x_zoom)/2),
+                      (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)), x, x );
+            if ( x->x_phaso )
+            {
+                SYS_VGUI3(".x%lx.c delete %xPHASOGRAM\n", canvas, x );
+                SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xPHASOGRAM\n",
+                          canvas, x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
+                          x->x_xpos + x->x_size*x->x_zoom +1,
+                          x->x_ypos + x->x_blocksize*x->x_zoom + 3,
+                          x);
+                SYS_VGUI2("image delete FAZIMAGE%x\n", x );
+                SYS_VGUI3(".x%lx.c delete IFAZIMAGE%x\n", canvas, x );
+                SYS_VGUI4("image create photo FAZIMAGE%x -format gif -width %d -height %d\n",
+                          x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
+                SYS_VGUI2("FAZIMAGE%x blank\n", x);
+                SYS_VGUI6(".x%lx.c create image %d %d -image FAZIMAGE%x -tags IFAZIMAGE%x\n",
+                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2),
+                          x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
+            }
+            canvas_fixlinesfor( canvas, (t_text*)x );
+        }
+        // set borders in red
+        SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #FF0000\n", canvas, x);
+        if ( x->x_phaso )
+        {
+            SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #FF0000\n", canvas, x);
+        }
+
+        // launch update thread
+        if ( pthread_attr_init( &update_child_attr ) < 0 )
+        {
+            post( "sonogram~ : could not launch update thread" );
+            perror( "pthread_attr_init" );
+            return;
+        }
+        if ( pthread_attr_setdetachstate( &update_child_attr, PTHREAD_CREATE_DETACHED ) < 0 )
+        {
+            post( "sonogram~ : could not launch update thread" );
+            perror( "pthread_attr_setdetachstate" );
+            return;
+        }
+        if ( pthread_create( &x->x_updatechild, &update_child_attr, sonogram_do_update_part, x ) < 0 )
+        {
+            post( "sonogram~ : could not launch update thread" );
+            perror( "pthread_create" );
+            return;
+        }
+        else
+        {
+            // post( "sonogram~ : drawing thread %d launched", (int)x->x_updatechild );
+        }
+    }
+}
+
+/* paste selection at the drawing point */
 static void sonogram_paste( t_sonogram* x)
 {
-    t_int pxstart = (x->x_xdraw-x->x_xpos)/x->x_zoom; 
-    t_int pystart = (x->x_ypos-x->x_ydraw)/x->x_zoom+x->x_blocksize/2; 
+    t_int pxstart = (x->x_xdraw-x->x_xpos)/x->x_zoom;
+    t_int pystart = (x->x_ypos-x->x_ydraw)/x->x_zoom+x->x_blocksize/2;
     t_int cxs,cxe,cys,cye,si=0,fi=0;
     t_float *icopy;
     t_float *rcopy;
     t_int   copynd;
 
-    if ( x->x_xstartcapture > x->x_xendcapture ) {
-              fi = x->x_xstartcapture;
-              x->x_xstartcapture = x->x_xendcapture;
-              x->x_xendcapture = fi;
+    if ( x->x_xstartcapture > x->x_xendcapture )
+    {
+        fi = x->x_xstartcapture;
+        x->x_xstartcapture = x->x_xendcapture;
+        x->x_xendcapture = fi;
     }
-    if ( x->x_ystartcapture > x->x_yendcapture ) {
-              fi = x->x_ystartcapture;
-              x->x_ystartcapture = x->x_yendcapture;
-              x->x_yendcapture = fi;
+    if ( x->x_ystartcapture > x->x_yendcapture )
+    {
+        fi = x->x_ystartcapture;
+        x->x_ystartcapture = x->x_yendcapture;
+        x->x_yendcapture = fi;
     }
-    cxs=(x->x_xstartcapture-x->x_xpos)/x->x_zoom; 
-    cxe=(x->x_xendcapture-x->x_xpos)/x->x_zoom; 
-    cys=(x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2; 
-    cye=(x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; 
+    cxs=(x->x_xstartcapture-x->x_xpos)/x->x_zoom;
+    cxe=(x->x_xendcapture-x->x_xpos)/x->x_zoom;
+    cys=(x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2;
+    cye=(x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2;
     if ( cye < 0 ) cye=0;
     if ( cys < 0 ) cys=0;
     if ( cye >= x->x_blocksize/2 ) cye=x->x_blocksize/2-1;
@@ -570,81 +640,87 @@ static void sonogram_paste( t_sonogram* x)
     rcopy = ( t_float* ) getbytes( ( cxe-cxs+1 )*( cye-cys+1 )*sizeof( t_float ) );
     if ( !icopy || !rcopy )
     {
-       post( "sonogram~ : cannot allocate buffers for pasting" );
-       return;
+        post( "sonogram~ : cannot allocate buffers for pasting" );
+        return;
     }
     // copy initial data
     copynd = 0;
-    for ( si=cxs; si<=cxe; si++) {
-      for ( fi=cys; fi<=cye; fi++) {
-        *(rcopy+copynd) = *(x->x_rdata+(si)*x->x_blocksize+fi); 
-        *(icopy+copynd) = *(x->x_idata+(si)*x->x_blocksize+fi); 
-        copynd++;
-      }
+    for ( si=cxs; si<=cxe; si++)
+    {
+        for ( fi=cys; fi<=cye; fi++)
+        {
+            *(rcopy+copynd) = *(x->x_rdata+(si)*x->x_blocksize+fi);
+            *(icopy+copynd) = *(x->x_idata+(si)*x->x_blocksize+fi);
+            copynd++;
+        }
     }
 
     post( "sonogram~ : paste from [%d,%d,%d,%d] to [%d,%d]", cxs, cys, cxe, cye, pxstart, pystart );
 
-    for ( si=cxs; si<=cxe; si++) {
-      if ( pxstart+si-cxs >= x->x_size ) break;
-      copynd = (si-cxs)*(cye-cys+1);
-      for ( fi=cys; fi<=cye; fi++) {
-          // post ( "sonogram~ : si : %d : fi : %d : copynd : %d", si, fi, copynd );
-          if ( pystart+fi-cys >= x->x_blocksize/2 ) break;
-          *(x->x_rudata+((si-cxs)*x->x_blocksize)+(fi-cys)) = *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys));
-          *(x->x_iudata+((si-cxs)*x->x_blocksize)+(fi-cys)) = *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys));
-          if ( x->x_enhancemode )
-          {
-             // save data for undo
-             *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) += *(rcopy+copynd);
-             *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) += *(icopy+copynd);
-          }
-          else
-          {
-             *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) = *(rcopy+copynd);
-             *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) = *(icopy+copynd);
-          }
-          copynd++;
-      }
+    for ( si=cxs; si<=cxe; si++)
+    {
+        if ( pxstart+si-cxs >= x->x_size ) break;
+        copynd = (si-cxs)*(cye-cys+1);
+        for ( fi=cys; fi<=cye; fi++)
+        {
+            // post ( "sonogram~ : si : %d : fi : %d : copynd : %d", si, fi, copynd );
+            if ( pystart+fi-cys >= x->x_blocksize/2 ) break;
+            *(x->x_rudata+((si-cxs)*x->x_blocksize)+(fi-cys)) = *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys));
+            *(x->x_iudata+((si-cxs)*x->x_blocksize)+(fi-cys)) = *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys));
+            if ( x->x_enhancemode )
+            {
+                // save data for undo
+                *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) += *(rcopy+copynd);
+                *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) += *(icopy+copynd);
+            }
+            else
+            {
+                *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) = *(rcopy+copynd);
+                *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) = *(icopy+copynd);
+            }
+            copynd++;
+        }
     }
 
-    x->x_uxs = pxstart;  
-    x->x_uxe = pxstart+(si-1)-cxs;  
-    x->x_uys = pystart;  
-    x->x_uye = pystart+(fi-1)-cys;;  
+    x->x_uxs = pxstart;
+    x->x_uxe = pxstart+(si-1)-cxs;
+    x->x_uys = pystart;
+    x->x_uye = pystart+(fi-1)-cys;;
 
     freebytes( rcopy, ( cxe-cxs+1 )*( cye-cys+1 )*sizeof( t_float ) );
     freebytes( icopy, ( cxe-cxs+1 )*( cye-cys+1 )*sizeof( t_float ) );
 }
 
-    /* paste phase at the drawing point */
+/* paste phase at the drawing point */
 static void sonogram_paste_phase( t_sonogram* x)
 {
- t_int pxstart = (x->x_xdraw-x->x_xpos)/x->x_zoom; 
- t_int pystart = (x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ydraw)/x->x_zoom+x->x_blocksize/2; 
- t_int cxs,cxe,cys,cye,si,fi;
- t_float fspectrum, fdestspectrum;
- t_float fphase, fdestphase;
- t_float *icopy;
- t_float *rcopy;
- t_int   copynd;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_int pxstart = (x->x_xdraw-x->x_xpos)/x->x_zoom;
+    t_int pystart = (x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ydraw)/x->x_zoom+x->x_blocksize/2;
+    t_int cxs,cxe,cys,cye,si,fi;
+    t_float fspectrum, fdestspectrum;
+    t_float fphase, fdestphase;
+    t_float *icopy;
+    t_float *rcopy;
+    t_int   copynd;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
 
-    if ( x->x_xstartcapture > x->x_xendcapture ) {
-              fi = x->x_xstartcapture;
-              x->x_xstartcapture = x->x_xendcapture;
-              x->x_xendcapture = fi;
+    if ( x->x_xstartcapture > x->x_xendcapture )
+    {
+        fi = x->x_xstartcapture;
+        x->x_xstartcapture = x->x_xendcapture;
+        x->x_xendcapture = fi;
     }
-    if ( x->x_ystartcapture > x->x_yendcapture ) {
-              fi = x->x_ystartcapture;
-              x->x_ystartcapture = x->x_yendcapture;
-              x->x_yendcapture = fi;
+    if ( x->x_ystartcapture > x->x_yendcapture )
+    {
+        fi = x->x_ystartcapture;
+        x->x_ystartcapture = x->x_yendcapture;
+        x->x_yendcapture = fi;
     }
-    cxs=(x->x_xstartcapture-x->x_xpos)/x->x_zoom; 
-    cxe=(x->x_xendcapture-x->x_xpos)/x->x_zoom; 
-    cys=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2; 
-    cye=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; 
+    cxs=(x->x_xstartcapture-x->x_xpos)/x->x_zoom;
+    cxe=(x->x_xendcapture-x->x_xpos)/x->x_zoom;
+    cys=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2;
+    cye=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2;
     if ( cye < 0 ) cye=0;
     if ( cys < 0 ) cys=0;
     if ( cye >= x->x_blocksize/2 ) cye=x->x_blocksize/2-1;
@@ -657,48 +733,52 @@ static void sonogram_paste_phase( t_sonogram* x)
     rcopy = ( t_float* ) getbytes( ( cxe-cxs+1 )*( cye-cys+1 )*sizeof( t_float ) );
     if ( !icopy || !rcopy )
     {
-       post( "sonogram~ : cannot allocate buffers for pasting" );
-       return;
+        post( "sonogram~ : cannot allocate buffers for pasting" );
+        return;
     }
     // copy initial data
     copynd = 0;
-    for ( si=cxs; si<=cxe; si++) {
-      for ( fi=cys; fi<=cye; fi++) {
-        *(rcopy+copynd) = *(x->x_rdata+(si)*x->x_blocksize+fi); 
-        *(icopy+copynd) = *(x->x_idata+(si)*x->x_blocksize+fi); 
-        copynd++;
-      }
+    for ( si=cxs; si<=cxe; si++)
+    {
+        for ( fi=cys; fi<=cye; fi++)
+        {
+            *(rcopy+copynd) = *(x->x_rdata+(si)*x->x_blocksize+fi);
+            *(icopy+copynd) = *(x->x_idata+(si)*x->x_blocksize+fi);
+            copynd++;
+        }
     }
 
     post( "sonogram~ : paste phase from [%d,%d,%d,%d] to [%d,%d]", cxs, cys, cxe, cye, pxstart, pystart );
 
-    for ( si=cxs; si<=cxe; si++) {
-      if ( pxstart+si-cxs >= x->x_size ) break;
-      copynd = (si-cxs)*(cye-cys+1);
-      for ( fi=cys; fi<=cye; fi++) {
-          if ( pystart+fi-cys > x->x_blocksize+1 ) break;
-          fphase = atan2( *(icopy+copynd), *(rcopy+copynd) );
-          fdestspectrum =
+    for ( si=cxs; si<=cxe; si++)
+    {
+        if ( pxstart+si-cxs >= x->x_size ) break;
+        copynd = (si-cxs)*(cye-cys+1);
+        for ( fi=cys; fi<=cye; fi++)
+        {
+            if ( pystart+fi-cys > x->x_blocksize+1 ) break;
+            fphase = atan2( *(icopy+copynd), *(rcopy+copynd) );
+            fdestspectrum =
                 sqrt( pow( *(x->x_rdata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)), 2) +
-                   pow( *(x->x_idata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)), 2) );
-          fdestphase = atan2( *(x->x_idata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)), 
-                     *(x->x_rdata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)) );
-          if ( x->x_enhancemode )
-          {
-             *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) += 
-               fdestspectrum*cos( fdestphase + fphase );
-             *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) += 
-               fdestspectrum*sin( fdestphase + fphase );
-          }
-          else
-          {
-             *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) = 
-               fdestspectrum*cos( fphase );
-             *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) = 
-               fdestspectrum*sin( fphase );
-          }
-          copynd++;
-      }
+                      pow( *(x->x_idata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)), 2) );
+            fdestphase = atan2( *(x->x_idata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)),
+                                *(x->x_rdata+(pxstart+si-cxs)*x->x_blocksize+(pystart+fi-cys)) );
+            if ( x->x_enhancemode )
+            {
+                *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) +=
+                    fdestspectrum*cos( fdestphase + fphase );
+                *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) +=
+                    fdestspectrum*sin( fdestphase + fphase );
+            }
+            else
+            {
+                *(x->x_rdata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) =
+                    fdestspectrum*cos( fphase );
+                *(x->x_idata+((pxstart+si-cxs)*x->x_blocksize)+(pystart+fi-cys)) =
+                    fdestspectrum*sin( fphase );
+            }
+            copynd++;
+        }
     }
 
     freebytes( rcopy, ( cxe-cxs+1 )*( cye-cys+1 )*sizeof( t_float ) );
@@ -707,185 +787,185 @@ static void sonogram_paste_phase( t_sonogram* x)
     sonogram_update_part(x, x->x_glist, pxstart, pxstart+(si-1)-cxs, 0, 1, 1);
     // start a new capture
     SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
-    x->x_xstartcapture = x->x_xdraw; 
-    x->x_ystartcapture = x->x_ydraw; 
-    x->x_xendcapture = x->x_xdraw; 
-    x->x_yendcapture = x->x_ydraw; 
-    
+    x->x_xstartcapture = x->x_xdraw;
+    x->x_ystartcapture = x->x_ydraw;
+    x->x_xendcapture = x->x_xdraw;
+    x->x_yendcapture = x->x_ydraw;
+
 }
 
 static void sonogram_draw_new(t_sonogram *x, t_glist *glist)
 {
- t_canvas *canvas=glist_getcanvas(glist);
+    t_canvas *canvas=glist_getcanvas(glist);
 
-   x->x_xpos=text_xpix(&x->x_obj, glist);
-   x->x_ypos=text_ypix(&x->x_obj, glist);
-   if ( x->x_graphic )
-   {
-    SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xSONOGRAM\n",
-	     canvas, x->x_xpos-1, x->x_ypos-1,
-	     x->x_xpos + x->x_size*x->x_zoom+1, 
-             x->x_ypos + x->x_blocksize/2*x->x_zoom+1,
-	     x);
-    SYS_VGUI4("image create photo SONIMAGE%x -format gif -width %d -height %d\n", 
-                          x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
-    SYS_VGUI2("SONIMAGE%x blank\n", x);
-    SYS_VGUI6(".x%lx.c create image %d %d -image SONIMAGE%x -tags ISONIMAGE%x\n", 
-                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
-                          (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)), x, x );
-    if ( x->x_phaso )
+    x->x_xpos=text_xpix(&x->x_obj, glist);
+    x->x_ypos=text_ypix(&x->x_obj, glist);
+    if ( x->x_graphic )
     {
-          SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xPHASOGRAM\n",
-	     canvas, x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
-	     x->x_xpos + x->x_size*x->x_zoom +1, 
-             x->x_ypos + x->x_blocksize*x->x_zoom + 3,
-	     x);
-          SYS_VGUI4("image create photo FAZIMAGE%x -format gif -width %d -height %d\n", 
-                          x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
-          SYS_VGUI2("FAZIMAGE%x blank\n", x);
-          SYS_VGUI6(".x%lx.c create image %d %d -image FAZIMAGE%x -tags IFAZIMAGE%x\n", 
-                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
-                          x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
+        SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xSONOGRAM\n",
+                  canvas, x->x_xpos-1, x->x_ypos-1,
+                  x->x_xpos + x->x_size*x->x_zoom+1,
+                  x->x_ypos + x->x_blocksize/2*x->x_zoom+1,
+                  x);
+        SYS_VGUI4("image create photo SONIMAGE%x -format gif -width %d -height %d\n",
+                  x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
+        SYS_VGUI2("SONIMAGE%x blank\n", x);
+        SYS_VGUI6(".x%lx.c create image %d %d -image SONIMAGE%x -tags ISONIMAGE%x\n",
+                  canvas, x->x_xpos+((x->x_size*x->x_zoom)/2),
+                  (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)), x, x );
+        if ( x->x_phaso )
+        {
+            SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xPHASOGRAM\n",
+                      canvas, x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
+                      x->x_xpos + x->x_size*x->x_zoom +1,
+                      x->x_ypos + x->x_blocksize*x->x_zoom + 3,
+                      x);
+            SYS_VGUI4("image create photo FAZIMAGE%x -format gif -width %d -height %d\n",
+                      x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
+            SYS_VGUI2("FAZIMAGE%x blank\n", x);
+            SYS_VGUI6(".x%lx.c create image %d %d -image FAZIMAGE%x -tags IFAZIMAGE%x\n",
+                      canvas, x->x_xpos+((x->x_size*x->x_zoom)/2),
+                      x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
+        }
+        canvas_fixlinesfor( canvas, (t_text*)x );
     }
-    canvas_fixlinesfor( canvas, (t_text*)x );
-   }
 }
 
 static void sonogram_draw_delete(t_sonogram *x, t_glist *glist)
 {
- t_canvas *canvas=glist_getcanvas(glist);
+    t_canvas *canvas=glist_getcanvas(glist);
 
     if ( x->x_graphic && glist_isvisible( glist ) )
     {
-       SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
-       SYS_VGUI3( ".x%lx.c delete line %xREADSTART\n", canvas, x);
-       SYS_VGUI3( ".x%lx.c delete line %xREADEND\n", canvas, x);
-       SYS_VGUI3( ".x%lx.c delete line %xMODSTART\n", canvas, x);
-       SYS_VGUI3( ".x%lx.c delete line %xMODEND\n", canvas, x);
-       SYS_VGUI3(".x%lx.c delete %xSONOGRAM\n", canvas, x );
-       SYS_VGUI3(".x%lx.c delete %xPHASOGRAM\n", canvas, x );
-       SYS_VGUI3(".x%lx.c delete %xISONIMAGE\n", canvas, x );
-       SYS_VGUI2("image delete SONIMAGE%x\n", x );
-       if ( x->x_phaso ) 
-       {
-          SYS_VGUI3(".x%lx.c delete %xIFAZIMAGE\n", canvas, x );
-          SYS_VGUI2("image delete FAZIMAGE%x\n", x );
-       }
+        SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
+        SYS_VGUI3( ".x%lx.c delete line %xREADSTART\n", canvas, x);
+        SYS_VGUI3( ".x%lx.c delete line %xREADEND\n", canvas, x);
+        SYS_VGUI3( ".x%lx.c delete line %xMODSTART\n", canvas, x);
+        SYS_VGUI3( ".x%lx.c delete line %xMODEND\n", canvas, x);
+        SYS_VGUI3(".x%lx.c delete %xSONOGRAM\n", canvas, x );
+        SYS_VGUI3(".x%lx.c delete %xPHASOGRAM\n", canvas, x );
+        SYS_VGUI3(".x%lx.c delete %xISONIMAGE\n", canvas, x );
+        SYS_VGUI2("image delete SONIMAGE%x\n", x );
+        if ( x->x_phaso )
+        {
+            SYS_VGUI3(".x%lx.c delete %xIFAZIMAGE\n", canvas, x );
+            SYS_VGUI2("image delete FAZIMAGE%x\n", x );
+        }
     }
 }
 
 static void sonogram_draw_move(t_sonogram *x, t_glist *glist)
 {
- t_canvas *canvas=glist_getcanvas(glist);
+    t_canvas *canvas=glist_getcanvas(glist);
 
-   if ( x->x_graphic && glist_isvisible( x->x_glist ) )
-   {
-    SYS_VGUI7(".x%lx.c coords %xSONOGRAM %d %d %d %d\n",
-	     canvas, x,
-	     x->x_xpos-1, x->x_ypos-1,
-	     x->x_xpos+x->x_size*x->x_zoom+1, 
-             x->x_ypos+x->x_blocksize/2*x->x_zoom+1);
-    SYS_VGUI5(".x%lx.c coords ISONIMAGE%x %d %d\n",
-	     canvas, x,
-             x->x_xpos+((x->x_size*x->x_zoom)/2), 
-             (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)) );
-    if ( x->x_phaso )
+    if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
-      SYS_VGUI7(".x%lx.c coords %xPHASOGRAM %d %d %d %d\n",
-	     canvas, x,
-	     x->x_xpos-1, x->x_ypos+(x->x_blocksize/2*x->x_zoom)+1,
-	     x->x_xpos+x->x_size*x->x_zoom+1, 
-             x->x_ypos+x->x_blocksize*x->x_zoom+3);
-      SYS_VGUI5(".x%lx.c coords IFAZIMAGE%x %d %d\n",
-	     canvas, x,
-             x->x_xpos+((x->x_size*x->x_zoom)/2), 
-             x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2 );
+        SYS_VGUI7(".x%lx.c coords %xSONOGRAM %d %d %d %d\n",
+                  canvas, x,
+                  x->x_xpos-1, x->x_ypos-1,
+                  x->x_xpos+x->x_size*x->x_zoom+1,
+                  x->x_ypos+x->x_blocksize/2*x->x_zoom+1);
+        SYS_VGUI5(".x%lx.c coords ISONIMAGE%x %d %d\n",
+                  canvas, x,
+                  x->x_xpos+((x->x_size*x->x_zoom)/2),
+                  (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)) );
+        if ( x->x_phaso )
+        {
+            SYS_VGUI7(".x%lx.c coords %xPHASOGRAM %d %d %d %d\n",
+                      canvas, x,
+                      x->x_xpos-1, x->x_ypos+(x->x_blocksize/2*x->x_zoom)+1,
+                      x->x_xpos+x->x_size*x->x_zoom+1,
+                      x->x_ypos+x->x_blocksize*x->x_zoom+3);
+            SYS_VGUI5(".x%lx.c coords IFAZIMAGE%x %d %d\n",
+                      canvas, x,
+                      x->x_xpos+((x->x_size*x->x_zoom)/2),
+                      x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2 );
+        }
+        canvas_fixlinesfor( canvas, (t_text*)x );
     }
-    canvas_fixlinesfor( canvas, (t_text*)x );
-   }
 }
 
 static void sonogram_draw_select(t_sonogram* x,t_glist* glist)
 {
- t_canvas *canvas=glist_getcanvas(glist);
+    t_canvas *canvas=glist_getcanvas(glist);
 
-   if ( x->x_graphic && glist_isvisible( x->x_glist ) )
-   {
-    if(x->x_selected)
+    if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
-        /* sets the item in blue */
-	SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #0000FF\n", canvas, x);
-        if ( x->x_phaso )
+        if(x->x_selected)
         {
-	   SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #0000FF\n", canvas, x);
+            /* sets the item in blue */
+            SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #0000FF\n", canvas, x);
+            if ( x->x_phaso )
+            {
+                SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #0000FF\n", canvas, x);
+            }
+        }
+        else
+        {
+            SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #000000\n", canvas, x);
+            if ( x->x_phaso )
+            {
+                SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #000000\n", canvas, x);
+            }
         }
     }
-    else
-    {
-	SYS_VGUI3(".x%lx.c itemconfigure %xSONOGRAM -outline #000000\n", canvas, x);
-        if ( x->x_phaso )
-        {
-	   SYS_VGUI3(".x%lx.c itemconfigure %xPHASOGRAM -outline #000000\n", canvas, x);
-        }
-    }
-   }
 }
 
 /* ------------------------ widget callbacks ----------------------------- */
 
 
 static void sonogram_getrect(t_gobj *z, t_glist *owner,
-			    int *xp1, int *yp1, int *xp2, int *yp2)
+                             int *xp1, int *yp1, int *xp2, int *yp2)
 {
-   t_sonogram* x = (t_sonogram*)z;
+    t_sonogram* x = (t_sonogram*)z;
 
-   *xp1 = x->x_xpos;
-   *yp1 = x->x_ypos;
-   if ( !x->x_phaso )
-   {
-     *xp2 = x->x_xpos+x->x_size*x->x_zoom;
-     *yp2 = x->x_ypos+x->x_blocksize/2*x->x_zoom+1;
-   }
-   else
-   {
-     *xp2 = x->x_xpos+x->x_size*x->x_zoom;
-     *yp2 = x->x_ypos+x->x_blocksize*x->x_zoom+3;
-   }
+    *xp1 = x->x_xpos;
+    *yp1 = x->x_ypos;
+    if ( !x->x_phaso )
+    {
+        *xp2 = x->x_xpos+x->x_size*x->x_zoom;
+        *yp2 = x->x_ypos+x->x_blocksize/2*x->x_zoom+1;
+    }
+    else
+    {
+        *xp2 = x->x_xpos+x->x_size*x->x_zoom;
+        *yp2 = x->x_ypos+x->x_blocksize*x->x_zoom+3;
+    }
 }
 
 static void sonogram_save(t_gobj *z, t_binbuf *b)
 {
-   t_sonogram *x = (t_sonogram *)z;
+    t_sonogram *x = (t_sonogram *)z;
 
-   binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-        x->x_size, x->x_graphic, x->x_phaso );
-   binbuf_addv(b, ";");
+    binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
+                (t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+                atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+                x->x_size, x->x_graphic, x->x_phaso );
+    binbuf_addv(b, ";");
 }
 
 static void sonogram_select(t_gobj *z, t_glist *glist, int selected)
 {
-   t_sonogram *x = (t_sonogram *)z;
+    t_sonogram *x = (t_sonogram *)z;
 
-   x->x_selected = selected;
-   sonogram_draw_select( x, glist );
+    x->x_selected = selected;
+    sonogram_draw_select( x, glist );
 }
 
 static void sonogram_vis(t_gobj *z, t_glist *glist, int vis)
 {
-   t_sonogram *x = (t_sonogram *)z;
-   t_rtext *y;
+    t_sonogram *x = (t_sonogram *)z;
+    t_rtext *y;
 
-   if (vis)
-   {
-      sonogram_draw_new( x, glist );
-   }
-   else
-   {
-      // erase all points
-      sonogram_draw_delete( x, glist );
-   }
+    if (vis)
+    {
+        sonogram_draw_new( x, glist );
+    }
+    else
+    {
+        // erase all points
+        sonogram_draw_delete( x, glist );
+    }
 }
 
 static void sonogram_delete(t_gobj *z, t_glist *glist)
@@ -904,359 +984,416 @@ static void sonogram_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 
     if ( ( x->x_xpos != xold ) || ( x->x_ypos != yold ) )
     {
-       sonogram_draw_move( x, glist );
+        sonogram_draw_move( x, glist );
     }
 
 }
 
 static void sonogram_modify_point( t_sonogram* x, t_int sample, t_int frequency, t_int alted )
 {
-     if ( alted )
-     {
-       *(x->x_rdata+(sample*x->x_blocksize)+frequency) = 0;
-       *(x->x_idata+(sample*x->x_blocksize)+frequency) = 0;
-     }
-     else
-     {
-       if ( x->x_enhancemode )
-       {
-          *(x->x_rdata+(sample*x->x_blocksize)+frequency) *= x->x_modstep;
-          *(x->x_idata+(sample*x->x_blocksize)+frequency) *= x->x_modstep;
-       }
-       else
-       {
-          *(x->x_rdata+(sample*x->x_blocksize)+frequency) += x->x_modstep;
-          *(x->x_idata+(sample*x->x_blocksize)+frequency) += x->x_modstep;
-       }
-     }
+    if ( alted )
+    {
+        *(x->x_rdata+(sample*x->x_blocksize)+frequency) = 0;
+        *(x->x_idata+(sample*x->x_blocksize)+frequency) = 0;
+    }
+    else
+    {
+        if ( x->x_enhancemode )
+        {
+            *(x->x_rdata+(sample*x->x_blocksize)+frequency) *= x->x_modstep;
+            *(x->x_idata+(sample*x->x_blocksize)+frequency) *= x->x_modstep;
+        }
+        else
+        {
+            *(x->x_rdata+(sample*x->x_blocksize)+frequency) += x->x_modstep;
+            *(x->x_idata+(sample*x->x_blocksize)+frequency) += x->x_modstep;
+        }
+    }
 }
 
 static void sonogram_modify_point_phase( t_sonogram* x, t_int sample, t_int frequency, t_int alted )
 {
-   t_float fspectrum;
-   t_float fphase;
+    t_float fspectrum;
+    t_float fphase;
 
-     fspectrum =
-         sqrt( pow( *(x->x_rdata+sample*x->x_blocksize+frequency), 2) +
-               pow( *(x->x_idata+sample*x->x_blocksize+frequency), 2) );
-     fphase = atan2( *(x->x_idata+sample*x->x_blocksize+frequency), 
-                     *(x->x_rdata+sample*x->x_blocksize+frequency) );
-     if ( alted==4 )
-     {
-       // setting phase to 0
-       *(x->x_rdata+(sample*x->x_blocksize)+frequency) = fspectrum;
-       *(x->x_idata+(sample*x->x_blocksize)+frequency) = 0;
-     }
-     else
-     {
-       if ( x->x_enhancemode )
-       {
-          *(x->x_rdata+(sample*x->x_blocksize)+frequency) = fspectrum*cos( fphase*x->x_modstep );
-          *(x->x_idata+(sample*x->x_blocksize)+frequency) = fspectrum*sin( fphase*x->x_modstep );
-       }
-       else
-       {
-          *(x->x_rdata+(sample*x->x_blocksize)+frequency) = fspectrum*cos( fphase+x->x_modstep );
-          *(x->x_idata+(sample*x->x_blocksize)+frequency) = fspectrum*sin( fphase+x->x_modstep );
-       }
-     }
+    fspectrum =
+        sqrt( pow( *(x->x_rdata+sample*x->x_blocksize+frequency), 2) +
+              pow( *(x->x_idata+sample*x->x_blocksize+frequency), 2) );
+    fphase = atan2( *(x->x_idata+sample*x->x_blocksize+frequency),
+                    *(x->x_rdata+sample*x->x_blocksize+frequency) );
+    if ( alted==4 )
+    {
+        // setting phase to 0
+        *(x->x_rdata+(sample*x->x_blocksize)+frequency) = fspectrum;
+        *(x->x_idata+(sample*x->x_blocksize)+frequency) = 0;
+    }
+    else
+    {
+        if ( x->x_enhancemode )
+        {
+            *(x->x_rdata+(sample*x->x_blocksize)+frequency) = fspectrum*cos( fphase*x->x_modstep );
+            *(x->x_idata+(sample*x->x_blocksize)+frequency) = fspectrum*sin( fphase*x->x_modstep );
+        }
+        else
+        {
+            *(x->x_rdata+(sample*x->x_blocksize)+frequency) = fspectrum*cos( fphase+x->x_modstep );
+            *(x->x_idata+(sample*x->x_blocksize)+frequency) = fspectrum*sin( fphase+x->x_modstep );
+        }
+    }
 }
 
 static void sonogram_motion(t_sonogram *x, t_floatarg dx, t_floatarg dy)
 {
- t_int fdraw=0, sdraw=0;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_int fdraw=0, sdraw=0;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
-   // post( "sonogram_motion @ [%d,%d] dx=%f dy=%f alt=%d", x->x_xdraw, x->x_ydraw, dx, dy, x->x_alted );
-   if ( ( x->x_shifted || (x->x_alted==4) ) )
-   {
-     if ( (x->x_xdraw+dx) >= x->x_xpos && 
-       (x->x_xdraw+dx) <= x->x_xpos+x->x_size*x->x_zoom ) { 
-       x->x_xdraw += dx; 
-     }
-     if ( (x->x_ydraw+dy) >= x->x_ypos && 
-       (x->x_ydraw+dy) <= x->x_ypos+x->x_blocksize*x->x_zoom ) { 
-       x->x_ydraw += dy; 
-     } 
-     sdraw=(x->x_xdraw-x->x_xpos)/x->x_zoom;
-     if ( x->x_ydraw <= x->x_ypos+x->x_blocksize/2*x->x_zoom ) 
-     {
-        fdraw=(x->x_ypos-x->x_ydraw)/x->x_zoom+x->x_blocksize/2;
-        // post( "modify point @ [%d, %d] alted=%d", sdraw, fdraw, x->x_alted );
-        sonogram_modify_point( x, sdraw, fdraw, x->x_alted );
-     }
-     if ( x->x_ydraw >= x->x_ypos+x->x_blocksize/2*x->x_zoom+1 ) 
-     {
-        fdraw=(x->x_ypos+x->x_blocksize*x->x_zoom/2+1-x->x_ydraw)/x->x_zoom+x->x_blocksize/2;
-        // post( "modify phase @ [%d, %d]", sdraw, fdraw );
-        sonogram_modify_point_phase( x, sdraw, fdraw, x->x_alted );
-     }
-     sonogram_update_point( x, x->x_glist, sdraw, fdraw );
-   }
-   else
-   {
-       if ( (x->x_xendcapture+dx) >= x->x_xpos && 
-        (x->x_xendcapture+dx) <= x->x_xpos+x->x_size*x->x_zoom ) { 
-        x->x_xendcapture += dx; 
-       }
-       if ( (x->x_yendcapture+dy) >= x->x_ypos && 
-        (x->x_yendcapture+dy) <= x->x_ypos+x->x_blocksize*x->x_zoom ) { 
-        x->x_yendcapture += dy; 
-       }
-       SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
-       SYS_VGUI7( ".x%lx.c create rectangle %d %d %d %d -outline #0000FF -tags %xCAPTURE\n",
+    // post( "sonogram_motion @ [%d,%d] dx=%f dy=%f alt=%d", x->x_xdraw, x->x_ydraw, dx, dy, x->x_alted );
+    if ( ( x->x_shifted || (x->x_alted==4) ) )
+    {
+        if ( (x->x_xdraw+dx) >= x->x_xpos &&
+                (x->x_xdraw+dx) <= x->x_xpos+x->x_size*x->x_zoom )
+        {
+            x->x_xdraw += dx;
+        }
+        if ( (x->x_ydraw+dy) >= x->x_ypos &&
+                (x->x_ydraw+dy) <= x->x_ypos+x->x_blocksize*x->x_zoom )
+        {
+            x->x_ydraw += dy;
+        }
+        sdraw=(x->x_xdraw-x->x_xpos)/x->x_zoom;
+        if ( x->x_ydraw <= x->x_ypos+x->x_blocksize/2*x->x_zoom )
+        {
+            fdraw=(x->x_ypos-x->x_ydraw)/x->x_zoom+x->x_blocksize/2;
+            // post( "modify point @ [%d, %d] alted=%d", sdraw, fdraw, x->x_alted );
+            sonogram_modify_point( x, sdraw, fdraw, x->x_alted );
+        }
+        if ( x->x_ydraw >= x->x_ypos+x->x_blocksize/2*x->x_zoom+1 )
+        {
+            fdraw=(x->x_ypos+x->x_blocksize*x->x_zoom/2+1-x->x_ydraw)/x->x_zoom+x->x_blocksize/2;
+            // post( "modify phase @ [%d, %d]", sdraw, fdraw );
+            sonogram_modify_point_phase( x, sdraw, fdraw, x->x_alted );
+        }
+        sonogram_update_point( x, x->x_glist, sdraw, fdraw );
+    }
+    else
+    {
+        if ( (x->x_xendcapture+dx) >= x->x_xpos &&
+                (x->x_xendcapture+dx) <= x->x_xpos+x->x_size*x->x_zoom )
+        {
+            x->x_xendcapture += dx;
+        }
+        if ( (x->x_yendcapture+dy) >= x->x_ypos &&
+                (x->x_yendcapture+dy) <= x->x_ypos+x->x_blocksize*x->x_zoom )
+        {
+            x->x_yendcapture += dy;
+        }
+        SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
+        SYS_VGUI7( ".x%lx.c create rectangle %d %d %d %d -outline #0000FF -tags %xCAPTURE\n",
                    canvas, x->x_xstartcapture, x->x_ystartcapture, x->x_xendcapture, x->x_yendcapture, x );
-   }
+    }
 }
 
 static int sonogram_click(t_gobj *z, struct _glist *glist,
-			    int xpix, int ypix, int shift, int alt, int dbl, int doit)
+                          int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
- t_sonogram* x = (t_sonogram *)z;
- t_int si,fi;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_sonogram* x = (t_sonogram *)z;
+    t_int si,fi;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
 
     // post( "sonogram_click : x=%d y=%d doit=%d alt=%d, shift=%d", xpix, ypix, doit, alt, shift );
-    if ( x->x_aftermousedown == 1 && doit == 0) 
-    { 
-       x->x_aftermousedown = 1;
-    } 
+    if ( x->x_aftermousedown == 1 && doit == 0)
+    {
+        x->x_aftermousedown = 1;
+    }
     else
     {
-       x->x_aftermousedown = 0;
+        x->x_aftermousedown = 0;
     }
     if ( doit )
     {
-      x->x_xdraw = xpix; 
-      x->x_ydraw = ypix; 
-      x->x_shifted = shift;
-      x->x_alted = alt;
-      // activate motion callback
-      glist_grab( glist, &x->x_obj.te_g, (t_glistmotionfn)sonogram_motion,
-                  0, xpix, ypix );
-      
-      if ( shift && alt && (x->x_xstartcapture != x->x_xendcapture ) )
-      {
-         sonogram_paste(x);
-         sonogram_paste_phase(x);
-      }
-      else if ( shift && (x->x_xstartcapture != x->x_xendcapture ) )
-      {
-         // add or multiply modstep
-         if ( x->x_xstartcapture > x->x_xendcapture ) {
-              fi = x->x_xstartcapture;
-              x->x_xstartcapture = x->x_xendcapture;
-              x->x_xendcapture = fi;
-         }
-         if ( x->x_ystartcapture > x->x_yendcapture ) {
-              fi = x->x_ystartcapture;
-              x->x_ystartcapture = x->x_yendcapture;
-              x->x_yendcapture = fi;
-         }
-         for ( si=(x->x_xstartcapture-x->x_xpos)/x->x_zoom; 
-               si<=(x->x_xendcapture-x->x_xpos)/x->x_zoom; si++) {
-          for ( fi=(x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2; 
-               fi<=(x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++) {
-             sonogram_modify_point( x, si, fi, alt );
-          }
-          for ( fi=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2; 
-               fi<=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++) {
-             sonogram_modify_point_phase( x, si, fi, alt );
-          }
-         }
-         // post( "modified y from %d to %d", (x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2,
-         //       (x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2 );
-         sonogram_update_part(x, x->x_glist, (x->x_xstartcapture-x->x_xpos)/x->x_zoom,
-                      (x->x_xendcapture-x->x_xpos)/x->x_zoom, 0, 1, 1);
-       }
-       else if ( (alt==4) && (x->x_xstartcapture != x->x_xendcapture ) )
-       {
-         // clean up area
-         if ( x->x_xstartcapture > x->x_xendcapture ) {
-              fi = x->x_xstartcapture;
-              x->x_xstartcapture = x->x_xendcapture;
-              x->x_xendcapture = fi;
-         }
-         if ( x->x_ystartcapture > x->x_yendcapture ) {
-              fi = x->x_ystartcapture;
-              x->x_ystartcapture = x->x_yendcapture;
-              x->x_yendcapture = fi;
-         }
-         for ( si=(x->x_xstartcapture-x->x_xpos)/x->x_zoom; 
-               si<=(x->x_xendcapture-x->x_xpos)/x->x_zoom; si++) {
-          for ( fi=(x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2; 
-               fi<=(x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++) {
-             sonogram_modify_point( x, si, fi, alt );
-          }
-          for ( fi=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2; 
-               fi<=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++) {
-             sonogram_modify_point_phase( x, si, fi, alt );
-          }
-         }
-         sonogram_update_part(x, x->x_glist, (x->x_xstartcapture-x->x_xpos)/x->x_zoom,
-                      (x->x_xendcapture-x->x_xpos)/x->x_zoom, 0, 1, 1);
-       } 
-       // start a new capture
-       SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
-       x->x_xstartcapture = xpix; 
-       x->x_ystartcapture = ypix; 
-       x->x_xendcapture = xpix; 
-       x->x_yendcapture = ypix; 
+        x->x_xdraw = xpix;
+        x->x_ydraw = ypix;
+        x->x_shifted = shift;
+        x->x_alted = alt;
+        // activate motion callback
+        glist_grab( glist, &x->x_obj.te_g, (t_glistmotionfn)sonogram_motion,
+                    0, xpix, ypix );
+
+        if ( shift && alt && (x->x_xstartcapture != x->x_xendcapture ) )
+        {
+            sonogram_paste(x);
+            sonogram_paste_phase(x);
+        }
+        else if ( shift && (x->x_xstartcapture != x->x_xendcapture ) )
+        {
+            // add or multiply modstep
+            if ( x->x_xstartcapture > x->x_xendcapture )
+            {
+                fi = x->x_xstartcapture;
+                x->x_xstartcapture = x->x_xendcapture;
+                x->x_xendcapture = fi;
+            }
+            if ( x->x_ystartcapture > x->x_yendcapture )
+            {
+                fi = x->x_ystartcapture;
+                x->x_ystartcapture = x->x_yendcapture;
+                x->x_yendcapture = fi;
+            }
+            for ( si=(x->x_xstartcapture-x->x_xpos)/x->x_zoom;
+                    si<=(x->x_xendcapture-x->x_xpos)/x->x_zoom; si++)
+            {
+                for ( fi=(x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2;
+                        fi<=(x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++)
+                {
+                    sonogram_modify_point( x, si, fi, alt );
+                }
+                for ( fi=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2;
+                        fi<=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++)
+                {
+                    sonogram_modify_point_phase( x, si, fi, alt );
+                }
+            }
+            // post( "modified y from %d to %d", (x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2,
+            //       (x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2 );
+            sonogram_update_part(x, x->x_glist, (x->x_xstartcapture-x->x_xpos)/x->x_zoom,
+                                 (x->x_xendcapture-x->x_xpos)/x->x_zoom, 0, 1, 1);
+        }
+        else if ( (alt==4) && (x->x_xstartcapture != x->x_xendcapture ) )
+        {
+            // clean up area
+            if ( x->x_xstartcapture > x->x_xendcapture )
+            {
+                fi = x->x_xstartcapture;
+                x->x_xstartcapture = x->x_xendcapture;
+                x->x_xendcapture = fi;
+            }
+            if ( x->x_ystartcapture > x->x_yendcapture )
+            {
+                fi = x->x_ystartcapture;
+                x->x_ystartcapture = x->x_yendcapture;
+                x->x_yendcapture = fi;
+            }
+            for ( si=(x->x_xstartcapture-x->x_xpos)/x->x_zoom;
+                    si<=(x->x_xendcapture-x->x_xpos)/x->x_zoom; si++)
+            {
+                for ( fi=(x->x_ypos-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2;
+                        fi<=(x->x_ypos-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++)
+                {
+                    sonogram_modify_point( x, si, fi, alt );
+                }
+                for ( fi=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_yendcapture)/x->x_zoom+x->x_blocksize/2;
+                        fi<=(x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ystartcapture)/x->x_zoom+x->x_blocksize/2; fi++)
+                {
+                    sonogram_modify_point_phase( x, si, fi, alt );
+                }
+            }
+            sonogram_update_part(x, x->x_glist, (x->x_xstartcapture-x->x_xpos)/x->x_zoom,
+                                 (x->x_xendcapture-x->x_xpos)/x->x_zoom, 0, 1, 1);
+        }
+        // start a new capture
+        SYS_VGUI3( ".x%lx.c delete %xCAPTURE\n", canvas, x );
+        x->x_xstartcapture = xpix;
+        x->x_ystartcapture = ypix;
+        x->x_xendcapture = xpix;
+        x->x_yendcapture = ypix;
     }
     else
     {
-         // nothing
+        // nothing
     }
     x->x_aftermousedown = doit;
     return (1);
 }
 
-	/* clean up */
-static void sonogram_free(t_sonogram *x)    
+/* clean up */
+static void sonogram_free(t_sonogram *x)
 {
-    if ( x->x_rdata != NULL ) {
-       freebytes(x->x_rdata, x->x_size*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
-       x->x_rdata = NULL;
+    if ( x->x_rdata != NULL )
+    {
+        freebytes(x->x_rdata, x->x_size*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+        x->x_rdata = NULL;
     }
-    if ( x->x_idata != NULL ) {
-       freebytes(x->x_idata, x->x_size*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
-       x->x_idata = NULL;
+    if ( x->x_idata != NULL )
+    {
+        freebytes(x->x_idata, x->x_size*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+        x->x_idata = NULL;
     }
-    if ( x->x_rudata != NULL ) {
-       freebytes(x->x_rudata, x->x_size*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
-       x->x_rdata = NULL;
+    if ( x->x_rudata != NULL )
+    {
+        freebytes(x->x_rudata, x->x_size*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+        x->x_rdata = NULL;
     }
-    if ( x->x_iudata != NULL ) {
-       freebytes(x->x_iudata, x->x_size*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
-       x->x_idata = NULL;
+    if ( x->x_iudata != NULL )
+    {
+        freebytes(x->x_iudata, x->x_size*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+        x->x_idata = NULL;
     }
-    if ( x->x_gifdata != NULL ) {
-       freebytes(x->x_gifdata, (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       post( "Freed %d bytes", (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       x->x_gifdata = NULL;
+    if ( x->x_gifdata != NULL )
+    {
+        freebytes(x->x_gifdata, (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        post( "Freed %d bytes", (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        x->x_gifdata = NULL;
     }
-    if ( x->x_guicommand != NULL ) {
-       freebytes(x->x_guicommand, 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       post( "Freed %d bytes", 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       x->x_guicommand = NULL;
+    if ( x->x_guicommand != NULL )
+    {
+        freebytes(x->x_guicommand, 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        post( "Freed %d bytes", 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        x->x_guicommand = NULL;
     }
 }
 
-    /* allocate tables for storing ffts */
+/* allocate tables for storing ffts */
 static t_int sonogram_allocate(t_sonogram *x)
 {
-  t_int fi;
+    t_int fi;
 
-    if ( !(x->x_rdata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+    if ( !(x->x_rdata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
     }
-    if ( !(x->x_idata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
     }
-    if ( !(x->x_multfreq = getbytes( x->x_blocksize*sizeof(t_int) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", x->x_blocksize*sizeof(t_int) );
+    if ( !(x->x_idata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
+    }
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+    }
+    if ( !(x->x_multfreq = getbytes( x->x_blocksize*sizeof(t_int) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
+    }
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", x->x_blocksize*sizeof(t_int) );
     }
     for ( fi=0; fi<x->x_blocksize; fi++ )
     {
-       *(x->x_multfreq+fi)=1;
+        *(x->x_multfreq+fi)=1;
     }
     // no undo is available
     x->x_uxs = x->x_uxe = x->x_uys = x->x_uye = -1;
-    if ( !(x->x_rudata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+    if ( !(x->x_rudata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
     }
-    if ( !(x->x_iudata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
     }
-    if ( !( x->x_gifdata = ( char* ) getbytes( (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes",  (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    if ( !(x->x_iudata = getbytes( x->x_size*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
     }
-    if ( !( x->x_guicommand = ( char* ) getbytes( 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes",  128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", x->x_size*x->x_blocksize*sizeof(float) );
     }
-    
+    if ( !( x->x_gifdata = ( char* ) getbytes( (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
+    }
+    else
+    {
+        post( "sonogram~ : allocated %d bytes",  (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    }
+    if ( !( x->x_guicommand = ( char* ) getbytes( 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
+    }
+    else
+    {
+        post( "sonogram~ : allocated %d bytes",  128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    }
+
     return 0;
 }
 
-    /* reallocate tables for storing ffts */
+/* reallocate tables for storing ffts */
 static t_int sonogram_reallocate(t_sonogram *x, t_int ioldsize, t_int inewsize)
 {
-  t_int fi;
-  t_float *prdata=x->x_rdata, *pidata=x->x_idata;
-  t_float *prudata=x->x_rudata, *piudata=x->x_iudata;
+    t_int fi;
+    t_float *prdata=x->x_rdata, *pidata=x->x_idata;
+    t_float *prudata=x->x_rudata, *piudata=x->x_iudata;
 
-    if ( !(x->x_rdata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
+    if ( !(x->x_rdata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
     }
-    if ( !(x->x_idata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
+    }
+    if ( !(x->x_idata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
+    }
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
     }
     // no undo is available
     x->x_uxs = x->x_uxe = x->x_uys = x->x_uye = -1;
-    if ( !(x->x_rudata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
+    if ( !(x->x_rudata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
     }
-    if ( !(x->x_iudata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return -1;
-    } else {
-       post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
     }
-    if ( prdata != NULL ) {
-       freebytes(prdata, ioldsize*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
+    if ( !(x->x_iudata = getbytes( inewsize*x->x_blocksize*sizeof(float) ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return -1;
     }
-    if ( pidata != NULL ) {
-       freebytes(pidata, ioldsize*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes", inewsize*x->x_blocksize*sizeof(float) );
     }
-    if ( prudata != NULL ) {
-       freebytes(prudata, ioldsize*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
+    if ( prdata != NULL )
+    {
+        freebytes(prdata, ioldsize*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
     }
-    if ( piudata != NULL ) {
-       freebytes(piudata, ioldsize*x->x_blocksize*sizeof(float) );
-       post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
+    if ( pidata != NULL )
+    {
+        freebytes(pidata, ioldsize*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
     }
-    
+    if ( prudata != NULL )
+    {
+        freebytes(prudata, ioldsize*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
+    }
+    if ( piudata != NULL )
+    {
+        freebytes(piudata, ioldsize*x->x_blocksize*sizeof(float) );
+        post( "Freed %d bytes", ioldsize*x->x_blocksize*sizeof(float) );
+    }
+
     return 0;
 }
-    /* records or playback the sonogram */
+/* records or playback the sonogram */
 static t_int *sonogram_perform(t_int *w)
 {
     t_float *rin = (t_float *)(w[1]);
@@ -1273,81 +1410,91 @@ static t_int *sonogram_perform(t_int *w)
 
     if ( x->x_readstart <= x->x_readend )
     {
-       startsamp = (x->x_readstart*x->x_size)/100;
-       endsamp = (x->x_readend*x->x_size)/100;
+        startsamp = (x->x_readstart*x->x_size)/100;
+        endsamp = (x->x_readend*x->x_size)/100;
     }
     else
     {
-       startsamp = (x->x_readend*x->x_size)/100;
-       endsamp = (x->x_readstart*x->x_size)/100;
+        startsamp = (x->x_readend*x->x_size)/100;
+        endsamp = (x->x_readstart*x->x_size)/100;
     }
 
     // reallocate tables if blocksize has been changed
-    if ( n != x->x_blocksize && x->x_updatechild == 0 ) {
-       post( "sonogram~ : reallocating tables" );
-       // erase all points
-       sonogram_free(x);
-       x->x_blocksize = n;
-       sonogram_allocate(x);
-       sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, 0, 0);
-       canvas_fixlinesfor(x->x_glist, (t_text*)x );
+    if ( n != x->x_blocksize && x->x_updatechild == 0 )
+    {
+        post( "sonogram~ : reallocating tables" );
+        // erase all points
+        sonogram_free(x);
+        x->x_blocksize = n;
+        sonogram_allocate(x);
+        sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, 0, 0);
+        canvas_fixlinesfor(x->x_glist, (t_text*)x );
     }
 
     bi = 0;
-    while (bi<n) 
+    while (bi<n)
     {
         // eventually records input
-        if ( x->x_record) {
-           *(x->x_rdata+(x->x_writepos*x->x_blocksize)+bi)=(*(rin))*(*(x->x_multfreq+bi));
-           *(x->x_idata+(x->x_writepos*x->x_blocksize)+bi)=(*(iin))*(*(x->x_multfreq+bi));
+        if ( x->x_record)
+        {
+            *(x->x_rdata+(x->x_writepos*x->x_blocksize)+bi)=(*(rin))*(*(x->x_multfreq+bi));
+            *(x->x_idata+(x->x_writepos*x->x_blocksize)+bi)=(*(iin))*(*(x->x_multfreq+bi));
         }
         // set outputs
         *rout = 0.0;
         *iout = 0.0;
-        if ( x->x_play) {
+        if ( x->x_play)
+        {
             is=0;
-            fspectrum = 
-                  sqrt( pow( *(x->x_rdata+(((int)x->x_readpos+is)*x->x_blocksize)+bi), 2) +
-                        pow( *(x->x_idata+(((int)x->x_readpos+is)*x->x_blocksize)+bi), 2) );
-            fphase = atan2( *(x->x_idata+(((int)x->x_readpos+is)*x->x_blocksize)+bi), 
-                          *(x->x_rdata+(((int)x->x_readpos+is)*x->x_blocksize)+bi) );
+            fspectrum =
+                sqrt( pow( *(x->x_rdata+(((int)x->x_readpos+is)*x->x_blocksize)+bi), 2) +
+                      pow( *(x->x_idata+(((int)x->x_readpos+is)*x->x_blocksize)+bi), 2) );
+            fphase = atan2( *(x->x_idata+(((int)x->x_readpos+is)*x->x_blocksize)+bi),
+                            *(x->x_rdata+(((int)x->x_readpos+is)*x->x_blocksize)+bi) );
             fphase += (x->x_phase/180.0)*(M_PI);
             *rout += fspectrum*cos( fphase );
             *iout += fspectrum*sin( fphase );
-        } 
-        rout++;iout++;
-        rin++;iin++;
+        }
+        rout++;
+        iout++;
+        rin++;
+        iin++;
         bi++;
-  
+
     }
     // reset playing position until next play
-    if ( x->x_play ) {
-         x->x_readpos+=x->x_readspeed;
-         // post( "xreadpos : %f (added %f) %d", x->x_readpos, x->x_readspeed, x->x_readend );
-         if ( ( x->x_readspeed >= 0 ) && ( x->x_readpos >= endsamp ) ) {
-           x->x_play=0;
-           x->x_readpos=(float)(startsamp);
-           // post( "cooled~ : stopped playing (readpos=%d)", x->x_readpos );
-           outlet_bang(x->x_end);
-         }
-         if ( ( x->x_readspeed < 0 ) && ( x->x_readpos <= startsamp ) ) {
-           x->x_play=0;
-           x->x_readpos = (float)(endsamp);
-           // post( "cooled~ : stopped playing (readpos=%d)", x->x_readpos );
-           outlet_bang(x->x_end);
-         }
+    if ( x->x_play )
+    {
+        x->x_readpos+=x->x_readspeed;
+        // post( "xreadpos : %f (added %f) %d", x->x_readpos, x->x_readspeed, x->x_readend );
+        if ( ( x->x_readspeed >= 0 ) && ( x->x_readpos >= endsamp ) )
+        {
+            x->x_play=0;
+            x->x_readpos=(float)(startsamp);
+            // post( "cooled~ : stopped playing (readpos=%d)", x->x_readpos );
+            outlet_bang(x->x_end);
+        }
+        if ( ( x->x_readspeed < 0 ) && ( x->x_readpos <= startsamp ) )
+        {
+            x->x_play=0;
+            x->x_readpos = (float)(endsamp);
+            // post( "cooled~ : stopped playing (readpos=%d)", x->x_readpos );
+            outlet_bang(x->x_end);
+        }
     }
     // reset recording position until next record
-    if ( x->x_record ) {
-         x->x_writepos++;
-         if ( x->x_writepos >= x->x_size ) {
-           x->x_record=0;
-           x->x_writepos=0;
-           sonogram_update_part(x, x->x_glist, 0, x->x_size-1, 0, 1, 0);
-           outlet_bang(x->x_recend);
-           if ( x->x_empty ) x->x_empty = 0;
-           // post( "sonogram~ : stopped recording" );
-         }
+    if ( x->x_record )
+    {
+        x->x_writepos++;
+        if ( x->x_writepos >= x->x_size )
+        {
+            x->x_record=0;
+            x->x_writepos=0;
+            sonogram_update_part(x, x->x_glist, 0, x->x_size-1, 0, 1, 0);
+            outlet_bang(x->x_recend);
+            if ( x->x_empty ) x->x_empty = 0;
+            // post( "sonogram~ : stopped recording" );
+        }
     }
     // post( "sonogram~ : read : %f:%d : write: %d:%d", x->x_readpos, x->x_play, x->x_writepos, x->x_record );
     return (w+7);
@@ -1358,7 +1505,7 @@ static void sonogram_dsp(t_sonogram *x, t_signal **sp)
     dsp_add(sonogram_perform, 6, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[3]->s_vec, sp[0]->s_n, x);
 }
 
-    /* record the sonogram */
+/* record the sonogram */
 static void sonogram_record(t_sonogram *x)
 {
     x->x_record=1;
@@ -1366,7 +1513,7 @@ static void sonogram_record(t_sonogram *x)
     // post( "sonogram~ : recording on" );
 }
 
-    /* play the sonogram */
+/* play the sonogram */
 static void sonogram_play(t_sonogram *x)
 {
     x->x_play=1;
@@ -1374,11 +1521,11 @@ static void sonogram_play(t_sonogram *x)
     // post( "sonogram~ : playing on" );
 }
 
-    /* setting the starting point for reading ( in percent ) */
+/* setting the starting point for reading ( in percent ) */
 static void sonogram_readstart(t_sonogram *x, t_floatarg fstart)
 {
- t_float startpoint = fstart;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_float startpoint = fstart;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (startpoint < 0) startpoint = 0;
     if (startpoint > 100) startpoint = 100;
@@ -1388,63 +1535,66 @@ static void sonogram_readstart(t_sonogram *x, t_floatarg fstart)
     if ( ( x->x_readstart < x->x_readend ) && ( x->x_readspeed < 0 ) ) x->x_readspeed = -x->x_readspeed;
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
-       SYS_VGUI3( ".x%lx.c delete line %xREADSTART\n",
+        SYS_VGUI3( ".x%lx.c delete line %xREADSTART\n",
                    canvas, x);
-       SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #FF0000 -tags %xREADSTART -width 3\n",
+        SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #FF0000 -tags %xREADSTART -width 3\n",
                    canvas, x->x_xpos+(x->x_readstart*(x->x_size)/100 ),
-                          x->x_ypos, x->x_xpos+(x->x_readstart*(x->x_size)/100 ), 
-                          x->x_ypos+x->x_blocksize*x->x_zoom, x );
+                   x->x_ypos, x->x_xpos+(x->x_readstart*(x->x_size)/100 ),
+                   x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
 }
 
-    /* setting the starting point for modification ( in percent ) */
+/* setting the starting point for modification ( in percent ) */
 static void sonogram_modstart(t_sonogram *x, t_floatarg fstart)
 {
- t_float startpoint = fstart;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_float startpoint = fstart;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (startpoint < 0) startpoint = 0;
     if (startpoint > 100) startpoint = 100;
-    if ( startpoint > x->x_modend ) {
-       x->x_modstart = x->x_modend;
-       post( "sonogram~ : warning : range for modifications is null" );
-    } else {
-      x->x_modstart=startpoint;
+    if ( startpoint > x->x_modend )
+    {
+        x->x_modstart = x->x_modend;
+        post( "sonogram~ : warning : range for modifications is null" );
+    }
+    else
+    {
+        x->x_modstart=startpoint;
     }
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
-       SYS_VGUI3( ".x%lx.c delete line %xMODSTART\n",
+        SYS_VGUI3( ".x%lx.c delete line %xMODSTART\n",
                    canvas, x);
-       SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #11E834 -tags %xMODSTART -width 3\n",
+        SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #11E834 -tags %xMODSTART -width 3\n",
                    canvas, x->x_xpos+(x->x_modstart*(x->x_size)/100 ),
-                          x->x_ypos, x->x_xpos+(x->x_modstart*(x->x_size)/100 ), 
-                          x->x_ypos+x->x_blocksize*x->x_zoom, x );
+                   x->x_ypos, x->x_xpos+(x->x_modstart*(x->x_size)/100 ),
+                   x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
 }
 
-    /* setting the modification step for graphical mode */
+/* setting the modification step for graphical mode */
 static void sonogram_modstep(t_sonogram *x, t_floatarg fmodstep)
 {
-  if ( x->x_graphic )
-  {
-     x->x_modstep = fmodstep;
-  }
+    if ( x->x_graphic )
+    {
+        x->x_modstep = fmodstep;
+    }
 }
 
-    /* setting enhance mode */                                  
+/* setting enhance mode */
 static void sonogram_enhancemode(t_sonogram *x, t_floatarg fenhancemode)
 {
-  if ( x->x_graphic )
-  {
-     x->x_enhancemode = fenhancemode;
-  }
+    if ( x->x_graphic )
+    {
+        x->x_enhancemode = fenhancemode;
+    }
 }
 
-    /* setting the ending point for reading ( in percent ) */
+/* setting the ending point for reading ( in percent ) */
 static void sonogram_readend(t_sonogram *x, t_floatarg fend)
 {
- t_float endpoint = fend;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_float endpoint = fend;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (endpoint < 0) endpoint = 0;
     if (endpoint > 100) endpoint = 100;
@@ -1454,120 +1604,133 @@ static void sonogram_readend(t_sonogram *x, t_floatarg fend)
     if ( ( x->x_readstart < x->x_readend ) && ( x->x_readspeed < 0 ) ) x->x_readspeed = -x->x_readspeed;
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
-       SYS_VGUI3( ".x%lx.c delete line %xREADEND\n",
+        SYS_VGUI3( ".x%lx.c delete line %xREADEND\n",
                    canvas, x);
-       SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #FF0000 -tags %xREADEND -width 3\n",
+        SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #FF0000 -tags %xREADEND -width 3\n",
                    canvas, x->x_xpos+(x->x_readend*(x->x_size)/100 ),
-                          x->x_ypos, x->x_xpos+(x->x_readend*(x->x_size)/100 ), 
-                          x->x_ypos+x->x_blocksize*x->x_zoom, x );
+                   x->x_ypos, x->x_xpos+(x->x_readend*(x->x_size)/100 ),
+                   x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
 }
 
-    /* setting the ending point for modification ( in percent ) */
+/* setting the ending point for modification ( in percent ) */
 static void sonogram_modend(t_sonogram *x, t_floatarg fend)
 {
- t_float endpoint = fend;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
+    t_float endpoint = fend;
+    t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (endpoint < 0) endpoint = 0;
     if (endpoint > 100) endpoint = 100;
-    if ( endpoint < x->x_modstart ) {
-       x->x_modend = x->x_modstart;
-       post( "sonogram~ : warning : range for modifications is null" );
-    } else {
-      x->x_modend=endpoint;
+    if ( endpoint < x->x_modstart )
+    {
+        x->x_modend = x->x_modstart;
+        post( "sonogram~ : warning : range for modifications is null" );
+    }
+    else
+    {
+        x->x_modend=endpoint;
     }
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
-       SYS_VGUI3( ".x%lx.c delete line %xMODEND\n",
+        SYS_VGUI3( ".x%lx.c delete line %xMODEND\n",
                    canvas, x);
-       SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #11E834 -tags %xMODEND -width 3\n",
+        SYS_VGUI7( ".x%lx.c create line %d %d %d %d -fill #11E834 -tags %xMODEND -width 3\n",
                    canvas, x->x_xpos+(x->x_modend*(x->x_size)/100 ),
-                          x->x_ypos, x->x_xpos+(x->x_modend*(x->x_size)/100 ), 
-                          x->x_ypos+x->x_blocksize*x->x_zoom, x );
+                   x->x_ypos, x->x_xpos+(x->x_modend*(x->x_size)/100 ),
+                   x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
 }
 
-    /* sets the reading speed */
+/* sets the reading speed */
 static void sonogram_readspeed(t_sonogram *x, t_floatarg freadspeed)
 {
-    if (freadspeed <= 0 ) {
-       post( "sonogram~ : wrong readspeed argument" );
-       return;
+    if (freadspeed <= 0 )
+    {
+        post( "sonogram~ : wrong readspeed argument" );
+        return;
     }
     x->x_readspeed=freadspeed;
 }
 
-    /* enhance frequencies */
+/* enhance frequencies */
 static void sonogram_enhance(t_sonogram *x, t_floatarg fstartfreq, t_floatarg fendfreq, t_floatarg fenhance, t_floatarg fnoupdate )
 {
-  t_int samplestart, sampleend, si, fi=0, ffi=0;
-  t_float oldenergy;
+    t_int samplestart, sampleend, si, fi=0, ffi=0;
+    t_float oldenergy;
 
     if (fstartfreq < 0 || fendfreq < 0 ||
-        fstartfreq > x->x_blocksize || fendfreq > x->x_blocksize || 
-        fstartfreq > fendfreq ) {
+            fstartfreq > x->x_blocksize || fendfreq > x->x_blocksize ||
+            fstartfreq > fendfreq )
+    {
         post( "sonogram~ : error : wrong frequencies range" );
         return;
     }
-    if ( fenhance < 0 ) {
+    if ( fenhance < 0 )
+    {
         post( "sonogram~ : error : wrong multiplicating factor" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
     // post("enhancing portion [%d,%d]", samplestart, sampleend );
-    for ( si=samplestart; si<=sampleend; si++ ) {
-       for ( fi=(int)fstartfreq; fi<=(int)fendfreq; fi++ ) {
-         *(x->x_multfreq+fi) = fenhance;
-         if ( (fi != 0) && (fi != x->x_blocksize/2-1) )
-         {
-           /* multiply both r*sin(a) and r*cos(a) to mutiply r */
-           *(x->x_rdata+(si*x->x_blocksize)+fi) *= fenhance;
-           *(x->x_idata+(si*x->x_blocksize)+fi) *= fenhance;
-         }
-       }
+    for ( si=samplestart; si<=sampleend; si++ )
+    {
+        for ( fi=(int)fstartfreq; fi<=(int)fendfreq; fi++ )
+        {
+            *(x->x_multfreq+fi) = fenhance;
+            if ( (fi != 0) && (fi != x->x_blocksize/2-1) )
+            {
+                /* multiply both r*sin(a) and r*cos(a) to mutiply r */
+                *(x->x_rdata+(si*x->x_blocksize)+fi) *= fenhance;
+                *(x->x_idata+(si*x->x_blocksize)+fi) *= fenhance;
+            }
+        }
     }
     // post( "sonogram~ : enhanced %d,%d", fi, ffi );
     if ( !(int)fnoupdate )
     {
-       sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
+        sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
     }
 }
 
-    /* add a constant to frequencies */
+/* add a constant to frequencies */
 static void sonogram_add(t_sonogram *x, t_floatarg fstartfreq, t_floatarg fendfreq, t_floatarg fadd)
 {
-  t_int samplestart, sampleend, si, fi;
-  t_float oldenergy;
+    t_int samplestart, sampleend, si, fi;
+    t_float oldenergy;
 
     if (fstartfreq < 0 || fendfreq < 0 ||
-        fstartfreq > x->x_blocksize || fendfreq > x->x_blocksize || 
-        fstartfreq > fendfreq ) {
+            fstartfreq > x->x_blocksize || fendfreq > x->x_blocksize ||
+            fstartfreq > fendfreq )
+    {
         post( "sonogram~ : error : wrong frequencies range" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
     // post("enhancing portion [%d,%d]", samplestart, sampleend );
-    for ( si=samplestart; si<=sampleend; si++ ) {
-       for ( fi=(int)fstartfreq; fi<=(int)fendfreq; fi++ ) {
-           /* multiply both r*sin(a) and r*cos(a) to mutiply r */
-           *(x->x_rdata+(si*x->x_blocksize)+fi) += fadd;
-           *(x->x_idata+(si*x->x_blocksize)+fi) += fadd;
-       }
+    for ( si=samplestart; si<=sampleend; si++ )
+    {
+        for ( fi=(int)fstartfreq; fi<=(int)fendfreq; fi++ )
+        {
+            /* multiply both r*sin(a) and r*cos(a) to mutiply r */
+            *(x->x_rdata+(si*x->x_blocksize)+fi) += fadd;
+            *(x->x_idata+(si*x->x_blocksize)+fi) += fadd;
+        }
     }
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* resize sonogram */
+/* resize sonogram */
 static void sonogram_resize(t_sonogram *x, t_floatarg fnewsize )
 {
-    if (fnewsize <= 0) {
+    if (fnewsize <= 0)
+    {
         post( "sonogram~ : error : wrong size" );
         return;
     }
-    if (x->x_updatechild > 0) {
+    if (x->x_updatechild > 0)
+    {
         post( "sonogram~ : can't resize now, an update is pending." );
         return;
     }
@@ -1580,145 +1743,164 @@ static void sonogram_resize(t_sonogram *x, t_floatarg fnewsize )
     sonogram_update_part(x, x->x_glist, 0, x->x_size-1, 0, 0, 0);
 }
 
-    /* set zoom factor */
+/* set zoom factor */
 static void sonogram_zoom(t_sonogram *x, t_floatarg fzoom )
 {
     post( "sonogram~: warning : zoom and big block factors might lead to a crash" );
-    if (fzoom < 1) {
+    if (fzoom < 1)
+    {
         post( "sonogram~ : error : wrong zoom factor" );
         return;
     }
-    if ( x->x_gifdata != NULL ) {
-       freebytes(x->x_gifdata, (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       post( "Freed %d bytes", (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       x->x_gifdata = NULL;
+    if ( x->x_gifdata != NULL )
+    {
+        freebytes(x->x_gifdata, (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        post( "Freed %d bytes", (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        x->x_gifdata = NULL;
     }
-    if ( x->x_guicommand != NULL ) {
-       freebytes(x->x_guicommand, 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       post( "Freed %d bytes", 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
-       x->x_guicommand = NULL;
+    if ( x->x_guicommand != NULL )
+    {
+        freebytes(x->x_guicommand, 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        post( "Freed %d bytes", 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+        x->x_guicommand = NULL;
     }
     x->x_zoom = (int)fzoom;
-    if ( !( x->x_gifdata = ( char* ) getbytes( (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return;
-    } else {
-       post( "sonogram~ : allocated %d bytes",  (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    if ( !( x->x_gifdata = ( char* ) getbytes( (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return;
     }
-    if ( !( x->x_guicommand = ( char* ) getbytes( 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) ) {
-       post( "sonogram~ : error : could not allocate buffers" );
-       return;
-    } else {
-       post( "sonogram~ : allocated %d bytes",  128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    else
+    {
+        post( "sonogram~ : allocated %d bytes",  (x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
+    }
+    if ( !( x->x_guicommand = ( char* ) getbytes( 128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") ) ) )
+    {
+        post( "sonogram~ : error : could not allocate buffers" );
+        return;
+    }
+    else
+    {
+        post( "sonogram~ : allocated %d bytes",  128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
     }
     sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, !x->x_empty, 0);
     canvas_fixlinesfor(x->x_glist, (t_text*)x );
 }
 
-    /* refresh data    */
+/* refresh data    */
 static void sonogram_refresh(t_sonogram *x)
 {
     sonogram_update_part(x, x->x_glist, 0, x->x_size-1, 0, 1, 1);
 }
 
-    /* flip frequencies */
+/* flip frequencies */
 static void sonogram_flipfreqs(t_sonogram *x)
 {
-  t_int samplestart, sampleend, si, fi;
-  t_float fvalue;
-  t_int ioperon;
+    t_int samplestart, sampleend, si, fi;
+    t_float fvalue;
+    t_int ioperon;
 
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
     ioperon=x->x_blocksize/2;
-    for ( si=samplestart; si<=sampleend; si++ ) {
-       for ( fi=0; fi<=ioperon/2; fi++ ) {
-           fvalue = *(x->x_rdata+(si*x->x_blocksize)+fi);
-           *(x->x_rdata+(si*x->x_blocksize)+fi) = *(x->x_rdata+(si*x->x_blocksize)+(ioperon-fi-1));
-           *(x->x_rdata+(si*x->x_blocksize)+(ioperon-fi-1)) = fvalue;
-           fvalue = *(x->x_idata+(si*x->x_blocksize)+fi);
-           *(x->x_idata+(si*x->x_blocksize)+fi) = *(x->x_idata+(si*x->x_blocksize)+(ioperon-fi-1));
-           *(x->x_idata+(si*x->x_blocksize)+(ioperon-fi-1)) = fvalue;
-       }
+    for ( si=samplestart; si<=sampleend; si++ )
+    {
+        for ( fi=0; fi<=ioperon/2; fi++ )
+        {
+            fvalue = *(x->x_rdata+(si*x->x_blocksize)+fi);
+            *(x->x_rdata+(si*x->x_blocksize)+fi) = *(x->x_rdata+(si*x->x_blocksize)+(ioperon-fi-1));
+            *(x->x_rdata+(si*x->x_blocksize)+(ioperon-fi-1)) = fvalue;
+            fvalue = *(x->x_idata+(si*x->x_blocksize)+fi);
+            *(x->x_idata+(si*x->x_blocksize)+fi) = *(x->x_idata+(si*x->x_blocksize)+(ioperon-fi-1));
+            *(x->x_idata+(si*x->x_blocksize)+(ioperon-fi-1)) = fvalue;
+        }
     }
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* flip blocks */
+/* flip blocks */
 static void sonogram_flipblocks(t_sonogram *x)
 {
-  t_int samplestart, sampleend, middlesample, fi, si;
-  t_float fvalue;
+    t_int samplestart, sampleend, middlesample, fi, si;
+    t_float fvalue;
 
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
     middlesample = ( sampleend+samplestart+1 ) / 2;
-    for ( si=samplestart; si<=middlesample; si++ ) {
-       for ( fi=0; fi<x->x_blocksize; fi++ ) {
-           fvalue = *(x->x_rdata+((si)*x->x_blocksize)+fi);
-           *(x->x_rdata+((si)*x->x_blocksize)+fi) = *(x->x_rdata+((sampleend+samplestart-si)*x->x_blocksize)+fi);
-           *(x->x_rdata+((sampleend+samplestart-si)*x->x_blocksize)+fi) = fvalue;
-           fvalue = *(x->x_idata+((si)*x->x_blocksize)+fi);
-           *(x->x_idata+((si)*x->x_blocksize)+fi) = *(x->x_idata+((sampleend+samplestart-si)*x->x_blocksize)+fi);
-           *(x->x_idata+((sampleend+samplestart-si)*x->x_blocksize)+fi) = fvalue;
-       }
+    for ( si=samplestart; si<=middlesample; si++ )
+    {
+        for ( fi=0; fi<x->x_blocksize; fi++ )
+        {
+            fvalue = *(x->x_rdata+((si)*x->x_blocksize)+fi);
+            *(x->x_rdata+((si)*x->x_blocksize)+fi) = *(x->x_rdata+((sampleend+samplestart-si)*x->x_blocksize)+fi);
+            *(x->x_rdata+((sampleend+samplestart-si)*x->x_blocksize)+fi) = fvalue;
+            fvalue = *(x->x_idata+((si)*x->x_blocksize)+fi);
+            *(x->x_idata+((si)*x->x_blocksize)+fi) = *(x->x_idata+((sampleend+samplestart-si)*x->x_blocksize)+fi);
+            *(x->x_idata+((sampleend+samplestart-si)*x->x_blocksize)+fi) = fvalue;
+        }
     }
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* undo if available */
+/* undo if available */
 static void sonogram_undo(t_sonogram *x)
 {
-  t_int si,fi;
+    t_int si,fi;
 
     if ( x->x_uxs == -1 )
     {
-       post( "sonogram~ : nothing to undo, man" );
-       return;
+        post( "sonogram~ : nothing to undo, man" );
+        return;
     }
 
     post( "sonogram~ : restoring region [%d,%d,%d,%d]", x->x_uxs, x->x_uys, x->x_uxe, x->x_uye );
-    for ( si=x->x_uxs; si<=x->x_uxe; si++ ) {
-       for ( fi=x->x_uys; fi<=x->x_uye; fi++ ) {
-           *(x->x_rdata+((si)*x->x_blocksize)+fi) = *(x->x_rudata+(si-x->x_uxs)*x->x_blocksize+(fi-x->x_uys));
-           *(x->x_idata+((si)*x->x_blocksize)+fi) = *(x->x_iudata+(si-x->x_uxs)*x->x_blocksize+(fi-x->x_uys));
-       }
+    for ( si=x->x_uxs; si<=x->x_uxe; si++ )
+    {
+        for ( fi=x->x_uys; fi<=x->x_uye; fi++ )
+        {
+            *(x->x_rdata+((si)*x->x_blocksize)+fi) = *(x->x_rudata+(si-x->x_uxs)*x->x_blocksize+(fi-x->x_uys));
+            *(x->x_idata+((si)*x->x_blocksize)+fi) = *(x->x_iudata+(si-x->x_uxs)*x->x_blocksize+(fi-x->x_uys));
+        }
     }
     sonogram_update_part(x, x->x_glist, x->x_uxs, x->x_uxe, 0, 1, 1);
 }
 
-    /* zswap exchanges real and imaginery part */
+/* zswap exchanges real and imaginery part */
 static void sonogram_zswap(t_sonogram *x)
 {
-  t_int samplestart, sampleend, fi, si;
-  t_float fvalue;
+    t_int samplestart, sampleend, fi, si;
+    t_float fvalue;
 
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    for ( si=samplestart; si<=sampleend; si++ ) {
-       for ( fi=0; fi<x->x_blocksize; fi++ ) {
-           fvalue = *(x->x_rdata+(si*x->x_blocksize)+fi);
-           *(x->x_rdata+(si*x->x_blocksize)+fi) = *(x->x_idata+(si*x->x_blocksize)+fi);
-           *(x->x_idata+(si*x->x_blocksize)+fi) = fvalue;
-       }
+    for ( si=samplestart; si<=sampleend; si++ )
+    {
+        for ( fi=0; fi<x->x_blocksize; fi++ )
+        {
+            fvalue = *(x->x_rdata+(si*x->x_blocksize)+fi);
+            *(x->x_rdata+(si*x->x_blocksize)+fi) = *(x->x_idata+(si*x->x_blocksize)+fi);
+            *(x->x_idata+(si*x->x_blocksize)+fi) = fvalue;
+        }
     }
 }
 
-    /* swap points */
+/* swap points */
 static void sonogram_swappoints(t_sonogram *x, t_floatarg fnbpoints)
 {
-  t_int samplestart, sampleend, sp;
-  t_float s1, s2, f1, f2;
-  t_float fvalue;
+    t_int samplestart, sampleend, sp;
+    t_float s1, s2, f1, f2;
+    t_float fvalue;
 
-    if (fnbpoints <= 0) {
+    if (fnbpoints <= 0)
+    {
         post( "sonogram~ : error : bad number of points" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
-    for ( sp=0; sp<fnbpoints; sp++ ) {
+
+    for ( sp=0; sp<fnbpoints; sp++ )
+    {
         s1 = samplestart + (random()%(sampleend-samplestart));
         s2 = samplestart + (random()%(sampleend-samplestart));
         f1 = random()%( x->x_blocksize/2-1 );
@@ -1733,59 +1915,68 @@ static void sonogram_swappoints(t_sonogram *x, t_floatarg fnbpoints)
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* average blocks according to a factor */
+/* average blocks according to a factor */
 static void sonogram_average(t_sonogram *x, t_floatarg fnbblocks)
 {
-  t_int samplestart, sampleend, fi, si, ssi;
-  t_float fraverage, fiaverage;
+    t_int samplestart, sampleend, fi, si, ssi;
+    t_float fraverage, fiaverage;
 
-    if (fnbblocks < 1) {
+    if (fnbblocks < 1)
+    {
         post( "sonogram~ : error : bad average factor" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
+
     fraverage=fiaverage=0.0;
-    for ( fi=0; fi<x->x_blocksize; fi++ ) {
-        for ( si=samplestart; si<=sampleend-fnbblocks; si+=fnbblocks ) {
-           fraverage=fiaverage=0.0;
-           for ( ssi=0; ssi<fnbblocks; ssi++ ) {
-              fraverage += *(x->x_rdata+((int)(si+ssi)*x->x_blocksize)+fi);
-              fiaverage += *(x->x_idata+((int)(si+ssi)*x->x_blocksize)+fi);
-           }
-           fraverage /= fnbblocks;
-           fiaverage /= fnbblocks;
-           for ( ssi=0; ssi<fnbblocks; ssi++ ) {
-              *(x->x_rdata+((int)(si+ssi)*x->x_blocksize)+fi)=fraverage;
-              *(x->x_idata+((int)(si+ssi)*x->x_blocksize)+fi)=fiaverage;
-           }
+    for ( fi=0; fi<x->x_blocksize; fi++ )
+    {
+        for ( si=samplestart; si<=sampleend-fnbblocks; si+=fnbblocks )
+        {
+            fraverage=fiaverage=0.0;
+            for ( ssi=0; ssi<fnbblocks; ssi++ )
+            {
+                fraverage += *(x->x_rdata+((int)(si+ssi)*x->x_blocksize)+fi);
+                fiaverage += *(x->x_idata+((int)(si+ssi)*x->x_blocksize)+fi);
+            }
+            fraverage /= fnbblocks;
+            fiaverage /= fnbblocks;
+            for ( ssi=0; ssi<fnbblocks; ssi++ )
+            {
+                *(x->x_rdata+((int)(si+ssi)*x->x_blocksize)+fi)=fraverage;
+                *(x->x_idata+((int)(si+ssi)*x->x_blocksize)+fi)=fiaverage;
+            }
         }
     }
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* go up by the given number */
+/* go up by the given number */
 static void sonogram_goup(t_sonogram *x, t_floatarg fgoup)
 {
-  t_int samplestart, sampleend, sp, sf;
+    t_int samplestart, sampleend, sp, sf;
 
-    if (fgoup <= 0 || fgoup > x->x_blocksize/2) {
+    if (fgoup <= 0 || fgoup > x->x_blocksize/2)
+    {
         post( "sonogram~ : error : wrong offset in goup function" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
-    for ( sp=samplestart; sp<=sampleend; sp++ ) {
-        for (sf=(x->x_blocksize/2)-fgoup-1; sf>=0; sf-- ) {
-            *(x->x_rdata+((int)sp*x->x_blocksize)+(sf+(int)fgoup)) = 
-                                   *(x->x_rdata+((int)sp*x->x_blocksize)+sf);
-            *(x->x_idata+((int)sp*x->x_blocksize)+(sf+(int)fgoup)) = 
-                                   *(x->x_idata+((int)sp*x->x_blocksize)+sf);
-     
+
+    for ( sp=samplestart; sp<=sampleend; sp++ )
+    {
+        for (sf=(x->x_blocksize/2)-fgoup-1; sf>=0; sf-- )
+        {
+            *(x->x_rdata+((int)sp*x->x_blocksize)+(sf+(int)fgoup)) =
+                *(x->x_rdata+((int)sp*x->x_blocksize)+sf);
+            *(x->x_idata+((int)sp*x->x_blocksize)+(sf+(int)fgoup)) =
+                *(x->x_idata+((int)sp*x->x_blocksize)+sf);
+
         }
-        for (sf=0; sf<fgoup; sf++ ) {
+        for (sf=0; sf<fgoup; sf++ )
+        {
             *(x->x_rdata+((int)sp*x->x_blocksize)+(int)sf) = 0.0;
             *(x->x_idata+((int)sp*x->x_blocksize)+(int)sf) = 0.0;
         }
@@ -1793,47 +1984,54 @@ static void sonogram_goup(t_sonogram *x, t_floatarg fgoup)
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* roll up by the given number */
+/* roll up by the given number */
 static void sonogram_roll(t_sonogram *x, t_floatarg froll)
 {
-  t_int samplestart, sampleend, sp, sf;
-  t_float *fprvalues;
-  t_float *fpivalues;
+    t_int samplestart, sampleend, sp, sf;
+    t_float *fprvalues;
+    t_float *fpivalues;
 
-    if (froll <= 0 || froll > x->x_blocksize/2) {
+    if (froll <= 0 || froll > x->x_blocksize/2)
+    {
         post( "sonogram~ : error : wrong offset in roll function" );
         return;
     }
     fprvalues = (t_float*)getbytes( ((int)froll)*sizeof( float ) );
-    if ( !fprvalues ) {
+    if ( !fprvalues )
+    {
         post( "sonogram~ : error : could not allocate %d bytes", ((int)froll)*sizeof(float) );
         return;
     }
     fpivalues = (t_float*)getbytes( ((int)froll)*sizeof( float ) );
-    if ( !fpivalues ) {
+    if ( !fpivalues )
+    {
         post( "sonogram~ : error : could not allocate %d bytes", ((int)froll)*sizeof(float) );
         return;
     }
 
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
-    for ( sp=samplestart; sp<=sampleend; sp++ ) {
-        
+
+    for ( sp=samplestart; sp<=sampleend; sp++ )
+    {
+
         // saving values
-        for (sf=0; sf<froll; sf++ ) {
-            *(fprvalues+sf) = 
-                 *(x->x_rdata+((int)sp*x->x_blocksize)+(x->x_blocksize/2-(int)froll+sf));
-            *(fpivalues+sf) = 
-                 *(x->x_idata+((int)sp*x->x_blocksize)+(x->x_blocksize/2-(int)froll+sf));
+        for (sf=0; sf<froll; sf++ )
+        {
+            *(fprvalues+sf) =
+                *(x->x_rdata+((int)sp*x->x_blocksize)+(x->x_blocksize/2-(int)froll+sf));
+            *(fpivalues+sf) =
+                *(x->x_idata+((int)sp*x->x_blocksize)+(x->x_blocksize/2-(int)froll+sf));
         }
-        for (sf=(x->x_blocksize/2)-froll-1; sf>=0; sf-- ) {
-            *(x->x_rdata+((int)sp*x->x_blocksize)+(sf+(int)froll)) = 
-                                   *(x->x_rdata+((int)sp*x->x_blocksize)+sf);
-            *(x->x_idata+((int)sp*x->x_blocksize)+(sf+(int)froll)) = 
-                                   *(x->x_idata+((int)sp*x->x_blocksize)+sf);
+        for (sf=(x->x_blocksize/2)-froll-1; sf>=0; sf-- )
+        {
+            *(x->x_rdata+((int)sp*x->x_blocksize)+(sf+(int)froll)) =
+                *(x->x_rdata+((int)sp*x->x_blocksize)+sf);
+            *(x->x_idata+((int)sp*x->x_blocksize)+(sf+(int)froll)) =
+                *(x->x_idata+((int)sp*x->x_blocksize)+sf);
         }
-        for (sf=0; sf<froll; sf++ ) {
+        for (sf=0; sf<froll; sf++ )
+        {
             *(x->x_rdata+((int)sp*x->x_blocksize)+(int)sf) = *(fprvalues+sf);
             *(x->x_idata+((int)sp*x->x_blocksize)+(int)sf) = *(fpivalues+sf);
         }
@@ -1843,63 +2041,71 @@ static void sonogram_roll(t_sonogram *x, t_floatarg froll)
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* suppress point below the threshold */
+/* suppress point below the threshold */
 static void sonogram_threshold(t_sonogram *x, t_floatarg fthreshold)
 {
-  t_int samplestart, sampleend, sp, sf;
-  t_float fspectrum;
+    t_int samplestart, sampleend, sp, sf;
+    t_float fspectrum;
 
-    if (fthreshold <= 0) {
+    if (fthreshold <= 0)
+    {
         post( "sonogram~ : error : wrong threshold" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
-    for ( sp=samplestart; sp<=sampleend; sp++ ) {
-      for (sf=0; sf<=(x->x_blocksize/2)-1; sf++ ) {
-         fspectrum = sqrt( pow( *(x->x_rdata+sp*x->x_blocksize+sf), 2) +
-                pow( *(x->x_idata+sp*x->x_blocksize+sf), 2) );
-         if ( fspectrum < fthreshold )
-         {
-            *(x->x_rdata+sp*x->x_blocksize+sf) = 0.0;
-            *(x->x_idata+sp*x->x_blocksize+sf) = 0.0;
-         }
-      }
+
+    for ( sp=samplestart; sp<=sampleend; sp++ )
+    {
+        for (sf=0; sf<=(x->x_blocksize/2)-1; sf++ )
+        {
+            fspectrum = sqrt( pow( *(x->x_rdata+sp*x->x_blocksize+sf), 2) +
+                              pow( *(x->x_idata+sp*x->x_blocksize+sf), 2) );
+            if ( fspectrum < fthreshold )
+            {
+                *(x->x_rdata+sp*x->x_blocksize+sf) = 0.0;
+                *(x->x_idata+sp*x->x_blocksize+sf) = 0.0;
+            }
+        }
     }
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* change the phase */
+/* change the phase */
 static void sonogram_phase(t_sonogram *x, t_floatarg fincphase)
 {
-    if (fincphase < 0 || fincphase > 90) {
+    if (fincphase < 0 || fincphase > 90)
+    {
         post( "sonogram~ : error : wrong phase in phase function : out of [0,90]" );
         return;
     }
     x->x_phase = fincphase;
 }
 
-    /* go down by the given number */
+/* go down by the given number */
 static void sonogram_godown(t_sonogram *x, t_floatarg fgodown)
 {
-  t_int samplestart, sampleend, sp, sf;
+    t_int samplestart, sampleend, sp, sf;
 
-    if (fgodown <= 0 || fgodown > x->x_blocksize/2) {
+    if (fgodown <= 0 || fgodown > x->x_blocksize/2)
+    {
         post( "sonogram~ : error : wrong offset in godown function" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
-    for ( sp=samplestart; sp<=sampleend; sp++ ) {
-        for (sf=0; sf<=(x->x_blocksize/2)-fgodown-1; sf++ ) {
-            *(x->x_rdata+((int)sp*x->x_blocksize)+sf) = 
-                                   *(x->x_rdata+((int)sp*x->x_blocksize)+(sf+(int)fgodown));
-            *(x->x_idata+((int)sp*x->x_blocksize)+sf) = 
-                                   *(x->x_idata+((int)sp*x->x_blocksize)+(sf+(int)fgodown));
+
+    for ( sp=samplestart; sp<=sampleend; sp++ )
+    {
+        for (sf=0; sf<=(x->x_blocksize/2)-fgodown-1; sf++ )
+        {
+            *(x->x_rdata+((int)sp*x->x_blocksize)+sf) =
+                *(x->x_rdata+((int)sp*x->x_blocksize)+(sf+(int)fgodown));
+            *(x->x_idata+((int)sp*x->x_blocksize)+sf) =
+                *(x->x_idata+((int)sp*x->x_blocksize)+(sf+(int)fgodown));
         }
-        for (sf=(x->x_blocksize/2)-fgodown; sf<(x->x_blocksize/2); sf++ ) {
+        for (sf=(x->x_blocksize/2)-fgodown; sf<(x->x_blocksize/2); sf++ )
+        {
             *(x->x_rdata+((int)sp*x->x_blocksize)+(int)sf) = 0.0;
             *(x->x_idata+((int)sp*x->x_blocksize)+(int)sf) = 0.0;
         }
@@ -1907,23 +2113,24 @@ static void sonogram_godown(t_sonogram *x, t_floatarg fgodown)
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
 }
 
-    /* swap blocks */
+/* swap blocks */
 static void sonogram_swapblocks(t_sonogram *x, t_floatarg fperstart, t_floatarg fperend, t_floatarg fpersize)
 {
-  t_int samplestart, samplestartb, samplesize, sp, sf;
-  t_int iperstart, iperend, ipersize;
-  t_float s1, s2;
-  t_float fvalue;
+    t_int samplestart, samplestartb, samplesize, sp, sf;
+    t_int iperstart, iperend, ipersize;
+    t_float s1, s2;
+    t_float fvalue;
 
     iperstart = fperstart;
     iperend = fperend;
     ipersize = fpersize;
 
     if (iperstart < 0 || iperstart > iperend ||
-        iperend <= 0 || iperend+ipersize > 100 ||
-        ipersize < 0 || fpersize > 100 ) {
+            iperend <= 0 || iperend+ipersize > 100 ||
+            ipersize < 0 || fpersize > 100 )
+    {
         post( "sonogram~ : error : wrong interval [%d%%, %d%%] <-> [%d%%, %d%%]",
-                           iperstart, iperstart+ipersize, iperend, iperend+ipersize );
+              iperstart, iperstart+ipersize, iperend, iperend+ipersize );
         return;
     }
 
@@ -1934,41 +2141,45 @@ static void sonogram_swapblocks(t_sonogram *x, t_floatarg fperstart, t_floatarg 
     samplestartb=samplestart+((samplestartb-samplestart)*iperend)/100;
 
     post( "swap blocks [%d,%d] and [%d,%d]", samplestart, samplestart+samplesize, samplestartb, samplestartb+samplesize );
-    
-    for ( sp=samplesize; sp>=0; sp-- ) {
-        for ( sf=0; sf<x->x_blocksize; sf++) {
-           fvalue = *(x->x_rdata+((int)(samplestart+sp)*x->x_blocksize)+sf);
-           *(x->x_rdata+((int)(samplestart+sp)*x->x_blocksize)+sf) = *(x->x_rdata+((int)(samplestartb+sp)*x->x_blocksize)+sf);
-           *(x->x_rdata+((int)(samplestartb+sp)*x->x_blocksize)+sf) = fvalue;
-           fvalue = *(x->x_idata+((int)(samplestart+sp)*x->x_blocksize)+sf);
-           *(x->x_idata+((int)(samplestart+sp)*x->x_blocksize)+sf) = *(x->x_idata+((int)(samplestartb+sp)*x->x_blocksize)+sf);
-           *(x->x_idata+((int)(samplestartb+sp)*x->x_blocksize)+sf) = fvalue;
+
+    for ( sp=samplesize; sp>=0; sp-- )
+    {
+        for ( sf=0; sf<x->x_blocksize; sf++)
+        {
+            fvalue = *(x->x_rdata+((int)(samplestart+sp)*x->x_blocksize)+sf);
+            *(x->x_rdata+((int)(samplestart+sp)*x->x_blocksize)+sf) = *(x->x_rdata+((int)(samplestartb+sp)*x->x_blocksize)+sf);
+            *(x->x_rdata+((int)(samplestartb+sp)*x->x_blocksize)+sf) = fvalue;
+            fvalue = *(x->x_idata+((int)(samplestart+sp)*x->x_blocksize)+sf);
+            *(x->x_idata+((int)(samplestart+sp)*x->x_blocksize)+sf) = *(x->x_idata+((int)(samplestartb+sp)*x->x_blocksize)+sf);
+            *(x->x_idata+((int)(samplestartb+sp)*x->x_blocksize)+sf) = fvalue;
         }
     }
     sonogram_update_part(x, x->x_glist, 0, x->x_size-1, 0, 1, 1);
 }
 
-    /* swap frequencies */
+/* swap frequencies */
 static void sonogram_swapfreqs(t_sonogram *x, t_floatarg ffirstfreq, t_floatarg fsecondfreq)
 {
-  t_int samplestart, sampleend, sp;
-  t_float fvalue;
+    t_int samplestart, sampleend, sp;
+    t_float fvalue;
 
-    if (ffirstfreq < 0 || fsecondfreq <0) {
+    if (ffirstfreq < 0 || fsecondfreq <0)
+    {
         post( "sonogram~ : error : wrong frequencies" );
         return;
     }
     samplestart=(x->x_modstart*(x->x_size-1))/100;
     sampleend=(x->x_modend*(x->x_size-1))/100;
-    
-    for ( sp=samplestart; sp<=sampleend; sp++ ) {
+
+    for ( sp=samplestart; sp<=sampleend; sp++ )
+    {
         fvalue = *(x->x_rdata+((int)sp*x->x_blocksize)+(int)ffirstfreq);
-        *(x->x_rdata+((int)sp*x->x_blocksize)+(int)ffirstfreq) = 
-                        *(x->x_rdata+((int)sp*x->x_blocksize)+(int)fsecondfreq);
+        *(x->x_rdata+((int)sp*x->x_blocksize)+(int)ffirstfreq) =
+            *(x->x_rdata+((int)sp*x->x_blocksize)+(int)fsecondfreq);
         *(x->x_rdata+((int)sp*x->x_blocksize)+(int)fsecondfreq) = fvalue;
         fvalue = *(x->x_idata+((int)sp*x->x_blocksize)+(int)ffirstfreq);
-        *(x->x_idata+((int)sp*x->x_blocksize)+(int)ffirstfreq) = 
-                        *(x->x_idata+((int)sp*x->x_blocksize)+(int)fsecondfreq);
+        *(x->x_idata+((int)sp*x->x_blocksize)+(int)ffirstfreq) =
+            *(x->x_idata+((int)sp*x->x_blocksize)+(int)fsecondfreq);
         *(x->x_idata+((int)sp*x->x_blocksize)+(int)fsecondfreq) = fvalue;
     }
     sonogram_update_part(x, x->x_glist, samplestart, sampleend, 0, 1, 1);
@@ -1987,19 +2198,20 @@ static void *sonogram_new(t_floatarg fsize, t_floatarg fgraphic, t_floatarg fpha
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("modstart"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("modend"));
 
-    if ( fsize <= 0 || ( fgraphic != 0 && fgraphic != 1 ) || ( fphaso != 0 && fphaso != 1 ) ) {
-       error( "sonogram~ : missing or negative creation arguments" );
-       return NULL;
+    if ( fsize <= 0 || ( fgraphic != 0 && fgraphic != 1 ) || ( fphaso != 0 && fphaso != 1 ) )
+    {
+        error( "sonogram~ : missing or negative creation arguments" );
+        return NULL;
     }
 
     // activate graphical callbacks
-    if ( fgraphic != 0 ) 
+    if ( fgraphic != 0 )
     {
-       class_setwidget(sonogram_class, &sonogram_widgetbehavior);
+        class_setwidget(sonogram_class, &sonogram_widgetbehavior);
     }
     x->x_graphic = (int) fgraphic;
     x->x_phaso = (int) fphaso;
-    
+
     x->x_size = fsize;
     x->x_blocksize = sys_getblksize();
     x->x_play = 0;
@@ -2026,10 +2238,13 @@ static void *sonogram_new(t_floatarg fsize, t_floatarg fgraphic, t_floatarg fpha
     x->x_enhancemode = 0;
     x->x_glist = (t_glist*)canvas_getcurrent();
 
-    if ( sonogram_allocate(x) <0 ) {
-      return NULL;
-    } else {
-      return(x);
+    if ( sonogram_allocate(x) <0 )
+    {
+        return NULL;
+    }
+    else
+    {
+        return(x);
     }
 
 }
@@ -2038,7 +2253,7 @@ void sonogram_tilde_setup(void)
 {
     verbose(0, sonogram_version);
     sonogram_class = class_new(gensym("sonogram~"), (t_newmethod)sonogram_new, (t_method)sonogram_free,
-                    sizeof(t_sonogram), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+                               sizeof(t_sonogram), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
 
 
     // set callbacks

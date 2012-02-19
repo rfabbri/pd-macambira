@@ -46,34 +46,36 @@
 #define BFSZ            4096   /* main delay buffer                  */
 #define BLOCK_DELAY     10     /* number of blocks to delay          */
 #define NA              0.0    /* param not applicable               */
-#define NBEXPS          129    
+#define NBEXPS          129
 
 static char   *disto_version = "disto~: distortion, version 0.1 (ydegoyon@free.fr)";
 
-struct hipass {
-  /* few intermediate variables */
-  double omega;
-  double sn,cs;
-  double alpha;
-  /* filter coefficients */
-  double a0,a1,a2,b0,b1,b2;
-  double k0,k1,k2,k3,k4;
-  /* amplitudes */
-  double x0,x1,x2;
-  double y0,y1,y2;
+struct hipass
+{
+    /* few intermediate variables */
+    double omega;
+    double sn,cs;
+    double alpha;
+    /* filter coefficients */
+    double a0,a1,a2,b0,b1,b2;
+    double k0,k1,k2,k3,k4;
+    /* amplitudes */
+    double x0,x1,x2;
+    double y0,y1,y2;
 } hipass;
 
-struct lowpass {
-  /* few intermediate variables */
-  double omega;
-  double sn,cs;
-  double alpha;
-  /* filter coefficients */
-  double a0,a1,a2,b0,b1,b2;
-  double k0,k1,k2,k3,k4;
-  /* amplitudes */
-  double x0,x1,x2;
-  double y0,y1,y2;
+struct lowpass
+{
+    /* few intermediate variables */
+    double omega;
+    double sn,cs;
+    double alpha;
+    /* filter coefficients */
+    double a0,a1,a2,b0,b1,b2;
+    double k0,k1,k2,k3,k4;
+    /* amplitudes */
+    double x0,x1,x2;
+    double y0,y1,y2;
 } lowpass;
 
 typedef struct _disto
@@ -91,7 +93,7 @@ typedef struct _disto
     double x_hipassQ;     /* the EE kinda definition for hi pass filter */  /* 0.1< <=1 */
     double x_lowpassQ;    /* the EE kinda definition for low pass filter */ /* 0.1< <=1 */
 
-    /* audio processing data ( not setable ) */     
+    /* audio processing data ( not setable ) */
     double data,pred;
     double outval,outvol;
     double exps[NBEXPS];
@@ -107,11 +109,11 @@ static t_class *disto_class;
 
 static void disto_init_filters (t_disto *x)
 {
-  t_int i;
+    t_int i;
 
     for (i=0; i<130; i++)
     {
-      x->exps[i]=exp((double)i*x->x_drive)*x->x_wetmix;
+        x->exps[i]=exp((double)i*x->x_drive)*x->x_wetmix;
     }
 
     x->HPF.omega = 2.0*M_PI*x->x_hipassfreq/(double)x->x_samplerate;
@@ -151,11 +153,11 @@ static void disto_drive(t_disto *x, t_floatarg fdrive )
 {
     if ( fdrive > 25.0 )
     {
-       fdrive = 25.0;
+        fdrive = 25.0;
     }
     if ( fdrive < 0.0 )
     {
-       fdrive = 0.0;
+        fdrive = 0.0;
     }
     x->x_drive = fdrive;
     // post( "disto~ : drive: %f", x->x_drive );
@@ -166,11 +168,11 @@ static void disto_drymix(t_disto *x, t_floatarg fdrymix )
 {
     if ( fdrymix > 5.0 )
     {
-       fdrymix = 5.0;
+        fdrymix = 5.0;
     }
     if ( fdrymix < -5.0 )
     {
-       fdrymix = -5.0;
+        fdrymix = -5.0;
     }
     x->x_drymix = fdrymix;
     // post( "disto~ : drymix: %f", x->x_drymix );
@@ -181,11 +183,11 @@ static void disto_wetmix(t_disto *x, t_floatarg fwetmix )
 {
     if ( fwetmix > 5.0 )
     {
-       fwetmix = 5.0;
+        fwetmix = 5.0;
     }
     if ( fwetmix < -5.0 )
     {
-       fwetmix = -5.0;
+        fwetmix = -5.0;
     }
     x->x_wetmix = fwetmix;
     // post( "disto~ : wetmix: %f", x->x_wetmix );
@@ -196,11 +198,11 @@ static void disto_feedback(t_disto *x, t_floatarg ffeedback )
 {
     if ( ffeedback > 10.0 )
     {
-       ffeedback = 10.0;
+        ffeedback = 10.0;
     }
     if ( ffeedback < -10.0 )
     {
-       ffeedback = -10.0;
+        ffeedback = -10.0;
     }
     x->x_feedback = ffeedback;
     // post( "disto~ : feedback: %f", x->x_feedback );
@@ -211,11 +213,11 @@ static void disto_volume(t_disto *x, t_floatarg fvolume )
 {
     if ( fvolume > 5.0 )
     {
-       fvolume = 5.0;
+        fvolume = 5.0;
     }
     if ( fvolume < 0.0 )
     {
-       fvolume = 0.0;
+        fvolume = 0.0;
     }
     x->x_volume = fvolume;
     // post( "disto~ : volume: %f", x->x_volume );
@@ -226,11 +228,11 @@ static void disto_hipassfreq(t_disto *x, t_floatarg fhipassfreq )
 {
     if ( fhipassfreq > x->x_samplerate/2 )
     {
-       fhipassfreq = x->x_samplerate/2;
+        fhipassfreq = x->x_samplerate/2;
     }
     if ( fhipassfreq < 0.0 )
     {
-       fhipassfreq = 0.0;
+        fhipassfreq = 0.0;
     }
     x->x_hipassfreq = fhipassfreq;
     // post( "disto~ : hipassfreq: %f", x->x_hipassfreq );
@@ -241,11 +243,11 @@ static void disto_hipassQ(t_disto *x, t_floatarg fhipassQ )
 {
     if ( fhipassQ > 1.0 )
     {
-       fhipassQ = 1.0;
+        fhipassQ = 1.0;
     }
     if ( fhipassQ < 0.1 )
     {
-       fhipassQ = 0.1;
+        fhipassQ = 0.1;
     }
     x->x_hipassQ = fhipassQ;
     // post( "disto~ : hipassQ: %f", x->x_hipassQ );
@@ -256,11 +258,11 @@ static void disto_lowpassfreq(t_disto *x, t_floatarg flowpassfreq )
 {
     if ( flowpassfreq > x->x_samplerate/2 )
     {
-       flowpassfreq = x->x_samplerate/2;
+        flowpassfreq = x->x_samplerate/2;
     }
     if ( flowpassfreq < 0.0 )
     {
-       flowpassfreq = 0.0;
+        flowpassfreq = 0.0;
     }
     x->x_lowpassfreq = flowpassfreq;
     // post( "disto~ : lowpassfreq: %f", x->x_lowpassfreq );
@@ -271,11 +273,11 @@ static void disto_lowpassQ(t_disto *x, t_floatarg flowpassQ )
 {
     if ( flowpassQ > 1.0 )
     {
-       flowpassQ = 1.0;
+        flowpassQ = 1.0;
     }
     if ( flowpassQ < 0.1 )
     {
-       flowpassQ = 0.1;
+        flowpassQ = 0.1;
     }
     x->x_lowpassQ = flowpassQ;
     // post( "disto~ : lowpassQ: %f", x->x_lowpassQ );
@@ -284,49 +286,48 @@ static void disto_lowpassQ(t_disto *x, t_floatarg flowpassQ )
 
 static t_int *disto_perform(t_int *w)
 {
-  t_float *in = (t_float *)(w[1]);
-  t_float *out = (t_float *)(w[2]);
-  t_int n = (int)(w[3]);
-  t_disto *x = (t_disto*)(w[4]);
-  t_int i;
+    t_float *in = (t_float *)(w[1]);
+    t_float *out = (t_float *)(w[2]);
+    t_int n = (int)(w[3]);
+    t_disto *x = (t_disto*)(w[4]);
+    t_int i;
 
     for (i = 0; i < n; i++)
     {
 
-      x->HPF.x0 = *(in++);
-      x->HPF.y0 = (x->HPF.k0*x->HPF.x0+x->HPF.k1*x->HPF.x1+x->HPF.k2*x->HPF.x2-x->HPF.k3*x->HPF.y1-x->HPF.k4*x->HPF.y2);
-      x->HPF.y2 = x->HPF.y1;
-      x->HPF.y1 = x->HPF.y0;
-      x->HPF.x2 = x->HPF.x1;
-      x->HPF.x1 = x->HPF.x0;
-      x->data = (int)x->HPF.y0;
+        x->HPF.x0 = *(in++);
+        x->HPF.y0 = (x->HPF.k0*x->HPF.x0+x->HPF.k1*x->HPF.x1+x->HPF.k2*x->HPF.x2-x->HPF.k3*x->HPF.y1-x->HPF.k4*x->HPF.y2);
+        x->HPF.y2 = x->HPF.y1;
+        x->HPF.y1 = x->HPF.y0;
+        x->HPF.x2 = x->HPF.x1;
+        x->HPF.x1 = x->HPF.x0;
+        x->data = (int)x->HPF.y0;
 
-      if ((x->data-x->pred)>0)
-        x->outval += (x->data*x->x_drymix+ x->exps[abs(x->data)]);
-      else
-        if ((x->data-x->pred)<0)
-         x->outval += (x->data*x->x_drymix- x->exps[abs(x->data)]);
-      x->pred = x->data;
+        if ((x->data-x->pred)>0)
+            x->outval += (x->data*x->x_drymix+ x->exps[abs(x->data)]);
+        else if ((x->data-x->pred)<0)
+            x->outval += (x->data*x->x_drymix- x->exps[abs(x->data)]);
+        x->pred = x->data;
 
-      x->LPF.x0 = *(out);
-      x->LPF.y0 = (x->LPF.k0*x->LPF.x0+x->LPF.k1*x->LPF.x1+x->LPF.k2*x->LPF.x2-x->LPF.k3*x->LPF.y1-x->LPF.k4*x->LPF.y2);
-      x->LPF.y2 = x->LPF.y1;
-      x->LPF.y1 = x->LPF.y0;
-      x->LPF.x2 = x->LPF.x1;
-      x->LPF.x1 = x->LPF.x0;
+        x->LPF.x0 = *(out);
+        x->LPF.y0 = (x->LPF.k0*x->LPF.x0+x->LPF.k1*x->LPF.x1+x->LPF.k2*x->LPF.x2-x->LPF.k3*x->LPF.y1-x->LPF.k4*x->LPF.y2);
+        x->LPF.y2 = x->LPF.y1;
+        x->LPF.y1 = x->LPF.y0;
+        x->LPF.x2 = x->LPF.x1;
+        x->LPF.x1 = x->LPF.x0;
 
-      x->outvol = x->LPF.y0*x->x_volume;
+        x->outvol = x->LPF.y0*x->x_volume;
 
-      if(x->outvol > 1.0)
-          x->data = 1.0;
-      else if(x->outvol < -1.0)
-          x->data = -1.0;
+        if(x->outvol > 1.0)
+            x->data = 1.0;
+        else if(x->outvol < -1.0)
+            x->data = -1.0;
         else
-          x->data = x->outvol;
+            x->data = x->outvol;
 
-      *(out++) = x->data;
+        *(out++) = x->data;
 
-      x->outval *= x->x_feedback;
+        x->outval *= x->x_feedback;
 
     }
 
@@ -337,88 +338,88 @@ static void disto_preset(t_disto *x, t_float pnumber)
 {
     switch ( (int)pnumber )
     {
-       /* "Hard Distortion 100-10000Hz" */
-       case 1:
-          x->x_drive = 1.5;
-          x->x_drymix = 1.0;
-          x->x_wetmix = 0.5;
-          x->x_feedback = 0.0;
-          x->x_volume = 1.0;
-          x->x_hipassfreq = 100.0;
-          x->x_hipassQ = 0.5;
-          x->x_lowpassfreq = 10000.0;
-          x->x_lowpassQ = 0.5;
-          break;
-         
-       /* "Hard Distortion 100-6000Hz" */
-       case 2:
-          x->x_drive = 1.5;
-          x->x_drymix = 1.0;
-          x->x_wetmix = 0.5;
-          x->x_feedback = 0.0;
-          x->x_volume = 1.0;
-          x->x_hipassfreq = 100.0;
-          x->x_hipassQ = 0.5;
-          x->x_lowpassfreq = 2000.0;
-          x->x_lowpassQ = 0.5;
-          break;
-         
-       /* "Very Hard Distortion" */
-       case 3:
-          x->x_drive = 2.0;
-          x->x_drymix = 0.0;
-          x->x_wetmix = 1.0;
-          x->x_feedback = 1.0;
-          x->x_volume = 5.0;
-          x->x_hipassfreq = 100.0;
-          x->x_hipassQ = 0.5;
-          x->x_lowpassfreq = 6000.0;
-          x->x_lowpassQ = 0.5;
-          break;
-         
-       /* "Medium Distortion 0.2" */
-       case 4:
-          x->x_drive = 0.2;
-          x->x_drymix = 1.0;
-          x->x_wetmix = 1.0;
-          x->x_feedback = 0.1;
-          x->x_volume = 1.0;
-          x->x_hipassfreq = 100.0;
-          x->x_hipassQ = 0.5;
-          x->x_lowpassfreq = 6000.0;
-          x->x_lowpassQ = 0.5;
-          break;
-         
-       /* "Medium Distortion 0.8" */
-       case 5:
-          x->x_drive = 0.8;
-          x->x_drymix = 1.0;
-          x->x_wetmix = 1.0;
-          x->x_feedback = 0.1;
-          x->x_volume = 1.0;
-          x->x_hipassfreq = 100.0;
-          x->x_hipassQ = 1.0;
-          x->x_lowpassfreq = 6000.0;
-          x->x_lowpassQ = 0.5;
-          break;
-         
-       /* "Soft Distortion 0.8" */
-       case 6:
-          x->x_drive = 0.8;
-          x->x_drymix = 0.4;
-          x->x_wetmix = 0.8;
-          x->x_feedback = 0.0;
-          x->x_volume = 0.5;
-          x->x_hipassfreq = 100.0;
-          x->x_hipassQ = 1.0;
-          x->x_lowpassfreq = 10000.0;
-          x->x_lowpassQ = 0.5;
-          break;
-         
-       default:
-          post( "disto~ : unknown preset requested : %d", pnumber );
-          return;
-          break;
+        /* "Hard Distortion 100-10000Hz" */
+    case 1:
+        x->x_drive = 1.5;
+        x->x_drymix = 1.0;
+        x->x_wetmix = 0.5;
+        x->x_feedback = 0.0;
+        x->x_volume = 1.0;
+        x->x_hipassfreq = 100.0;
+        x->x_hipassQ = 0.5;
+        x->x_lowpassfreq = 10000.0;
+        x->x_lowpassQ = 0.5;
+        break;
+
+        /* "Hard Distortion 100-6000Hz" */
+    case 2:
+        x->x_drive = 1.5;
+        x->x_drymix = 1.0;
+        x->x_wetmix = 0.5;
+        x->x_feedback = 0.0;
+        x->x_volume = 1.0;
+        x->x_hipassfreq = 100.0;
+        x->x_hipassQ = 0.5;
+        x->x_lowpassfreq = 2000.0;
+        x->x_lowpassQ = 0.5;
+        break;
+
+        /* "Very Hard Distortion" */
+    case 3:
+        x->x_drive = 2.0;
+        x->x_drymix = 0.0;
+        x->x_wetmix = 1.0;
+        x->x_feedback = 1.0;
+        x->x_volume = 5.0;
+        x->x_hipassfreq = 100.0;
+        x->x_hipassQ = 0.5;
+        x->x_lowpassfreq = 6000.0;
+        x->x_lowpassQ = 0.5;
+        break;
+
+        /* "Medium Distortion 0.2" */
+    case 4:
+        x->x_drive = 0.2;
+        x->x_drymix = 1.0;
+        x->x_wetmix = 1.0;
+        x->x_feedback = 0.1;
+        x->x_volume = 1.0;
+        x->x_hipassfreq = 100.0;
+        x->x_hipassQ = 0.5;
+        x->x_lowpassfreq = 6000.0;
+        x->x_lowpassQ = 0.5;
+        break;
+
+        /* "Medium Distortion 0.8" */
+    case 5:
+        x->x_drive = 0.8;
+        x->x_drymix = 1.0;
+        x->x_wetmix = 1.0;
+        x->x_feedback = 0.1;
+        x->x_volume = 1.0;
+        x->x_hipassfreq = 100.0;
+        x->x_hipassQ = 1.0;
+        x->x_lowpassfreq = 6000.0;
+        x->x_lowpassQ = 0.5;
+        break;
+
+        /* "Soft Distortion 0.8" */
+    case 6:
+        x->x_drive = 0.8;
+        x->x_drymix = 0.4;
+        x->x_wetmix = 0.8;
+        x->x_feedback = 0.0;
+        x->x_volume = 0.5;
+        x->x_hipassfreq = 100.0;
+        x->x_hipassQ = 1.0;
+        x->x_lowpassfreq = 10000.0;
+        x->x_lowpassQ = 0.5;
+        break;
+
+    default:
+        post( "disto~ : unknown preset requested : %d", pnumber );
+        return;
+        break;
     }
     disto_init_filters( x );
 }
@@ -428,13 +429,14 @@ static void disto_dsp(t_disto *x, t_signal **sp)
     dsp_add(disto_perform, 4, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n, x );
 }
 
-        /* clean up */
+/* clean up */
 static void disto_free(t_disto *x)
 {
-    if ( x->x_buf != NULL ) {
-       freebytes(x->x_buf, BFSZ*sizeof( double ) );
-       post( "Freed %d bytes",  BFSZ*sizeof( double ) );
-       x->x_buf = NULL;
+    if ( x->x_buf != NULL )
+    {
+        freebytes(x->x_buf, BFSZ*sizeof( double ) );
+        post( "Freed %d bytes",  BFSZ*sizeof( double ) );
+        x->x_buf = NULL;
     }
 }
 
@@ -458,8 +460,8 @@ static void *disto_new(void)
 
     if ( !( x->x_buf = ( double* ) getbytes( BFSZ*sizeof( double ) ) ) )
     {
-       post ("disto~ : could not allocate buffer" );
-       return NULL;
+        post ("disto~ : could not allocate buffer" );
+        return NULL;
     }
 
     // set default parameters
@@ -473,7 +475,7 @@ void disto_tilde_setup(void)
 {
     verbose(0,  disto_version );
     disto_class = class_new(gensym("disto~"), (t_newmethod)disto_new, (t_method)disto_free,
-    	sizeof(t_disto), 0, 0);
+                            sizeof(t_disto), 0, 0);
 
     CLASS_MAINSIGNALIN( disto_class, t_disto, x_f );
     class_addmethod(disto_class, (t_method)disto_drive, gensym("drive"), A_FLOAT, 0);

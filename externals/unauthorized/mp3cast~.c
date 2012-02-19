@@ -53,7 +53,7 @@
 #include <windows.h>
 #include <winsock.h>
 #include <windef.h>
-#else 
+#else
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -64,19 +64,20 @@
 #endif
 
 #include <lame/lame.h>        /* lame encoder stuff */
-#include "mpg123.h" 
+#include "mpg123.h"
 
 
 #define        MY_MP3_MALLOC_IN_SIZE        65536
-                                            /* max size taken from lame readme */
-#define        MY_MP3_MALLOC_OUT_SIZE       1.25*MY_MP3_MALLOC_IN_SIZE+7200 
+/* max size taken from lame readme */
+#define        MY_MP3_MALLOC_OUT_SIZE       1.25*MY_MP3_MALLOC_IN_SIZE+7200
 
 #define        MAXDATARATE 320        /* maximum mp3 data rate is 320kbit/s */
 #define        STRBUF_SIZE 1024
 
 static char   *mp3cast_version = "mp3cast~: mp3 streamer version 0.5, written by Yves Degoyon";
 
-static char base64table[65] = {
+static char base64table[65] =
+{
     'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
     'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
     'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
@@ -89,12 +90,12 @@ typedef struct _mp3cast
 {
     t_object x_obj;
 
-        /* LAME stuff */
+    /* LAME stuff */
     int x_lame;               /* info about encoder status */
     int x_lamechunk;          /* chunk size for LAME encoder */
     int x_mp3size;            /* number of returned mp3 samples */
 
-        /* buffer stuff */
+    /* buffer stuff */
     unsigned short x_inp;     /* in position for buffer */
     unsigned short x_outp;    /* out position for buffer*/
     short *x_mp3inbuf;        /* data to be sent to LAME */
@@ -103,17 +104,17 @@ typedef struct _mp3cast
     int x_bytesbuffered;      /* number of unprocessed bytes in buffer */
     int x_start;
 
-        /* mp3 format stuff */
+    /* mp3 format stuff */
     int x_samplerate;
     int x_bitrate;            /* bitrate of mp3 stream */
     int x_mp3mode;            /* mode (mono, joint stereo, stereo, dual mono) */
     int x_mp3quality;         /* quality of encoding */
 
-        /* SHOUTcast server stuff */
+    /* SHOUTcast server stuff */
     int x_fd;                 /* info about connection status */
     char* x_passwd;           /* password for server */
     int x_icecast;            /* tells if we use a IceCast server or SHOUTcast */
-        /* special IceCast server stuff */
+    /* special IceCast server stuff */
     char* x_mountpoint;
     char* x_name;
     char* x_url;
@@ -128,7 +129,7 @@ typedef struct _mp3cast
 } t_mp3cast;
 
 
-    /* encode PCM data to mp3 stream */
+/* encode PCM data to mp3 stream */
 static void mp3cast_encode(t_mp3cast *x)
 {
     unsigned short i, wp;
@@ -145,11 +146,11 @@ static void mp3cast_encode(t_mp3cast *x)
         return;
     }
 
-        /* on start/reconnect set outpoint that it not interferes with inpoint */ 
+    /* on start/reconnect set outpoint that it not interferes with inpoint */
     if(x->x_start == -1)
     {
         post("mp3cast~: initialising buffers");
-            /* we try to keep 2.5 times the data the encoder needs in the buffer */
+        /* we try to keep 2.5 times the data the encoder needs in the buffer */
         if(x->x_inp > (2 * x->x_lamechunk))
         {
             x->x_outp = (short) x->x_inp - (2.5 * x->x_lamechunk);
@@ -164,10 +165,10 @@ static void mp3cast_encode(t_mp3cast *x)
 
     i = MY_MP3_MALLOC_IN_SIZE - x->x_outp;
 
-        /* read from buffer */
-    if(x->x_lamechunk <= i)    
+    /* read from buffer */
+    if(x->x_lamechunk <= i)
     {
-            /* enough data until end of buffer */
+        /* enough data until end of buffer */
         for(n = 0; n < x->x_lamechunk; n++)                                /* fill encode buffer */
         {
             x->x_mp3inbuf[n] = x->x_buffer[n + x->x_outp];
@@ -188,13 +189,13 @@ static void mp3cast_encode(t_mp3cast *x)
         x->x_outp = x->x_lamechunk - i;
     }
 
-        /* encode mp3 data */
-    x->x_mp3size = lame_encode_buffer_interleaved(x->lgfp, x->x_mp3inbuf, 
-                   x->x_lamechunk/lame_get_num_channels(x->lgfp), 
+    /* encode mp3 data */
+    x->x_mp3size = lame_encode_buffer_interleaved(x->lgfp, x->x_mp3inbuf,
+                   x->x_lamechunk/lame_get_num_channels(x->lgfp),
                    x->x_mp3outbuf, MY_MP3_MALLOC_OUT_SIZE);
     // post( "mp3cast~ : encoding returned %d frames", x->x_mp3size );
 
-        /* check result */
+    /* check result */
     if(x->x_mp3size<0)
     {
         lame_close( x->lgfp );
@@ -204,7 +205,7 @@ static void mp3cast_encode(t_mp3cast *x)
 }
 
 
-    /* stream mp3 to SHOUTcast server */
+/* stream mp3 to SHOUTcast server */
 static void mp3cast_stream(t_mp3cast *x)
 {
     int err = -1, i;            /* error return code */
@@ -223,12 +224,12 @@ static void mp3cast_stream(t_mp3cast *x)
 #endif /* _WIN32 */
         x->x_fd = -1;
         outlet_float(x->x_obj.ob_outlet, 0);
-    } 
+    }
     if((err > 0)&&(err != x->x_mp3size))error("mp3cast~: %d bytes skipped", x->x_mp3size - err);
 }
 
-    
-    /* buffer data as channel interleaved PCM */
+
+/* buffer data as channel interleaved PCM */
 static t_int *mp3cast_perform(t_int *w)
 {
     t_float *in1   = (t_float *)(w[1]);       /* left audio inlet */
@@ -238,76 +239,94 @@ static t_int *mp3cast_perform(t_int *w)
     unsigned short i,wp;
     float in;
 
-        /* copy the data into the buffer */
+    /* copy the data into the buffer */
     i = MY_MP3_MALLOC_IN_SIZE - x->x_inp;     /* space left at the end of buffer */
-    
+
     n *= 2;                                  /* two channels go into one buffer */
 
-    if( n <= i ) 
+    if( n <= i )
     {
         /* the place between inp and MY_MP3_MALLOC_IN_SIZE */
         /* is big enough to hold the data                  */
 
-            for(wp = 0; wp < n; wp++)
+        for(wp = 0; wp < n; wp++)
+        {
+            if(wp%2)
             {
-                if(wp%2)
-                {
-                    in = *(in2++);    /* right channel / inlet */
-                }
-                else
-                {
-                    in = *(in1++);    /* left channel / inlet */
-                }
-                if (in > 1.0) { in = 1.0; }
-                if (in < -1.0) { in = -1.0; }
-                x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+                in = *(in2++);    /* right channel / inlet */
             }
-            x->x_inp += n;    /* n more samples written to buffer */
-    } 
-    else 
+            else
+            {
+                in = *(in1++);    /* left channel / inlet */
+            }
+            if (in > 1.0)
+            {
+                in = 1.0;
+            }
+            if (in < -1.0)
+            {
+                in = -1.0;
+            }
+            x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+        }
+        x->x_inp += n;    /* n more samples written to buffer */
+    }
+    else
     {
-                /* the place between inp and MY_MP3_MALLOC_IN_SIZE is not */    
-                /* big enough to hold the data                              */
-                /* writing will take place in two turns, one from         */
-                /* x->x_inp -> MY_MP3_MALLOC_IN_SIZE, then from 0 on      */
+        /* the place between inp and MY_MP3_MALLOC_IN_SIZE is not */
+        /* big enough to hold the data                              */
+        /* writing will take place in two turns, one from         */
+        /* x->x_inp -> MY_MP3_MALLOC_IN_SIZE, then from 0 on      */
 
-            for(wp = 0; wp < i; wp++)            /* fill up to end of buffer */
+        for(wp = 0; wp < i; wp++)            /* fill up to end of buffer */
+        {
+            if(wp%2)
             {
-                if(wp%2)
-                {
-                    in = *(in2++);
-                }
-                else
-                {
-                    in = *(in1++);
-                }
-                if (in > 1.0) { in = 1.0; }
-                if (in < -1.0) { in = -1.0; }
-                x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+                in = *(in2++);
             }
-            for(wp = i; wp < n; wp++)        /* write rest at start of buffer */
+            else
             {
-                if(wp%2)
-                {
-                    in = *(in2++);
-                }
-                else
-                {
-                    in = *(in1++);
-                }
-                if (in > 1.0) { in = 1.0; }
-                if (in < -1.0) { in = -1.0; }
-                x->x_buffer[wp - i] = (short) (32767.0 * in);
+                in = *(in1++);
             }
-            x->x_inp = n - i;                /* new writeposition in buffer */
+            if (in > 1.0)
+            {
+                in = 1.0;
+            }
+            if (in < -1.0)
+            {
+                in = -1.0;
+            }
+            x->x_buffer[wp + x->x_inp] = (short) (32767.0 * in);
+        }
+        for(wp = i; wp < n; wp++)        /* write rest at start of buffer */
+        {
+            if(wp%2)
+            {
+                in = *(in2++);
+            }
+            else
+            {
+                in = *(in1++);
+            }
+            if (in > 1.0)
+            {
+                in = 1.0;
+            }
+            if (in < -1.0)
+            {
+                in = -1.0;
+            }
+            x->x_buffer[wp - i] = (short) (32767.0 * in);
+        }
+        x->x_inp = n - i;                /* new writeposition in buffer */
     }
 
     if((x->x_fd >= 0)&&(x->x_lame >= 0))
-    { 
-            /* count buffered samples when things are running */
+    {
+        /* count buffered samples when things are running */
         x->x_bytesbuffered += n;
 
-            /* encode and send to server */
+        /* encode and send to server */
         if(x->x_bytesbuffered > x->x_lamechunk)
         {
             mp3cast_encode(x);        /* encode to mp3 */
@@ -327,7 +346,7 @@ static void mp3cast_dsp(t_mp3cast *x, t_signal **sp)
     dsp_add(mp3cast_perform, 4, sp[0]->s_vec, sp[1]->s_vec, x, sp[0]->s_n);
 }
 
-    /* initialize the lame library */
+/* initialize the lame library */
 static void mp3cast_tilde_lame_init(t_mp3cast *x)
 {
     int    ret;
@@ -335,8 +354,8 @@ static void mp3cast_tilde_lame_init(t_mp3cast *x)
 
 #ifdef _WIN32
     /* load lame_enc.dll library */
-	 HINSTANCE dll;
-	 dll=LoadLibrary("lame_enc.dll");
+    HINSTANCE dll;
+    dll=LoadLibrary("lame_enc.dll");
     if(!dll)
     {
         error("mp3cast~: error loading lame_enc.dll");
@@ -348,12 +367,12 @@ static void mp3cast_tilde_lame_init(t_mp3cast *x)
     }
 #endif  /* _WIN32 */
     {
-       const char *lameVersion = get_lame_version();
-       verbose(0,  "mp3cast~ : using lame version : %s", lameVersion );
+        const char *lameVersion = get_lame_version();
+        verbose(0,  "mp3cast~ : using lame version : %s", lameVersion );
     }
 
 
-        /* setting lame parameters */
+    /* setting lame parameters */
     lame_set_num_channels( x->lgfp, 2);
     lame_set_in_samplerate( x->lgfp, sys_getsr() );
     lame_set_out_samplerate( x->lgfp, x->x_samplerate );
@@ -366,60 +385,65 @@ static void mp3cast_tilde_lame_init(t_mp3cast *x)
     lame_set_disable_reservoir( x->lgfp, 0 );
     lame_set_padding_type( x->lgfp, PAD_NO );
     ret = lame_init_params( x->lgfp );
-    if ( ret<0 ) {
-       post( "mp3cast~ : error : lame params initialization returned : %d", ret );
-    } else {
-       x->x_lame=1;
-       /* magic formula copied from windows dll for MPEG-I */
-       x->x_lamechunk = 2*1152;
+    if ( ret<0 )
+    {
+        post( "mp3cast~ : error : lame params initialization returned : %d", ret );
+    }
+    else
+    {
+        x->x_lame=1;
+        /* magic formula copied from windows dll for MPEG-I */
+        x->x_lamechunk = 2*1152;
 
-       post( "mp3cast~ : lame initialization done. (%d)", x->x_lame );
+        post( "mp3cast~ : lame initialization done. (%d)", x->x_lame );
     }
     lame_init_bitstream( x->lgfp );
 }
 
 char *mp3cast_base64_encode(char *data)
 {
-  int len = strlen(data);
-  char *out = t_getbytes(len*4/3 + 4);
-  char *result = out;
-  int chunk;
+    int len = strlen(data);
+    char *out = t_getbytes(len*4/3 + 4);
+    char *result = out;
+    int chunk;
 
-  while(len > 0) {
-    chunk = (len >3)?3:len;
-    *out++ = base64table[(*data & 0xFC)>>2];
-    *out++ = base64table[((*data & 0x03)<<4) | ((*(data+1) & 0xF0) >> 4)];
+    while(len > 0)
+    {
+        chunk = (len >3)?3:len;
+        *out++ = base64table[(*data & 0xFC)>>2];
+        *out++ = base64table[((*data & 0x03)<<4) | ((*(data+1) & 0xF0) >> 4)];
 
-    switch(chunk) {
-      case 3:
-        *out++ = base64table[((*(data+1) & 0x0F)<<2) | ((*(data+2) & 0xC0)>>6)];
-        *out++ = base64table[(*(data+2)) & 0x3F];
-        break;
-      case 2:
-        *out++ = base64table[((*(data+1) & 0x0F)<<2)];
-        *out++ = '=';
-        break;
-      case 1:
-        *out++ = '=';
-        *out++ = '=';
-        break;
-     }
-     data += chunk;
-     len -= chunk;
-  }
-  *out = 0;
+        switch(chunk)
+        {
+        case 3:
+            *out++ = base64table[((*(data+1) & 0x0F)<<2) | ((*(data+2) & 0xC0)>>6)];
+            *out++ = base64table[(*(data+2)) & 0x3F];
+            break;
+        case 2:
+            *out++ = base64table[((*(data+1) & 0x0F)<<2)];
+            *out++ = '=';
+            break;
+        case 1:
+            *out++ = '=';
+            *out++ = '=';
+            break;
+        }
+        data += chunk;
+        len -= chunk;
+    }
+    *out = 0;
 
-  return result;
+    return result;
 }
 
-    /* connect to server */
+/* connect to server */
 static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno)
 {
     struct          sockaddr_in server;
     struct          hostent *hp;
     int             portno            = fportno;    /* get port from message box */
 
-        /* information about this broadcast to be send to the server */
+    /* information about this broadcast to be send to the server */
     const char     *name            = x->x_name;                     /* name of broadcast */
     const char     *url             = x->x_url;                      /* url of broadcast */
     const char     *genre           = x->x_genre;                    /* genre of broadcast */
@@ -430,7 +454,7 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     const char     *mountpoint      = x->x_mountpoint;               /* mountpoint for IceCast server */
     int            isPublic        = x->x_isPublic;                /* don't publish broadcast on www.shoutcast.com */
 
-        /* variables used for communication with server */
+    /* variables used for communication with server */
     const char      * buf = 0;
     char            resp[STRBUF_SIZE];
     unsigned int    len;
@@ -454,7 +478,7 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
         return;
     }
 
-        /* connect socket using hostname provided in command line */
+    /* connect socket using hostname provided in command line */
     server.sin_family = AF_INET;
     hp = gethostbyname(hostname->s_name);
     if (hp == 0)
@@ -465,10 +489,10 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
-        /* assign client port number */
+    /* assign client port number */
     server.sin_port = htons((unsigned short)portno);
 
-        /* try to connect.  */
+    /* try to connect.  */
     post("mp3cast~: connecting to port %d", portno);
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
@@ -481,7 +505,7 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
         return;
     }
 
-        /* sheck if we can read/write from/to the socket */
+    /* sheck if we can read/write from/to the socket */
     FD_ZERO( &fdset);
     FD_SET( sockfd, &fdset);
     tv.tv_sec  = 0;            /* seconds */
@@ -510,16 +534,16 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
 
     if(x->x_icecast == 0) /* SHOUTCAST */
     {
-            /* now try to log in at SHOUTcast server */
+        /* now try to log in at SHOUTcast server */
         post("mp3cast~: logging in to SHOUTcast server...");
 
-            /* first line is the passwd */
+        /* first line is the passwd */
         buf = x->x_passwd;
         send(sockfd, buf, strlen(buf), 0);
         buf = "\n";
         send(sockfd, buf, strlen(buf), 0);
 
-             /* header for SHOUTcast server */
+        /* header for SHOUTcast server */
         buf = "icy-name:";                        /* name of broadcast */
         send(sockfd, buf, strlen(buf), 0);
         buf = name;
@@ -528,18 +552,18 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
         send(sockfd, buf, strlen(buf), 0);
         buf = url;
         send(sockfd, buf, strlen(buf), 0);
-        
-	buf = "\nicy-genre:";                    /* genre of broadcast */
+
+        buf = "\nicy-genre:";                    /* genre of broadcast */
         send(sockfd, buf, strlen(buf), 0);
         buf = genre;
         send(sockfd, buf, strlen(buf), 0);
-        
-	buf = "\nicy-description:";                    /* description of broadcast */
+
+        buf = "\nicy-description:";                    /* description of broadcast */
         send(sockfd, buf, strlen(buf), 0);
         buf = description;
         send(sockfd, buf, strlen(buf), 0);
-        
-	buf = "\nicy-irc:";
+
+        buf = "\nicy-irc:";
         send(sockfd, buf, strlen(buf), 0);
         buf = irc;
         send(sockfd, buf, strlen(buf), 0);
@@ -574,11 +598,11 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     }
     else if ( x->x_icecast == 1 )  /* IceCast */
     {
-            /* now try to log in at IceCast server */
+        /* now try to log in at IceCast server */
         post("mp3cast~: logging in to IceCast server...");
 
-            /* send the request, a string like:
-         * "SOURCE <password> /<mountpoint>\n" */
+        /* send the request, a string like:
+        * "SOURCE <password> /<mountpoint>\n" */
         buf = "SOURCE ";
         send(sockfd, buf, strlen(buf), 0);
         buf = x->x_passwd;
@@ -631,51 +655,51 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
 
         buf = "\n\n";
         send(sockfd, buf, strlen(buf), 0);
-            /* end login for IceCast */
+        /* end login for IceCast */
     }
     else if ( x->x_icecast == 2 ) /* Icecast 2 */
     {
         char *base64;    /* buffer to hold 64bit encoded strings */
-            /* send the request, a string like: "SOURCE /<mountpoint> HTTP/1.0\r\n" */
+        /* send the request, a string like: "SOURCE /<mountpoint> HTTP/1.0\r\n" */
         buf = "SOURCE /";
         send(sockfd, buf, strlen(buf), 0);
         buf = x->x_mountpoint;
         send(sockfd, buf, strlen(buf), 0);
         buf = " HTTP/1.0\r\n";
         send(sockfd, buf, strlen(buf), 0);
-            /* send basic authorization as base64 encoded string */
+        /* send basic authorization as base64 encoded string */
         sprintf(resp, "source:%s", x->x_passwd);
         len = strlen(resp);
         base64 = mp3cast_base64_encode(resp);
         sprintf(resp, "Authorization: Basic %s\r\n", base64);
         send(sockfd, resp, strlen(resp), 0);
         t_freebytes(base64, len*4/3 + 4);
-            /* send application name */
+        /* send application name */
         buf = "User-Agent: mp3cast~";
         send(sockfd, buf, strlen(buf), 0);
-            /* send content type: mpeg */
+        /* send content type: mpeg */
         buf = "\r\nContent-Type: audio/mpeg";
         send(sockfd, buf, strlen(buf), 0);
-            /* send the ice headers */
-            /* name */
+        /* send the ice headers */
+        /* name */
         buf = "\r\nice-name: ";
         send(sockfd, buf, strlen(buf), 0);
         buf = x->x_name;
         send(sockfd, buf, strlen(buf), 0);
-            /* url */
+        /* url */
         buf = "\r\nice-url: ";
         send(sockfd, buf, strlen(buf), 0);
         buf = x->x_url;
         send(sockfd, buf, strlen(buf), 0);
-            /* genre */
+        /* genre */
         buf = "\r\nice-genre: ";
         send(sockfd, buf, strlen(buf), 0);
         buf = genre;
         send(sockfd, buf, strlen(buf), 0);
-            /* public */
+        /* public */
         buf = "\r\nice-public: ";
         send(sockfd, buf, strlen(buf), 0);
-        if(isPublic==0) 
+        if(isPublic==0)
         {
             buf = "0";
         }
@@ -684,25 +708,25 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
             buf = "1";
         }
         send(sockfd, buf, strlen(buf), 0);
-            /* bitrate */
+        /* bitrate */
         if(sprintf(resp, "\r\nice-audio-info: bitrate=%d", x->x_bitrate) == -1)
         {
             error("shoutcast~: could not create audio-info");
         }
         send(sockfd, resp, strlen(resp), 0);
-            /* description */
+        /* description */
         buf = "\r\nice-description: ";
         send(sockfd, buf, strlen(buf), 0);
         buf = description;
         send(sockfd, buf, strlen(buf), 0);
-            /* end of header: write an empty line */
+        /* end of header: write an empty line */
         buf = "\r\n\r\n";
         send(sockfd, buf, strlen(buf), 0);
     }
 
-        /* read the anticipated response: "OK" */
+    /* read the anticipated response: "OK" */
     len = recv(sockfd, resp, STRBUF_SIZE, 0);
-    if ( strstr( resp, "OK" ) == NULL ) 
+    if ( strstr( resp, "OK" ) == NULL )
     {
         post("mp3cast~: login failed!");
         if ( len>0 ) post("mp3cast~: server answered : %s", resp);
@@ -714,8 +738,8 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
         return;
     }
 
-        /* suck anything that the other side has to say */
-    // while (len = recv(sockfd, resp, STRBUF_SIZE,0)) 
+    /* suck anything that the other side has to say */
+    // while (len = recv(sockfd, resp, STRBUF_SIZE,0))
     // {
     //     post("mp3cast~: server answered : %s", resp);
     // }
@@ -728,14 +752,15 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
 
 }
 
-    /* close connection to SHOUTcast server */
+/* close connection to SHOUTcast server */
 static void mp3cast_disconnect(t_mp3cast *x)
 {
     int err = -1;
     if(x->x_lame >= 0)
     {
-		 /* ignore remaining bytes */
-        if ( x->x_mp3size = lame_encode_flush( x->lgfp, x->x_mp3outbuf, 0) < 0 ) {
+        /* ignore remaining bytes */
+        if ( x->x_mp3size = lame_encode_flush( x->lgfp, x->x_mp3outbuf, 0) < 0 )
+        {
             post( "mp3cast~ : warning : remaining encoded bytes" );
         }
         lame_close( x->lgfp );
@@ -757,16 +782,16 @@ static void mp3cast_disconnect(t_mp3cast *x)
     }
 }
 
-    /* set password for SHOUTcast server */
+/* set password for SHOUTcast server */
 static void mp3cast_password(t_mp3cast *x, t_symbol *password)
 {
     post("mp3cast~ : setting password to %s", password->s_name );
     x->x_passwd = password->s_name;
 }
 
-    /* settings for mp3 encoding */
+/* settings for mp3 encoding */
 static void mp3cast_mpeg(t_mp3cast *x, t_floatarg fsamplerate, t_floatarg fbitrate,
-                           t_floatarg fmode, t_floatarg fquality)
+                         t_floatarg fmode, t_floatarg fquality)
 {
     x->x_samplerate = fsamplerate;
     if(fbitrate > MAXDATARATE)
@@ -777,11 +802,11 @@ static void mp3cast_mpeg(t_mp3cast *x, t_floatarg fsamplerate, t_floatarg fbitra
     x->x_mp3mode = fmode;
     x->x_mp3quality = fquality;
     post("mp3cast~: setting mp3 stream to %dHz, %dkbit/s, mode %d, quality %d",
-          x->x_samplerate, x->x_bitrate, x->x_mp3mode, x->x_mp3quality);
+         x->x_samplerate, x->x_bitrate, x->x_mp3mode, x->x_mp3quality);
     if(x->x_fd>=0)post("mp3cast~ : reconnect to make changes take effect! ");
 }
 
-    /* print settings */
+/* print settings */
 static void mp3cast_print(t_mp3cast *x)
 {
     const char        * buf = 0;
@@ -791,18 +816,18 @@ static void mp3cast_print(t_mp3cast *x)
          "    bitrate: %d kbit/s", x->x_samplerate, x->x_bitrate);
     switch(x->x_mp3mode)
     {
-        case 0 : 
-            buf = "stereo";
-            break;
-        case 1 : 
-            buf = "joint stereo";
-            break;
-        case 2 : 
-            buf = "dual channel";
-            break;
-        case 3 : 
-            buf = "mono";
-            break;
+    case 0 :
+        buf = "stereo";
+        break;
+    case 1 :
+        buf = "joint stereo";
+        break;
+    case 2 :
+        buf = "dual channel";
+        break;
+    case 3 :
+        buf = "mono";
+        break;
     }
     post("    mode: %s\n"
          "    quality: %d", buf, x->x_mp3quality);
@@ -844,40 +869,40 @@ static void mp3cast_shoutcast(t_mp3cast *x)
     post("mp3cast~: set server type to SHOUTcast");
 }
 
-    /* set mountpoint for IceCast server */
+/* set mountpoint for IceCast server */
 static void mp3cast_mountpoint(t_mp3cast *x, t_symbol *mount)
 {
     x->x_mountpoint = mount->s_name;
     post("mp3cast~: mountpoint set to %s", x->x_mountpoint);
 }
 
-    /* set namle for IceCast server */
+/* set namle for IceCast server */
 static void mp3cast_name(t_mp3cast *x, t_symbol *name)
 {
     x->x_name = name->s_name;
     post("mp3cast~: name set to %s", x->x_name);
 }
 
-    /* set url for IceCast server */
+/* set url for IceCast server */
 static void mp3cast_url(t_mp3cast *x, t_symbol *url)
 {
     x->x_url = url->s_name;
     post("mp3cast~: url set to %s", x->x_url);
 }
 
-    /* set genre for IceCast server */
+/* set genre for IceCast server */
 static void mp3cast_genre(t_mp3cast *x, t_symbol *genre)
 {
     x->x_genre = genre->s_name;
     post("mp3cast~: genre set to %s", x->x_genre);
 }
 
-    /* set isPublic for IceCast server */
+/* set isPublic for IceCast server */
 static void mp3cast_isPublic(t_mp3cast *x, t_floatarg isPublic)
 {
     x->x_isPublic = isPublic;
     char* isPublicStr;
-    if(isPublic==0) 
+    if(isPublic==0)
     {
         isPublicStr = "no";
     }
@@ -888,15 +913,15 @@ static void mp3cast_isPublic(t_mp3cast *x, t_floatarg isPublic)
     post("mp3cast~: isPublic set to %s", isPublicStr);
 }
 
-    /* set description for IceCast server */
+/* set description for IceCast server */
 static void mp3cast_description(t_mp3cast *x, t_symbol *description)
 {
     x->x_description = description->s_name;
     post("mp3cast~: description set to %s", x->x_description);
 }
 
-    /* clean up */
-static void mp3cast_free(t_mp3cast *x)    
+/* clean up */
+static void mp3cast_free(t_mp3cast *x)
 {
     if(x->x_lame >= 0)
         lame_close( x->lgfp );
@@ -949,7 +974,7 @@ void mp3cast_tilde_setup(void)
 {
     verbose(0, mp3cast_version);
     mp3cast_class = class_new(gensym("mp3cast~"), (t_newmethod)mp3cast_new, (t_method)mp3cast_free,
-        sizeof(t_mp3cast), 0, 0);
+                              sizeof(t_mp3cast), 0, 0);
     CLASS_MAINSIGNALIN(mp3cast_class, t_mp3cast, x_f );
     class_addmethod(mp3cast_class, (t_method)mp3cast_dsp, gensym("dsp"), 0);
     class_addmethod(mp3cast_class, (t_method)mp3cast_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);

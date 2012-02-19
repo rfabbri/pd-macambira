@@ -39,15 +39,21 @@ static t_int *spigot_perform(t_int *w)
     t_float *outl = (t_float *)(w[3]);
     int n = (int)(w[4]);
     t_spigot* x = (t_spigot*)(w[5]);
-    while (n--) {
-       if ( (x->x_on)==0.0 ) {
-          *(outl)=0.0;
-          *(outr)=*(in);
-       } else {
-          *(outl)=*(in);
-          *(outr)=0.0;
-       }
-       in++;outl++;outr++;
+    while (n--)
+    {
+        if ( (x->x_on)==0.0 )
+        {
+            *(outl)=0.0;
+            *(outr)=*(in);
+        }
+        else
+        {
+            *(outl)=*(in);
+            *(outr)=0.0;
+        }
+        in++;
+        outl++;
+        outr++;
     }
     return (w+6);
 }
@@ -67,7 +73,7 @@ void spigot_tilde_setup(void)
 {
     verbose(0, spigot_version );
     spigot_class = class_new(gensym("spigot~"), (t_newmethod)spigot_new, 0,
-    	sizeof(t_spigot), 0, 0);
+                             sizeof(t_spigot), 0, 0);
     CLASS_MAINSIGNALIN( spigot_class, t_spigot, x_f );
     class_addmethod(spigot_class, (t_method)spigot_dsp, gensym("dsp"), 0);
     class_addmethod(spigot_class, (t_method)spigot_set, gensym("seton"), A_FLOAT, 0);
