@@ -28,13 +28,13 @@ static t_symbol* args2symbol(int argc, t_atom *argv)
 
 static void logpost_bang(t_logpost *x)
 {
-    logpost(x, (const int)x->level, "%s%sbang", 
+    logpost(x, (const int)x->level, "%s%sbang",
             x->tag->s_name, (*x->tag->s_name ? ": " : ""));
 }
 
 static void logpost_pointer(t_logpost *x, t_gpointer *gp)
 {
-    logpost(x, (const int)x->level, "%s%s(pointer %lx)", 
+    logpost(x, (const int)x->level, "%s%s(pointer %lx)",
             x->tag->s_name, (*x->tag->s_name ? ": " : ""), gp);
 }
 
@@ -48,7 +48,7 @@ static void logpost_anything(t_logpost *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_symbol* output = args2symbol(argc, argv);
     logpost(x, (const int)x->level, "%s%s%s %s",
-            x->tag->s_name, (*x->tag->s_name ? ": " : ""), 
+            x->tag->s_name, (*x->tag->s_name ? ": " : ""),
             s->s_name, output->s_name);
 }
 
@@ -66,7 +66,8 @@ static void *logpost_new(t_symbol *sel, int argc, t_atom *argv)
         x->level = atom_getfloatarg(0, argc, argv);
     if (argc > 1)
     {
-        argc--; argv++; // lose the level arg
+        argc--;
+        argv++; // lose the level arg
         x->tag = args2symbol(argc, argv);
     }
     floatinlet_new(&x->x_obj, &x->level);

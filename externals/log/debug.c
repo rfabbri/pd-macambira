@@ -28,13 +28,13 @@ static t_symbol* args2symbol(int argc, t_atom *argv)
 
 static void debug_bang(t_debug *x)
 {
-    logpost(x, x->level, "%s%sbang", 
+    logpost(x, x->level, "%s%sbang",
             x->tag->s_name, (*x->tag->s_name ? ": " : ""));
 }
 
 static void debug_pointer(t_debug *x, t_gpointer *gp)
 {
-    logpost(x, x->level, "%s%s(pointer %lx)", 
+    logpost(x, x->level, "%s%s(pointer %lx)",
             x->tag->s_name, (*x->tag->s_name ? ": " : ""), gp);
 }
 
@@ -48,7 +48,7 @@ static void debug_anything(t_debug *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_symbol* output = args2symbol(argc, argv);
     logpost(x, (const int)x->level, "%s%s%s %s",
-            x->tag->s_name, (*x->tag->s_name ? ": " : ""), 
+            x->tag->s_name, (*x->tag->s_name ? ": " : ""),
             s->s_name, output->s_name);
 }
 
@@ -65,11 +65,11 @@ static void *debug_new(t_symbol *s, int argc, t_atom *argv)
 void debug_setup(void)
 {
     debug_class = class_new(gensym("debug"),
-                              (t_newmethod)debug_new,
-                              0,
-                              sizeof(t_debug),
-                              CLASS_DEFAULT,
-                              A_GIMME, 0);
+                            (t_newmethod)debug_new,
+                            0,
+                            sizeof(t_debug),
+                            CLASS_DEFAULT,
+                            A_GIMME, 0);
     class_addbang(debug_class, debug_bang);
     class_addfloat(debug_class, debug_float);
     class_addpointer(debug_class, debug_pointer);
