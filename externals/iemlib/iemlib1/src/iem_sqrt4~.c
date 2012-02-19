@@ -12,8 +12,8 @@ iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 
 /* ------------------------ iem_sqrt4~ ----------------------------- */
 
-t_float *iem_sqrt4_tilde_exptab=(t_float *)0L;
-t_float *iem_sqrt4_tilde_mantissatab=(t_float *)0L;
+static t_float *iem_sqrt4_tilde_exptab=(t_float *)0L;
+static t_float *iem_sqrt4_tilde_mantissatab=(t_float *)0L;
 
 static t_class *iem_sqrt4_tilde_class;
 
@@ -66,16 +66,15 @@ static void iem_sqrt4_tilde_maketable(void)
 {
   int i;
   t_float f;
-  long l;
+  union tabfudge_f tf;
   
   if(!iem_sqrt4_tilde_exptab)
   {
     iem_sqrt4_tilde_exptab = (t_float *)getbytes(sizeof(t_float) * IEMSQRT4TAB1SIZE);
     for(i=0; i<IEMSQRT4TAB1SIZE; i++)
     {
-      l = (i ? (i == IEMSQRT4TAB1SIZE-1 ? IEMSQRT4TAB1SIZE-2 : i) : 1)<< 23;
-      *(long *)(&f) = l;
-      iem_sqrt4_tilde_exptab[i] = 1.0f/sqrt(f); 
+      tf.tf_l = (i ? (i == IEMSQRT4TAB1SIZE-1 ? IEMSQRT4TAB1SIZE-2 : i) : 1)<< 23;
+      iem_sqrt4_tilde_exptab[i] = 1.0f/sqrt(tf.tf_f); 
     }
   }
   if(!iem_sqrt4_tilde_mantissatab)
