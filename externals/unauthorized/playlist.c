@@ -98,54 +98,11 @@ int alphasort(const struct dirent **, const struct dirent **);
 t_widgetbehavior playlist_widgetbehavior;
 static t_class *playlist_class;
 
-static int guidebug=0;
-
 static char   *playlist_version = "playlist: 1 click file chooser : version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define MAX_DIR_LENGTH 2048 // maximum length for a directory name
 
 #define MIN(a,b) (a>b?b:a)
-
-#define SYS_VGUI2(a,b) if (guidebug) \
-                         post(a,b);\
-                         sys_vgui(a,b)
-
-#define SYS_VGUI3(a,b,c) if (guidebug) \
-                         post(a,b,c);\
-                         sys_vgui(a,b,c)
-
-#define SYS_VGUI4(a,b,c,d) if (guidebug) \
-                         post(a,b,c,d);\
-                         sys_vgui(a,b,c,d)
-
-#define SYS_VGUI5(a,b,c,d,e) if (guidebug) \
-                         post(a,b,c,d,e);\
-                         sys_vgui(a,b,c,d,e)
-
-#define SYS_VGUI6(a,b,c,d,e,f) if (guidebug) \
-                         post(a,b,c,d,e,f);\
-                         sys_vgui(a,b,c,d,e,f)
-
-#define SYS_VGUI7(a,b,c,d,e,f,g) if (guidebug) \
-                         post(a,b,c,d,e,f,g);\
-                         sys_vgui(a,b,c,d,e,f,g)
-
-#define SYS_VGUI8(a,b,c,d,e,f,g,h) if (guidebug) \
-                         post(a,b,c,d,e,f,g,h);\
-                         sys_vgui(a,b,c,d,e,f,g,h)
-
-#define SYS_VGUI9(a,b,c,d,e,f,g,h,i) if (guidebug) \
-                         post(a,b,c,d,e,f,g,h,i );\
-                         sys_vgui(a,b,c,d,e,f,g,h,i)
-
-#define SYS_VGUI10(a,b,c,d,e,f,g,h,i,j) if (guidebug) \
-                         post(a,b,c,d,e,f,g,h,i,j );\
-                         sys_vgui(a,b,c,d,e,f,g,h,i,j)
-
-#define SYS_VGUI11(a,b,c,d,e,f,g,h,i,j,k) if (guidebug) \
-                         post(a,b,c,d,e,f,g,h,i,j,k );\
-                         sys_vgui(a,b,c,d,e,f,g,h,i,j,k)
-
 
 typedef struct _playlist
 {
@@ -189,10 +146,10 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
     tv.tv_nsec = 10000000;
 
     // set title
-    SYS_VGUI3(".x%lx.c delete %xTITLE\n", canvas, x);
+    sys_vgui(".x%lx.c delete %xTITLE\n", canvas, x);
     if ( x->x_graphics )
     {
-        SYS_VGUI8(".x%lx.c create text %d %d -width %d -text \"%s\" -anchor w -font %s -tags %xTITLE\n",
+        sys_vgui(".x%lx.c create text %d %d -width %d -text \"%s\" -anchor w -font %s -tags %xTITLE\n",
                   canvas,
                   text_xpix(&x->x_obj, glist)+5,
                   text_ypix(&x->x_obj, glist)-10,
@@ -205,7 +162,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
     // delete previous entries
     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
     {
-        SYS_VGUI4(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
+        sys_vgui(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
     }
 
     // display the content of current directory
@@ -241,8 +198,6 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
         x->x_pnentries = nentries;
         for ( i=0; i<nentries; i++ )
         {
-            size_t nmatches = 0;
-            regmatch_t matchinfos[1];
             DIR* tmpdir;
 
             // ckeck if that entry should be displayed
@@ -271,7 +226,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
                     x->x_lastseen = x->x_nentries;
                     strncpy( wrappedname, x->x_dentries[x->x_nentries],  MIN(x->x_width/x->x_charwidth, MAX_DIR_LENGTH) );
                     wrappedname[ x->x_width/x->x_charwidth ] = '\0';
-                    SYS_VGUI11(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
+                    sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
                                canvas,
                                text_xpix(&x->x_obj, glist)+5,
                                text_ypix(&x->x_obj, glist)+5+(x->x_nentries-x->x_firstseen)*x->x_charheight,
@@ -345,11 +300,11 @@ static void playlist_draw_new(t_playlist *x, t_glist *glist)
     x->x_glist = glist;
     if ( x->x_graphics )
     {
-        SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xPLAYLIST\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xPLAYLIST\n",
                   canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
                   text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
                   x->x_bgcolor, x);
-        SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xSCROLLLIST\n",
+        sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %xSCROLLLIST\n",
                   canvas, text_xpix(&x->x_obj, glist)+4*x->x_width/5, text_ypix(&x->x_obj, glist),
                   text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
                   x->x_sbcolor, x);
@@ -369,24 +324,24 @@ static void playlist_draw_move(t_playlist *x, t_glist *glist)
 
     if ( x->x_graphics )
     {
-        SYS_VGUI7(".x%lx.c coords %xPLAYLIST %d %d %d %d\n",
+        sys_vgui(".x%lx.c coords %xPLAYLIST %d %d %d %d\n",
                   canvas, x,
                   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
                   text_xpix(&x->x_obj, glist)+x->x_width,
                   text_ypix(&x->x_obj, glist)+x->x_height);
-        SYS_VGUI7(".x%lx.c coords %xSCROLLLIST %d %d %d %d\n",
+        sys_vgui(".x%lx.c coords %xSCROLLLIST %d %d %d %d\n",
                   canvas, x,
                   text_xpix(&x->x_obj, glist)+4*x->x_width/5, text_ypix(&x->x_obj, glist),
                   text_xpix(&x->x_obj, glist)+x->x_width,
                   text_ypix(&x->x_obj, glist)+x->x_height);
-        SYS_VGUI5(".x%lx.c coords %xTITLE %d %d\n",
+        sys_vgui(".x%lx.c coords %xTITLE %d %d\n",
                   canvas, x,
                   text_xpix(&x->x_obj, glist)+5, text_ypix(&x->x_obj, glist)-10 );
     }
     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
     {
         // nanosleep( &tv, NULL );
-        SYS_VGUI6(".x%lx.c coords %xENTRY%d %d %d\n",
+        sys_vgui(".x%lx.c coords %xENTRY%d %d %d\n",
                   canvas, x, i,
                   text_xpix(&x->x_obj, glist)+5,
                   text_ypix(&x->x_obj, glist)+5+(i-x->x_firstseen)*x->x_charheight);
@@ -402,13 +357,13 @@ static void playlist_draw_erase(t_playlist* x, t_glist* glist)
 
     if ( x->x_graphics )
     {
-        SYS_VGUI3(".x%lx.c delete %xPLAYLIST\n", canvas, x);
-        SYS_VGUI3(".x%lx.c delete %xSCROLLLIST\n", canvas, x);
-        SYS_VGUI3(".x%lx.c delete %xTITLE\n", canvas, x);
+        sys_vgui(".x%lx.c delete %xPLAYLIST\n", canvas, x);
+        sys_vgui(".x%lx.c delete %xSCROLLLIST\n", canvas, x);
+        sys_vgui(".x%lx.c delete %xTITLE\n", canvas, x);
     }
     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
     {
-        SYS_VGUI4(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
+        sys_vgui(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
     }
 }
 
@@ -420,11 +375,11 @@ static void playlist_draw_select(t_playlist* x, t_glist* glist)
     if(x->x_selected)
     {
         /* sets the item in blue */
-        if (x->x_graphics) SYS_VGUI3(".x%lx.c itemconfigure %xPLAYLIST -outline #0000FF\n", canvas, x);
+        if (x->x_graphics) sys_vgui(".x%lx.c itemconfigure %xPLAYLIST -outline #0000FF\n", canvas, x);
     }
     else
     {
-        if (x->x_graphics) SYS_VGUI3(".x%lx.c itemconfigure %xPLAYLIST -outline #000000\n", canvas, x);
+        if (x->x_graphics) sys_vgui(".x%lx.c itemconfigure %xPLAYLIST -outline #000000\n", canvas, x);
     }
 }
 
@@ -520,7 +475,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                 {
                     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
                     {
-                        SYS_VGUI4(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
+                        sys_vgui(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
                     }
                     x->x_firstseen++;
                     for ( i=x->x_firstseen; i< x->x_nentries; i++ )
@@ -532,7 +487,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                             x->x_lastseen = i;
                             strncpy( wrappedname, x->x_dentries[i],  x->x_width/x->x_charwidth );
                             wrappedname[ x->x_width/x->x_charwidth ] = '\0';
-                            SYS_VGUI11(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
+                            sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
                                        canvas,
                                        text_xpix(&x->x_obj, x->x_glist)+5,
                                        text_ypix(&x->x_obj, x->x_glist)+5+(i-x->x_firstseen)*x->x_charheight,
@@ -545,7 +500,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                         }
                         else break;
                     }
-                    SYS_VGUI5(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
+                    sys_vgui(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
                               canvas, x, x->x_itemselected, x->x_secolor);
                     // post( "playlist : moved down first=%d last=%d", x->x_firstseen, x->x_lastseen );
                 }
@@ -561,7 +516,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                 {
                     for ( i=x->x_firstseen; i<=x->x_lastseen; i++ )
                     {
-                        SYS_VGUI4(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
+                        sys_vgui(".x%lx.c delete %xENTRY%d\n", canvas, x, i);
                     }
                     x->x_firstseen--;
                     for ( i=x->x_firstseen; i< x->x_nentries; i++ )
@@ -573,7 +528,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                             x->x_lastseen = i;
                             strncpy( wrappedname, x->x_dentries[i],  x->x_width/x->x_charwidth );
                             wrappedname[ x->x_width/x->x_charwidth ] = '\0';
-                            SYS_VGUI11(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\"  \
+                            sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\"  \
                           -anchor w -font %s -tags %xENTRY%d\n",
                                        canvas,
                                        text_xpix(&x->x_obj, x->x_glist)+5,
@@ -587,7 +542,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                         }
                         else break;
                     }
-                    SYS_VGUI5(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
+                    sys_vgui(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
                               canvas, x, x->x_itemselected, x->x_secolor);
                     // post( "playlist : moved up first=%d last=%d", x->x_firstseen, x->x_lastseen );
                 }
@@ -631,10 +586,10 @@ static int playlist_click(t_gobj *z, struct _glist *glist,
         if ( (xpix-text_xpix(&x->x_obj, glist)) < 4*x->x_width/5 )
         {
             // deselect previously selected item
-            SYS_VGUI5(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
+            sys_vgui(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
                       canvas, x, x->x_itemselected, x->x_fgcolor);
             x->x_itemselected = x->x_firstseen + (ypix-text_ypix(&x->x_obj, glist))/x->x_charheight;
-            SYS_VGUI5(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
+            sys_vgui(".x%lx.c itemconfigure %xENTRY%d -fill %s\n",
                       canvas, x, x->x_itemselected, x->x_secolor);
             // post( "playlist : selected item : %d", x->x_itemselected );
             if ( x->x_dentries && ( x->x_itemselected < x->x_nentries ) )
@@ -743,9 +698,8 @@ static void playlist_dialog(t_playlist *x, t_symbol *s, int argc, t_atom *argv)
 
 static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
 {
-    t_int i, argoffset=0;
+    t_int argoffset=0;
     t_playlist *x;
-    char *tmpcurdir;
 
     x = (t_playlist *)pd_new(playlist_class);
 
@@ -790,7 +744,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
         }
         if ( (int)argv[1].a_w.w_float <= 0 )
         {
-            pd_error(x, "playlist : wrong width (%d)", (t_int)(int)argv[1].a_w.w_float );
+            pd_error(x, "playlist : wrong width (%d)", (int)argv[1].a_w.w_float );
             pd_error(x, "playlist : usage : playlist <extension> <width> <height>" );
             return NULL;
         }
@@ -805,7 +759,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
         }
         if ( (int)argv[2].a_w.w_float <= 0 )
         {
-            pd_error(x, "playlist : wrong height (%d)", (t_int)(int)argv[2].a_w.w_float );
+            pd_error(x, "playlist : wrong height (%d)", (int)argv[2].a_w.w_float );
             pd_error(x, "playlist : usage : playlist <extension> <width> <height>" );
             return NULL;
         }
@@ -840,13 +794,13 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
                      (int)x->x_charheight, argv[5].a_w.w_symbol->s_name );
             argoffset=0;
         }
-        verbose(0, "playlist : font : %s, size : %d", x->x_font, x->x_charheight );
+        verbose(0, "playlist : font : %s, size : %d", x->x_font, (int)x->x_charheight );
     }
     if ( argc >= 7-argoffset )
     {
         if ( argv[6-argoffset].a_type != A_SYMBOL )
         {
-            pd_error(x, "playlist : wrong arguments (background color : %d)", 7-argoffset );
+            pd_error(x, "playlist : wrong arguments (background color : %d)", 7-(int)argoffset );
             return NULL;
         }
         strcpy( x->x_bgcolor, argv[6-argoffset].a_w.w_symbol->s_name );
@@ -855,7 +809,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[7-argoffset].a_type != A_SYMBOL )
         {
-            pd_error(x, "playlist : wrong arguments (scrollbar color : %d)", 8-argoffset );
+            pd_error(x, "playlist : wrong arguments (scrollbar color : %d)", 8-(int)argoffset );
             return NULL;
         }
         strcpy( x->x_sbcolor, argv[7-argoffset].a_w.w_symbol->s_name );
@@ -864,7 +818,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[8-argoffset].a_type != A_SYMBOL )
         {
-            pd_error(x, "playlist : wrong arguments (foreground color : %d)", 9-argoffset );
+            pd_error(x, "playlist : wrong arguments (foreground color : %d)", 9-(int)argoffset );
             return NULL;
         }
         strcpy( x->x_fgcolor, argv[8-argoffset].a_w.w_symbol->s_name );
@@ -873,7 +827,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     {
         if ( argv[9-argoffset].a_type != A_SYMBOL )
         {
-            pd_error(x, "playlist : wrong arguments (selection color : %d)", 10-argoffset );
+            pd_error(x, "playlist : wrong arguments (selection color : %d)", 10-(int)argoffset );
             return NULL;
         }
         strcpy( x->x_secolor, argv[9-argoffset].a_w.w_symbol->s_name );
@@ -889,7 +843,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
     x->x_dentries = NULL;
 
     // get current directory full path
-    t_symbol *cwd = canvas_getdir(canvas_getcurrent());
+    t_symbol *cwd = canvas_getdir(x->x_glist);
     int cwdlen = strlen(cwd->s_name);
     x->x_curdir = ( char * ) getbytes( cwdlen );
     strncpy( x->x_curdir, cwd->s_name, cwdlen );
@@ -959,15 +913,14 @@ static void playlist_seek(t_playlist *x, t_floatarg fseeked)
     {
         return;
     }
-    SYS_VGUI5(".x%lx.c itemconfigure %xENTRY%d -fill %s\n", canvas, x, x->x_itemselected, x->x_fgcolor);
+    sys_vgui(".x%lx.c itemconfigure %xENTRY%d -fill %s\n", canvas, x, x->x_itemselected, x->x_fgcolor);
     x->x_itemselected = iout;
-    SYS_VGUI5(".x%lx.c itemconfigure %xENTRY%d -fill %s\n", canvas, x, x->x_itemselected, x->x_secolor);
+    sys_vgui(".x%lx.c itemconfigure %xENTRY%d -fill %s\n", canvas, x, x->x_itemselected, x->x_secolor);
     playlist_output_current(x);
 }
 
 static void playlist_location(t_playlist *x, t_symbol *flocation)
 {
-    int iout=0;
     char olddir[ MAX_DIR_LENGTH ];           /* remember old location  */
 
     strcpy( olddir, x->x_curdir );
@@ -1024,7 +977,7 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
 
 void playlist_setup(void)
 {
-    verbose(0,  playlist_version );
+    verbose(0, "%s", playlist_version );
     playlist_class = class_new(gensym("playlist"), (t_newmethod)playlist_new,
                                (t_method)playlist_free, sizeof(t_playlist),
                                CLASS_DEFAULT, A_GIMME, 0);
