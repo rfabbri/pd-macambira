@@ -321,7 +321,7 @@ ifeq ($(UNAME),Darwin)
 # force tclpd to use the Tcl.framework built into Pd-extended
 	install_name_tool -change \
 		/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl \
-		@executable_path/../Frameworks/Tcl.framework/Versions/8.5/Tcl \
+		@executable_path/../../Frameworks/Tcl.framework/Versions/8.5/Tcl \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 endif
 
