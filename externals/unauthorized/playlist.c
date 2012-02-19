@@ -100,7 +100,7 @@ static t_class *playlist_class;
 
 static char   *playlist_version = "playlist: 1 click file chooser : version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
 
-#define MAX_DIR_LENGTH 2048 // maximum length for a directory name
+#define MAX_DIR_LENGTH MAXPDSTRING // maximum length for a directory name
 
 #define MIN(a,b) (a>b?b:a)
 
