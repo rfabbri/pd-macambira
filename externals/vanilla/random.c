@@ -9,16 +9,26 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef UNISTD
+#ifdef _WIN32
+#include <wtypes.h>
+#include <time.h>
+#else
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/times.h>
 #include <sys/param.h>
 #include <unistd.h>
+#endif /* _WIN32 */
+
+#if defined (__APPLE__) || defined (__FreeBSD__)
+#define CLOCKHZ CLK_TCK
 #endif
-#ifdef _WIN32
-#include <wtypes.h>
+#if defined (__linux__) || defined (__CYGWIN__) || defined (ANDROID)
+#define CLOCKHZ sysconf(_SC_CLK_TCK)
+#endif
+#if defined (__FreeBSD_kernel__) || defined(__GNU__)
 #include <time.h>
+#define CLOCKHZ CLOCKS_PER_SEC
 #endif
 
 static t_class *random_class;

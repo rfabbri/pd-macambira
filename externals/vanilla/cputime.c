@@ -9,23 +9,26 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef UNISTD
+#ifdef _WIN32
+#include <wtypes.h>
+#include <time.h>
+#else
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/times.h>
 #include <sys/param.h>
 #include <unistd.h>
-#endif
-#ifdef _WIN32
-#include <wtypes.h>
-#include <time.h>
-#endif
+#endif /* _WIN32 */
 
 #if defined (__APPLE__) || defined (__FreeBSD__)
 #define CLOCKHZ CLK_TCK
 #endif
-#if defined (__linux__)
+#if defined (__linux__) || defined (__CYGWIN__) || defined (ANDROID)
 #define CLOCKHZ sysconf(_SC_CLK_TCK)
+#endif
+#if defined (__FreeBSD_kernel__) || defined(__GNU__)
+#include <time.h>
+#define CLOCKHZ CLOCKS_PER_SEC
 #endif
 
 static t_class *cputime_class;
@@ -33,21 +36,17 @@ static t_class *cputime_class;
 typedef struct _cputime
 {
     t_object x_obj;
-#ifdef UNISTD
-    struct tms x_setcputime;
-#endif
 #ifdef _WIN32
     LARGE_INTEGER x_kerneltime;
     LARGE_INTEGER x_usertime;
     int x_warned;
-#endif
+#else
+    struct tms x_setcputime;
+#endif /* _WIN32 */
 } t_cputime;
 
 static void cputime_bang(t_cputime *x)
 {
-#ifdef UNISTD
-    times(&x->x_setcputime);
-#endif
 #ifdef _WIN32
     FILETIME ignorethis, ignorethat;
     BOOL retval;
@@ -61,12 +60,14 @@ static void cputime_bang(t_cputime *x)
         x->x_kerneltime.QuadPart = 0;
         x->x_usertime.QuadPart = 0;
     }
-#endif
+#else
+    times(&x->x_setcputime);
+#endif /* _WIN32 */
 }
 
 static void cputime_bang2(t_cputime *x)
 {
-#ifdef UNISTD
+#ifndef _WIN32
     t_float elapsedcpu;
     struct tms newcputime;
     times(&newcputime);
@@ -74,8 +75,7 @@ static void cputime_bang2(t_cputime *x)
         newcputime.tms_utime + newcputime.tms_stime -
             x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / CLOCKHZ;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
-#endif
-#ifdef _WIN32
+#else
     t_float elapsedcpu;
     FILETIME ignorethis, ignorethat;
     LARGE_INTEGER usertime, kerneltime;
@@ -89,7 +89,7 @@ static void cputime_bang2(t_cputime *x)
                 (usertime.QuadPart - x->x_usertime.QuadPart));
     else elapsedcpu = 0;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
-#endif
+#endif /* NOT _WIN32 */
 }
 
 static void *cputime_new(void)
