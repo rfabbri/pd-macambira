@@ -2,6 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 
+extern int sys_verbose;  /* included in pd, also defined in s_stuff.h */
+
 /* from tcl_class.c: */
 //void source_table_remove(const char *object_name);
 void source_table_add(const char *object_name, const char *source_path);
@@ -22,7 +24,8 @@ extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
     }
 
     /* try looking in the path for (objectname).(tcl) ... */
-    verbose(-1, "tclpd loader: searching for %s in path...", objectname);
+    if(sys_verbose)
+        verbose(-1, "tclpd loader: searching for %s in path...", objectname);
     if ((fd = canvas_open(canvas, objectname, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto found;
@@ -33,12 +36,14 @@ extern int tclpd_do_load_lib(t_canvas *canvas, char *objectname) {
     strcat(filename, "/");
     strncat(filename, classname, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING - 1] = 0;
-    verbose(-1, "tclpd loader: searching for %s in path...", filename);
+    if(sys_verbose)
+        verbose(-1, "tclpd loader: searching for %s in path...", filename);
     if ((fd = canvas_open(canvas, filename, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto found;
 
-    verbose(-1, "tclpd loader: found nothing!");
+    if(sys_verbose)
+        verbose(-1, "tclpd loader: found nothing!");
     return 0;
 
 found:
