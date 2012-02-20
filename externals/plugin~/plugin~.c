@@ -17,7 +17,6 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,12 +69,6 @@ void plugin_tilde_setup (void)
                                   sizeof (Pd_Plugin_Tilde),
                                   0,
                                   A_DEFSYM, A_DEFSYM, 0);
-  assert (plugin_tilde_class != NULL);
-
-  /* Let's be explicit in not converting the signals in any way */
-  assert (sizeof (float) == sizeof (t_float));
-
-  assert (sizeof (float) == sizeof (LADSPA_Data));
 
   class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_dsp,gensym ("dsp"),0);
   class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_control,gensym ("control"),A_SYMBOL, A_FLOAT, 0);
@@ -234,9 +227,6 @@ static t_int* plugin_tilde_perform (t_int* w)
   t_float** audio_inputs = NULL;
   t_float** audio_outputs = NULL;
   int num_samples = 0;
-
-  /* precondition(s) */
-  assert (w != NULL);
  
   /* Unpack DSP parameter vector */
   x = (Pd_Plugin_Tilde*)(w[1]);
@@ -547,10 +537,11 @@ int plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
                                      unsigned long sample_rate)
 {
   /* precondition(s) */
-  assert (x != NULL);
-  assert (lib_name != NULL);
-  assert (name != NULL);
-  assert (sample_rate != 0);
+  if (x == NULL || lib_name == NULL || name == NULL || sample_rate == 0)
+  {
+      pd_error(x, "NULL arguments when opening plugin");
+      return;
+  }
 
   /* Initialize object struct */
   x->plugin.ladspa.type = NULL;
@@ -778,9 +769,6 @@ void plugin_tilde_ladspa_set_control_input_by_name (Pd_Plugin_Tilde* x,
   unsigned ctrl_input_index = 0;
   int found_port = 0; /* boolean */
 
-  /* precondition(s) */
-  assert (x != NULL);
-
   if (name == NULL || strlen (name) == 0) {
     pd_error(x, "plugin~: no control port name specified");
     return;
@@ -837,11 +825,6 @@ void plugin_tilde_ladspa_set_control_input_by_index (Pd_Plugin_Tilde* x,
   unsigned port_index = 0;
   unsigned ctrl_input_count = 0;
   int found_port = 0; /* boolean */
- 
-  /* precondition(s) */
-  assert (x != NULL);
-  /* assert (ctrl_input_index >= 0); causes a warning */
-  /* assert (ctrl_input_index < x->num_control_inputs); */
 
   if(NULL==x->plugin.ladspa.type) {
     error("plugin~: unable to determine LADSPA type");
@@ -886,7 +869,6 @@ void plugin_tilde_ladspa_set_control_input_by_index (Pd_Plugin_Tilde* x,
      bounded_from_below = 1;
      lower_bound = hint->LowerBound;
      if (LADSPA_IS_HINT_SAMPLE_RATE (hint->HintDescriptor)) {
-     assert (x->plugin.ladspa.sample_rate != 0);
      lower_bound *= (float)x->plugin.ladspa.sample_rate;
      }
      }
@@ -894,7 +876,6 @@ void plugin_tilde_ladspa_set_control_input_by_index (Pd_Plugin_Tilde* x,
      bounded_from_above = 1;
      upper_bound = hint->UpperBound;
      if (LADSPA_IS_HINT_SAMPLE_RATE (hint->HintDescriptor)) {
-     assert (x->plugin.ladspa.sample_rate != 0);
      upper_bound *= (float)x->plugin.ladspa.sample_rate;
      }
      }
@@ -996,8 +977,6 @@ static void plugin_tilde_ladspa_connect_control_ports (Pd_Plugin_Tilde* x)
 
 static int plugin_tilde_ladspa_alloc_outofplace_memory (Pd_Plugin_Tilde* x, unsigned long buflen)
 {
-  assert (x != NULL);
-
   plugin_tilde_ladspa_free_outofplace_memory (x);
 
   if (LADSPA_IS_INPLACE_BROKEN (x->plugin.ladspa.type->Properties))
@@ -1025,8 +1004,6 @@ static int plugin_tilde_ladspa_alloc_outofplace_memory (Pd_Plugin_Tilde* x, unsi
 
 static void plugin_tilde_ladspa_free_outofplace_memory (Pd_Plugin_Tilde* x)
 {
-  assert (x != NULL);
-
   if (x->plugin.ladspa.outofplace_audio_outputs != NULL)
     {
       unsigned i = 0;
