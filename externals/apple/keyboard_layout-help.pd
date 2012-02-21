@@ -1,7 +1,7 @@
 #N canvas 0 26 553 346 10;
 #X msg 116 32 bang;
 #X msg 144 63 menu;
-#X obj 242 244 flatspace/popup 124 25 #ffffff _ option;
+#X obj 242 244 flatgui/popup 124 25 #ffffff _ option;
 #X msg 141 209 options;
 #X obj 203 163 route clear;
 #X symbolatom 116 277 0 0 0 0 - - -;
