@@ -32,5 +32,9 @@ for section in abstractions doc externals packages pd scripts; do
          cd ..
 done
 
-test -e $dir/pd/.git && \
-    cd $dir/pd && git pull origin master
+if [ -e $svn_root_dir/pd/.git ]; then
+	echo "cd $svn_root_dir/pd && git pull origin master"
+    cd $svn_root_dir/pd && git pull origin master
+else
+	echo "no git found at $svn_root_dir/pd/.git"
+fi
