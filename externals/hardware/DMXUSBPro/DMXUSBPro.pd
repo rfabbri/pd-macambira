@@ -7,7 +7,7 @@
 #X obj 38 237 list append 231;
 #X obj 37 98 list prepend 0;
 #X msg 65 175 126 6 \$1 0;
-#X obj 266 295 flatspace/comport;
+#X obj 266 295 comport;
 #X obj 420 189 loadbang;
 #X msg 420 217 baud 115200;
 #X connect 0 0 1 0;
