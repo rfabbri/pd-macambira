@@ -17,7 +17,8 @@
 #include "mtx_spherical_harmonics/legendre_a.h"
 
 static void legendre_first_recurrence (double *sintheta, LegendreWorkSpace *wl) {
-   int n,l,l0;
+   int n;
+   unsigned int l,l0;
    int nmo0=0;
    int n0=1;
    const int incr=(wl->nmax+1)*(wl->nmax+2)/2;
