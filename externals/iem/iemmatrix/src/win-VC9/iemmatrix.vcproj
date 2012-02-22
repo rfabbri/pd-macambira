@@ -71,7 +71,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/export:iemmatrix_setup"
 				AdditionalDependencies="pd.lib"
-				OutputFile="..\iemmatrix.dll"
+				OutputFile="..\..\iemmatrix.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\..\pd\src;&quot;$(ProgramFiles)\pd\bin&quot;"
