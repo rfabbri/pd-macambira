@@ -11,7 +11,6 @@
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
  *
  */
-
 #include "iemmatrix.h"
 #include <stdlib.h>
 
@@ -54,28 +53,28 @@ static void getTFloatMatrix (int rows, int columns, t_float ***mtx, t_float **ar
    if (!size)
       return;
    
-   if (*array=ptr=(t_float *)calloc(sizeof(t_float),size)) {
-      if (*mtx=dptr=(t_float **)calloc(sizeof(t_float *),rows)) {
+   if (*array=ptr=(t_float *)calloc(size, sizeof(t_float))) {
+      if (*mtx=dptr=(t_float **)calloc(rows, sizeof(t_float *))) {
 	 for(;rows-- ; ptr+=columns) {
 	    *dptr++ = ptr;
 	 }
       } else {
-	 freebytes (*array,sizeof(t_float)*size);
+	 free (*array);
 	 array=0;
       }
    }
 }
 
-static void deleteTFloatMatrix (int rows, int columns, t_float ***mtx, t_float **array)
+static void deleteTFloatMatrix (int rows, int columns, t_float ***mtx, t_float **myarray)
 {
    int size = rows*columns;
-
    if (*mtx) 
-      freebytes (*mtx, sizeof(t_float*) * columns);
-   if (*array)
-      freebytes (*array, sizeof(t_float) * size);
+      free (*mtx);
+
+   if (*myarray)
+      free (*myarray);
    *mtx=0;
-   *array=0;
+   *myarray=0;
 }
 
 
@@ -85,7 +84,7 @@ static void deleteMTXConv (MTXConv *mtx_conv_obj)
    deleteTFloatMatrix (mtx_conv_obj->rows, mtx_conv_obj->columns, &mtx_conv_obj->x, &mtx_conv_obj->x_array);
    deleteTFloatMatrix (mtx_conv_obj->rows_y, mtx_conv_obj->columns_y, &mtx_conv_obj->y, &mtx_conv_obj->y_array);
    if (mtx_conv_obj->list)
-      freebytes (mtx_conv_obj->list, sizeof(t_float) * (mtx_conv_obj->size_y + 2));
+      free (mtx_conv_obj->list);
          
    mtx_conv_obj->list = 0;
 }
@@ -263,10 +262,9 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      mtx_conv_obj->columns_y = columns_y;
 
      if (list_ptr)
-	list_ptr = (t_atom *) resizebytes (list_ptr, sizeof(t_atom) * (mtx_conv_obj->size_y+2),
-                                          sizeof (t_atom) * (size_y+2));
+	list_ptr = (t_atom *) realloc (list_ptr, sizeof (t_atom) * (size_y+2));
      else
-	list_ptr = (t_atom *) getbytes (sizeof (t_atom) * (size_y+2));
+	list_ptr = (t_atom *) calloc (size_y+2, sizeof (t_atom));
      mtx_conv_obj->list = list_ptr;
      if (!list_ptr) {
 	post("mtx_conv: memory allocation failed!");
