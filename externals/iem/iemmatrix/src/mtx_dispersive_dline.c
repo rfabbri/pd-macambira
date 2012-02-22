@@ -153,7 +153,7 @@ static allpass_chain_cycle (t_float x, t_float *y, t_float *z, int n, t_float a)
 	}
 }
 
-static mtx_dispersive_dline_matrix(t_mtx_dispersive_dline *x, t_symbol *s,
+static void mtx_dispersive_dline_matrix(t_mtx_dispersive_dline *x, t_symbol *s,
       int argc, t_atom *argv)
 {
   int channels=(int)atom_getfloat(argv);
@@ -194,10 +194,12 @@ static void mtx_dispersive_dline_helper(void)
 static void *mtx_dispersive_dline_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_mtx_dispersive_dline *x = (t_mtx_dispersive_dline *)pd_new(mtx_dispersive_dline_class);
-  x->list_outlet = outlet_new(&x->x_obj, &s_list);
   t_float length=1;
   t_float lambda=0;
   t_atom resize_msg[2];
+
+  x->list_outlet = outlet_new(&x->x_obj, &s_list);
+
   switch ((argc>2)?2:argc)
   {
      case 2:

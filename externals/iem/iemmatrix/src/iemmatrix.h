@@ -53,6 +53,9 @@
 
 #include "m_pd.h"
 
+#ifndef M_PI
+
+#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -71,10 +74,18 @@
 #include <memory.h>
 
 #ifdef __WIN32__
+#ifndef fabsf
 # define fabsf fabs
+#endif
+#ifndef sqrtf
 # define sqrtf sqrt
+#endif
+#ifndef powf
 # define powf pow
+#endif
+#ifndef atanf
 # define atanf atan
+#endif
 #endif
 
 #ifdef __APPLE__

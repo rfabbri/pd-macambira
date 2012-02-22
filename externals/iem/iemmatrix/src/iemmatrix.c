@@ -12,7 +12,6 @@
  *
  */
 #include "iemmatrix.h"
-
 void iemmatrix_sources_setup(void);
 
 void iemmatrix_setup(){

@@ -13,6 +13,7 @@
  */
 
 #include <math.h>
+#include <stdlib.h>
 
 #include "sph_radial.h"
 

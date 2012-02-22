@@ -16,7 +16,7 @@
 
 SHNorml *sharmonics_normalization_new (const size_t nmax) {
    SHNorml *wn;
-   int n,n0,m;
+   unsigned int n,n0,m;
    const double oneoversqrt2 = 1.0/sqrt(2);
    
    // memory allocation

@@ -22,8 +22,8 @@
 // ly0 and lp0 denote the starting position for one vertex in the arrays
 // see below to find out how the data is arranged
 static void sharmonics_initlegendrenormlzd(SHWorkSpace *ws) {
-   int n,m,ny0,np0;
-   int l,ly0,lp0;
+   unsigned int n,m,ny0,np0;
+   unsigned int l,ly0,lp0;
    const int pincr=(ws->nmax+1)*(ws->nmax+2)/2;
    const int yincr=(ws->nmax+1)*(ws->nmax+1);
 
@@ -49,9 +49,9 @@ static void sharmonics_initlegendrenormlzd(SHWorkSpace *ws) {
 // ly0 and lt0 denote the starting position for one vertex in the arrays
 // see below to find out how the data is arranged
 static void sharmonics_multcheby12(SHWorkSpace *ws) {
-   int n,m,ny0;
+   unsigned int n,m,ny0;
    const int nt0=ws->nmax;
-   int l,ly0,lt0;
+   unsigned int l,ly0,lt0;
    const int tincr=2*ws->nmax+1;
    const int yincr=(ws->nmax+1)*(ws->nmax+1);
 

@@ -38,7 +38,7 @@ void chebyshev12_free(Cheby12WorkSpace *wc) {
 }
 
 void chebyshev12(double *phi, Cheby12WorkSpace *wc) {
-   int l,l0,n;
+   unsigned int l,l0,n;
    const int incr=2*wc->nmax+1;
    double *cosphi;
    double *sinphi;

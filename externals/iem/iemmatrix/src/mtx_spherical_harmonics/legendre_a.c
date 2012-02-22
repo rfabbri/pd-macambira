@@ -34,7 +34,7 @@ static void legendre_first_recurrence (double *sintheta, LegendreWorkSpace *wl) 
 }
 
 static void legendre_second_recurrence (double *costheta, LegendreWorkSpace *wl) {
-   int m,n,l,l0;
+   unsigned int m,n,l,l0;
    int nmt0=-1;
    int nmo0=0;
    int n0=1;
@@ -88,7 +88,7 @@ void legendre_a_free(LegendreWorkSpace *wl) {
 }
 
 void legendre_a(double *theta, LegendreWorkSpace *wl) {
-   int l,l0;
+   unsigned int l,l0;
    const int incr=(wl->nmax+1)*(wl->nmax+2)/2;
    double *costheta;
    double *sintheta;

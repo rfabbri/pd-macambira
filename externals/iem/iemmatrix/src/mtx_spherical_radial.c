@@ -118,7 +118,7 @@ static void mTXSphMatrix (MTXSph *x, t_symbol *s,
   int columns = atom_getint (argv++);
   int size = rows * columns;
   int in_size = argc-2;
-  int n,ofs;
+  unsigned int n,ofs;
 
 
   /* size check */
