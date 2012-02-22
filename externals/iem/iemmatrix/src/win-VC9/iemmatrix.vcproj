@@ -45,8 +45,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\Programme\pd\src"
-				PreprocessorDefinitions="PD;MSW;__WIN32__;IEMMATRIX"
+				AdditionalIncludeDirectories="..\;&quot;$(ProgramFiles)\pd\src&quot;;..\..\..\..\..\pd\src"
+				PreprocessorDefinitions="PD;MSW;__WIN32__;IEMMATRIX;_USE_MATH_DEFINES;PACKAGE_VERSION=\&quot;0.2\&quot;"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
 				PrecompiledHeaderFile=".\obj/iemmatrix.pch"
@@ -70,12 +70,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/export:iemmatrix_setup"
-				AdditionalDependencies="wsock32.lib libc.lib oldnames.lib pd.lib"
+				AdditionalDependencies="pd.lib"
 				OutputFile="..\iemmatrix.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../bin,C:\Programme\pd\bin"
-				IgnoreAllDefaultLibraries="true"
+				AdditionalLibraryDirectories="..\..\..\..\..\pd\src;&quot;$(ProgramFiles)\pd\bin&quot;"
 				ProgramDatabaseFile="./iemmatrix.pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -1295,15 +1294,7 @@
 				Name="spherical_harmonics"
 				>
 				<File
-					RelativePath="..\mtx_spherical_harmonics\chebyshev12.c"
-					>
-				</File>
-				<File
 					RelativePath="..\mtx_spherical_harmonics\chebyshev12.h"
-					>
-				</File>
-				<File
-					RelativePath="..\mtx_spherical_harmonics\legendre_a.c"
 					>
 				</File>
 				<File
@@ -1311,23 +1302,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\mtx_spherical_harmonics\sharmonics.c"
-					>
-				</File>
-				<File
 					RelativePath="..\mtx_spherical_harmonics\sharmonics.h"
 					>
 				</File>
 				<File
-					RelativePath="..\mtx_spherical_harmonics\sharmonics_normalization.c"
-					>
-				</File>
-				<File
 					RelativePath="..\mtx_spherical_harmonics\sharmonics_normalization.h"
-					>
-				</File>
-				<File
-					RelativePath="..\mtx_spherical_harmonics\sph_radial.c"
 					>
 				</File>
 				<File
