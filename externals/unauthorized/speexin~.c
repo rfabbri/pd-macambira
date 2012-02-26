@@ -608,7 +608,7 @@ static void *speexin_new(t_floatarg fportno, t_floatarg fdographics)
 
 void speexin_tilde_setup(void)
 {
-    verbose(0,  speexin_version );
+    logpost(NULL, 4,  speexin_version );
     speexin_class = class_new(gensym("speexin~"),
                               (t_newmethod) speexin_new, (t_method) speexin_free,
                               sizeof(t_speexin),  CLASS_NOINLET, A_DEFFLOAT, A_DEFFLOAT, A_NULL);

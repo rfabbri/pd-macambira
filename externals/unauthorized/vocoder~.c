@@ -153,7 +153,7 @@ static void vocoder_free(t_vocoder *x)
 
 void vocoder_tilde_setup(void)
 {
-    verbose(0, vocoder_version);
+    logpost(NULL, 4, vocoder_version);
     vocoder_class = class_new(gensym("vocoder~"), (t_newmethod)vocoder_new, (t_method)vocoder_free,
                               sizeof(t_vocoder), 0, 0);
     CLASS_MAINSIGNALIN( vocoder_class, t_vocoder, x_f );

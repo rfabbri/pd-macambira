@@ -115,7 +115,7 @@ static void *countund_bang(t_countund *x)
 
 void countund_setup(void)
 {
-    verbose(0, countund_version);
+    logpost(NULL, 4, countund_version);
     countund_class = class_new(gensym("countund"), (t_newmethod)countund_new,
                                (t_method)countund_free,
                                sizeof(t_countund), 0, A_DEFFLOAT, 0);

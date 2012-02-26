@@ -297,8 +297,8 @@ void stat_setup(void)
 	/* add inlet message methods */
 	class_addmethod(stat_class,(t_method) stat_set,gensym("set"), 
 					A_DEFSYM, 0);
-    verbose(0, "[stat] %s",version);  
-    verbose(0, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
-    verbose(0, "\tcompiled on "__DATE__" at "__TIME__ " ");
+    logpost(NULL, 4, "[stat] %s",version);  
+    logpost(NULL, 4, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
+    logpost(NULL, 4, "\tcompiled on "__DATE__" at "__TIME__ " ");
 }
 

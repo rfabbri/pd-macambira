@@ -813,7 +813,7 @@ void freeverb_tilde_setup(void)
 	class_addmethod(freeverb_class, (t_method)freeverb_setbypass, gensym("bypass"), A_FLOAT, A_NULL);
 	class_addmethod(freeverb_class, (t_method)freeverb_mute, gensym("clear"), A_NULL);
     class_addmethod(freeverb_class, (t_method)freeverb_print, gensym("print"), A_NULL);
-	verbose(0, version);
+	logpost(NULL, 4, version);
 }
 
 #else

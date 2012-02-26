@@ -579,7 +579,7 @@ static void *samplebox_new(t_floatarg fsize)
 
 void samplebox_tilde_setup(void)
 {
-    verbose(0, samplebox_version);
+    logpost(NULL, 4, samplebox_version);
     samplebox_class = class_new(gensym("samplebox~"), (t_newmethod)samplebox_new, (t_method)samplebox_free,
                                 sizeof(t_samplebox), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN( samplebox_class, t_samplebox, x_f );

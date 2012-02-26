@@ -133,10 +133,10 @@ void classpath_setup(void)
 	class_addmethod(classpath_class,(t_method) classpath_add,gensym("add"), 
 					A_DEFSYMBOL, 0);
 
-    verbose(0, "[classpath] %s",version);  
-    verbose(0, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
-    verbose(0, "\tcompiled on "__DATE__" at "__TIME__ " ");
-    verbose(0, "\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
+    logpost(NULL, 4, "[classpath] %s",version);  
+    logpost(NULL, 4, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
+    logpost(NULL, 4, "\tcompiled on "__DATE__" at "__TIME__ " ");
+    logpost(NULL, 4, "\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
             PD_MINOR_VERSION, PD_BUGFIX_VERSION);
 }
 

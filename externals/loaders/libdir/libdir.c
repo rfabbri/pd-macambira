@@ -89,7 +89,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
 //        post("\tThis is deprecated behavior.");
     }
     /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
-    verbose(10,"Loaded libdir '%s' from '%s'", classname, dirbuf);
+    logpost(NULL, 14, "Loaded libdir '%s' from '%s'", classname, dirbuf);
 
     return (1);
 }

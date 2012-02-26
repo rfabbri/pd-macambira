@@ -789,7 +789,7 @@ static void exciter_free(t_exciter *x)
 
 void exciter_setup(void)
 {
-    verbose(0,  exciter_version );
+    logpost(NULL, 4,  exciter_version );
     exciter_class = class_new(gensym("exciter"), (t_newmethod)exciter_new,
                               (t_method)exciter_free, sizeof(t_exciter), 0, A_GIMME, 0);
     class_addmethod(exciter_class, (t_method)exciter_dialog, gensym("dialog"), A_GIMME, 0);

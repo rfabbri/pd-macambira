@@ -2251,7 +2251,7 @@ static void *sonogram_new(t_floatarg fsize, t_floatarg fgraphic, t_floatarg fpha
 
 void sonogram_tilde_setup(void)
 {
-    verbose(0, sonogram_version);
+    logpost(NULL, 4, sonogram_version);
     sonogram_class = class_new(gensym("sonogram~"), (t_newmethod)sonogram_new, (t_method)sonogram_free,
                                sizeof(t_sonogram), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
 

@@ -111,7 +111,7 @@ static void randomblock_dsp(t_randomblock *x, t_signal **sp)
 
 void randomblock_tilde_setup(void)
 {
-    verbose(0, randomblock_version);
+    logpost(NULL, 4, randomblock_version);
     randomblock_class = class_new(gensym("randomblock~"), (t_newmethod)randomblock_new,
                                   (t_method)randomblock_free,
                                   sizeof(t_randomblock), 0, A_DEFFLOAT, 0);

@@ -676,7 +676,7 @@ static void probalizer_free(t_probalizer *x)
 
 void probalizer_setup(void)
 {
-    verbose(0,  probalizer_version );
+    logpost(NULL, 4,  probalizer_version );
     probalizer_class = class_new(gensym("probalizer"), (t_newmethod)probalizer_new,
                                  (t_method)probalizer_free, sizeof(t_probalizer), 0, A_GIMME, 0);
     class_addmethod(probalizer_class, (t_method)probalizer_dialog, gensym("dialog"), A_GIMME, 0);

@@ -177,7 +177,7 @@ void boids2d_setup(void)
     class_addmethod(boids2d_class, (t_method) Flock_reset,                 gensym("init"),         0);
     class_addmethod(boids2d_class, (t_method) Flock_dump,                 gensym("dump"),         0);
     
-    verbose(0, "boids2d 2005-2006 a.sier / jasch    1995-2003 eric l. singer   "__DATE__" "__TIME__);    
+    logpost(NULL, 4, "boids2d 2005-2006 a.sier / jasch    1995-2003 eric l. singer   "__DATE__" "__TIME__);    
     ps_nothing = gensym("");
 }
 

@@ -394,7 +394,7 @@ static void *oggread_new(t_floatarg fdographics)
     x->x_outunread = 0;
 	x->x_decoded = 0;
 
-    verbose(0, oggread_version);
+    logpost(NULL, 4, oggread_version);
 
     return (x);
 }

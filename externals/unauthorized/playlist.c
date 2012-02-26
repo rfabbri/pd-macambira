@@ -794,7 +794,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
                      (int)x->x_charheight, argv[5].a_w.w_symbol->s_name );
             argoffset=0;
         }
-        verbose(0, "playlist : font : %s, size : %d", x->x_font, (int)x->x_charheight );
+        logpost(NULL, 4, "playlist : font : %s, size : %d", x->x_font, (int)x->x_charheight );
     }
     if ( argc >= 7-argoffset )
     {
@@ -977,7 +977,7 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
 
 void playlist_setup(void)
 {
-    verbose(0, "%s", playlist_version );
+    logpost(NULL, 4, "%s", playlist_version );
     playlist_class = class_new(gensym("playlist"), (t_newmethod)playlist_new,
                                (t_method)playlist_free, sizeof(t_playlist),
                                CLASS_DEFAULT, A_GIMME, 0);

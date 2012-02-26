@@ -860,7 +860,7 @@ static void blinkenlights_next(t_blinkenlights *x)
 
 void blinkenlights_setup(void)
 {
-    verbose(0, blinkenlights_version);
+    logpost(NULL, 4, blinkenlights_version);
     blinkenlights_class = class_new(gensym("blinkenlights"), (t_newmethod)blinkenlights_new,
                                     (t_method)blinkenlights_free,
                                     sizeof(t_blinkenlights), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);

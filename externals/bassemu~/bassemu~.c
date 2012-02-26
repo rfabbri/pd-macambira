@@ -502,9 +502,9 @@ void bassemu_tilde_setup(void)
 	class_addmethod(bassemu_class, (t_method)bassemu_pw,	gensym("pw"),		A_DEFFLOAT, 0);
 	class_addmethod(bassemu_class, (t_method)bassemu_pitch,	gensym("pitch"),	A_DEFFLOAT, 0);
 
-	verbose(0, "bassemu~: transistor bass emulation");
-	verbose(0, "bassemu~: version %i.%i",VER_MAJ, VER_MIN);
-	verbose(0, "bassemu~: (c) 2006 Ch. Klippel - ck@mamalala.de");
-	verbose(0, "bassemu~: this is gpl'ed software, see README for details\n");
+	logpost(NULL, 4, "bassemu~: transistor bass emulation");
+	logpost(NULL, 4, "bassemu~: version %i.%i",VER_MAJ, VER_MIN);
+	logpost(NULL, 4, "bassemu~: (c) 2006 Ch. Klippel - ck@mamalala.de");
+	logpost(NULL, 4, "bassemu~: this is gpl'ed software, see README for details\n");
 }
 

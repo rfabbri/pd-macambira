@@ -66,8 +66,8 @@ void split_path_setup(void)
     split_path_class = class_new(gensym("split_path"), (t_newmethod)split_path_new, 0,
 				sizeof(t_split_path), 0,0);
     class_addsymbol(split_path_class,split_path_symbol);
-    verbose(0, "[split_path] %s",version);  
-    verbose(0, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
+    logpost(NULL, 4, "[split_path] %s",version);  
+    logpost(NULL, 4, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
 }
 
 

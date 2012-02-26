@@ -444,7 +444,7 @@ static void *speexout_new(t_symbol *s, int argc, t_atom *argv)
 
 void speexout_tilde_setup(void)
 {
-    verbose(0, speexout_version);
+    logpost(NULL, 4, speexout_version);
     speexout_class = class_new(gensym("speexout~"), (t_newmethod)speexout_new, (t_method)speexout_free,
                                sizeof(t_speexout), 0, A_GIMME, 0);
     CLASS_MAINSIGNALIN(speexout_class, t_speexout, x_f );

@@ -200,9 +200,9 @@ void passwd_setup(void)
 					A_GIMME, 
 					0);
 
-    verbose(0, "[passwd] %s",version);  
-    verbose(0, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
-    verbose(0, "\tcompiled on "__DATE__" at "__TIME__ " ");
+    logpost(NULL, 4, "[passwd] %s",version);  
+    logpost(NULL, 4, "\twritten by Hans-Christoph Steiner <hans@eds.org>");
+    logpost(NULL, 4, "\tcompiled on "__DATE__" at "__TIME__ " ");
 }
 
 #endif /* NOT _WIN32 */

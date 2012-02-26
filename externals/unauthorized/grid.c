@@ -682,7 +682,7 @@ static void grid_free(t_grid *x)
 
 void grid_setup(void)
 {
-    verbose(0, grid_version );
+    logpost(NULL, 4, grid_version );
     grid_class = class_new(gensym("grid"), (t_newmethod)grid_new,
                            (t_method)grid_free, sizeof(t_grid), 0, A_GIMME, 0);
     class_addmethod(grid_class, (t_method)grid_click, gensym("click"),

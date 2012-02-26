@@ -171,7 +171,7 @@ static void beatify_dsp(t_beatify *x, t_signal **sp)
 
 void beatify_tilde_setup(void)
 {
-    verbose(0,  beatify_version );
+    logpost(NULL, 4,  beatify_version );
     beatify_class = class_new(gensym("beatify~"), (t_newmethod)beatify_new, 0,
                               sizeof(t_beatify), 0, 0);
     CLASS_MAINSIGNALIN( beatify_class, t_beatify, x_f );

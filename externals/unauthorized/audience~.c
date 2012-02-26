@@ -1038,7 +1038,7 @@ static void audience_delay(t_audience_tilde *x, t_floatarg fdelay )
 
 void audience_tilde_setup(void)
 {
-    verbose(0,  audience_version );
+    logpost(NULL, 4,  audience_version );
     audience_class_tilde = class_new(gensym("audience~"), (t_newmethod)audience_new,
                                      (t_method)audience_free, sizeof(t_audience_tilde), 0, A_GIMME, 0);
     CLASS_MAINSIGNALIN( audience_class_tilde, t_audience_tilde, x_f );

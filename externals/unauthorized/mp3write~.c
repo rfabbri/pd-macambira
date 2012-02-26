@@ -362,7 +362,7 @@ static int mp3write_tilde_lame_init(t_mp3write *x)
 #endif
     {
         const char *lameVersion = get_lame_version();
-        verbose(0,  "mp3write~ : using lame version : %s", lameVersion );
+        logpost(NULL, 4,  "mp3write~ : using lame version : %s", lameVersion );
     }
 
     /* setting lame parameters */
@@ -490,7 +490,7 @@ static void mp3write_mpeg(t_mp3write *x, t_floatarg fsamplerate, t_floatarg fbit
 static void mp3write_print(t_mp3write *x)
 {
     const char        * buf = 0;
-    verbose(0, mp3write_version);
+    logpost(NULL, 4, mp3write_version);
     post("  LAME mp3 settings:\n"
          "    output sample rate: %d Hz\n"
          "    bitrate: %d kbit/s", x->x_samplerate, x->x_bitrate);
@@ -622,7 +622,7 @@ static void *mp3write_new(void)
 
 void mp3write_tilde_setup(void)
 {
-    verbose(0, mp3write_version);
+    logpost(NULL, 4, mp3write_version);
     mp3write_class = class_new(gensym("mp3write~"), (t_newmethod)mp3write_new, (t_method)mp3write_free,
                                sizeof(t_mp3write), 0, 0);
     CLASS_MAINSIGNALIN(mp3write_class, t_mp3write, x_f );

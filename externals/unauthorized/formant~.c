@@ -260,7 +260,7 @@ static void *formant_new(t_floatarg fsize, t_floatarg ffreq, t_floatarg ffwidth,
 
 void formant_tilde_setup(void)
 {
-    verbose(0, formant_version);
+    logpost(NULL, 4, formant_version);
     formant_class = class_new(gensym("formant~"), (t_newmethod)formant_new, (t_method)formant_free,
                               sizeof(t_formant), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addmethod(formant_class, (t_method)formant_dsp, gensym("dsp"), 0);

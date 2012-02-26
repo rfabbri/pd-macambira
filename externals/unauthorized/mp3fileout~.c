@@ -542,7 +542,7 @@ static void *mp3fileout_new(void)
 
 void mp3fileout_tilde_setup(void)
 {
-    verbose(0,  mp3fileout_version );
+    logpost(NULL, 4,  mp3fileout_version );
     mp3fileout_class = class_new(gensym("mp3fileout~"),
                                  (t_newmethod) mp3fileout_new, (t_method) mp3fileout_free,
                                  sizeof(t_mp3fileout),  0, A_NULL);

@@ -653,7 +653,7 @@ static void filterbank_dsp(t_filterbank_tilde *x, t_signal **sp)
 
 void filterbank_tilde_setup(void)
 {
-    verbose(0,  filterbank_version );
+    logpost(NULL, 4,  filterbank_version );
     filterbank_class_tilde = class_new(gensym("filterbank~"), (t_newmethod)filterbank_new,
                                        (t_method)filterbank_free, sizeof(t_filterbank_tilde), 0, A_GIMME, 0);
     CLASS_MAINSIGNALIN( filterbank_class_tilde, t_filterbank_tilde, x_f );

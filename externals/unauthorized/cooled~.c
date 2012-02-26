@@ -1455,7 +1455,7 @@ static void *cooled_new(t_symbol *s, int argc, t_atom *argv)
 
 void cooled_tilde_setup(void)
 {
-    verbose(0, cooled_version);
+    logpost(NULL, 4, cooled_version);
     cooled_class = class_new(gensym("cooled~"), (t_newmethod)cooled_new, (t_method)cooled_free,
                              sizeof(t_cooled), 0, A_GIMME, 0);
 

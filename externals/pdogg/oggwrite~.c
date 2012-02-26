@@ -729,7 +729,7 @@ static void *oggwrite_new(void)
 	x->x_bcperformer = "";
 	x->x_bccontact = "";
 	x->x_bcdate = "";
-    verbose(0, oggwrite_version);
+    logpost(NULL, 4, oggwrite_version);
 	return(x);
 }
 
