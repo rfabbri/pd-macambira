@@ -6,7 +6,7 @@ Maintainer: Hans-Christoph Steiner <hans@eds.org>
 Homepage: http://puredata.info
 Package: pd-extended
 Architecture: i386
-Depends: xterm | x-terminal-emulator, ttf-dejavu-core, tk8.5
+Depends: xterm | x-terminal-emulator, ttf-dejavu-core, tk8.5, lua5.1
 Provides: pd
 Recommends: xdg-utils, puredata-dev, puredata-utils, pulseaudio-utils, x-ttcidfont-conf, tcllib
 Conflicts: pdextended, cyclist, puredata (<< 0.43)
