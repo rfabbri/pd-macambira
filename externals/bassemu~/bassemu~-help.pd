@@ -1,4 +1,4 @@
-#N canvas 250 76 852 548 10;
+#N canvas -9 18 852 548 10;
 #X obj 455 501 dac~;
 #X text 358 150 CutOff;
 #X text 412 150 Reso;
@@ -47,7 +47,7 @@
 #X text 597 151 Glide;
 #X msg 41 124 30 0.5 0.3 0.1 0.5;
 #X obj 372 165 vsl 25 128 -1 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 9625 1;
+-1 -1 9525 1;
 #X obj 418 165 vsl 25 128 -1 2 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 7620 1;
 #X obj 464 165 vsl 25 128 -1 2 0 0 empty empty empty 0 -8 0 8 -262144
@@ -106,25 +106,25 @@
 #X obj 603 301 / 127;
 #X msg 217 276 pitch \$1;
 #X obj 220 218 hsl 129 15 0 128 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 6900 1;
+-1 -1 6400 1;
 #X obj 217 235 - 64;
 #X obj 217 295 s bass_ctl;
 #X obj 217 254 / 16;
 #X msg 217 199 64;
 #X obj 250 236 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
--262144 -1 -1 0.3125 256;
+-262144 -1 -1 0 256;
 #X text 258 199 Pitch Bend;
 #N canvas 504 253 494 344 META 0;
 #X text 12 135 RELEASE_DATE 2009-06-12;
 #X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
 Wilkes for Pd version 0.42.;
-#X text 12 5 KEYWORDS signal needs_work (object won't create);
 #X text 12 45 DESCRIPTION a transistor bass emulation;
 #X text 12 65 INLET_0 float list reset pitch cutoff reso envmod decay
 pw glide limit envinc hpf ext vco tune;
 #X text 12 95 OUTLET_0 signal;
 #X text 12 115 AUTHOR Christian Klippel;
 #X text 12 25 LICENSE GPL;
+#X text 12 5 KEYWORDS signal;
 #X restore 800 527 pd META;
 #X obj 466 468 bassemu~;
 #X connect 5 0 47 0;
