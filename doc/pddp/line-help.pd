@@ -28,27 +28,17 @@ for Pd version 0.42.;
 0 13 -228856 -1 0;
 #X obj 0 498 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
-#N canvas 104 484 428 109 Related_objects 0;
+#N canvas 59 376 428 230 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X obj 22 43 line~;
 #X obj 62 43 vline~;
-#N canvas 0 22 456 306 related_objects_from_other_libraries 0;
-#X obj 23 21 tripleLine;
-#X obj 105 20 t3_line~;
-#X obj 171 20 fade~;
-#X obj 219 21 step;
-#X text 17 54 These objects are offered in Pd only if you have downloaded
-and properly installed the appropriate library. These objects may or
-may not exist in a single library.;
-#X text 16 103 The best places to find information about Pd's libraries
-is:;
-#X text 13 125 www.puredata.org and click on "Downloads" then "Software"
-;
-#X text 14 141 or;
-#X text 15 155 iem.kug.ac.at/pdb/;
-#X restore 21 70 pd related_objects_from_other_libraries;
 #X text 8 2 [line] Related Objects;
+#X text 19 102 Externals;
+#X obj 19 142 pddp/helplink markex/tripleLine;
+#X obj 19 162 pddp/helplink iemlib/t3_line~;
+#X obj 19 182 pddp/helplink iemlib/fade~;
+#X obj 19 122 pddp/helplink maxlib/step;
 #X restore 101 598 pd Related_objects;
 #X obj 78 276 cnv 17 3 63 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
@@ -253,7 +243,8 @@ the ramp). Hence \, the example to the left works:;
 #X text 80 474 2) float;
 #X text 168 459 - initial value \, i.e. \, the starting point of the
 first ramp.;
-#X obj 3 598 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 3 598 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 98 571 pddp/pddplink ../3.audio.examples/C03.zipper.noise.pd
 -text doc/3.audio.examples/C03.zipper.noise.pd;
 #X connect 17 0 19 0;
