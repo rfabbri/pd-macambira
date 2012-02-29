@@ -16,16 +16,15 @@
 #X msg 312 45 RANDOM;
 #X text 18 7 get and set environment variables etc ...;
 #X msg 244 51 DATE;
-#N canvas 381 218 494 344 META 0;
+#N canvas 299 125 494 344 META 0;
 #X text 12 145 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
 to conform to the PDDP template for Pd version 0.42.;
 #X text 12 65 DESCRIPTION get and set environment variables;
-#X text 12 15 KEYWORDS control needs_work filesystem (objects won't
-create);
 #X text 12 85 INLET_0 RAND_MAX getenv;
 #X text 12 105 OUTLET_0 float symbol;
 #X text 12 45 LICENSE GPL v2;
 #X text 12 125 AUTHOR jdl@xdv.org;
+#X text 12 15 KEYWORDS control filesystem;
 #X restore 575 293 pd META;
 #X obj 386 168 cxc_prepend setenv;
 #X connect 0 0 9 0;
