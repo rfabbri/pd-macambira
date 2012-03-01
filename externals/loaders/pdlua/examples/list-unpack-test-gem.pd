@@ -1,4 +1,5 @@
-#N canvas 0 0 450 300 10;
+#N canvas 67 452 450 300 10;
+#X declare -lib Gem;
 #X obj 22 42 gemhead;
 #X obj 222 124 gemwin;
 #X msg 266 46 create;
@@ -9,6 +10,7 @@
 #X obj 108 102 print gem3;
 #X obj 65 123 print gem2;
 #X obj 22 143 print gem1;
+#X obj 144 203 import Gem;
 #X connect 0 0 5 0;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
