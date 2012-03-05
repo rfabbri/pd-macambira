@@ -58,7 +58,6 @@
  */
 //#define HEXLOADER_PATCHES
 
-
 #ifdef HEXLOADER_PATCHES
 void canvas_popabstraction(t_canvas *x);
 static void*hexloader_fakenew(t_symbol *s, int argc, t_atom *argv);
@@ -90,7 +89,7 @@ typedef struct _hexloader
 } t_hexloader;
 static t_class *hexloader_class;
 
-static char *version = "$Revision: 1.5 $";
+static char *version = "1.6";
 
 
 static char*hex_dllextent[] = {
@@ -167,6 +166,64 @@ static  char *patch_extent[]={
 
 /* -------------------- utilities --------------------- */
 
+/* --- symlist_t: a linked list of symbols --- */
+
+/* linked list of loaders */
+typedef struct symlist_ {
+    t_symbol* sym;
+    struct symlist_ *next;
+} symlist_t;
+static symlist_t*g_abstractionclasses=NULL;
+
+static symlist_t*symlist_find(symlist_t*syms, t_symbol*sym) {
+  symlist_t*dummy=syms;
+  for(; dummy; dummy=dummy->next) {
+    //    post("checking '%s' vs '%s'", sym, dummy->sym);
+    if (sym==dummy->sym) {
+      // we already have this entry!
+      //      post("found sym %s=%s", sym, dummy->sym);
+      return syms;
+    }
+  }
+  return NULL;
+}
+
+
+static symlist_t*symlist_add(symlist_t*syms, t_symbol*sym) {
+  symlist_t*dummy=syms;
+  symlist_t*last=0;
+
+  //  symlist_print("adder contained:", syms);
+
+  if(NULL==sym)return syms;
+
+  if(!dummy) {
+    dummy=(symlist_t*)getbytes(sizeof(symlist_t));
+    dummy->next=0;
+    dummy->sym=sym;
+    return dummy;
+  }
+
+  for(; dummy; dummy=dummy->next) {
+    //    post("checking '%s' vs '%s'", sym, dummy->sym);
+    if (sym==dummy->sym) {
+      // we already have this entry!
+      //      post("found sym %s=%s", sym, dummy->sym);
+      return syms;
+    }
+    last=dummy;
+  }
+  dummy=last;
+
+  dummy->next=(symlist_t*)getbytes(sizeof(symlist_t));
+  dummy=dummy->next;
+  dummy->next=0;
+  dummy->sym=sym;
+
+  //  symlist_print("adder contains::", syms);
+
+  return syms;
+}
 
 /* --- namelist_t: a linked list of names --- */
 
@@ -578,7 +635,7 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
   sprintf(fullfile, "%s/%s", pathname, filename);
 
   while(altname) {
-    verbose(2, "hexloader trying %s (%s)", fullfile, altname->name);
+    verbose(0, "hexloader trying %s (%s)", fullfile, altname->name);
     if(hexloader_doload(fullfile, altname->name))
       return 1;
 
@@ -604,21 +661,27 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
 static t_filepath*hexloader_loadpatch(char*pathname, char*filename, char*altclassname, char*realclassname)
 {
   char fullfile[MAXPDSTRING];
+  t_symbol*realname=gensym(realclassname);
+  t_filepath*result=NULL;
   sprintf(fullfile, "%s/%s", pathname, filename);
 
 #ifdef HEXLOADER_PATCHES
-  class_addcreator((t_newmethod)hexloader_fakenew, gensym(realclassname), A_GIMME, 0);
-  {
-    t_filepath*result=getbytes(sizeof(t_filepath));
-    result->filename=gensym(filename);
-    result->pathname=gensym(pathname);
-    return result;
+  if(symlist_find(g_abstractionclasses, realname)) {
+    // already in the list
+  } else {
+    class_addcreator((t_newmethod)hexloader_fakenew, realname, A_GIMME, 0);
+    g_abstractionclasses=symlist_add(g_abstractionclasses, realname);
   }
+
+  result=getbytes(sizeof(t_filepath));
+  result->filename=gensym(filename);
+  result->pathname=gensym(pathname);
+
   
 #else
   error("BUG: hexloader not loading abstraction: %s (not yet implemented)", fullfile);
 #endif /* HEXLOADER_PATCHES */
-  return 0;
+  return result;
 }
 /**
  * the actual loader:
@@ -646,7 +709,7 @@ static t_filepath*hexloader_loadpatch(char*pathname, char*filename, char*altclas
  * @return 1 on success, 0 on failure
  */
 
-static int hexloader_trylibraries(filelist_t*altnames0) {
+static int hexloader_trylibraries(t_canvas*x, filelist_t*altnames0) {
   int fd = -1;
   char dirbuf[MAXPDSTRING];
   char*nameptr;
@@ -658,7 +721,12 @@ static int hexloader_trylibraries(filelist_t*altnames0) {
     int dll_index=0;
     char*dllextent=hex_dllextent[dll_index];
     while(dllextent!=0) {
-      if ((fd = open_via_path(".", altname, dllextent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
+      if(NULL!=x)
+        fd=canvas_open(x, altname, dllextent, dirbuf, &nameptr, MAXPDSTRING, 0);
+      else
+        fd = open_via_path(".", altname, dllextent, dirbuf, &nameptr, MAXPDSTRING, 0);
+
+      if (fd >= 0) {
         close (fd);
 
         if(hexloader_loadfile(dirbuf, nameptr, altnames->setupfun)) {
@@ -674,7 +742,7 @@ static int hexloader_trylibraries(filelist_t*altnames0) {
 
   return 0;
 }
-static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
+static t_filepath*hexloader_trypatches(t_canvas*x, filelist_t*altnames0, char*classname) {
   int fd = -1;
   char dirbuf[MAXPDSTRING];
   char*nameptr;
@@ -688,8 +756,11 @@ static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
     char*extent=patch_extent[extindex];
     if(strcmp(altname, classname)) { /* we only try if it is worth trying... */
       while(extent!=0) {
-        if ((fd = open_via_path(".", altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
-          t_symbol*s;
+        if(NULL!=x)
+          fd=canvas_open(x, altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0);
+        else
+          fd = open_via_path(".", altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0);
+        if (fd >= 0) {
           close (fd);
           t_filepath*fp=hexloader_loadpatch(dirbuf, nameptr, altname, classname);
           if(fp) {
@@ -715,10 +786,10 @@ static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
 static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*classname)
 {
   t_filepath*fp=0;
-  if(hexloader_trylibraries(altnames0))
+  if(hexloader_trylibraries(canvas, altnames0))
     return 1;
 
-  fp=hexloader_trypatches(altnames0, classname);
+  fp=hexloader_trypatches(canvas, altnames0, classname);
   if(fp) {
     freebytes(fp, sizeof(t_filepath));
     return 1;
@@ -799,12 +870,23 @@ static void*hexloader_fakenew(t_symbol*s, int argc, t_atom*argv) {
   /* get alternatives */
   altnames=hexloader_getalternatives(s->s_name);
   /* do the loading */
-  fp=hexloader_trypatches(altnames, s->s_name);
+  fp=hexloader_trypatches(NULL, altnames, s->s_name);
   /* clean up */
   filelist_clear(altnames); 
 
   if(fp) {
     canvas_setargs(argc, argv);
+    /* this fails when the object is loaded the first time
+     * since m_class.c:new_anything() has set the "tryingalready" flag
+     * the next time the object is created, it will work, since pd_objectmaker already knows about us and thus new_anything() never get's called
+     */
+    /* ideas how to fix this:
+     * - a simple hack is to register the abstractions to be hexloaded beforehand (but we have to know them before they are requested!)
+     * - override the anything-method of pd_objectmaker "new_anything()" and call it ourselves (this makes the entire sys_loader hook absurd)
+     *
+     * claude's "abstraction caching" (http://lists.puredata.info/pipermail/pd-dev/2008-10/012334.html) works because he is injecting the code right
+     * before sys_load_lib() and the "tryingalready" guards
+     */
     binbuf_evalfile(fp->filename, fp->pathname);
     freebytes(fp, sizeof(t_filepath));
     if (s__X.s_thing != current)
@@ -828,7 +910,7 @@ static void*hexloader_new(t_symbol *s, int argc, t_atom *argv)
 void hexloader_setup(void)
 {
   /* relies on t.grill's loader functionality, fully added in 0.40 */
-  post("hex loader %s",version);  
+  post("hexloader %s",version);  
   post("\twritten by IOhannes m zmölnig, IEM <zmoelnig@iem.at>");
   post("\tcompiled on "__DATE__" at "__TIME__ " ");
   post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION, PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
