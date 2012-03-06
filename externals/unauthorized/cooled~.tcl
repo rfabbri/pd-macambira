@@ -17,13 +17,13 @@ proc cooled_apply {id} {
      	[eval concat $$var_graph_draw] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc cooled_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc cooled_ok {id} {

@@ -32,13 +32,13 @@ proc playlist_apply {id} {
      	[eval concat $$var_graph_secolor] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc playlist_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc playlist_ok {id} {

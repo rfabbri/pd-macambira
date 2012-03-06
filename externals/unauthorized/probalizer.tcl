@@ -22,13 +22,13 @@ proc probalizer_apply {id} {
          [eval concat $$var_graph_noccurrences] \
          [eval concat $$var_graph_save] \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc probalizer_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc probalizer_ok {id} {

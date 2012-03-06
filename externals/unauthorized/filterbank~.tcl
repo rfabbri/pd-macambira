@@ -14,13 +14,13 @@ proc filterbank_apply {id} {
      	[eval concat $$var_graph_highfreq] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc filterbank_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc filterbank_ok {id} {

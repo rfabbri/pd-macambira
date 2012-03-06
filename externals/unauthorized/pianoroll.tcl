@@ -34,13 +34,13 @@ proc pianoroll_apply {id} {
          [eval concat $$var_graph_defvalue] \
          [eval concat $$var_graph_save] \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc pianoroll_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc pianoroll_ok {id} {

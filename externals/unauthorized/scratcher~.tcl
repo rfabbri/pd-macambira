@@ -14,13 +14,13 @@ proc scratcher_apply {id} {
      	[eval concat $$var_graph_height] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc scratcher_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc scratcher_ok {id} {

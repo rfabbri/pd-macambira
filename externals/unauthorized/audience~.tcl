@@ -17,13 +17,13 @@ proc audience_apply {id} {
      	[eval concat $$var_graph_nboutputs] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc audience_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc audience_ok {id} {

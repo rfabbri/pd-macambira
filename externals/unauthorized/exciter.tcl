@@ -25,13 +25,13 @@ proc exciter_apply {id} {
          [eval concat $$var_graph_loop] \
          [eval concat $$var_graph_save] \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc exciter_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc exciter_ok {id} {

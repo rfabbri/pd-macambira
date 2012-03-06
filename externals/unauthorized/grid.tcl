@@ -44,13 +44,13 @@ proc grid_apply {id} {
      	[eval concat $$var_graph_ylines] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc grid_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc grid_ok {id} {

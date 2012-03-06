@@ -29,13 +29,13 @@ proc scrolllist_apply {id} {
      	[eval concat $$var_graph_secolor] \
  	\;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc scrolllist_cancel {id} {
      set cmd [concat $id cancel \;]
      #puts stderr $cmd
-     pd $cmd
+     pdsend $cmd
 }
  
 proc scrolllist_ok {id} {
