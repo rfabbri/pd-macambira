@@ -856,16 +856,17 @@ static int open_serial(unsigned int com_num, t_comport *x)
     switch( glob( x->serial_device_prefix, 0, NULL, &glob_buffer ) )
     {
         case GLOB_NOSPACE:
-            error("[comport] out of memory for \"%s\"",x->serial_device_prefix);
+            pd_error(x,"[comport] out of memory for \"%s\"",x->serial_device_prefix);
             break;
 #ifdef GLOB_ABORTED
         case GLOB_ABORTED:
-            error("[comport] aborted \"%s\"",x->serial_device_prefix);
+            pd_error(x,"[comport] aborted \"%s\"",x->serial_device_prefix);
             break;
 #endif
 #ifdef GLOB_NOMATCH
         case GLOB_NOMATCH:
-            error("[comport] no serial devices found for \"%s\"",x->serial_device_prefix);
+            pd_error(x,"[comport] no serial devices found for \"%s\"",
+                     x->serial_device_prefix);
             break;
 #endif
     }
@@ -892,7 +893,7 @@ static int open_serial(unsigned int com_num, t_comport *x)
 
     if((fd = open(x->serial_device->s_name, OPENPARAMS)) == INVALID_HANDLE_VALUE)
     {
-        error("[comport] ** ERROR ** could not open device %s:\n failure(%d): %s\n",
+        pd_error(x, "[comport] ** ERROR ** could not open device %s:\n failure(%d): %s\n",
             x->serial_device->s_name,errno,strerror(errno));
         return INVALID_HANDLE_VALUE;
     }
@@ -903,7 +904,7 @@ static int open_serial(unsigned int com_num, t_comport *x)
     /*   Save the Current Port Configuration  */
     if(tcgetattr(fd, old) == -1 || tcgetattr(fd, new) == -1)
     {
-        error("[comport] ** ERROR ** could not get termios-structure of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not get termios-structure of device %s\n",
             x->serial_device->s_name);
         close(fd);
         return INVALID_HANDLE_VALUE;
@@ -944,7 +945,7 @@ static int open_serial(unsigned int com_num, t_comport *x)
     }
     else
     {
-        error("[comport] ** ERROR ** could not set params to ioctl of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set params to ioctl of device %s\n",
             x->serial_device->s_name);
         close(fd);
         return INVALID_HANDLE_VALUE;
@@ -962,7 +963,7 @@ static int close_serial(t_comport *x)
     {
         tcsetattr(fd, TCSANOW, tios);
         close(fd);
-        post("[comport] closed %s",x->serial_device->s_name);
+        post("[comport] closed port %i (%s)", x->comport, x->serial_device->s_name);
     }
     return INVALID_HANDLE_VALUE;
 }
@@ -1070,7 +1071,7 @@ static void comport_tick(t_comport *x)
             if (count > x->x_inbuf_len) count = x->x_inbuf_len; /* ...but no more than the buffer can hold */
             /*err = read(fd,(char *) &serial_byte,1);*/
             err = read(fd,(char *)x->x_inbuf, count);/* try to read count bytes */
-            if (err >= 0)
+            if (err > 0)
             {
                 for (i = 0; i < err; ++i )
                 {
@@ -1337,7 +1338,7 @@ static void comport_baud(t_comport *x,t_floatarg f)
 
     if(set_serial(x) == 0)
     {
-        error("[comport] ** ERROR ** could not set baudrate of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set baudrate of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1361,7 +1362,7 @@ static void comport_bits(t_comport *x,t_floatarg f)
 
     if(set_serial(x) == 0)
     {
-        error("[comport] ** ERROR ** could not set bits of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set bits of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1388,7 +1389,7 @@ static void comport_parity(t_comport *x,t_floatarg f)
 
     if(set_serial(x) == 0)
     {
-        error("[comport] ** ERROR ** could not set extra paritybit of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set extra paritybit of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1415,10 +1416,10 @@ static void comport_stopbit(t_comport *x, t_floatarg f)
     if(set_serial(x) == 0)
     {
 #ifdef _WIN32
-        error("[comport] ** ERROR ** could not set stopbits of device %s to %g\n",
+        pd_error(,"[comport] ** ERROR ** could not set stopbits of device %s to %g\n",
             &x->serial_device->s_name[4], f);
 #else
-        error("[comport] ** ERROR ** could not set extra stopbit of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set extra stopbit of device %s\n",
             x->serial_device->s_name);
 #endif
         return;
@@ -1442,7 +1443,7 @@ static void comport_rtscts(t_comport *x,t_floatarg f)
 
     if(set_serial(x) == 0)
     {
-        error("[comport] ** ERROR ** could not set rts_cts of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set rts_cts of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1468,7 +1469,7 @@ static void comport_dtr(t_comport *x,t_floatarg f)
 
     if(f < 0)
     {
-        error("[comport] ** ERROR ** could not set dtr of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set dtr of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1492,7 +1493,7 @@ static void comport_rts(t_comport *x,t_floatarg f)
 
     if(f < 0)
     {
-        error("[comport] ** ERROR ** could not set rts of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set rts of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1516,7 +1517,7 @@ static void comport_xonxoff(t_comport *x,t_floatarg f)
 
     if(set_serial(x) == 0)
     {
-        error("[comport] ** ERROR ** could not set xonxoff of device %s\n",
+        pd_error(x,"[comport] ** ERROR ** could not set xonxoff of device %s\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4]);
 #else
@@ -1633,16 +1634,16 @@ static void comport_enum(t_comport *x)
     switch( glob( x->serial_device_prefix, 0, NULL, &glob_buffer ) )
     {
     case GLOB_NOSPACE:
-        error("[comport] out of memory for \"%s\"",x->serial_device_prefix);
+        pd_error(x,"[comport] out of memory for \"%s\"",x->serial_device_prefix);
         break;
 # ifdef GLOB_ABORTED
         case GLOB_ABORTED:
-        error("[comport] aborted \"%s\"",x->serial_device_prefix);
+        pd_error(x,"[comport] aborted \"%s\"",x->serial_device_prefix);
         break;
 # endif /* GLOB_ABORTED */
 # ifdef GLOB_NOMATCH
     case GLOB_NOMATCH:
-        error("[comport] no serial devices found for \"%s\"",x->serial_device_prefix);
+        pd_error(x,"[comport] no serial devices found for \"%s\"",x->serial_device_prefix);
         break;
 # endif /* GLOB_NOMATCH */
     }
@@ -1704,16 +1705,16 @@ static void comport_ports(t_comport *x)
     switch( glob( x->serial_device_prefix, 0, NULL, &glob_buffer ) )
     {
         case GLOB_NOSPACE:
-            error("[comport] out of memory for \"%s\"",x->serial_device_prefix);
+            pd_error(x,"[comport] out of memory for \"%s\"",x->serial_device_prefix);
             break;
 # ifdef GLOB_ABORTED
         case GLOB_ABORTED:
-            error("[comport] aborted \"%s\"",x->serial_device_prefix);
+            pd_error(x,"[comport] aborted \"%s\"",x->serial_device_prefix);
             break;
 # endif /* GLOB_ABORTED */
 # ifdef GLOB_NOMATCH
         case GLOB_NOMATCH:
-            error("[comport] no serial devices found for \"%s\"",x->serial_device_prefix);
+            pd_error(x,"[comport] no serial devices found for \"%s\"",x->serial_device_prefix);
             break;
 # endif /* GLOB_NOMATCH */
     }
