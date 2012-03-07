@@ -1078,7 +1078,18 @@ static void comport_tick(t_comport *x)
                     outlet_float(x->x_data_outlet, (t_float) x->x_inbuf[i]);
                 }
             }
-            else whicherr = errno;
+            else if (err == 0 && count == 0)
+            {
+                /* if both ioctl() and read() return a 0 count, assume
+                 * that we lost the connection to the serial port.
+                 * otherwise there is a race condition when the serial
+                 * port gets interrupted, like if the USB gets yanked
+                 * out or a bluetooth connection drops */
+                pd_error(x, "Lost connection to serial device, closing!");
+                comport_close(x);
+            }
+            else 
+                whicherr = errno;
         }
 #endif /* _WIN32 */
         if(err < 0)
