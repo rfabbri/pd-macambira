@@ -1315,7 +1315,12 @@ allows COM port numbers to be specified. */
     x->x_status_outlet = outlet_new(&x->x_obj, &s_float);
 
     x->x_hit = 0;
-    x->x_deltime = 1;
+    /* Since 10ms is also the default poll time for most HID devices,
+     * and it seems that for most uses of [comport] (i.e. arduinos and
+     * other serial ports 115200 baud or less) that 10ms polling is
+     * going to give the data as fast as 1ms polling with a lot less
+     * CPU time wasted. */
+    x->x_deltime = 10;
     x->x_clock = clock_new(x, (t_method)comport_tick);
 
     clock_delay(x->x_clock, x->x_deltime);
