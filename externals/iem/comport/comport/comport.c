@@ -1085,7 +1085,8 @@ static void comport_tick(t_comport *x)
                  * otherwise there is a race condition when the serial
                  * port gets interrupted, like if the USB gets yanked
                  * out or a bluetooth connection drops */
-                pd_error(x, "Lost connection to serial device, closing!");
+                pd_error(x, "[comport]: lost connection to port %i (%s)!",
+                         x->comport, x->serial_device->s_name);
                 comport_close(x);
             }
             else 
@@ -1095,7 +1096,7 @@ static void comport_tick(t_comport *x)
         if(err < 0)
         { /* if a read error detected */
             if(x->rxerrors < 10) /* ten times max */
-                post("RXERRORS on serial line (%d)\n", whicherr);
+                post("[comport]: RXERRORS on serial line (%d)\n", whicherr);
             x->rxerrors++; /* remember */
         }
 /* now if anything to send, send the output buffer */
@@ -1142,7 +1143,9 @@ endsendevent:
 #else
             err = write(x->comhandle,(char *)x->x_outbuf, x->x_outbuf_wr_index);
             if (err != x->x_outbuf_wr_index)
-            post ("[comport]: Write returned %d, errno is %d", err, errno);
+            {
+                pd_error(x,"[comport]: Write failed for %d bytes, error is %d",err,errno);
+            }
 #endif /*_WIN32*/
             x->x_outbuf_wr_index = 0; /* for now we just drop anything that didn't send */
         }
