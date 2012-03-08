@@ -1,5 +1,5 @@
 #N canvas 145 39 541 656 10;
-#X declare -lib smlib creb zexy;
+#X declare -lib smlib -lib creb -lib zexy;
 #X obj 28 22 adc~;
 #X obj 20 330 vmin;
 #X floatatom 69 348 5 0 0 0 - - -;
@@ -76,7 +76,7 @@
 #X obj 1 470 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 0 1;
 #X text 441 593 j#|@2002;
-#X obj 362 -26 declare -lib smlib creb zexy;
+#X obj 362 -26 declare -lib smlib -lib creb -lib zexy;
 #X connect 0 0 20 0;
 #X connect 0 0 26 0;
 #X connect 1 0 6 0;
