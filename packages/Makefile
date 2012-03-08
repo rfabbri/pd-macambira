@@ -91,13 +91,15 @@ externals:
 #------------------------------------------------------------------------------
 # pd
 
+PD_CONFIGURE_FLAGS = --prefix=$(prefix)
+
 ifeq ($(OS_NAME),darwin)
-  PD_CONFIGURE_FLAGS = --enable-jack
+  PD_CONFIGURE_FLAGS += --enable-jack
 else
   ifeq ($(OS_NAME),linux)
-    PD_CONFIGURE_FLAGS = --enable-jack --enable-alsa
+    PD_CONFIGURE_FLAGS += --enable-jack --enable-alsa
   else
-    PD_CONFIGURE_FLAGS = 
+    PD_CONFIGURE_FLAGS += 
   endif
 endif
 
