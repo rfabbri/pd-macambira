@@ -1,5 +1,5 @@
 #N canvas 0 22 889 703 10;
-#X declare -lib Gem pdp;
+#X declare -lib Gem -lib pdp;
 #X obj 92 298 gemwin;
 #X obj 399 302 gemhead;
 #X obj 151 557 pix_texture;
@@ -58,7 +58,7 @@ from Gem to PDP to Gem to PDP to ... if you use the Gem pix objects!
 #X msg 276 202 colorspace Gray;
 #X text 382 181 <- use YUV if possible to be fast;
 #X obj 276 158 loadbang;
-#X obj 679 17 declare -lib Gem pdp;
+#X obj 679 17 declare -lib Gem -lib pdp;
 #X connect 1 0 9 0;
 #X connect 2 0 3 0;
 #X connect 5 0 4 0;

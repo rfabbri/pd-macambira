@@ -1,5 +1,5 @@
 #N canvas 469 25 909 767 12;
-#X declare -lib Gem pdp;
+#X declare -lib Gem -lib pdp;
 #X obj 38 229 gemwin;
 #X msg 70 12 create;
 #X obj 526 46 gemhead;
@@ -82,7 +82,7 @@
 #X text 464 427 GL_AUX2;
 #X text 464 441 GL_AUX3;
 #X text 561 258 ( default );
-#X obj 716 14 declare -lib Gem pdp;
+#X obj 716 14 declare -lib Gem -lib pdp;
 #X connect 1 0 0 0;
 #X connect 2 0 7 0;
 #X connect 3 0 0 0;
