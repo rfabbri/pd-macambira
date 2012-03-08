@@ -35,7 +35,7 @@ static int gridcount=0;
 static int guidebug=0;
 static int pointsize = 5;
 
-static char   *grid_version = "grid: version 0.8, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *grid_version = "grid: version 0.9, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define GRID_SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -476,12 +476,14 @@ static void grid_values(t_grid* x, t_floatarg xvalue, t_floatarg yvalue)
     if (xvalue < x->x_min ) xvalue = x->x_min;
     if (xvalue > x->x_max ) xvalue = x->x_max;
 
-    x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+    x->x_current = text_xpix(&x->x_obj, x->x_glist)
+        + abs(((xvalue - x->x_min) / (x->x_max - x->x_min)) * x->x_width);
 
     if (yvalue < x->y_min ) yvalue = x->y_min;
     if (yvalue > x->y_max ) yvalue = x->y_max;
 
-    x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+    x->y_current = text_ypix(&x->x_obj, x->x_glist)
+        + abs((1 - (yvalue - x->y_min) / (x->y_max  - x->y_min)) * x->x_height);
 
     if(xold != x->x_current || yold != x->y_current)
     {
@@ -498,12 +500,14 @@ static void grid_xvalues(t_grid* x, t_floatarg xvalue, t_floatarg yvalue)
     if (xvalue < x->x_min ) xvalue = x->x_min;
     if (xvalue > x->x_max ) xvalue = x->x_max;
 
-    x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+    x->x_current = text_xpix(&x->x_obj, x->x_glist)
+        + abs(((xvalue - x->x_min) / (x->x_max - x->x_min)) * x->x_width);
 
     if (yvalue < x->y_min ) yvalue = x->y_min;
     if (yvalue > x->y_max ) yvalue = x->y_max;
 
-    x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+    x->y_current = text_ypix(&x->x_obj, x->x_glist)
+        + abs((1 - (yvalue - x->y_min) / (x->y_max  - x->y_min)) * x->x_height);
 
     if(xold != x->x_current || yold != x->y_current)
     {
@@ -531,12 +535,14 @@ static void grid_valuemotion(t_grid* x, t_floatarg dx, t_floatarg dy)
     if (xvalue < x->x_min ) xvalue = x->x_min;
     if (xvalue > x->x_max ) xvalue = x->x_max;
 
-    x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+    x->x_current = text_xpix(&x->x_obj, x->x_glist)
+        + abs(((xvalue - x->x_min) / (x->x_max - x->x_min)) * x->x_width);
 
     if (yvalue < x->y_min ) yvalue = x->y_min;
     if (yvalue > x->y_max ) yvalue = x->y_max;
 
-    x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+    x->y_current =  text_ypix(&x->x_obj, x->x_glist)
+        + abs((1 - (yvalue - x->y_min) / (x->y_max - x->y_min)) * x->x_height);
 
     if(xold != x->x_current || yold != x->y_current)
     {
@@ -565,12 +571,14 @@ static void grid_xvaluemotion(t_grid* x, t_floatarg dx, t_floatarg dy)
     if (xvalue < x->x_min ) xvalue = x->x_min;
     if (xvalue > x->x_max ) xvalue = x->x_max;
 
-    x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+    x->x_current = text_xpix(&x->x_obj, x->x_glist)
+        + abs(((xvalue - x->x_min) / (x->x_max - x->x_min)) * x->x_width);
 
     if (yvalue < x->y_min ) yvalue = x->y_min;
     if (yvalue > x->y_max ) yvalue = x->y_max;
 
-    x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+    x->y_current = text_ypix(&x->x_obj, x->x_glist)
+        + abs((1 - (yvalue - x->y_min) / (x->y_max - x->y_min)) * x->x_height);
 
     if(xold != x->x_current || yold != x->y_current)
     {
