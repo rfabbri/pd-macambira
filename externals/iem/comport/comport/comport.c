@@ -74,6 +74,8 @@ typedef struct comport
     short           rxerrors; /* holds the rx line errors */
     t_clock         *x_clock;
     int             x_hit;
+    int             x_retries;
+    int             x_retry_count;
     double          x_deltime;
     int             verbose;
     t_outlet        *x_data_outlet;
@@ -230,6 +232,7 @@ static long baudratetable[] =
 t_class *comport_class;
 
 static void comport_pollintervall(t_comport *x, t_floatarg g);
+static void comport_retries(t_comport *x, t_floatarg g);
 static void comport_tick(t_comport *x);
 static float set_baudrate(t_comport *x, t_float baud);
 static float set_bits(t_comport *x, int nr);
@@ -938,6 +941,8 @@ static int open_serial(unsigned int com_num, t_comport *x)
     set_xonxoff(x, x->xonxoff); /* (IXON | IXOFF | IXANY) */
     set_baudrate(x, *baud);
 
+    x->x_retry_count = 0; /* reset retry counter */
+
     if(tcsetattr(fd, TCSAFLUSH, new) != -1)
     {
         post("[comport] opened serial line device %d (%s)\n",
@@ -1010,6 +1015,12 @@ static void comport_pollintervall(t_comport *x, t_floatarg g)
 {
     if (g < 1) g = 1;
     x->x_deltime = g;
+}
+
+static void comport_retries(t_comport *x, t_floatarg g)
+{
+    if (g < 0) g = 0;
+    x->x_retries = g;
 }
 
 static void comport_tick(t_comport *x)
@@ -1085,9 +1096,25 @@ static void comport_tick(t_comport *x)
                  * otherwise there is a race condition when the serial
                  * port gets interrupted, like if the USB gets yanked
                  * out or a bluetooth connection drops */
-                pd_error(x, "[comport]: lost connection to port %i (%s)!",
-                         x->comport, x->serial_device->s_name);
-                comport_close(x);
+                if(x->x_retry_count < x->x_retries)
+                { 
+                    t_atom retrying_atom;
+                    SETFLOAT(&retrying_atom, x->x_retry_count);
+                    outlet_anything(x->x_status_outlet, gensym("retrying"), 1, &retrying_atom);
+
+                    pd_error(x, "[comport]: lost connection to port %i (%s), retrying...",
+                             x->comport, x->serial_device->s_name);
+                    if (!x->x_hit)
+                        clock_delay(x->x_clock, 1000); /* retry every second */
+                    x->x_retry_count++;
+                    return;
+                }
+                else
+                {
+                    pd_error(x, "[comport]: Giving up on port %i (%s)!",
+                             x->comport, x->serial_device->s_name);
+                    comport_close(x);
+                }
             }
             else 
                 whicherr = errno;
@@ -1149,7 +1176,7 @@ endsendevent:
 #endif /*_WIN32*/
             x->x_outbuf_wr_index = 0; /* for now we just drop anything that didn't send */
         }
-        if (!x->x_hit) clock_delay(x->x_clock, x->x_deltime); /* default 1 ms */
+        if (!x->x_hit) clock_delay(x->x_clock, x->x_deltime); /* default 10 ms */
     }
 }
 
@@ -1321,6 +1348,7 @@ allows COM port numbers to be specified. */
      * going to give the data as fast as 1ms polling with a lot less
      * CPU time wasted. */
     x->x_deltime = 10;
+    x->x_retries = 10;
     x->x_clock = clock_new(x, (t_method)comport_tick);
 
     clock_delay(x->x_clock, x->x_deltime);
@@ -1926,6 +1954,7 @@ void comport_setup(void)
     class_addmethod(comport_class, (t_method)comport_devicename, gensym("devicename"), A_SYMBOL, 0);
     class_addmethod(comport_class, (t_method)comport_print, gensym("print"), A_GIMME, 0);
     class_addmethod(comport_class, (t_method)comport_pollintervall, gensym("pollintervall"), A_FLOAT, 0);
+    class_addmethod(comport_class, (t_method)comport_retries, gensym("retries"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_verbose, gensym("verbose"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_help, gensym("help"), 0);
     class_addmethod(comport_class, (t_method)comport_info, gensym("info"), 0);
