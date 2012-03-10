@@ -8,7 +8,7 @@
 
 static t_class *midiout_class;
 
-void sys_putmidibyte(int portno, int byte);
+void outmidi_byte(int portno, int value);
 
 typedef struct _midiout
 {
