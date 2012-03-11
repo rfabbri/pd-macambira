@@ -1,14 +1,15 @@
-#N canvas 243 71 910 727 10;
+#N canvas 143 28 813 728 10;
+#X declare -lib hexloader -lib iemmatrix;
 #X obj 98 144 define_loudspeakers 3 -45 0 45 0 0 45 180 45;
 #X msg 32 62 bang;
 #X floatatom 136 276 5 0 0 2 azi - -;
 #X floatatom 180 276 5 0 0 2 ele - -;
 #X floatatom 224 276 5 0 100 2 spread - -;
 #X msg 115 173 bang;
-#X text 428 201 In two dimensions \, only specify the azimuth. (for
+#X text 428 231 In two dimensions \, only specify the azimuth. (for
 example "define_loudspeakers 2 -45 45 0 180";
 #X text 63 21 VBAP and define_loudspeakers;
-#X text 430 338 The spread-parameter can be used to prevent a situation
+#X text 430 368 The spread-parameter can be used to prevent a situation
 where sound is coming from one speaker only \, which would make speaker
 positions "visible". The range is 0 to 100;
 #X text 231 410 actual location;
@@ -16,7 +17,7 @@ positions "visible". The range is 0 to 100;
 #X floatatom 277 277 5 1 20 2 dist - -;
 #X text 131 241 azimuth \, elevation \, spread and distance;
 #X msg 98 119 bang;
-#X text 428 111 1) Use define_loudspeakers to list the speaker positions.
+#X text 428 141 1) Use define_loudspeakers to list the speaker positions.
 The example here defines loudspeakers in three dimensions (the first
 parameter). For each speaker \, define its azimuth and elevation. Here
 we have speakers front left and right with no elevation (-45 0 45 0)
@@ -28,7 +29,7 @@ the data to vbap.;
 #X floatatom 300 382 5 0 0 3 dist - -;
 #X floatatom 277 597 5 0 100 1 dB_after_1sec - -;
 #X obj 114 691 dac~ 1 2 3 4;
-#N canvas 0 0 699 527 sig 0;
+#N canvas 0 22 699 527 sig 0;
 #X obj 58 72 line~;
 #X msg 58 49 0 \, 10000 5;
 #X obj 58 118 cos~;
@@ -147,7 +148,7 @@ the data to vbap.;
 #X restore 129 438 pd peek;
 #X floatatom 201 567 5 0 0 1 interp - -;
 #X msg 297 622 clear;
-#N canvas 0 0 450 300 tba 0;
+#N canvas 0 22 450 300 tba 0;
 #X obj 143 51 inlet;
 #X obj 96 49 inlet;
 #X obj 191 51 inlet;
@@ -176,7 +177,7 @@ the data to vbap.;
 #X restore 136 316 pd tba;
 #X obj 318 262 hsl 64 15 1 20 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#N canvas 0 0 766 594 four-reverbs 0;
+#N canvas 0 22 766 594 four-reverbs 0;
 #X obj 67 179 rev1~;
 #X obj 114 179 rev1~;
 #X obj 160 179 rev1~;
@@ -210,25 +211,23 @@ the data to vbap.;
 #X connect 14 0 1 2;
 #X connect 14 0 0 2;
 #X restore 197 644 pd four-reverbs;
-#X text 429 15 rvbap is almost compatible to;
-#X obj 644 15 vbap 0 0;
+#X text 429 45 rvbap is almost compatible to;
 #X obj 33 82 define_loudspeakers 2 -45 45 0 180;
 #X obj 115 599 mtx_*~ 8 1 20;
-#X text 711 17 see help for this \, too.;
-#X text 429 36 Additionally it generates additional commands for controlling
+#X text 431 65 Additionally it generates additional commands for controlling
 a reverberated signal and has control to set the radial distance of
 a sound.;
-#X text 430 397 3) rvbap also will generate messages to control the
+#X text 430 427 3) rvbap also will generate messages to control the
 amount of reverberated signal to generate. This is meant to be used
 with [matrix~] or [mtx_*~] from the IEMmatrix collection of externals.
 ;
-#X text 431 255 2) For rvbap \, give azimuth and elevation and a distance
+#X text 431 285 2) For rvbap \, give azimuth and elevation and a distance
 (1-inf \, default 1) for the desired location. Bang the first inlet
 and vbap will output gain-factors for each speaker and the actual location
 produced. This can be different from the desired one depending where
 your speakers are.;
-#X text 433 589 See rvbap-demo.pd for a more complex setup.;
-#X text 429 467 To use it \, create a [mtx_*~] object that has double
+#X text 433 619 See rvbap-demo.pd for a more complex setup.;
+#X text 429 497 To use it \, create a [mtx_*~] object that has double
 the amount of outlets as you have speakers. Send the first half of
 the matrix-signals to the speakers and the second half through a reverbarator
 and add them to the respective speaker outs. The example shows this
@@ -236,8 +235,10 @@ in action for four speakers. Pay attention to the "set-element" subpatch
 which translates the [rvbap] output to set matrix elements correctly.
 ;
 #X text 193 439 <= here's the output of [rvbap];
+#X obj 633 7 import hexloader iemmatrix;
+#X obj 610 45 pddp/helplink vbap;
 #X connect 0 0 10 0;
-#X connect 1 0 33 0;
+#X connect 1 0 32 0;
 #X connect 2 0 28 0;
 #X connect 3 0 28 1;
 #X connect 4 0 28 2;
@@ -251,11 +252,11 @@ which translates the [rvbap] output to set matrix elements correctly.
 #X connect 11 0 28 3;
 #X connect 13 0 0 0;
 #X connect 19 0 30 4;
-#X connect 21 0 34 1;
+#X connect 21 0 33 1;
 #X connect 22 0 21 0;
-#X connect 23 0 34 0;
+#X connect 23 0 33 0;
 #X connect 24 0 23 0;
-#X connect 26 0 34 2;
+#X connect 26 0 33 2;
 #X connect 27 0 30 5;
 #X connect 28 0 10 0;
 #X connect 28 1 10 1;
@@ -267,12 +268,12 @@ which translates the [rvbap] output to set matrix elements correctly.
 #X connect 30 1 20 1;
 #X connect 30 2 20 2;
 #X connect 30 3 20 3;
-#X connect 33 0 10 0;
-#X connect 34 0 20 0;
-#X connect 34 1 20 1;
-#X connect 34 2 20 2;
-#X connect 34 3 20 3;
-#X connect 34 4 30 0;
-#X connect 34 5 30 1;
-#X connect 34 6 30 2;
-#X connect 34 7 30 3;
+#X connect 32 0 10 0;
+#X connect 33 0 20 0;
+#X connect 33 1 20 1;
+#X connect 33 2 20 2;
+#X connect 33 3 20 3;
+#X connect 33 4 30 0;
+#X connect 33 5 30 1;
+#X connect 33 6 30 2;
+#X connect 33 7 30 3;
