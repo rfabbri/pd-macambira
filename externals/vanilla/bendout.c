@@ -6,6 +6,8 @@
 
 #include "m_pd.h"
 
+void outmidi_pitchbend(int portno, int channel, int value);
+
 static t_class *bendout_class;
 
 typedef struct _bendout

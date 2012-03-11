@@ -6,6 +6,8 @@
 
 #include "m_pd.h"
 
+void outmidi_programchange(int portno, int channel, int value);
+
 static t_class *pgmout_class;
 
 typedef struct _pgmout

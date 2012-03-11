@@ -6,6 +6,8 @@
 
 #include "m_pd.h"
 
+void outmidi_controlchange(int portno, int channel, int ctlno, int value);
+
 static t_class *ctlout_class;
 
 typedef struct _ctlout

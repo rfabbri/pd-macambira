@@ -6,6 +6,8 @@
 
 #include "m_pd.h"
 
+void outmidi_noteon(int portno, int channel, int pitch, int velo);
+
 static t_class *noteout_class;
 
 typedef struct _noteout
