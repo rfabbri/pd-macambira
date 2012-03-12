@@ -156,6 +156,24 @@ deb: $(bindir)
 	rm -- $(DESTDIR)/usr/share/man/man1/pdsend.1
 	rm -- $(DESTDIR)/usr/share/man/man1/pdreceive.1
 	rm -- $(DESTDIR)/usr/include/m_pd.h
+# Debian docs dir
+	install -d $(DESTDIR)/usr/share/doc/pd-extended/
+	ln -s /usr/lib/pd-extended/doc/1.manual \
+		$(DESTDIR)/usr/share/doc/pd-extended/html
+	ln -s /usr/lib/pd-extended/doc/manuals/Pd/License.html \
+		$(DESTDIR)/usr/share/doc/pd-extended/License.html
+	ln -s /usr/lib/pd-extended/doc/manuals/Pd/notes.txt \
+		$(DESTDIR)/usr/share/doc/pd-extended/notes.txt
+	ln -s /usr/lib/pd-extended/doc/manuals/Pd/Pd_File_Format.html \
+		$(DESTDIR)/usr/share/doc/pd-extended/Pd_File_Format.html
+	ln -s /usr/lib/pd-extended/doc/manuals/Pd/Pd-LICENSE.txt \
+		$(DESTDIR)/usr/share/doc/pd-extended/Pd-LICENSE.txt
+	ln -s /usr/lib/pd-extended/doc/manuals/Pd/ReadMe.html \
+		$(DESTDIR)/usr/share/doc/pd-extended/ReadMe.html
+	ln -s /usr/lib/pd-extended/doc/manuals/Pd/Welcome.html \
+		$(DESTDIR)/usr/share/doc/pd-extended/Welcome.html
+	ln -s /usr/share/common-licenses/GPL-3 \
+		$(DESTDIR)/usr/share/doc/pd-extended/copyright
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
