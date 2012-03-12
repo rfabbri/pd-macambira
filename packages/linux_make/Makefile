@@ -23,7 +23,7 @@ endif
 ifeq ($(PACKAGE_TYPE),deb)
   prefix = /usr
   # generates the dependencies for all externals and pd itself
-  PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | sed 's|shlibs:Depends=|, |' )
+  PACKAGE_DEPENDS = $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | sed 's|shlibs:Depends=|, |' )
 else
   prefix = /usr/local
 endif
