@@ -80,13 +80,26 @@ static void arraycopy_setsourcearray(t_arraycopy *x, t_symbol *s)
 	/* get's called directly when we get a 'bang' */
 static void arraycopy_docopy(t_arraycopy *x)
 {
+
+#if (defined PD_MAJOR_VERSION && defined PD_MINOR_VERSION) && (PD_MAJOR_VERSION > 0 || PD_MINOR_VERSION >= 41)
+# define arraynumber_t t_word
+# define array_getarray garray_getfloatwords
+# define array_get(pointer, index) (pointer[index].w_float)
+# define array_set(pointer, index, value) ((pointer[index].w_float)=value)
+#else
+# define arraynumber_t t_float
+# define array_getarray garray_getfloatarray
+# define array_get(pointer, index) (pointer[index])
+# define array_set(pointer, index, value) ((pointer[index])=value)
+#endif
+
 	t_garray *b;		/* make local copy of array */
-	t_float *tab;                 /* the content itselfe */
+	arraynumber_t *tab;                 /* the content itselfe */
 	int items;
 	t_int i;
 	t_garray *A;
 	int npoints;
-	t_float *vec;
+	arraynumber_t *vec;
 
 	if(!x->x_destarray)
 	{
@@ -110,7 +123,7 @@ static void arraycopy_docopy(t_arraycopy *x)
 	}
 
 		// read from our array
-	if (!garray_getfloatarray(b, &items, &tab))
+	if (!array_getarray(b, &items, &tab))
 	{
 		post("arraycopy: couldn't read from source array!");
 		return;
@@ -118,7 +131,7 @@ static void arraycopy_docopy(t_arraycopy *x)
 
 	if (!(A = (t_garray *)pd_findbyclass(x->x_destarray, garray_class)))
 		error("arraycopy: %s: no such array", x->x_destarray->s_name);
-	else if (!garray_getfloatarray(A, &npoints, &vec))
+	else if (!array_getarray(A, &npoints, &vec))
 		error("arraycopy: %s: bad template ", x->x_destarray->s_name);
 	else
 	{
@@ -139,10 +152,12 @@ static void arraycopy_docopy(t_arraycopy *x)
 
 		if(x->x_pos)
 			vec += x->x_pos;
+      
 
 		for(i = x->x_start; i < x->x_end; i++)
 		{
-			*vec++ = tab[i];
+      array_set(vec, 0, array_get(tab, i));
+			vec++;
 		}
 		garray_redraw(A);
 		if(x->x_print)post("arraycopy: copied %d values from array \"%s\" to array \"%s\"", 
