@@ -104,6 +104,7 @@ void routeOSC_setup(void);
 static void routeOSC_free(t_routeOSC *x);
 static int MyPatternMatch (const char *pattern, const char *test);
 static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
+static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv);
 static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void routeOSC_paths(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
@@ -149,6 +150,7 @@ void routeOSC_setup(void)
     routeOSC_class = class_new(gensym("routeOSC"), (t_newmethod)routeOSC_new,
         (t_method)routeOSC_free, sizeof(t_routeOSC), 0, A_GIMME, 0);
     class_addanything(routeOSC_class, routeOSC_doanything);
+    class_addlist(routeOSC_class, routeOSC_list);
     class_addmethod(routeOSC_class, (t_method)routeOSC_set, gensym("set"), A_GIMME, 0);
     class_addmethod(routeOSC_class, (t_method)routeOSC_paths, gensym("paths"), A_GIMME, 0);
     class_addmethod(routeOSC_class, (t_method)routeOSC_verbosity, gensym("verbosity"), A_DEFFLOAT, 0);
@@ -403,6 +405,18 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
     }
 }
 
+static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
+{
+    post ("routeOSC_list: argc is %d", argc);
+    if (argv[0].a_type == A_SYMBOL) routeOSC_doanything(x, argv[0].a_w.w_symbol, argc-1, &argv[1]);
+    else
+    {
+        routeOSC_doanything(x, gensym("/"), argc, argv);
+        if (x->x_verbosity)
+            post("routeOSC_doanything(%p): message pattern is not a symbol, setting path to /", x);
+    }
+}
+
 static char *NextSlashOrNull(char *p)
 {
     while (*p != '/' && *p != '\0') p++;
@@ -423,7 +437,6 @@ static char *NthSlashOrNull(char *p, int n)
     }
     return p;
 }
-
 
 static void StrCopyUntilSlash(char *target, const char *source)
 {
