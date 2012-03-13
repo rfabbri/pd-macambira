@@ -407,7 +407,6 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
 
 static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
-    post ("routeOSC_list: argc is %d", argc);
     if (argv[0].a_type == A_SYMBOL) routeOSC_doanything(x, argv[0].a_w.w_symbol, argc-1, &argv[1]);
     else
     {
