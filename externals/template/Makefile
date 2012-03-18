@@ -237,7 +237,7 @@ ALL_LIBS := $(LIBS) $(ALL_LIBS)
 
 SHARED_SOURCE ?= $(wildcard lib$(LIBRARY_NAME).c)
 SHARED_HEADER ?= $(shell test ! -e $(LIBRARY_NAME).h || echo $(LIBRARY_NAME).h)
-SHARED_LIB = $(SHARED_SOURCE:.c=.$(SHARED_EXTENSION))
+SHARED_LIB ?= $(SHARED_SOURCE:.c=.$(SHARED_EXTENSION))
 SHARED_TCL_LIB = $(wildcard lib$(LIBRARY_NAME).tcl)
 
 .PHONY = install libdir_install single_install install-doc install-examples install-manual install-unittests clean distclean dist etags $(LIBRARY_NAME)
