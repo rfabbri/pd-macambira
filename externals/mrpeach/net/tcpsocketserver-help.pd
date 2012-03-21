@@ -1,9 +1,10 @@
-#N canvas 35 3 878 523 10;
+#N canvas 84 59 878 523 10;
 #X declare -stdpath extra/mrpeach;
 #X declare -stdlib extra/pdstring declare -stdlib extra/maxlib;
 #X declare -stdpath extra/mrpeach;
-#X declare -stdlib extra/pdstring declare -stdlib extra/maxlib;
+#X declare -stdpath extra/moocow declare -stdpath extra/maxlib;
 #X declare -stdpath extra/mrpeach;
+#X declare -stdlib extra/pdstring declare -stdlib extra/maxlib;
 #X msg 471 74 print;
 #X text 521 75 list of connections;
 #X text 627 103 send to all clients;
@@ -47,7 +48,7 @@ might mix up packets from different sockets.;
 abstraction \, which should be named [tcpsocket.PROTOCOL]. currently
 available are the protocols:;
 #X text 23 293 - FUDI;
-#N canvas 704 167 472 356 EXTENDABILITY 0;
+#N canvas 701 158 472 356 EXTENDABILITY 0;
 #X text 3 39 Support for more protocols can easily be added. In order
 to do so:;
 #X text 5 10 EXTENDABILITY;
@@ -68,68 +69,70 @@ of packet transmission.;
 replacement for [tcpserver]. it uses same the same inlet and outlet
 configuration as [tcpserver].;
 #X text 469 478 only well-formed FUDI messages are received here.;
-#N canvas 469 232 147 274 EXAMPLES 0;
-#N canvas 231 0 579 756 FUDI 0;
-#X obj 9 39 cnv 15 550 240 empty empty client_1 20 12 0 14 -249661
+#N canvas 460 289 147 274 EXAMPLES 0;
+#N canvas 1109 44 571 769 FUDI 0;
+#X obj 8 52 cnv 15 550 240 empty empty client_1 20 12 0 14 -249661
 -66577 0;
-#X obj 25 193 tcpclient;
-#X msg 369 94 connect localhost 11001;
-#X msg 393 115 disconnect;
-#X obj 369 72 sel 1 0;
-#X obj 369 51 tgl 15 0 empty empty empty 17 7 0 10 -261234 -1 -1 0
+#X obj 24 206 tcpclient;
+#X msg 368 107 connect localhost 11001;
+#X msg 392 128 disconnect;
+#X obj 368 85 sel 1 0;
+#X obj 368 64 tgl 15 0 empty empty empty 17 7 0 10 -261234 -1 -1 0
 1;
-#X obj 25 259 print CLIENT_1;
-#X msg 25 70 one two;
-#X obj 25 91 any2string 0 -1;
-#X msg 69 151 59 10;
-#X msg 33 117 32 116 104 114 101 101 23;
-#X obj 9 286 cnv 15 550 150 empty empty client_2 20 12 0 14 -249661
+#X obj 24 272 print CLIENT_1;
+#X msg 24 83 one two;
+#X obj 24 104 any2string 0 -1;
+#X msg 68 164 59 10;
+#X msg 32 130 32 116 104 114 101 101 23;
+#X obj 8 299 cnv 15 550 150 empty empty client_2 20 12 0 14 -249661
 -66577 0;
-#X msg 369 341 connect localhost 11001;
-#X msg 393 362 disconnect;
-#X obj 369 319 sel 1 0;
-#X obj 369 298 tgl 15 0 empty empty empty 17 7 0 10 -261234 -1 -1 0
+#X msg 368 354 connect localhost 11001;
+#X msg 392 375 disconnect;
+#X obj 368 332 sel 1 0;
+#X obj 368 311 tgl 15 0 empty empty empty 17 7 0 10 -261234 -1 -1 0
 1;
-#X obj 25 214 string2any 0 59;
-#X obj 25 234 route bang;
-#X obj 25 373 netclient;
+#X obj 24 227 string2any 0 59;
+#X obj 24 247 route bang;
+#X obj 24 386 netclient;
 #X obj 8 9 declare -stdlib extra/pdstring declare -stdlib extra/maxlib
 ;
-#X obj 25 402 print CLIENT_2;
-#X text 169 324 <- send FUDI message;
-#X obj 10 444 cnv 15 550 300 empty empty FUDI_server 20 12 0 14 -241408
+#X obj 24 415 print CLIENT_2;
+#X text 168 337 <- send FUDI message;
+#X obj 9 457 cnv 15 550 300 empty empty FUDI_server 20 12 0 14 -241408
 -66577 0;
-#X obj 12 600 tcpsocketserver FUDI 11001;
-#X obj 12 674 string2any 0 59;
-#X obj 12 695 route bang;
-#X obj 191 620 unpack 0 0 0 0;
-#X floatatom 191 640 3 0 0 0 - - -;
-#X floatatom 222 640 3 0 0 0 - - -;
-#X floatatom 254 641 3 0 0 0 - - -;
-#X floatatom 288 641 3 0 0 0 - - -;
-#X text 189 657 IP;
-#X floatatom 131 640 5 0 0 0 - - -;
-#X floatatom 71 641 5 0 0 0 - - -;
-#X text 60 656 clients;
-#X text 127 656 socket;
-#X text 132 675 <--;
-#X text 165 675 [tcpsocketserver FUDI] does _not_ remove the trailing
+#X obj 11 613 tcpsocketserver FUDI 11001;
+#X obj 11 687 string2any 0 59;
+#X obj 11 708 route bang;
+#X obj 190 633 unpack 0 0 0 0;
+#X floatatom 190 653 3 0 0 0 - - -;
+#X floatatom 221 653 3 0 0 0 - - -;
+#X floatatom 253 654 3 0 0 0 - - -;
+#X floatatom 287 654 3 0 0 0 - - -;
+#X text 188 670 IP;
+#X floatatom 130 653 5 0 0 0 - - -;
+#X floatatom 70 654 5 0 0 0 - - -;
+#X text 59 669 clients;
+#X text 126 669 socket;
+#X text 131 688 <--;
+#X text 164 688 [tcpsocketserver FUDI] does _not_ remove the trailing
 ' \; ';
-#X text 165 70 1) start a FUDI message;
-#X text 232 118 2) continue;
-#X text 118 152 3) finish FUDI message (with semicolon - newline);
-#X text 391 52 connect;
-#X text 390 296 connect;
-#X text 20 475 [tcpsocketserver FUDI] doesn't take care of building
+#X text 164 83 1) start a FUDI message;
+#X text 231 131 2) continue;
+#X text 117 165 3) finish FUDI message (with semicolon - newline);
+#X text 390 65 connect;
+#X text 389 309 connect;
+#X text 19 488 [tcpsocketserver FUDI] doesn't take care of building
 FUDI-compliant messages. this should be done by the user.;
-#X text 154 216 4) try sending a message from client_2 during composing
+#X text 153 229 4) try sending a message from client_2 during composing
 a message with client_1 and see \, how the server behaves.;
-#X text 279 522 <- this doesn't work;
-#X text 315 549 <- this should;
-#X msg 25 323 send four five six;
-#X msg 43 550 client 2 115 101 118 101 110 32 59 10;
-#X msg 42 521 client 2 115 101 118 101 110 32;
-#X obj 12 720 print SERVER;
+#X text 278 535 <- this doesn't work;
+#X text 314 562 <- this should;
+#X msg 24 336 send four five six;
+#X msg 42 563 client 2 115 101 118 101 110 32 59 10;
+#X msg 41 534 client 2 115 101 118 101 110 32;
+#X obj 11 733 print SERVER;
+#X obj 8 29 declare -stdpath extra/moocow declare -stdpath extra/maxlib
+;
 #X connect 1 0 16 0;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
@@ -162,7 +165,7 @@ a message with client_1 and see \, how the server behaves.;
 #X connect 48 0 23 0;
 #X connect 49 0 23 0;
 #X restore 23 25 pd FUDI;
-#N canvas 231 0 579 756 OSC 0;
+#N canvas 1101 44 579 756 OSC 0;
 #X obj 9 39 cnv 15 550 240 empty empty client_1 20 12 0 14 -249661
 -66577 0;
 #X obj 25 211 tcpclient;
@@ -177,8 +180,6 @@ a message with client_1 and see \, how the server behaves.;
 #X obj 369 319 sel 1 0;
 #X obj 369 298 tgl 15 0 empty empty empty 17 7 0 10 -261234 -1 -1 0
 1;
-#X obj 8 9 declare -stdlib extra/pdstring declare -stdlib extra/maxlib
-;
 #X obj 25 417 print CLIENT_2;
 #X obj 10 444 cnv 15 550 300 empty empty OSC_server 20 12 0 14 -241408
 -66577 0;
@@ -225,43 +226,45 @@ a message with client_1 and see \, how the server behaves.;
 suitable for tcp transport.;
 #X text 238 486 send to clients;
 #X text 93 695 <---;
+#X obj 8 9 declare -stdlib extra/pdstring declare -stdlib extra/maxlib
+;
 #X text 139 694 CAUTION: not [unpackOSCstream] is used here \, since
-[tcpsocket.OSC] already removes the 4-byte header.;
-#X connect 1 0 30 0;
+[tcpsocket.OSC] already unwraps the OSC message;
+#X connect 1 0 29 0;
 #X connect 2 0 1 0;
-#X connect 3 0 28 0;
+#X connect 3 0 27 0;
 #X connect 3 1 2 0;
 #X connect 4 0 3 0;
-#X connect 7 0 31 0;
-#X connect 8 0 29 0;
+#X connect 7 0 30 0;
+#X connect 8 0 28 0;
 #X connect 8 1 7 0;
 #X connect 9 0 8 0;
-#X connect 13 0 14 0;
-#X connect 13 1 15 0;
-#X connect 13 2 16 0;
-#X connect 13 3 17 0;
+#X connect 12 0 13 0;
+#X connect 12 1 14 0;
+#X connect 12 2 15 0;
+#X connect 12 3 16 0;
+#X connect 24 0 25 0;
+#X connect 24 1 19 0;
+#X connect 24 2 18 0;
+#X connect 24 3 12 0;
 #X connect 25 0 26 0;
-#X connect 25 1 20 0;
-#X connect 25 2 19 0;
-#X connect 25 3 13 0;
-#X connect 26 0 27 0;
-#X connect 28 0 1 0;
-#X connect 29 0 31 0;
-#X connect 30 0 5 0;
-#X connect 31 0 32 0;
-#X connect 32 0 11 0;
-#X connect 33 0 39 0;
+#X connect 27 0 1 0;
+#X connect 28 0 30 0;
+#X connect 29 0 5 0;
+#X connect 30 0 31 0;
+#X connect 31 0 10 0;
+#X connect 32 0 38 0;
+#X connect 33 0 1 0;
 #X connect 34 0 1 0;
-#X connect 35 0 1 0;
-#X connect 37 0 38 0;
-#X connect 38 0 31 0;
-#X connect 39 0 45 0;
-#X connect 40 0 25 0;
-#X connect 41 0 39 0;
-#X connect 42 0 43 0;
-#X connect 43 0 45 1;
-#X connect 45 0 46 0;
-#X connect 46 0 40 0;
+#X connect 36 0 37 0;
+#X connect 37 0 30 0;
+#X connect 38 0 44 0;
+#X connect 39 0 24 0;
+#X connect 40 0 38 0;
+#X connect 41 0 42 0;
+#X connect 42 0 44 1;
+#X connect 44 0 45 0;
+#X connect 45 0 39 0;
 #X restore 23 49 pd OSC;
 #X restore 21 365 pd EXAMPLES;
 #X obj 471 455 print FUDI;
