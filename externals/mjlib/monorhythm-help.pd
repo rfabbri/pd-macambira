@@ -30,7 +30,7 @@ a third outlet - the sync outlet. This does a bang at the start of
 every bar - which can be fed to the left most inlet of a second (or
 Nth) monorhythm.;
 #X text 29 367 for an example of a polyrhythm see:;
-#X obj 380 367 polyexample;
+#X obj 380 367 examples/polyexample;
 #X text 199 606 beat;
 #X text 277 603 accent;
 #X text 352 604 sync;
