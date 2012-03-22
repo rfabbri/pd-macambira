@@ -18,12 +18,12 @@
 #X msg 491 145 cat;
 #X msg 523 143 dog;
 #X obj 430 194 list prepend 0;
-#X obj 430 220 bytes2array array1;
+#X obj 430 220 rawbytes2array array1;
 #X msg 385 159 data;
 #X msg 555 143 data;
-#X obj 274 302 array2bytes array1;
+#X obj 274 302 array2rawbytes array1;
 #X msg 274 278 get 0 -1;
-#X obj 224 330 print array2bytes;
+#X obj 224 330 print array2rawbytes;
 #X obj 558 196 print any2bytes;
 #X obj 358 402 print bytes2any;
 #X msg 411 89 this_is_a_test!!;
