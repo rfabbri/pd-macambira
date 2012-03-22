@@ -100,8 +100,6 @@ static t_class *playlist_class;
 
 static char   *playlist_version = "playlist: 1 click file chooser : version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
 
-#define MAX_DIR_LENGTH MAXPDSTRING // maximum length for a directory name
-
 #define MIN(a,b) (a>b?b:a)
 
 typedef struct _playlist
@@ -124,7 +122,7 @@ typedef struct _playlist
     t_int x_lastseen;           /* last displayed entry                      */
     t_int x_cdy;                /* cumulated y drag                          */
     t_int x_sort;               /* sorting option flag                       */
-    char   *x_curdir;           /* current directory informations            */
+    char  x_curdir[MAXPDSTRING];/* current directory informations            */
     char   *x_font;             /* font used for entries                     */
     t_int  x_charheight;        /* height of characters                      */
     t_int  x_charwidth;         /* width of characters                       */
@@ -139,7 +137,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     t_int i;
-    char wrappedname[ MAX_DIR_LENGTH ];
+    char wrappedname[ MAXPDSTRING ];
     struct timespec tv;
 
     tv.tv_sec = 0;
@@ -224,7 +222,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
                 {
                     // nanosleep( &tv, NULL );
                     x->x_lastseen = x->x_nentries;
-                    strncpy( wrappedname, x->x_dentries[x->x_nentries],  MIN(x->x_width/x->x_charwidth, MAX_DIR_LENGTH) );
+                    strncpy( wrappedname, x->x_dentries[x->x_nentries],  MIN(x->x_width/x->x_charwidth, MAXPDSTRING) );
                     wrappedname[ x->x_width/x->x_charwidth ] = '\0';
                     sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
                                canvas,
@@ -621,7 +619,7 @@ static int playlist_click(t_gobj *z, struct _glist *glist,
                     }
                     else
                     {
-                        if ( strlen( x->x_curdir ) + strlen( x->x_dentries[x->x_itemselected] ) + 2 > MAX_DIR_LENGTH )
+                        if ( strlen( x->x_curdir ) + strlen( x->x_dentries[x->x_itemselected] ) + 2 > MAXPDSTRING )
                         {
                             pd_error(x, "playlist : maximum dir length reached : cannot change directory" );
                             return -1;
@@ -703,21 +701,21 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
 
     x = (t_playlist *)pd_new(playlist_class);
 
-    x->x_extension = ( char * ) getbytes( MAX_DIR_LENGTH );
+    x->x_extension = ( char * ) getbytes( MAXPDSTRING );
     sprintf( x->x_extension, "all" );
     x->x_width = 400;
     x->x_height = 300;
-    x->x_font = ( char * ) getbytes( MAX_DIR_LENGTH );
+    x->x_font = ( char * ) getbytes( MAXPDSTRING );
     sprintf( x->x_font, "{Helvetica 10 bold}" );
     x->x_charheight = 10;
     x->x_charwidth = (2*10)/3;
-    x->x_bgcolor = ( char * ) getbytes( MAX_DIR_LENGTH );
+    x->x_bgcolor = ( char * ) getbytes( MAXPDSTRING );
     sprintf( x->x_bgcolor, "#457782" );
-    x->x_sbcolor = ( char * ) getbytes( MAX_DIR_LENGTH );
+    x->x_sbcolor = ( char * ) getbytes( MAXPDSTRING );
     sprintf( x->x_sbcolor, "yellow" );
-    x->x_fgcolor = ( char * ) getbytes( MAX_DIR_LENGTH );
+    x->x_fgcolor = ( char * ) getbytes( MAXPDSTRING );
     sprintf( x->x_fgcolor, "black" );
-    x->x_secolor = ( char * ) getbytes( MAX_DIR_LENGTH );
+    x->x_secolor = ( char * ) getbytes( MAXPDSTRING );
     sprintf( x->x_secolor, "red" );
 
     if ( argc >= 1 )
@@ -844,10 +842,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
 
     // get current directory full path
     t_symbol *cwd = canvas_getdir(x->x_glist);
-    int cwdlen = strlen(cwd->s_name);
-    x->x_curdir = ( char * ) getbytes( cwdlen );
-    strncpy( x->x_curdir, cwd->s_name, cwdlen );
-    x->x_curdir[ cwdlen ] = '\0';
+    strncpy( x->x_curdir, cwd->s_name, MAXPDSTRING );
 
     x->x_selected = 0;
     x->x_itemselected = -1;
@@ -865,31 +860,27 @@ static void playlist_free(t_playlist *x)
     // post( "playlist : playlist_free" );
     if ( x->x_extension )
     {
-        freebytes( x->x_extension, MAX_DIR_LENGTH );
-    }
-    if ( x->x_curdir )
-    {
-        freebytes( x->x_curdir, MAX_DIR_LENGTH );
+        freebytes( x->x_extension, MAXPDSTRING );
     }
     if ( x->x_font )
     {
-        freebytes( x->x_font, MAX_DIR_LENGTH );
+        freebytes( x->x_font, MAXPDSTRING );
     }
     if ( x->x_bgcolor )
     {
-        freebytes( x->x_bgcolor, MAX_DIR_LENGTH );
+        freebytes( x->x_bgcolor, MAXPDSTRING );
     }
     if ( x->x_sbcolor )
     {
-        freebytes( x->x_sbcolor, MAX_DIR_LENGTH );
+        freebytes( x->x_sbcolor, MAXPDSTRING );
     }
     if ( x->x_fgcolor )
     {
-        freebytes( x->x_fgcolor, MAX_DIR_LENGTH );
+        freebytes( x->x_fgcolor, MAXPDSTRING );
     }
     if ( x->x_secolor )
     {
-        freebytes( x->x_secolor, MAX_DIR_LENGTH );
+        freebytes( x->x_secolor, MAXPDSTRING );
     }
 }
 
@@ -921,7 +912,7 @@ static void playlist_seek(t_playlist *x, t_floatarg fseeked)
 
 static void playlist_location(t_playlist *x, t_symbol *flocation)
 {
-    char olddir[ MAX_DIR_LENGTH ];           /* remember old location  */
+    char olddir[ MAXPDSTRING ];           /* remember old location  */
 
     strcpy( olddir, x->x_curdir );
 
@@ -940,17 +931,17 @@ static void playlist_location(t_playlist *x, t_symbol *flocation)
     else if ( !strncmp( flocation->s_name, "/", 1 ) )
     {
         // absolute path required
-        if ( strlen( flocation->s_name ) >= MAX_DIR_LENGTH )
+        if ( strlen( flocation->s_name ) >= MAXPDSTRING )
         {
             pd_error(x, "playlist : maximum dir length reached : cannot change directory" );
             return;
         }
-        strncpy( x->x_curdir, flocation->s_name, MAX_DIR_LENGTH );
+        strncpy( x->x_curdir, flocation->s_name, MAXPDSTRING );
     }
     else
     {
         // relative path
-        if ( strlen( x->x_curdir ) + strlen( flocation->s_name ) + 2 > MAX_DIR_LENGTH )
+        if ( strlen( x->x_curdir ) + strlen( flocation->s_name ) + 2 > MAXPDSTRING )
         {
             pd_error(x, "playlist : maximum dir length reached : cannot change directory" );
             return;
