@@ -41,7 +41,7 @@ UNITTESTS =
 ALL_CFLAGS = -I"$(PD_INCLUDE)"
 ALL_LDFLAGS =  
 SHARED_LDFLAGS =
-ALL_LIBS = -lspeex -lmp3lame
+ALL_LIBS = -lspeex -lmp3lame -lpthread
 
 
 #------------------------------------------------------------------------------#
