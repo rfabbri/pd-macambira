@@ -1,5 +1,5 @@
-#N canvas 138 75 425 489 10;
-#N canvas 591 210 368 330 testing 1;
+#N canvas 0 18 425 489 10;
+#N canvas 438 18 368 330 testing 1;
 #X obj 95 10 loadbang;
 #X msg 95 35 0;
 #X obj 12 37 random 127;
@@ -9,7 +9,7 @@
 #X connect 1 0 3 0;
 #X connect 2 0 3 0;
 #X connect 4 0 2 0;
-#X restore 315 439 pd testing;
+#X restore 315 409 pd testing;
 #X obj 20 438 s pd-testing;
 #X obj 248 211 pack f f;
 #X text 7 40 Start here;
@@ -31,6 +31,16 @@
 #X msg 40 389 motion 15 15 0 \, editmode 0 \, vis 0;
 #X msg 37 146 copy \, paste \, mouse 25 25 0 0;
 #X text 50 125 and then here to copy \, paste ... and move;
+#N canvas 458 158 494 396 META 0;
+#X text 12 5 GENRE tutorial;
+#X text 12 95 HELP_PATCH_AUTHORS Damien Henry. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 25 KEYWORDS control canvas_op nonlocal dynamic_patching
+;
+#X text 12 64 DESCRIPTION simulating mouse selections and cut \, copy
+\, and paste by sending messages to a canvas;
+#X text 12 42 LICENSE public domain;
+#X restore 373 458 pd META;
 #X connect 2 0 14 0;
 #X connect 4 0 6 0;
 #X connect 5 0 2 0;

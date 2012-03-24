@@ -1,4 +1,4 @@
-#N canvas 220 255 452 479 10;
+#N canvas -9 18 452 479 10;
 #X obj 105 408 osc~;
 #X obj 105 332 mtof;
 #X obj 105 459 dac~;

@@ -1,6 +1,6 @@
-#N canvas 421 111 543 545 10;
+#N canvas 0 18 543 545 10;
 #X msg 39 481 restore;
-#X text 15 48 objects;
+#X text 23 48 objects;
 #X msg 39 71 obj 300 10 r test;
 #X msg 39 93 msg 300 40 bang;
 #X msg 39 115 floatatom 300 70 symbol;
@@ -22,7 +22,7 @@
 #X text 24 259 1;
 #X text 54 284 2;
 #X text 54 320 3;
-#N canvas 34 396 417 187 connections 1;
+#N canvas 34 396 417 187 connections 0;
 #X obj 14 8 inlet;
 #X obj 14 107 outlet;
 #X text 61 29 Object and inlet numbers start at 0;
@@ -39,13 +39,23 @@
 #X floatatom 204 388 5 0 0 0 - - -;
 #X obj 254 439 print;
 #X floatatom 204 439 5 0 0 0 - - -;
-#X text 33 239 graph name xfrom yfrom xto yto xtopl ytopl xbtmr ybtmr
+#X text 43 238 graph name xfrom yfrom xto yto xtopl ytopl xbtmr ybtmr
 ;
 #X msg 39 259 graph my_graph 0 1 99 -1 300 280 500 420;
 #X text 72 301 array name size float style;
 #X msg 69 321 array my_array 100 float 2;
 #X text 17 24 that deal with objects:;
 #X text 16 7 Here's a list of all messages;
+#N canvas 218 113 494 396 META 0;
+#X text 12 5 GENRE tutorial;
+#X text 12 95 HELP_PATCH_AUTHORS Damien Henry. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 65 DESCRIPTION list of canvas messages that can be used
+to dynamically instantiate objects and connections.;
+#X text 12 25 KEYWORDS control canvas_op nonlocal dynamic_patching
+;
+#X text 12 45 LICENSE public domain;
+#X restore 481 514 pd META;
 #X connect 0 0 7 0;
 #X connect 2 0 7 0;
 #X connect 3 0 7 0;
