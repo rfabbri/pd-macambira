@@ -192,3 +192,8 @@ void forpp_setup(void)
   class_addmethod(forpp_class, (t_method)forpp_ft2, gensym("ft2"), A_FLOAT, 0);
   class_addmethod(forpp_class, (t_method)forpp_ft3, gensym("ft3"), A_FLOAT, 0);
 }
+
+void setup_for0x2b0x2b(void)
+{
+    forpp_setup();
+}
