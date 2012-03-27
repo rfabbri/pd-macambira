@@ -18,6 +18,7 @@ static t_float spec2_rsqrt_exptab[SPEC2DUMTAB1SIZE], spec2_rsqrt_mantissatab[SPE
 
 static void init_spec2_rsqrt(void)
 {
+#ifndef __x86_64__
   int i;
   
   for (i=0; i<SPEC2DUMTAB1SIZE; i++)
@@ -35,6 +36,7 @@ static void init_spec2_rsqrt(void)
     
     spec2_rsqrt_mantissatab[i] = 1.0f / sqrt(f);  
   }
+#endif
 }
 
 typedef struct _spec2_sqrt_tilde
@@ -51,6 +53,14 @@ static t_int *spec2_sqrt_tilde_perform(t_int *w)
   
   while(n--)
   { 
+#ifdef __x86_64__
+    t_sample f = *in++;
+    if (f<0.f) {
+      *out++=0.f;
+    } else {
+      *out++=sqrtf(f);
+    }
+#else
     t_float f = *in;
     long l = *(long *)(in++);
     
@@ -62,6 +72,7 @@ static t_int *spec2_sqrt_tilde_perform(t_int *w)
       
       *out++ = f*g*(1.5f - 0.5f*g*g*f);
     }
+#endif
   }
   return(w+4);
 }
