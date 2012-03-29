@@ -5,7 +5,7 @@ LIBRARY_NAME = ekext
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = bmt~.c cup.c cupd.c doubledelta.c framescore~.c framespect~.c hasc~.c hssc~.c ihisto.c listmoses.c list_sum.c lpc~.c lpreson~.c maskxor.c peakit~.c polymap.c polystat.c sieve.c simile~.c simile.c steady.c valve.c voicing_detector~.c weightonset.c zeroxpos~.c
+SOURCES = bmt~.c cup.c cupd.c doubledelta.c framescore~.c framespect~.c hasc~.c hssc~.c ihisto.c listmoses.c list_sum.c lpc~.c lpreson~.c maskxor.c mvcf~.c peakit~.c polymap.c polystat.c sieve.c simile~.c simile.c steady.c valve.c voicing_detector~.c weightonset.c zeroxpos~.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
