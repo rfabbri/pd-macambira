@@ -1,4 +1,4 @@
-#N canvas 648 414 404 386 10;
+#N canvas 189 78 404 386 10;
 #X obj 83 68 frameclock 100;
 #X text 33 16 Generate a 0-to-1-to-0 envelope based on frame numbers
 \, outputting once per frame.;

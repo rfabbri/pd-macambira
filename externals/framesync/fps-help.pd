@@ -1,4 +1,4 @@
-#N canvas 535 476 450 300 10;
+#N canvas 262 51 450 300 10;
 #X text 38 24 Set the global Frames-Per-Second (FPS) for the global
 clock when using the 'framesync' library. You should only use this
 object once in a project. [frameclock] uses this object to set the

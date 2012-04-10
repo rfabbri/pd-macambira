@@ -1,4 +1,4 @@
-#N canvas 249 258 487 404 10;
+#N canvas 104 124 487 404 10;
 #X floatatom 52 321 5 0 0 0 - - -;
 #X text 51 22 a GUI to generate and control the frame clock \, with
 a default frames-per-second (FPS) of 30 frames/second.;

@@ -1,4 +1,4 @@
-#N canvas 684 302 373 298 10;
+#N canvas 116 136 373 298 10;
 #X obj 95 187 clockrunning;
 #X obj 95 87 frameclock;
 #X obj 95 209 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0

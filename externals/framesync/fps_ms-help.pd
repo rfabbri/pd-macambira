@@ -1,4 +1,4 @@
-#N canvas 591 561 450 300 10;
+#N canvas 183 103 450 300 10;
 #X obj 100 132 fps_ms;
 #X text 30 34 get the Frames-Per-Second (FPS) in milliseconds (ms)
 to use with [metro] \, [delay] \, etc.;

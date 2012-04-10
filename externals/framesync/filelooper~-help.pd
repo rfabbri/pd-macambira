@@ -1,4 +1,4 @@
-#N canvas 730 299 556 452 10;
+#N canvas 110 130 556 452 10;
 #X text 23 15 loops a sound file between a startframe and endframe
 ;
 #X text 163 188 start;

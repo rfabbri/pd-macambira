@@ -1,4 +1,4 @@
-#N canvas 198 116 438 400 10;
+#N canvas 285 106 438 400 10;
 #X text 272 227 frame;
 #X text 71 265 audio out;
 #X text 25 20 Plays a sound file til it ends \, synced up to the frame

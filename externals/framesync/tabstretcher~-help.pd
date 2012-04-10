@@ -1,4 +1,4 @@
-#N canvas 228 173 595 379 10;
+#N canvas 232 120 595 379 10;
 #X text 165 227 frame;
 #X text 71 265 audio out;
 #X text 96 216 array;
