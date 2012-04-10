@@ -12,7 +12,7 @@
 #X text 311 214 args: filename startframe# endframe#;
 #X text 26 146 This will loop the voice.wav sound file starting at
 frame 50 and ending at frame 200:;
-#X obj 54 216 filelooper~ examples/sdf.wav 15 111;
+#X obj 54 216 filelooper~ examples/sdf.wav 45 291;
 #X text 29 341 FYI: if the time between start frame and end frame is
 shorter than the sample file \, then you'll get an error message in
 the Pd window:;

@@ -10,8 +10,8 @@
 #X text 31 187 This will loop the voice.wav sound file starting at
 frame 50 and ending at frame 200:;
 #N canvas 0 22 450 300 (subpatch) 0;
-#X array \$0-array 232798 float 2;
-#X coords 0 1 232798 -1 100 70 1;
+#X array \$0-array 126079 float 2;
+#X coords 0 1 126079 -1 100 70 1;
 #X restore 420 19 graph;
 #X obj 402 121 symbol \$0-array;
 #X obj 402 165 soundfiler;
@@ -35,7 +35,7 @@ will generate a line with 0 at the start and 1 at the end;
 #X msg 123 42 53;
 #X msg 402 142 read examples/sdf.wav \$1;
 #X msg 152 42 111;
-#X obj 62 256 tablooper~ \$0-array 20 126;
+#X obj 62 256 tablooper~ \$0-array 40 186;
 #X text 180 41 <-- try jumping to a frame;
 #X connect 10 0 28 0;
 #X connect 12 0 10 0;
