@@ -10,8 +10,8 @@
 #X text 31 187 This will loop the voice.wav sound file starting at
 frame 50 and ending at frame 200:;
 #N canvas 0 22 450 300 (subpatch) 0;
-#X array \$0-array 62079 float 2;
-#X coords 0 1 62079 -1 100 70 1;
+#X array \$0-array 232798 float 2;
+#X coords 0 1 232798 -1 100 70 1;
 #X restore 420 19 graph;
 #X obj 402 121 symbol \$0-array;
 #X obj 402 165 soundfiler;
