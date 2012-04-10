@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+    patch="$1"
+    newx=`expr $RANDOM % 200 + 100`
+    newy=`expr $RANDOM % 100 + 50`
+elif [ $# -eq 3 ]; then
+    patch="$1"
+    newx=$2
+    newy=$3
+else
+    echo "Move a patch to a given (x,y) location on the screen"
+    echo "Usage: $0 patch [x] [y]"
+    exit
+fi
+
+firstline=`head -1 "$patch"`
+x=`echo $firstline | sed 's|^#N canvas \([0-9][0-9]*\) [0-9 ;-]*$|\1|'`
+y=`echo $firstline | sed 's|^#N canvas [0-9][0-9]* \([0-9][0-9]*\) [0-9 ;-]*$|\1|'`
+
+replaceline=`echo $firstline | sed "s|canvas $x $y|canvas $newx $newy|"`
+echo replace first line with: $replaceline
+sed -i "s|$firstline|$replaceline|" $patch
