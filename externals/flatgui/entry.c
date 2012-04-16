@@ -263,7 +263,7 @@ static void create_widget(t_entry *x)
     /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
     sys_vgui("destroy %s\n", x->frame_id);
     sys_vgui("frame %s \n", x->frame_id);
-    sys_vgui("text %s -font {%s %d %s} -border 1 \
+    sys_vgui("text %s -font {{%s} %d %s} -border 1 \
     -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\"  \
     -yscrollcommand {%s set} \n",
              x->text_id, 
@@ -639,7 +639,7 @@ static void entry_fontsize(t_entry *x, t_float font_size)
     if(font_size > 8) 
     {
         x->x_font_size = (t_int)font_size;
-        sys_vgui("%s configure -font {%s %d %s} \n", 
+        sys_vgui("%s configure -font {{%s} %d %s} \n", 
                  x->text_id,
                  x->x_font_face->s_name, x->x_font_size, 
                  x->x_font_weight->s_name);

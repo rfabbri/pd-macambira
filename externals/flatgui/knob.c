@@ -133,7 +133,7 @@ static void knob_draw_new(t_knob *x, t_glist *glist)
 	     x);   
     
     sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
-	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
+	     -font {{%s} %d bold} -fill #%6.6x -tags %xLABEL\n",
 	     canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
 	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
 	     x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_lcol, x);
@@ -220,7 +220,7 @@ static void knob_draw_config(t_knob* x,t_glist* glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
 
-    sys_vgui(".x%lx.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
+    sys_vgui(".x%lx.c itemconfigure %xLABEL -font {{%s} %d bold} -fill #%6.6x -text {%s} \n",
 	     canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
 	     x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_lcol,
 	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
@@ -279,19 +279,19 @@ static void knob_draw_select(t_knob *x, t_glist *glist)
 void knob_draw(t_knob *x, t_glist *glist, int mode)
 {
     if(mode == IEM_GUI_DRAW_MODE_UPDATE)
-	knob_draw_update(x, glist);
+        knob_draw_update(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_MOVE)
-	knob_draw_move(x, glist);
+        knob_draw_move(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_NEW)
-	knob_draw_new(x, glist);
+        knob_draw_new(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_SELECT)
-	knob_draw_select(x, glist);
+        knob_draw_select(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_ERASE)
-	knob_draw_erase(x, glist);
+        knob_draw_erase(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_CONFIG)
-	knob_draw_config(x, glist);
+        knob_draw_config(x, glist);
     else if(mode >= IEM_GUI_DRAW_MODE_IO)
-	knob_draw_io(x, glist, mode - IEM_GUI_DRAW_MODE_IO);
+        knob_draw_io(x, glist, mode - IEM_GUI_DRAW_MODE_IO);
 }
 
 /* ------------------------ knob widgetbehaviour----------------------------- */

@@ -147,7 +147,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
     sys_vgui(".x%lx.c delete %xTITLE\n", canvas, x);
     if ( x->x_graphics )
     {
-        sys_vgui(".x%lx.c create text %d %d -width %d -text \"%s\" -anchor w -font %s -tags %xTITLE\n",
+        sys_vgui(".x%lx.c create text %d %d -width %d -text \"%s\" -anchor w -font {%s} -tags %xTITLE\n",
                   canvas,
                   text_xpix(&x->x_obj, glist)+5,
                   text_ypix(&x->x_obj, glist)-10,
@@ -224,7 +224,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
                     x->x_lastseen = x->x_nentries;
                     strncpy( wrappedname, x->x_dentries[x->x_nentries],  MIN(x->x_width/x->x_charwidth, MAXPDSTRING) );
                     wrappedname[ x->x_width/x->x_charwidth ] = '\0';
-                    sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
+                    sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font {%s} -tags %xENTRY%d\n",
                                canvas,
                                text_xpix(&x->x_obj, glist)+5,
                                text_ypix(&x->x_obj, glist)+5+(x->x_nentries-x->x_firstseen)*x->x_charheight,
@@ -485,7 +485,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                             x->x_lastseen = i;
                             strncpy( wrappedname, x->x_dentries[i],  x->x_width/x->x_charwidth );
                             wrappedname[ x->x_width/x->x_charwidth ] = '\0';
-                            sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xENTRY%d\n",
+                            sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font {%s} -tags %xENTRY%d\n",
                                        canvas,
                                        text_xpix(&x->x_obj, x->x_glist)+5,
                                        text_ypix(&x->x_obj, x->x_glist)+5+(i-x->x_firstseen)*x->x_charheight,
@@ -527,7 +527,7 @@ static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
                             strncpy( wrappedname, x->x_dentries[i],  x->x_width/x->x_charwidth );
                             wrappedname[ x->x_width/x->x_charwidth ] = '\0';
                             sys_vgui(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\"  \
-                          -anchor w -font %s -tags %xENTRY%d\n",
+                          -anchor w -font {%s} -tags %xENTRY%d\n",
                                        canvas,
                                        text_xpix(&x->x_obj, x->x_glist)+5,
                                        text_ypix(&x->x_obj, x->x_glist)+5+(i-x->x_firstseen)*x->x_charheight,

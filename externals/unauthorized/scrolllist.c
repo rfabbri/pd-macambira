@@ -157,7 +157,7 @@ static void scrolllist_update(t_scrolllist *x, t_glist *glist)
         // display the entry if displayable
         if ( ( (i-x->x_firstseen)*x->x_charheight < x->x_height ) && ( x->x_items[i] != NULL ) )
         {
-            SYS_VGUI11(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font %s -tags %xITEM%d\n",
+            SYS_VGUI11(".x%lx.c create text %d %d -fill %s -activefill %s -width %d -text \"%s\" -anchor w -font {%s} -tags %xITEM%d\n",
                        canvas,
                        text_xpix(&x->x_obj, glist)+5,
                        text_ypix(&x->x_obj, glist)+5+(i-x->x_firstseen)*x->x_charheight,
