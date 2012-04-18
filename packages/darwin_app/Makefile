@@ -169,6 +169,9 @@ darwin_app_core: darwin_app_wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/bin"
 	cd "$(PD_APP_CONTENTS)/Resources" && \
 		ln -s -f tcl Scripts
+# include src/ as alias to include/ since Miller's Pd.app has headers there
+	cd "$(PD_APP_CONTENTS)/Resources" && \
+		ln -s -f include src
 	cd "$(PD_APP_CONTENTS)/Resources/bin" && \
 		test -e pdextended || ln -s pd pdextended
 # support for Info Panel Plugins mgmt
