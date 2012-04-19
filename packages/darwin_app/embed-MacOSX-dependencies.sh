@@ -72,7 +72,7 @@ for dylib in $PD_APP_LIB/*.dylib; do
 			fi
 			# @executable_path starts from Contents/Resources/bin/pd
 			install_name_tool -id @executable_path/../../$LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
-			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$new_lib $dylib
+			install_name_tool -change /sw/lib/$lib @loader_path/$new_lib $dylib
 		done
 		echo " "
 	fi
@@ -93,7 +93,7 @@ for dylib in $PD_APP_LIB/*.dylib; do
 			fi
 			# @executable_path starts from Contents/Resources/bin/pd
 			install_name_tool -id @executable_path/../../$LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
-			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$new_lib $dylib
+			install_name_tool -change /sw/lib/$lib @loader_path/$new_lib $dylib
 		done
 		echo " "
 	fi
