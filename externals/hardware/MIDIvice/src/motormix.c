@@ -1,5 +1,8 @@
-
-/* 2801:forum::f¸r::uml‰ute:2002 */
+/* (c) copyleft 2002-2008 IOhannes m zm√É¬∂lnig
+ * forum::f~r::uml~ute
+ * Institute of Electronic Music and Acoustics (IEM)
+ * University of Music and Dramatic Arts Graz (KUG)
+ */
 
 /*
   motormix by CM-labs
@@ -89,7 +92,7 @@ static void LCDtext_clear(t_LCDtext *x, t_float fmode)
   int offset = (mode==2)?0x28:0x00;
   int n = (mode>0)?0x28:0x50;
 
-  post("offset=%d\tn=%d", offset, n);
+  //  post("offset=%d\tn=%d", offset, n);
 
   LCD_header(LCD_TEXT);
   outmidi_byte(offset);
@@ -809,7 +812,7 @@ static void motormix_help(t_motormix *x)
        "\n\tmotormix_LCDtext"
        "\n\tmotormix_LCDgraph"
        "\n\tmotormix_7seg");
-  post("(l) forum::f¸r::uml‰ute @ IEM, Graz; 2002");
+  post("(l) forum::f√É≈ír::uml√É‚Ç¨ute @ IEM/KUG, Graz; 2002");
 }
 static void motormix_reset(t_motormix *x)
 { /* this LOOKs like a reset; i don't know what it really is... */

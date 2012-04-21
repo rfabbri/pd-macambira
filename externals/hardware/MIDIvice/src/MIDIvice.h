@@ -2,8 +2,14 @@
 /* the MIDIvice external                          */
 /* externals for controlling MIDI-devices         */
 /* ********************************************** */
-/*                            forum::f¸r::uml‰ute */
+/*                            forum::f√ºr::uml√§ute */
 /* ********************************************** */
+
+/* (c) copyleft 2002-2008 IOhannes m zm√∂lnig
+ * forum::f~r::uml~ute
+ * Institute of Electronic Music and Acoustics (IEM)
+ * University of Music and Dramatic Arts Graz (KUG)
+ */
 
 /* the MIDIvice external is a runtime-library for miller s. puckette's realtime-computermusic-software "pure data"
  * therefore you NEED "pure data" to make any use of the MIDIvice external
@@ -11,7 +17,7 @@
  * download "pure data" at
 
  http://iem.kug.ac.at/pd
- ftp://iem.kug.ac.at/pd
+ ftp://ftp.iem.at/pub/pd
 
  *
  * if you are looking for the latest release of the MIDIvice-external you should have another look at

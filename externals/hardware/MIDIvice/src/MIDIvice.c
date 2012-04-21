@@ -1,3 +1,13 @@
+/* (c) copyleft 2002-2008 IOhannes m zm√∂lnig
+ * forum::f~r::uml~ute
+ * Institute of Electronic Music and Acoustics (IEM)
+ * University of Music and Dramatic Arts Graz (KUG)
+ */
+
+/* 
+ * MIDIvice - accessing complex MIDI devices
+ */
+
 #include "MIDIvice.h"
 void motormix_setup();
 
@@ -29,7 +39,7 @@ void MIDIvice_setup(void)
 
   /* ************************************** */
   post("\n\tMIDIvice "VERSION);
-  post("\tcopyleft forum::f¸r::uml‰ute @ IEM/KUG 2002-2008");
+  post("\tcopyleft forum::f√ºr::uml√§ute @ IEM/KUG 2002-2008");
  
   MIDIvice_class = class_new(gensym("MIDIvice"), MIDIvice_new, 0, sizeof(t_MIDIvice), 0, 0);
   class_addmethod(MIDIvice_class, MIDIvice_help, gensym("help"), 0);
