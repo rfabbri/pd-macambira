@@ -1,5 +1,5 @@
-/* (c) copyleft 2002-2008 IOhannes m zmÃ¶lnig
- * forum::f~r::uml~ute
+/* (c) copyleft 2002-2008 IOhannes m zmölnig
+ * forum::für::umläute
  * Institute of Electronic Music and Acoustics (IEM)
  * University of Music and Dramatic Arts Graz (KUG)
  */
@@ -812,7 +812,7 @@ static void motormix_help(t_motormix *x)
        "\n\tmotormix_LCDtext"
        "\n\tmotormix_LCDgraph"
        "\n\tmotormix_7seg");
-  post("(l) forum::fÃŒr::umlÃ€ute @ IEM/KUG, Graz; 2002");
+  post("(l) forum::für::umläute @ IEM/KUG, Graz; 2002");
 }
 static void motormix_reset(t_motormix *x)
 { /* this LOOKs like a reset; i don't know what it really is... */

@@ -6,7 +6,7 @@
 /* ********************************************** */
 
 /* (c) copyleft 2002-2008 IOhannes m zmölnig
- * forum::f~r::uml~ute
+ * forum::für::umläute
  * Institute of Electronic Music and Acoustics (IEM)
  * University of Music and Dramatic Arts Graz (KUG)
  */
