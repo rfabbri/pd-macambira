@@ -35,6 +35,7 @@ SRC = 	add2_comma.c \
 	iem_samplerate~.c \
 	iem_sel_any.c \
 	iem_send.c \
+	iem_symtoalist.c \
 	init.c \
 	LFO_noise~.c \
 	list2send.c \
