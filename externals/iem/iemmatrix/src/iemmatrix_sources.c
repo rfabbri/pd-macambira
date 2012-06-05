@@ -36,6 +36,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_dispersive_dline_setup(); /* mtx_dispersive_dline.c */
 	iemtx_distance2_setup(); /* mtx_distance2.c */
 	iemtx_egg_setup(); /* mtx_egg.c */
+	iemtx_ei__setup(); /* mtx_ei~.c */
 	iemtx_eig_setup(); /* mtx_eig.c */
 	iemtx_element_setup(); /* mtx_element.c */
 	iemtx_eq_setup(); /* mtx_eq.c */

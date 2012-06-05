@@ -15,13 +15,13 @@
 #include "iemmatrix.h"
 #include <stdlib.h>
 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
 #include <fftw3.h>
 #endif
 
 static t_class *mtx_rfft_class;
 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
 enum ComplexPart { REALPART=0,  IMAGPART=1};
 #endif
 
@@ -31,7 +31,7 @@ struct _MTXRfft_
   t_object x_obj;
   int size;
   int size2;
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   int fftn;
   int rows;
   fftw_plan *fftplan;
@@ -51,7 +51,7 @@ struct _MTXRfft_
 
 static void deleteMTXRfft (MTXRfft *x) 
 {
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   int n;
   if (x->fftplan) {
      for (n=0; n<x->rows; n++) 
@@ -80,7 +80,7 @@ static void *newMTXRfft (t_symbol *s, int argc, t_atom *argv)
   x->list_re_out = outlet_new (&x->x_obj, gensym("matrix"));
   x->list_im_out = outlet_new (&x->x_obj, gensym("matrix"));
   x->size=x->size2=0;
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   x->fftn=0;
   x->rows=0;
   x->f_in=0;
@@ -136,7 +136,7 @@ static void readFloatFromList (int n, t_atom *l, t_float *f)
     *f++ = atom_getfloat (l++);
 }
 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
 static void writeFFTWComplexPartIntoList (int n, t_atom *l, fftw_complex *c, enum ComplexPart p) 
 {
    t_float f;
@@ -164,7 +164,7 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
   int fft_count;
   t_atom *list_re = x->list_re;
   t_atom *list_im = x->list_im;
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   fftw_complex *f_out = x->f_out;
   double *f_in = x->f_in;
 #else
@@ -184,7 +184,7 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
     /* ok, do the FFT! */
 
     /* memory things */
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
     if ((x->rows!=rows)||(columns!=x->fftn)){
        f_out=(fftw_complex*)realloc(f_out, sizeof(fftw_complex)*(size2-2));
        f_in=(double*)realloc(f_in, sizeof(double)*size);
@@ -217,7 +217,7 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
     x->list_re = list_re;
 
     /* main part */
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
     readDoubleFromList (size, argv, f_in);
 #else
     readFloatFromList (size, argv, f_re);
@@ -226,7 +226,7 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
     list_re += 2;
     list_im += 2;
     for (fft_count=0;fft_count<rows;fft_count++){ 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
       fftw_execute(x->fftplan[fft_count]);
       writeFFTWComplexPartIntoList(columns_re,list_re,f_out,REALPART);
       writeFFTWComplexPartIntoList(columns_re,list_im,f_out,IMAGPART);

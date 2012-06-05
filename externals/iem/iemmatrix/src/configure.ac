@@ -59,7 +59,11 @@ AC_CHECK_LIB(m, main)
 dnl Replace `main' with a function in -lpthread:
 dnl AC_CHECK_LIB(pthread, main)
 dnl Replace `main' with a function in -lfftw3:
-AC_CHECK_LIB(fftw3, fftw_destroy_plan)
+AC_CHECK_LIB([fftw3],
+	     [fftw_execute],
+	     [AC_CHECK_HEADER([fftw3.h],
+	        [AC_DEFINE(USE_FFTW,1,[can we use fftw?])],
+		)])
 
 dnl for soundfile reading (and writing, if we do that...)
 AC_CHECK_LIB(sndfile, sf_close)
@@ -68,7 +72,7 @@ dnl for gnu scientific library -lgsl:
 dnl AC_CHECK_LIB([m], [cos])
 AC_CHECK_LIB([gslcblas], [cblas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
-AC_CHECK_LIB([gsl], [gsl_eigen_nonsymm],AC_DEFINE(HAVE_GSL_EIGEN_NONSYMM,1,[can gsl compute complex eigenvalues?]))
+AC_CHECK_LIB([gsl], [gsl_eigen_nonsymm],[AC_DEFINE(HAVE_GSL_EIGEN_NONSYMM,1,[can gsl compute complex eigenvalues?])])
 AC_CHECK_LIB([gsl], [gsl_sf_bessel_Jn],AC_DEFINE(HAVE_GSL_BESSEL,1,[can gsl compute Bessel functions?]))
 
 dnl for math.h Bessel/Neumann functions

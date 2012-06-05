@@ -15,13 +15,13 @@
 #include "iemmatrix.h"
 #include <stdlib.h>
 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
 #include <fftw3.h>
 #endif
 
 static t_class *mtx_rifft_class;
 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
 enum ComplexPart { REALPART=0,  IMAGPART=1};
 #endif
 
@@ -34,7 +34,7 @@ typedef struct _MTXRifft_
   int size;
   int size2;
   t_float renorm_fac;
-#ifdef HAVE_FFTW3_H  
+#ifdef USE_FFTW  
   fftw_plan *fftplan;
   fftw_complex *f_in;
   double *f_out;
@@ -90,7 +90,7 @@ static void ifftPrepareReal (int n, t_float *re, t_float *im)
     *++re = -*--im;
 }
 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
 static void readFFTWComplexPartFromList (int n, t_atom *l, fftw_complex *f, enum ComplexPart p) 
 {
   for (;n--;) 
@@ -133,7 +133,7 @@ static void mTXRifftMatrixCold (MTXRifft *x, t_symbol *s,
   int size = rows * columns;
   int ifft_count;
   t_atom *list_re = x->list_re;
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   fftw_complex *f_in = x->f_in;
   double *f_out = x->f_out;
 #else
@@ -153,7 +153,7 @@ static void mTXRifftMatrixCold (MTXRifft *x, t_symbol *s,
   else if (columns == (1 << ilog2(columns))) {
 
     /* memory things */
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
     if ((x->rows!=rows)||(columns!=x->columns)){
       for (ifft_count=0;ifft_count<x->rows;ifft_count++) {
         fftw_destroy_plan(x->fftplan[ifft_count]);
@@ -192,7 +192,7 @@ static void mTXRifftMatrixCold (MTXRifft *x, t_symbol *s,
     ifft_count = rows;
     x->renorm_fac = 1.0f / columns;
     for (ifft_count=0;ifft_count<rows;ifft_count++) {
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
       readFFTWComplexPartFromList(columns_re, argv, f_in, IMAGPART);
       f_in += columns_re;
 #else
@@ -217,7 +217,7 @@ static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s,
   int in_size = argc-2;
   int size2 = x->size2;
   int ifft_count;
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   fftw_complex *f_in = x->f_in;
 #else
   t_float *f_re = x->f_re;
@@ -235,7 +235,7 @@ static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s,
     post("mtx_rifft: invalid right side matrix");
   else { /* main part */
     for (ifft_count=0;ifft_count<rows;ifft_count++){ 
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
       readFFTWComplexPartFromList(columns_re,argv,f_in,REALPART);
       fftw_execute(x->fftplan[ifft_count]);
       f_in+=columns_re;
@@ -248,14 +248,14 @@ static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s,
 #endif
       argv += columns_re;
     }
-#ifndef HAVE_FFTW3_H
+#ifndef USE_FFTW
     f_re = x->f_re;
 #endif
     size2 = x->size2;
 
     SETFLOAT(x->list_re, rows);
     SETFLOAT(x->list_re+1, x->columns);
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
     multiplyDoubleVector (size, x->f_out, renorm_fac);
     writeDoubleIntoList (size, x->list_re+2, x->f_out);
 #else
@@ -276,7 +276,7 @@ static void mTXRifftBang (MTXRifft *x)
 
 static void deleteMTXRifft (MTXRifft *x) 
 {
-#ifdef HAVE_FFTW3_H
+#ifdef USE_FFTW
   int n;
   if (x->fftplan) {
     for (n=0; n<x->rows; n++) 
