@@ -31,7 +31,7 @@ EXTRA_DIST =
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g 
 LDFLAGS =  
 LIBS = 
 
@@ -114,8 +114,8 @@ ifeq ($(UNAME),Linux)
   EXTENSION = pd_linux
   OS = linux
   PD_PATH = /usr
-  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer -ffast-math -fno-trapping-math
+  CFLAGS += -fPIC 
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
